@@ -1,0 +1,109 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: #0a0a0a;
+    color: #ffffff;
+    line-height: 1.6;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 5%;
+    background: rgba(10, 10, 10, 0.95);
+    position: fixed;
+    width: 100%;
+    z-index: 100;
+}
+
+.logo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #a855f7;
+    text-shadow: 0 0 20px #a855f7;
+}
+
+.hero {
+    height: 100vh;
+    background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), url('https://picsum.photos/id/1015/1920/1080') center/cover no-repeat;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.hero h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 7rem;
+    color: #a855f7;
+    text-shadow: 0 0 40px #a855f7;
+    margin-bottom: 1rem;
+}
+
+.slogan {
+    font-size: 2rem;
+    margin-bottom: 2.5rem;
+    color: #67e8f9;
+}
+
+.btn {
+    background: #a855f7;
+    color: white;
+    padding: 16px 40px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn:hover {
+    background: #c084fc;
+    transform: scale(1.1);
+    box-shadow: 0 0 30px #a855f7;
+}
+
+section {
+    padding: 120px 5% 100px;
+    text-align: center;
+}
+
+h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 3rem;
+    color: #a855f7;
+    margin-bottom: 40px;
+}
+
+.roster-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.player-card {
+    background: #1a1a1a;
+    padding: 30px;
+    border-radius: 20px;
+    border: 3px solid #a855f7;
+}
+
+#nous-rejoindre .btn {
+    margin-top: 40px;
+    display: inline-block;
+}
+
+footer {
+    padding: 40px;
+    background: #111;
+    margin-top: 50px;
+    text-align: center;
+}

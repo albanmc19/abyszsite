@@ -28,6 +28,11 @@
             color: #ffffff;
             transform: translateY(-2px);
         }
+        /* Sécurité au cas où le CSS bloquerait le clic */
+        .btn-small {
+            pointer-events: auto !important;
+            cursor: pointer !important;
+        }
     </style>
 </head>
 <body>
@@ -71,7 +76,11 @@
                     <div class="product-name">Maillot Officiel ABYSZ 2026</div>
                     <div class="product-price">59,99 €</div>
                     
-                    <a href="https://breakday.shop/products/maillot-abysz-e-sport?_pos=1&_sid=142723244&_ss=r" target="_blank" class="btn-small" style="text-decoration: none; display: inline-block;">
+                    <a href="https://breakday.shop/products/maillot-abysz-e-sport?_pos=1&_sid=142723244&_ss=r" 
+                       target="_blank" 
+                       onclick="window.open(this.href, '_blank'); return false;"
+                       class="btn-small" 
+                       style="text-decoration: none; display: inline-block;">
                         Voir & Acheter
                     </a>
                 </div>

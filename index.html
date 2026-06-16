@@ -62,8 +62,25 @@
         <h2>Actualités</h2>
         <p class="subtitle">Dernières news de l'équipe</p>
  
-        <div id="annonces-list" style="max-width:700px; margin:0 auto; padding: 10px;">
-            <p style="color:#aaa; text-align: center; font-family:'Orbitron',sans-serif;">Connexion à la base de données ABYSZ...</p>
+        <div id="admin-toggle" style="margin-bottom: 30px;">
+            <button class="btn-small" id="btn-admin-login">🔒 Admin</button>
+        </div>
+ 
+        <div id="admin-panel" style="display:none; background:#1a1a1a; border:2px solid #a855f7; border-radius:20px; padding:30px; max-width:600px; margin:0 auto 40px;">
+            <h3 style="font-family:'Orbitron',sans-serif; color:#a855f7; margin-bottom:20px;">Poster une annonce globale</h3>
+            
+            <div style="margin-bottom:15px;">
+                <input type="text" id="annonce-titre" placeholder="Titre de l'annonce" style="width:100%; padding:12px; border-radius:10px; background:#111; border:1px solid #333; color:#fff; font-size:0.9rem;">
+            </div>
+            <div style="margin-bottom:20px;">
+                <textarea id="annonce-texte" placeholder="Contenu de l'annonce..." rows="4" style="width:100%; padding:12px; border-radius:10px; background:#111; border:1px solid #333; color:#fff; font-size:0.9rem; resize:vertical;"></textarea>
+            </div>
+            <button class="btn-small" id="btn-publier">📢 Envoyer et Publier partout</button>
+            <p id="admin-status" style="margin-top:15px; color:#00ff9d; font-size:0.9rem;"></p>
+        </div>
+ 
+        <div id="annonces-list" style="max-width:700px; margin:0 auto;">
+            <p style="color:#aaa;">Connexion à la base de données ABYSZ...</p>
         </div>
     </section>
  
@@ -79,7 +96,7 @@
  
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-      import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+      import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
       // Configuration Firebase reliée à ton compte
       const firebaseConfig = {
@@ -96,48 +113,175 @@
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
 
-      // Fonction automatique pour charger et afficher tes annonces Firestore
+      // Met ton URL de Webhook Discord entre les guillemets ci-dessous :
+      const DISCORD_WEBHOOK_URL = ""; 
+
+      let adminUnlocked = false;
+
+      // FONCTION POUR CHARGER LES ANNONCES DEPUIS FIREBASE
       async function afficherAnnonces() {
           const liste = document.getElementById("annonces-list");
-
           try {
-              // Récupération en temps réel des documents dans la collection "actualites"
-              const querySnapshot = await getDocs(collection(db, "actualites"));
+              // On récupère les annonces triées par date (les plus récentes en premier)
+              const q = query(collection(db, "actualites"), orderBy("timestamp", "desc"));
+              const querySnapshot = await getDocs(q);
               
               if (querySnapshot.empty) {
                   liste.innerHTML = "<p style='color:#aaa; text-align:center;'>Aucune annonce pour le moment.</p>";
                   return;
               }
 
-              liste.innerHTML = ""; // Efface le message de connexion
+              liste.innerHTML = ""; 
 
-              querySnapshot.forEach((doc) => {
-                  const annonce = doc.data();
+              querySnapshot.forEach((documentUnique) => {
+                  const annonce = documentUnique.data();
+                  const docId = documentUnique.id; // Clé unique Firebase pour supprimer
 
-                  // Création de la carte d'annonce au design d'origine
                   const card = document.createElement("div");
-                  card.style.cssText = "background:#1a1a1a;border:2px solid #a855f7;border-radius:20px;padding:25px;margin-bottom:20px;text-align:left;";
+                  card.style.cssText = "background:#1a1a1a;border:2px solid #a855f7;border-radius:20px;padding:25px;margin-bottom:20px;text-align:left;position:relative;";
 
                   card.innerHTML = `
                       <div style="font-family:'Orbitron',sans-serif;color:#a855f7;font-size:1.1rem;font-weight:700;">
-                          📢 ${annonce.titre || 'Sans titre'}
+                          📢 ${annonce.titre}
                       </div>
-                      <div style="font-size:0.8rem;color:#67e8f9;margin:10px 0;font-family:'Inter',sans-serif;">
-                          ${annonce.date || ''}
+                      <div style="font-size:0.8rem;color:#67e8f9;margin:10px 0;">
+                          ${annonce.date}
                       </div>
-                      <p style="color:#ccc;line-height:1.7;white-space: pre-wrap;margin:0;font-family:'Inter',sans-serif;">
-                          ${annonce.description || ''}
+                      <p style="color:#ccc;line-height:1.7;white-space: pre-wrap;margin:0;">
+                          ${annonce.description}
                       </p>
+                      ${adminUnlocked ? `
+                      <button class="btn-supprimer" data-id="${docId}"
+                        style="margin-top:15px;padding:8px 12px;border:none;border-radius:10px;background:#ff4444;color:white;cursor:pointer;font-weight:600;font-size:0.8rem;">
+                        🗑 Supprimer l'annonce
+                      </button>` : ""}
                   `;
                   liste.appendChild(card);
               });
+
+              // Activer les événements sur les boutons supprimer s'ils existent
+              if (adminUnlocked) {
+                  document.querySelectorAll(".btn-supprimer").forEach(btn => {
+                      btn.onclick = async function() {
+                          const id = this.getAttribute("data-id");
+                          if (confirm("Voulez-vous vraiment supprimer cette annonce définitivement de Firebase ?")) {
+                              await deleteDoc(doc(db, "actualites", id));
+                              afficherAnnonces(); // Recharge la liste
+                          }
+                      };
+                  });
+              }
+
           } catch (error) {
-              console.error("Erreur d'accès Firebase : ", error);
-              liste.innerHTML = "<p style='color:#ff4444; text-align:center;'>⚠️ Impossible de charger les actualités. Vérifie ton mode test sur Firebase.</p>";
+              console.error("Erreur de chargement Firebase :", error);
+              // Si ton index "timestamp" n'est pas encore créé, on utilise une requête simple
+              const querySnapshot = await getDocs(collection(db, "actualites"));
+              liste.innerHTML = "";
+              querySnapshot.forEach((documentUnique) => {
+                  const annonce = documentUnique.data();
+                  const docId = documentUnique.id;
+                  const card = document.createElement("div");
+                  card.style.cssText = "background:#1a1a1a;border:2px solid #a855f7;border-radius:20px;padding:25px;margin-bottom:20px;text-align:left;";
+                  card.innerHTML = `
+                      <div style="font-family:'Orbitron',sans-serif;color:#a855f7;font-size:1.1rem;">📢 ${annonce.titre}</div>
+                      <div style="font-size:0.8rem;color:#67e8f9;margin:10px 0;">${annonce.date || ''}</div>
+                      <p style="color:#ccc;line-height:1.7;white-space: pre-wrap;">${annonce.description}</p>
+                      ${adminUnlocked ? `<button class="btn-supprimer" data-id="${docId}" style="margin-top:15px;padding:8px 12px;border:none;border-radius:10px;background:#ff4444;color:white;cursor:pointer;">🗑 Supprimer</button>` : ""}
+                  `;
+                  liste.appendChild(card);
+              });
           }
       }
 
-      // Lance le chargement dès que la page s'ouvre
+      // SYSTÈME DE CONNEXION ADMIN
+      document.getElementById("btn-admin-login").onclick = function() {
+          if (adminUnlocked) {
+              adminUnlocked = false;
+              document.getElementById("admin-panel").style.display = "none";
+              this.textContent = "🔒 Admin";
+              afficherAnnonces();
+              return;
+          }
+
+          const mdp = prompt("Mot de passe admin :");
+          if (mdp === "ABYSZ2026") {
+              adminUnlocked = true;
+              document.getElementById("admin-panel").style.display = "block";
+              this.textContent = "🔓 Déconnexion Admin";
+              afficherAnnonces();
+          } else {
+              alert("Mot de passe incorrect.");
+          }
+      };
+
+      // ENVOYER SUR FIREBASE + DISCORD WEBHOOK
+      document.getElementById("btn-publier").onclick = async function() {
+          const titre = document.getElementById("annonce-titre").value.trim();
+          const texte = document.getElementById("annonce-texte").value.trim();
+          const status = document.getElementById("admin-status");
+
+          if (!titre || !texte) {
+              status.textContent = "⚠️ Remplis tous les champs (Titre et Contenu).";
+              status.style.color = "#ff4444";
+              return;
+          }
+
+          status.textContent = "⏳ Publication sur Firebase en cours...";
+          status.style.color = "#ffaa00";
+
+          const dateAujourdhui = new Date().toLocaleDateString("fr-FR");
+
+          try {
+              // 1. Sauvegarde instantanée sur ton Firebase Cloud Firestore
+              await addDoc(collection(db, "actualites"), {
+                  titre: titre,
+                  description: texte,
+                  date: dateAujourdhui,
+                  timestamp: Date.now()
+              });
+
+              status.textContent = "✅ Enregistré sur Firebase ! Envoi Discord...";
+
+              // 2. Envoi sur Discord si l'URL est remplie
+              if (DISCORD_WEBHOOK_URL && DISCORD_WEBHOOK_URL !== "") {
+                  const discordPayload = {
+                      embeds: [{
+                          title: `📢 ${titre}`,
+                          description: texte,
+                          color: 11032055, // Couleur violette #a855f7
+                          footer: { text: "ABYSZ Esports - Site Officiel" },
+                          timestamp: new Date().toISOString()
+                      }]
+                  };
+
+                  await fetch(DISCORD_WEBHOOK_URL, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify(discordPayload)
+                  });
+                  status.textContent = "🚀 En ligne ! Publié avec succès sur Firebase et Discord !";
+              } else {
+                  status.textContent = "✅ En ligne ! Publié sur Firebase (Webhook absent).";
+              }
+
+              status.style.color = "#00ff9d";
+              
+              // On vide le formulaire
+              document.getElementById("annonce-titre").value = "";
+              document.getElementById("annonce-texte").value = "";
+              
+              // On rafraîchit la liste des annonces visibles
+              afficherAnnonces();
+
+          } catch (error) {
+              console.error("Erreur de publication :", error);
+              status.textContent = "❌ Échec de la publication. Vérifie ton code.";
+              status.style.color = "#ff4444";
+          }
+      };
+
+      // Lancement automatique au chargement initial
       window.onload = afficherAnnonces;
     </script>
 </body>
+</html>

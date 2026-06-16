@@ -94,87 +94,115 @@
     </footer>
  
     <script src="script.js"></script>
-    <script>
-        // ── Admin toggle avec mot de passe ──
-        let adminUnlocked = false;
- 
-        function toggleAdmin() {
-            if (adminUnlocked) {
-                document.getElementById('admin-panel').style.display = 'none';
-                adminUnlocked = false;
-                return;
-            }
-            const mdp = prompt('Mot de passe admin :');
-            if (mdp === 'ABYSZ2026') {
-                document.getElementById('admin-panel').style.display = 'block';
-                adminUnlocked = true;
-            } else {
-                alert('Mot de passe incorrect.');
-            }
-        }
- 
-        // ── Poster une annonce vers Discord et l'afficher sur le site ──
-        async function posterAnnonce() {
-            const webhookUrl = document.getElementById('webhook-url').value.trim();
-            const titre = document.getElementById('annonce-titre').value.trim();
-            const texte = document.getElementById('annonce-texte').value.trim();
-            const status = document.getElementById('admin-status');
- 
-            if (!webhookUrl || !titre || !texte) {
-                status.style.color = '#ff4444';
-                status.textContent = '⚠️ Remplis tous les champs.';
-                return;
-            }
- 
-            const payload = {
-                embeds: [{
-                    title: '📢 ' + titre,
-                    description: texte,
-                    color: 11141290,
-                    footer: { text: 'ABYSZ Esports • Site officiel' },
-                    timestamp: new Date().toISOString()
-                }]
-            };
- 
-            try {
-                const res = await fetch(webhookUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
- 
-                if (res.ok) {
-                    status.style.color = '#00ff9d';
-                    status.textContent = '✅ Annonce envoyée sur Discord !';
-                    afficherAnnonce(titre, texte);
-                    document.getElementById('annonce-titre').value = '';
-                    document.getElementById('annonce-texte').value = '';
-                } else {
-                    status.style.color = '#ff4444';
-                    status.textContent = '❌ Erreur lors de l\'envoi. Vérifie l\'URL webhook.';
-                }
-            } catch (e) {
-                status.style.color = '#ff4444';
-                status.textContent = '❌ Erreur réseau.';
-            }
-        }
- 
-        // ── Afficher l'annonce sur le site ──
-        function afficherAnnonce(titre, texte) {
-            const liste = document.getElementById('annonces-list');
-            const now = new Date().toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
- 
-            if (liste.querySelector('p')) liste.innerHTML = '';
- 
-            const card = document.createElement('div');
-            card.style.cssText = 'background:#1a1a1a; border:2px solid #a855f7; border-radius:20px; padding:25px; margin-bottom:20px; text-align:left;';
-            card.innerHTML = `
-                <div style="font-family:'Orbitron',sans-serif; font-size:1.1rem; color:#a855f7; margin-bottom:8px;">📢 ${titre}</div>
-                <div style="font-size:0.8rem; color:#67e8f9; margin-bottom:15px; text-transform:uppercase; letter-spacing:1px;">${now}</div>
-                <p style="color:#ccc; line-height:1.7;">${texte}</p>
-            `;
-            liste.prepend(card);
-        }
-    </script>
+    
+<script>
+let adminUnlocked = false;
+
+window.onload = function () {
+    afficherAnnonces();
+};
+
+function toggleAdmin() {
+    if (adminUnlocked) {
+        adminUnlocked = false;
+        document.getElementById("admin-panel").style.display = "none";
+        afficherAnnonces();
+        return;
+    }
+
+    const mdp = prompt("Mot de passe admin :");
+
+    if (mdp === "ABYSZ2026") {
+        adminUnlocked = true;
+        document.getElementById("admin-panel").style.display = "block";
+        afficherAnnonces();
+    } else {
+        alert("Mot de passe incorrect.");
+    }
+}
+
+function posterAnnonce() {
+    const titre = document.getElementById("annonce-titre").value.trim();
+    const texte = document.getElementById("annonce-texte").value.trim();
+    const status = document.getElementById("admin-status");
+
+    if (!titre || !texte) {
+        status.textContent = "⚠️ Remplis tous les champs.";
+        return;
+    }
+
+    let annonces = JSON.parse(localStorage.getItem("abysz_annonces")) || [];
+
+    annonces.unshift({
+        titre: titre,
+        texte: texte,
+        date: new Date().toLocaleDateString("fr-FR")
+    });
+
+    localStorage.setItem("abysz_annonces", JSON.stringify(annonces));
+
+    document.getElementById("annonce-titre").value = "";
+    document.getElementById("annonce-texte").value = "";
+
+    status.textContent = "✅ Annonce publiée.";
+
+    afficherAnnonces();
+}
+
+function supprimerAnnonce(index) {
+    if (!adminUnlocked) return;
+
+    if (!confirm("Supprimer cette annonce ?")) return;
+
+    let annonces = JSON.parse(localStorage.getItem("abysz_annonces")) || [];
+    annonces.splice(index, 1);
+
+    localStorage.setItem("abysz_annonces", JSON.stringify(annonces));
+
+    afficherAnnonces();
+}
+
+function afficherAnnonces() {
+    const liste = document.getElementById("annonces-list");
+    let annonces = JSON.parse(localStorage.getItem("abysz_annonces")) || [];
+
+    if (annonces.length === 0) {
+        liste.innerHTML = "<p style='color:#aaa;'>Aucune annonce pour le moment.</p>";
+        return;
+    }
+
+    liste.innerHTML = "";
+
+    annonces.forEach((annonce, index) => {
+        const card = document.createElement("div");
+
+        card.style.cssText =
+            "background:#1a1a1a;border:2px solid #a855f7;border-radius:20px;padding:25px;margin-bottom:20px;text-align:left;";
+
+        card.innerHTML = `
+            <div style="font-family:'Orbitron',sans-serif;color:#a855f7;font-size:1.1rem;">
+                📢 ${annonce.titre}
+            </div>
+
+            <div style="font-size:0.8rem;color:#67e8f9;margin:10px 0;">
+                ${annonce.date}
+            </div>
+
+            <p style="color:#ccc;line-height:1.7;">
+                ${annonce.texte}
+            </p>
+
+            ${adminUnlocked ? `
+            <button onclick="supprimerAnnonce(${index})"
+            style="margin-top:15px;padding:10px 15px;border:none;border-radius:10px;background:#ff4444;color:white;cursor:pointer;">
+            🗑 Supprimer
+            </button>` : ""}
+        `;
+
+        liste.appendChild(card);
+    });
+}
+</script>
+
 </body>
 </html>

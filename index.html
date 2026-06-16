@@ -92,7 +92,7 @@
             background: #cc3333;
         }
 
-        /* ── MODAL ADMIN ── */
+        /* ── MODAL ADMIN (Fermé dans index pour ne pas casser style.css) ── */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -107,29 +107,36 @@
             display: flex;
         }
         .modal-content {
-            background: #1a1a1a;
+            background: #141414;
             border: 2px solid #a855f7;
             border-radius: 24px;
-            max-width: 500px;
+            max-width: 450px;
             width: 100%;
-            padding: 30px;
+            padding: 35px;
             position: relative;
-            box-shadow: 0 10px 40px rgba(168, 85, 247, 0.2);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.25);
+            box-sizing: border-box;
         }
         .modal-close {
             position: absolute;
             top: 15px;
             right: 20px;
-            font-size: 1.5rem;
-            color: #aaa;
+            font-size: 1.8rem;
+            color: #777;
             cursor: pointer;
+            transition: color 0.2s;
         }
-        .modal h3 {
+        .modal-close:hover {
+            color: #ff4444;
+        }
+        .modal-content h3 {
             font-family: 'Orbitron', sans-serif;
-            color: #a855f7;
-            margin-bottom: 20px;
+            color: #ffffff;
+            margin-top: 0;
+            margin-bottom: 25px;
             font-size: 1.6rem;
             text-align: center;
+            letter-spacing: 1px;
         }
         .input-group {
             margin-bottom: 20px;
@@ -138,36 +145,46 @@
         .input-group label {
             display: block;
             margin-bottom: 8px;
-            color: #aaa;
-            font-size: 0.9rem;
+            color: #a855f7;
+            font-size: 0.85rem;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
         }
         .input-group input, .input-group textarea {
             width: 100%;
-            padding: 12px;
-            background: #111;
-            border: 1px solid #333;
+            padding: 12px 16px;
+            background: #0a0a0a;
+            border: 1px solid #2a2a2a;
             color: white;
             border-radius: 8px;
             font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            box-sizing: border-box;
         }
         .input-group input:focus, .input-group textarea:focus {
             border-color: #a855f7;
             outline: none;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.2);
         }
         .form-btn {
             background: #a855f7;
             color: white;
             border: none;
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             border-radius: 8px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             font-family: 'Orbitron', sans-serif;
-            transition: background 0.2s;
+            font-size: 1rem;
+            transition: background 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+            box-sizing: border-box;
         }
         .form-btn:hover {
-            background: #c084fc;
+            background: #b975ff;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
         }
         .hidden {
             display: none !important;
@@ -176,12 +193,20 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            background: #111;
-            padding: 10px 15px;
+            margin-bottom: 25px;
+            background: #0a0a0a;
+            padding: 12px 15px;
             border-radius: 8px;
+            border: 1px solid #2a2a2a;
         }
-        .error-message { color: #ff4444; font-size: 0.9rem; margin-top: 10px; text-align: center; }
+        .error-message { 
+            color: #ff4444; 
+            font-size: 0.85rem; 
+            margin-top: 15px; 
+            text-align: center; 
+            font-family: 'Inter', sans-serif;
+            line-height: 1.4;
+        }
         .loading-text { color: #666; font-style: italic; text-align: center; }
     </style>
 </head>
@@ -210,7 +235,7 @@
 
     <section id="accueil" class="hero" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url('./baniere.png');">
         <h1>ABYSZ</h1>
-        <p class="slogan">Alone we play together we win</p>
+        <p class="slogan">LE NOUVEAU VISAGE DE L'ESPORT</p>
         <a href="roster.html" class="btn">Découvrir le roster</a>
     </section>
 
@@ -257,8 +282,8 @@
             <div id="admin-panel-step" class="hidden">
                 <h3>Publier une annonce</h3>
                 <div class="admin-header-actions">
-                    <span id="user-display-email" style="color:#a855f7; font-weight:600; font-size: 0.9rem;"></span>
-                    <button id="logout-btn" style="background:none; border:none; color:#ff4444; cursor:pointer; font-weight: 600;">Déconnexion</button>
+                    <span id="user-display-email" style="color:#a855f7; font-weight:600; font-size: 0.85rem; font-family: 'Inter', sans-serif;"></span>
+                    <button id="logout-btn" style="background:none; border:none; color:#ff4444; cursor:pointer; font-weight: 600; font-family: 'Orbitron', sans-serif; font-size:0.85rem;">Déconnexion</button>
                 </div>
                 <form id="announcement-form" onsubmit="return false;">
                     <div class="input-group">
@@ -278,9 +303,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"; // Note: Correction automatique des imports lors de l'exécution
+        import {  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-        // Clé API mise à jour avec le "z" minuscule d'origine
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
             authDomain: "abysz-esports.firebaseapp.com",
@@ -293,12 +318,10 @@
 
         const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1516291585351090206/i4pbx0B2sPw1yAD63cBN56s37-GSyrrGxYUca34GSgwlsRLUoxQWqD6oZmEwjrr6oJif";
 
-        // Initialisation globale
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Liaisons HTML
         const modal = document.getElementById('admin-modal');
         const adminGateBtn = document.getElementById('admin-gate-btn');
         const closeModalBtn = document.getElementById('close-modal-btn');
@@ -313,7 +336,6 @@
 
         let currentUser = null;
 
-        // ── FLUX LIVE DEPUIS CLOUD FIRESTORE ──
         const q = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
         
         onSnapshot(q, (snapshot) => {
@@ -354,13 +376,12 @@
             });
         });
 
-        // ── GESTION DE LA CONNEXION ──
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
                 loginStep.classList.add('hidden');
                 panelStep.classList.remove('hidden');
-                userDisplayEmail.textContent = `Connecté : ${user.email}`;
+                userDisplayEmail.textContent = `Admin : ${user.email}`;
             } else {
                 loginStep.classList.remove('hidden');
                 panelStep.classList.add('hidden');
@@ -370,14 +391,13 @@
 
         loginForm.addEventListener('submit', async () => {
             loginError.classList.add('hidden');
-            
             const email = document.getElementById('admin-email').value.trim();
             const password = document.getElementById('admin-password').value;
 
             try {
                 await signInWithEmailAndPassword(auth, email, password);
             } catch (error) {
-                loginError.textContent = "Identifiants incorrects. Vérifiez votre e-mail, votre mot de passe ou l'activation de la méthode de connexion sur Firebase.";
+                loginError.textContent = "Identifiants incorrects. Vérifie l'e-mail, ton mot de passe ou l'activation de la méthode sur Firebase.";
                 loginError.classList.remove('hidden');
             }
         });
@@ -387,7 +407,6 @@
             modal.classList.remove('active');
         };
 
-        // ── ENVOI DE L'ANNONCE (FIRESTORE + DISCORD) ──
         announcementForm.addEventListener('submit', async () => {
             const titleInput = document.getElementById("annonce-title");
             const contentInput = document.getElementById("annonce-content");

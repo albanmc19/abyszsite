@@ -54,11 +54,10 @@
             border-bottom: 2px solid #a855f7;
             background: #141414;
         }
-        /* Style de l'image dans le profil ouvert : Rectangle respectant l'image d'origine */
         .popup-avatar-img {
             width: 100%;
             max-height: 250px;
-            object-fit: contain; /* L'image s'affiche entièrement sans être déformée ni coupée */
+            object-fit: contain;
             border: 2px solid #a855f7;
             border-radius: 12px;
             margin: 0 auto 20px auto;
@@ -136,7 +135,6 @@
             font-size: 0.9rem;
             box-sizing: border-box;
         }
-        /* Style spécial pour le bouton d'importation de fichier */
         .input-group input[type="file"] {
             background: #141414;
             border: 1px dashed #a855f7;
@@ -226,20 +224,23 @@
             <button class="admin-gate-btn" id="admin-gate-btn">🔑 Équipe Admin</button>
         </div>
 
+        <!-- 1. ÉQUIPE PRINCIPALE -->
         <div class="roster-grid" id="main-roster-grid">
             <p class="loading-text">Chargement de l'équipe principale...</p>
         </div>
 
-        <h2 style="margin-top: 80px;">Centre de Formation (CDF)</h2>
-        <p style="text-align:center; margin-bottom: 30px; color: #aaa;">Les futurs talents en pleine progression</p>
-        <div class="roster-grid" id="cdf-roster-grid">
-            <p class="loading-text">Chargement du centre de formation...</p>
-        </div>
-
+        <!-- 2. ACADÉMIQUES (remonté) -->
         <h2 style="margin-top: 80px;">Joueurs Académiques</h2>
         <p style="text-align:center; margin-bottom: 30px; color: #aaa;">Notre équipe de développement et d'avenir</p>
         <div class="roster-grid" id="academy-roster-grid">
             <p class="loading-text">Chargement de l'académie...</p>
+        </div>
+
+        <!-- 3. CDF (descendu en bas) -->
+        <h2 style="margin-top: 80px;">Centre de Formation (CDF)</h2>
+        <p style="text-align:center; margin-bottom: 30px; color: #aaa;">Les futurs talents en pleine progression</p>
+        <div class="roster-grid" id="cdf-roster-grid">
+            <p class="loading-text">Chargement du centre de formation...</p>
         </div>
 
         <br><br>
@@ -284,8 +285,8 @@
                         <label for="player-team">Catégorie d'équipe</label>
                         <select id="player-team">
                             <option value="main">Équipe Principale (Pro)</option>
-                            <option value="cdf">Centre de Formation (CDF)</option>
                             <option value="academy">Joueurs Académiques</option>
+                            <option value="cdf">Centre de Formation (CDF)</option>
                         </select>
                     </div>
                     <div class="input-group">
@@ -308,7 +309,7 @@
                         <div class="input-row">
                             <input type="text" id="stat-earnings" placeholder="Earnings (Ex: 500$)" required>
                             <input type="text" id="stat-best" placeholder="Best PR (Ex: Top 7)" required>
-                            <input type="text" id="stat-wins" placeholder="Wins (Ex: 142)" required>
+                            <input type="text" id="stat-wins" placeholder="Best Perf (Ex: 142)" required>
                         </div>
                     </div>
 
@@ -349,7 +350,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // DOM Elements
         const modal = document.getElementById('admin-modal');
         const adminGateBtn = document.getElementById('admin-gate-btn');
         const closeModalBtn = document.getElementById('close-modal-btn');
@@ -372,21 +372,19 @@
         let currentUser = null;
         let editingPlayerId = null;
         let cacheJoueurs = {};
-        let base64ImageString = ""; // Stockera l'image convertie en texte
+        let base64ImageString = "";
 
-        // ÉCOUTE DU CHANGEMENT DE FICHIER POUR CONVERSION BASE64
         playerFileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = () => {
-                    base64ImageString = reader.result; // Contient les données de l'image
+                    base64ImageString = reader.result;
                 };
                 reader.readAsDataURL(file);
             }
         });
 
-        // ÉCOUTE ET AFFICHAGE DES JOUEURS EN TEMPS RÉEL
         const q = query(collection(db, "roster"), orderBy("createdAt", "asc"));
         onSnapshot(q, (snapshot) => {
             mainGrid.innerHTML = "";
@@ -404,7 +402,6 @@
                 const id = docSnap.id;
                 cacheJoueurs[id] = player;
 
-                // Si pas d'image enregistrée, on remet le logo par défaut
                 const imgSrc = (player.image && player.image !== "#") ? player.image : "logo.png";
 
                 const cardContainer = document.createElement('div');
@@ -445,7 +442,7 @@
                     acadCount++;
                 }
 
-                // Création du Pop-up associé avec le nouveau style d'image d'origine rectangle complet
+                // Pop-up avec labels mis à jour : Best PR et Best Perf
                 const popupOverlay = document.createElement('div');
                 popupOverlay.className = "popup-overlay";
                 popupOverlay.id = `popup-${id}`;
@@ -458,8 +455,8 @@
                             <div class="popup-role">${player.role}</div>
                             <div class="popup-stats">
                                 <div class="stat"><div class="stat-value">${player.earnings}</div><div class="stat-label">Earning</div></div>
-                                <div class="stat"><div class="stat-value">${player.bestPlacement}</div><div class="stat-label">Best</div></div>
-                                <div class="stat"><div class="stat-value">${player.wins}</div><div class="stat-label">Wins</div></div>
+                                <div class="stat"><div class="stat-value">${player.bestPlacement}</div><div class="stat-label">Best PR</div></div>
+                                <div class="stat"><div class="stat-value">${player.wins}</div><div class="stat-label">Best Perf</div></div>
                             </div>
                             <div class="popup-bio">${player.bio}</div>
                             <div class="popup-socials">
@@ -486,10 +483,9 @@
             });
 
             if (mainCount === 0) mainGrid.innerHTML = '<p class="loading-text">Aucun joueur dans l\'équipe principale.</p>';
-            if (cdfCount === 0) cdfGrid.innerHTML = '<p class="loading-text">Aucun joueur au centre de formation.</p>';
             if (acadCount === 0) academyGrid.innerHTML = '<p class="loading-text">Aucun joueur académique.</p>';
+            if (cdfCount === 0) cdfGrid.innerHTML = '<p class="loading-text">Aucun joueur au centre de formation.</p>';
 
-            // BOUTONS DE SUPPRESSION
             document.querySelectorAll('.inline-delete-btn').forEach(btn => {
                 btn.onclick = async (e) => {
                     e.stopPropagation();
@@ -500,7 +496,6 @@
                 };
             });
 
-            // BOUTONS DE MODIFICATION (✏️)
             document.querySelectorAll('.inline-edit-btn').forEach(btn => {
                 btn.onclick = (e) => {
                     e.stopPropagation();
@@ -509,12 +504,12 @@
 
                     if (player) {
                         editingPlayerId = id;
-                        base64ImageString = player.image || "#"; // Garde l'ancienne image si on n'en choisit pas de nouvelle
+                        base64ImageString = player.image || "#";
                         
                         document.getElementById('player-team').value = player.team;
                         document.getElementById('player-pseudo').value = player.pseudo;
                         document.getElementById('player-role').value = player.role;
-                        playerFileInput.value = ""; // Reset du sélecteur de fichier visuel
+                        playerFileInput.value = "";
                         
                         document.getElementById('stat-earnings').value = player.earnings;
                         document.getElementById('stat-best').value = player.bestPlacement;
@@ -533,7 +528,6 @@
             });
         });
 
-        // CONNEXION ADMIN
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
@@ -566,13 +560,12 @@
             modal.classList.remove('active');
         };
 
-        // ENREGISTREMENT OU MODIFICATION
         playerForm.addEventListener('submit', async () => {
             const dataJoueur = {
                 team: document.getElementById('player-team').value,
                 pseudo: document.getElementById('player-pseudo').value.trim(),
                 role: document.getElementById('player-role').value.trim(),
-                image: base64ImageString || "#", // On stocke la chaîne de caractères Base64 générée
+                image: base64ImageString || "#",
                 earnings: document.getElementById('stat-earnings').value.trim(),
                 bestPlacement: document.getElementById('stat-best').value.trim(),
                 wins: document.getElementById('stat-wins').value.trim(),

@@ -13,7 +13,7 @@
 
     <nav>
         <div class="logo">
-            <img src="logo.jpg" alt="Logo Abysz">
+            <img src="logo.png" alt="Logo Abysz">
             ABYSZ
         </div>
         <ul>
@@ -30,151 +30,21 @@
         </ul>
     </nav>
 
-    <section id="accueil" class="hero" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url('./baniere.png');">
+    <section id="accueil" class="hero" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url('./baniere.jpg');">
         <h1>ABYSZ</h1>
         <p class="slogan">LE NOUVEAU VISAGE DE L'ESPORT</p>
-        <a href="#nous-rejoindre" class="btn">Nous rejoindre</a>
+        <a href="#rejoindre-commu" class="btn">Rejoindre la communauté</a>
     </section>
 
-    <section id="roster">
-        <h2>NOTRE ROSTER</h2>
-        <p class="subtitle">Découvrez les joueurs qui portent haut les couleurs d'Abysz.</p>
-        <div class="roster-grid">
-            <div class="player-card" onclick="openPopup('unkn0wn')">
-                <div class="player-avatar-placeholder"></div>
-                <div class="player-info">
-                    <div class="player-pseudo">Unkn0wn</div>
-                    <div class="player-role">Capitaine / IGL</div>
-                    <span class="voir-profil">Voir le profil</span>
-                </div>
-            </div>
-            <div class="player-card" onclick="openPopup('shadow')">
-                <div class="player-avatar-placeholder"></div>
-                <div class="player-info">
-                    <div class="player-pseudo">Shadow</div>
-                    <div class="player-role">Entry Fragger</div>
-                    <span class="voir-profil">Voir le profil</span>
-                </div>
-            </div>
-            <div class="player-card" onclick="openPopup('apex')">
-                <div class="player-avatar-placeholder"></div>
-                <div class="player-info">
-                    <div class="player-pseudo">Apex</div>
-                    <div class="player-role">Sniper / AWP</div>
-                    <span class="voir-profil">Voir le profil</span>
-                </div>
-            </div>
-        </div>
+    <section id="rejoindre-commu">
+        <h2>REJOINDRE LA COMMUNAUTÉ</h2>
+        <p class="subtitle">Entre dans l'univers Abysz, échange avec les joueurs et suis nos événements en direct !</p>
+        <a href="https://discord.gg/KeSPkvjBVy" target="_blank" class="btn">Rejoindre le Discord</a>
     </section>
-
-    <section id="boutique">
-        <h2>BOUTIQUE</h2>
-        <p class="subtitle">Portez nos couleurs. Maillots officiels et équipements bientôt disponibles.</p>
-        <div class="boutique-grid">
-            <div class="product-card">
-                <div class="product-image-placeholder">MAILLOT PRO 2025</div>
-                <div class="product-info">
-                    <div class="product-name">Maillot Officiel Abysz</div>
-                    <div class="product-price">49.99 €</div>
-                    <button class="btn-small">Bientôt disponible</button>
-                </div>
-            </div>
-            <div class="product-card">
-                <div class="product-image-placeholder">HOODIE</div>
-                <div class="product-info">
-                    <div class="product-name">Sweat à capuche Abysz</div>
-                    <div class="product-price">59.99 €</div>
-                    <button class="btn-small">Bientôt disponible</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="nous-rejoindre">
-        <h2>REJOINDRE L'AVENTURE</h2>
-        <p class="subtitle">Tu as le niveau pour intégrer nos rangs ? Postule dès maintenant.</p>
-        <a href="https://forms.gle/votre_lien_formulaire" target="_blank" class="btn">Remplir le formulaire</a>
-    </section>
-
-    <div id="popup-overlay" class="popup-overlay" onclick="closePopup(event)">
-        <div class="popup">
-            <span class="popup-close" onclick="closePopup(event)">&times;</span>
-            <div class="popup-avatar-placeholder"></div>
-            <div class="popup-body">
-                <div id="popup-pseudo" class="popup-pseudo"></div>
-                <div id="popup-role" class="popup-role"></div>
-                <div class="popup-stats">
-                    <div class="stat">
-                        <div id="popup-stat1-val" class="stat-value"></div>
-                        <div id="popup-stat1-lbl" class="stat-label"></div>
-                    </div>
-                    <div class="stat">
-                        <div id="popup-stat2-val" class="stat-value"></div>
-                        <div id="popup-stat2-lbl" class="stat-label"></div>
-                    </div>
-                    <div class="stat">
-                        <div id="popup-stat3-val" class="stat-value"></div>
-                        <div id="popup-stat3-lbl" class="stat-label"></div>
-                    </div>
-                </div>
-                <p id="popup-bio" class="popup-bio"></p>
-                <div id="popup-socials" class="popup-socials"></div>
-            </div>
-        </div>
-    </div>
 
     <footer>
         <p>&copy; 2025 Abysz Esports. Tous droits réservés.</p>
     </footer>
 
-    <script>
-        const playersData = {
-            unkn0wn: {
-                pseudo: "Unkn0wn", role: "Capitaine / IGL", bio: "Joueur d'expérience et leader né, Unkn0wn guide l'équipe vers la victoire grâce à sa vision de jeu hors du commun et ses stratégies imparables.",
-                stats: [ {val: "1.24", lbl: "K/D Ratio"}, {val: "78%", lbl: "Win Rate"}, {val: "8.5", lbl: "Avg Assists"} ],
-                socials: [ {name: "X / Twitter", url: "https://x.com"}, {name: "Twitch", url: "https://twitch.tv"} ]
-            },
-            shadow: {
-                pseudo: "Shadow", role: "Entry Fragger", bio: "Connu pour ses réflexes surhumains et son agressivité calculée, Shadow est celui qui ouvre les brèches et crée l'espace nécessaire pour ses coéquipiers.",
-                stats: [ {val: "1.35", lbl: "K/D Ratio"}, {val: "42%", lbl: "Headshot %"}, {val: "240", lbl: "Avg Damage"} ],
-                socials: [ {name: "X / Twitter", url: "https://x.com"}, {name: "YouTube", url: "https://youtube.com"} ]
-            },
-            apex: {
-                pseudo: "Apex", role: "Sniper / AWP", bio: "Le regard d'un aigle et un sang-froid à toute épreuve. Dès qu'Apex a une ligne, aucun adversaire ne peut passer. Le verrou de notre défense.",
-                stats: [ {val: "1.18", lbl: "K/D Ratio"}, {val: "15", lbl: "Clutchs Gagnés"}, {val: "0.4s", lbl: "Réflexe Moyen"} ],
-                socials: [ {name: "X / Twitter", url: "https://x.com"}, {name: "Instagram", url: "https://instagram.com"} ]
-            }
-        };
-
-        function openPopup(playerId) {
-            const data = playersData[playerId];
-            if(!data) return;
-            document.getElementById('popup-pseudo').innerText = data.pseudo;
-            document.getElementById('popup-role').innerText = data.role;
-            document.getElementById('popup-bio').innerText = data.bio;
-            
-            document.getElementById('popup-stat1-val').innerText = data.stats[0].val;
-            document.getElementById('popup-stat1-lbl').innerText = data.stats[0].lbl;
-            document.getElementById('popup-stat2-val').innerText = data.stats[1].val;
-            document.getElementById('popup-stat2-lbl').innerText = data.stats[1].lbl;
-            document.getElementById('popup-stat3-val').innerText = data.stats[2].val;
-            document.getElementById('popup-stat3-lbl').innerText = data.stats[2].lbl;
-            
-            const socialsContainer = document.getElementById('popup-socials');
-            socialsContainer.innerHTML = '';
-            data.socials.forEach(s => {
-                const a = document.createElement('a');
-                a.href = s.url; a.target = "_blank"; a.className = "social-btn"; a.innerText = s.name;
-                socialsContainer.appendChild(a);
-            });
-            document.getElementById('popup-overlay').classList.add('active');
-        }
-
-        function closePopup(e) {
-            if (e.target.id === 'popup-overlay' || e.target.className === 'popup-close') {
-                document.getElementById('popup-overlay').classList.remove('active');
-            }
-        }
-    </script>
 </body>
 </html>

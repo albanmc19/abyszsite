@@ -139,23 +139,40 @@
         .hidden { display: none !important; }
         .error-message { color: #ff4444; font-size: 0.85rem; margin-top: 10px; text-align: center; }
         
-        /* Bouton de suppression sur la carte */
+        /* ── CONTROLES ADMIN SUR LES CARTES ── */
         .player-card-container {
             position: relative;
         }
-        .inline-delete-btn {
+        .admin-controls {
             position: absolute;
             top: 10px;
             right: 10px;
-            background: #ff4444;
+            display: flex;
+            gap: 6px;
+            z-index: 10;
+        }
+        .inline-edit-btn {
+            background: #a855f7;
             color: white;
             border: none;
-            padding: 4px 10px;
+            padding: 4px 8px;
             border-radius: 4px;
             cursor: pointer;
             font-size: 0.75rem;
             font-weight: bold;
-            z-index: 10;
+            font-family: 'Inter', sans-serif;
+        }
+        .inline-edit-btn:hover { background: #b975ff; }
+        
+        .inline-delete-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: bold;
             font-family: 'Inter', sans-serif;
         }
         .inline-delete-btn:hover { background: #cc3333; }
@@ -224,7 +241,7 @@
             </div>
 
             <div id="admin-panel-step" class="hidden">
-                <h3>Ajouter un joueur</h3>
+                <h3 id="panel-title">Ajouter un joueur</h3>
                 <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:0.8rem; background:#0a0a0a; padding:8px; border-radius:6px;">
                     <span id="user-display-email" style="color:#a855f7;"></span>
                     <button id="logout-btn" style="background:none; border:none; color:#ff4444; cursor:pointer; font-weight:bold;">Déconnexion</button>
@@ -277,9 +294,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, updateDoc, query, orderBy, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-        // Ta configuration Firebase exacte
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
             authDomain: "abysz-esports.firebaseapp.com",
@@ -305,19 +321,24 @@
         const loginError = document.getElementById('login-error');
         const userDisplayEmail = document.getElementById('user-display-email');
         const logoutBtn = document.getElementById('logout-btn');
+        const panelTitle = document.getElementById('panel-title');
+        const addPlayerBtn = document.getElementById('add-player-btn');
         
         const mainGrid = document.getElementById('main-roster-grid');
         const academyGrid = document.getElementById('academy-roster-grid');
         const popupsContainer = document.getElementById('popups-container');
 
         let currentUser = null;
+        let editingPlayerId = null; // Stocke l'ID du joueur qu'on modifie (null si création)
+        let cacheJoueurs = {}; // Permet de stocker temporairement les données pour l'édition rapide
 
-        // ÉCOUTE ET AFFICHAGE DES JOUEURS EN TEMPS RÉEL depuis Firestore
+        // ÉCOUTE ET AFFICHAGE DES JOUEURS EN TEMPS RÉEL
         const q = query(collection(db, "roster"), orderBy("createdAt", "asc"));
         onSnapshot(q, (snapshot) => {
             mainGrid.innerHTML = "";
             academyGrid.innerHTML = "";
             popupsContainer.innerHTML = "";
+            cacheJoueurs = {};
 
             let mainCount = 0;
             let acadCount = 0;
@@ -325,18 +346,22 @@
             snapshot.forEach((docSnap) => {
                 const player = docSnap.data();
                 const id = docSnap.id;
+                cacheJoueurs[id] = player; // Sauvegarde dans le cache
 
                 // Création de la carte HTML
                 const cardContainer = document.createElement('div');
                 cardContainer.className = "player-card-container";
 
-                // Si admin connecté, ajout d'un bouton de suppression rapide
-                const deleteBtnHtml = currentUser 
-                    ? `<button class="inline-delete-btn" data-id="${id}">X</button>` 
-                    : "";
+                // Boutons d'administration cachés par défaut via la classe .hidden si non connecté
+                const adminControlsHtml = `
+                    <div class="admin-controls ${currentUser ? '' : 'hidden'}">
+                        <button class="inline-edit-btn" data-id="${id}">✏️</button>
+                        <button class="inline-delete-btn" data-id="${id}">X</button>
+                    </div>
+                `;
 
                 cardContainer.innerHTML = `
-                    ${deleteBtnHtml}
+                    ${adminControlsHtml}
                     <div class="player-card" id="card-${id}">
                         <div class="player-avatar-placeholder"></div>
                         <div class="player-info">
@@ -347,7 +372,7 @@
                     </div>
                 `;
 
-                // Attachement de l'événement de clic pour ouvrir son pop-up spécifique
+                // Clic sur la carte pour voir le profil public
                 cardContainer.querySelector('.player-card').addEventListener('click', () => {
                     document.getElementById(`popup-${id}`).classList.add('active');
                     document.body.style.overflow = 'hidden';
@@ -403,36 +428,66 @@
                 popupsContainer.appendChild(popupOverlay);
             });
 
-            // Afficher un texte si les grilles sont vides
             if (mainCount === 0) mainGrid.innerHTML = '<p class="loading-text">Aucun joueur dans l\'équipe principale.</p>';
             if (acadCount === 0) academyGrid.innerHTML = '<p class="loading-text">Aucun joueur académique.</p>';
 
-            // Configurer les actions de suppression pour l'admin
+            // CONFIGURATION DES BOUTONS DE SUPPRESSION
             document.querySelectorAll('.inline-delete-btn').forEach(btn => {
                 btn.onclick = async (e) => {
-                    e.stopPropagation();
+                    e.stopPropagation(); // Évite d'ouvrir le pop-up profil
                     if (confirm("Voulez-vous vraiment retirer ce joueur du roster ABYSZ ?")) {
                         const id = e.target.getAttribute('data-id');
                         await deleteDoc(doc(db, "roster", id));
                     }
                 };
             });
+
+            // CONFIGURATION DES BOUTONS DE MODIFICATION (✏️)
+            document.querySelectorAll('.inline-edit-btn').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.stopPropagation(); // Évite d'ouvrir le pop-up profil
+                    const id = e.target.getAttribute('data-id');
+                    const player = cacheJoueurs[id];
+
+                    if (player) {
+                        editingPlayerId = id; // On passe en mode édition
+                        
+                        // Remplissage automatique du formulaire avec les anciennes valeurs
+                        document.getElementById('player-team').value = player.team;
+                        document.getElementById('player-pseudo').value = player.pseudo;
+                        document.getElementById('player-role').value = player.role;
+                        document.getElementById('stat-earnings').value = player.earnings;
+                        document.getElementById('stat-best').value = player.bestPlacement;
+                        document.getElementById('stat-wins').value = player.wins;
+                        document.getElementById('player-bio').value = player.bio;
+                        document.getElementById('link-twitch').value = player.twitch;
+                        document.getElementById('link-twitter').value = player.twitter;
+                        document.getElementById('link-tracker').value = player.tracker;
+
+                        // Changement des textes de l'interface admin
+                        panelTitle.textContent = "Modifier le joueur : " + player.pseudo;
+                        addPlayerBtn.textContent = "Mettre à jour le joueur";
+
+                        // Ouvrir la modal d'édition directement
+                        modal.classList.add('active');
+                    }
+                };
+            });
         });
 
-        // AUTHENTICATION MANAGEMENT
+        // GESTION DU STATUT DE CONNEXION ADMIN
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
                 loginStep.classList.add('hidden');
                 panelStep.classList.remove('hidden');
                 userDisplayEmail.textContent = `${user.email}`;
-                // Rafraîchir les boutons de suppression visuels
-                document.querySelectorAll('.inline-delete-btn').forEach(b => b.classList.remove('hidden'));
+                document.querySelectorAll('.admin-controls').forEach(ctrl => ctrl.classList.remove('hidden'));
             } else {
                 loginStep.classList.remove('hidden');
                 panelStep.classList.add('hidden');
                 userDisplayEmail.textContent = '';
-                document.querySelectorAll('.inline-delete-btn').forEach(b => b.classList.add('hidden'));
+                document.querySelectorAll('.admin-controls').forEach(ctrl => ctrl.classList.add('hidden'));
             }
         });
 
@@ -453,38 +508,56 @@
             modal.classList.remove('active');
         };
 
-        // ENREGISTRER UN NOUVEAU JOUEUR SUR FIRESTORE
+        // SOUMISSION DU FORMULAIRE : CRÉATION OU MODIFICATION AUTOMATIQUE
         playerForm.addEventListener('submit', async () => {
-            try {
-                await addDoc(collection(db, "roster"), {
-                    team: document.getElementById('player-team').value,
-                    pseudo: document.getElementById('player-pseudo').value.trim(),
-                    role: document.getElementById('player-role').value.trim(),
-                    earnings: document.getElementById('stat-earnings').value.trim(),
-                    bestPlacement: document.getElementById('stat-best').value.trim(),
-                    wins: document.getElementById('stat-wins').value.trim(),
-                    bio: document.getElementById('player-bio').value.trim(),
-                    twitch: document.getElementById('link-twitch').value.trim(),
-                    twitter: document.getElementById('link-twitter').value.trim(),
-                    tracker: document.getElementById('link-tracker').value.trim(),
-                    createdAt: new Date()
-                });
+            const dataJoueur = {
+                team: document.getElementById('player-team').value,
+                pseudo: document.getElementById('player-pseudo').value.trim(),
+                role: document.getElementById('player-role').value.trim(),
+                earnings: document.getElementById('stat-earnings').value.trim(),
+                bestPlacement: document.getElementById('stat-best').value.trim(),
+                wins: document.getElementById('stat-wins').value.trim(),
+                bio: document.getElementById('player-bio').value.trim(),
+                twitch: document.getElementById('link-twitch').value.trim(),
+                twitter: document.getElementById('link-twitter').value.trim(),
+                tracker: document.getElementById('link-tracker').value.trim()
+            };
 
-                playerForm.reset();
-                // Remettre les '#' par défaut pour éviter les liens brisés
-                document.getElementById('link-twitch').value = "#";
-                document.getElementById('link-twitter').value = "#";
-                document.getElementById('link-tracker').value = "#";
-                
+            try {
+                if (editingPlayerId) {
+                    // MODE MODIFICATION : On met à jour le document existant
+                    await updateDoc(doc(db, "roster", editingPlayerId), dataJoueur);
+                    alert("Joueur mis à jour avec succès !");
+                } else {
+                    // MODE CRÉATION : On ajoute un nouveau document
+                    dataJoueur.createdAt = new Date();
+                    await addDoc(collection(db, "roster"), dataJoueur);
+                    alert("Joueur ajouté avec succès !");
+                }
+
+                // Reset complet du formulaire après action
+                reinitialiserFormulaire();
                 modal.classList.remove('active');
-                alert("Joueur ajouté avec succès !");
             } catch (error) {
-                alert("Erreur lors de l'ajout : " + error.message);
+                alert("Une erreur est survenue : " + error.message);
             }
         });
 
-        // Ouverture / Fermeture de la fenêtre globale de configuration admin
-        adminGateBtn.onclick = () => modal.classList.add('active');
+        function reinitialiserFormulaire() {
+            editingPlayerId = null;
+            playerForm.reset();
+            panelTitle.textContent = "Ajouter un joueur";
+            addPlayerBtn.textContent = "Enregistrer le joueur";
+            document.getElementById('link-twitch').value = "#";
+            document.getElementById('link-twitter').value = "#";
+            document.getElementById('link-tracker').value = "#";
+        }
+
+        // Événements d'ouverture de l'espace admin
+        adminGateBtn.onclick = () => {
+            reinitialiserFormulaire(); // On s'assure d'être en mode "Ajout" par défaut si on clique sur le bouton du haut
+            modal.classList.add('active');
+        };
         closeModalBtn.onclick = () => modal.classList.remove('active');
         window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
     </script>

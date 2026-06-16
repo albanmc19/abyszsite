@@ -280,8 +280,9 @@
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+        // Clé API mise à jour avec le "z" minuscule d'origine
         const firebaseConfig = {
-            apiKey: "AIzaSyBFZpc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
+            apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
             authDomain: "abysz-esports.firebaseapp.com",
             projectId: "abysz-esports",
             storageBucket: "abysz-esports.firebasestorage.app",
@@ -370,12 +371,10 @@
         loginForm.addEventListener('submit', async () => {
             loginError.classList.add('hidden');
             
-            // Récupération des deux vraies cases du formulaire
             const email = document.getElementById('admin-email').value.trim();
             const password = document.getElementById('admin-password').value;
 
             try {
-                // Connexion directe et réelle avec les données entrées par l'utilisateur
                 await signInWithEmailAndPassword(auth, email, password);
             } catch (error) {
                 loginError.textContent = "Identifiants incorrects. Vérifiez votre e-mail, votre mot de passe ou l'activation de la méthode de connexion sur Firebase.";

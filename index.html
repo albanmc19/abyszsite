@@ -242,14 +242,10 @@
                 <h3>Connexion Admin</h3>
                 <form id="login-form" onsubmit="return false;">
                     <div class="input-group">
-                        <label for="admin-email">Adresse Email</label>
-                        <input type="email" id="admin-email" placeholder="admin@abysz.com" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="admin-password">Mot de passe</label>
+                        <label for="admin-password">Mot de passe de l'Espace Admin</label>
                         <input type="password" id="admin-password" placeholder="••••••••" required>
                     </div>
-                    <button type="submit" class="form-btn" id="login-btn">Se connecter</button>
+                    <button type="submit" class="form-btn" id="login-btn">Accéder au panneau</button>
                 </form>
                 <p id="login-error" class="error-message hidden"></p>
             </div>
@@ -280,7 +276,6 @@
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-        // Configuration Firebase complétée avec tes identifiants
         const firebaseConfig = {
             apiKey: "AIzaSyBFZpc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
             authDomain: "abysz-esports.firebaseapp.com",
@@ -291,7 +286,6 @@
             measurementId: "G-HPQNQK5XL1"
         };
 
-        // URL de ton Webhook Discord active
         const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1516291585351090206/i4pbx0B2sPw1yAD63cBN56s37-GSyrrGxYUca34GSgwlsRLUoxQWqD6oZmEwjrr6oJif";
 
         // Initialisation globale
@@ -345,7 +339,6 @@
                 feed.appendChild(card);
             });
 
-            // Gérer les clics de suppression pour l'admin
             document.querySelectorAll('.delete-btn').forEach(btn => {
                 btn.onclick = async (e) => {
                     if (confirm("Supprimer définitivement cette annonce de la base de données ?")) {
@@ -356,13 +349,13 @@
             });
         });
 
-        // ── GESTION DE LA CONNEXION (FIREBASE AUTH) ──
+        // ── GESTION DE LA CONNEXION ──
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
                 loginStep.classList.add('hidden');
                 panelStep.classList.remove('hidden');
-                userDisplayEmail.textContent = user.email;
+                userDisplayEmail.textContent = "Mode Administrateur Connecté";
             } else {
                 loginStep.classList.remove('hidden');
                 panelStep.classList.add('hidden');
@@ -372,13 +365,23 @@
 
         loginForm.addEventListener('submit', async () => {
             loginError.classList.add('hidden');
-            const email = document.getElementById('admin-email').value.trim();
+            
+            // L'adresse mail est gérée automatiquement en arrière-plan
+            const emailFixe = "admin@abysz.com"; 
             const password = document.getElementById('admin-password').value;
 
+            // Vérification locale du mot de passe demandé (2025co@)
+            if (password !== "2025co@") {
+                loginError.textContent = "Mot de passe incorrect.";
+                loginError.classList.remove('hidden');
+                return;
+            }
+
             try {
-                await signInWithEmailAndPassword(auth, email, password);
+                // Connexion sécurisée à Firebase
+                await signInWithEmailAndPassword(auth, emailFixe, password);
             } catch (error) {
-                loginError.textContent = "Identifiants invalides ou droits insuffisants.";
+                loginError.textContent = "Erreur d'authentification Firebase. Vérifiez vos utilisateurs dans la console.";
                 loginError.classList.remove('hidden');
             }
         });
@@ -399,14 +402,12 @@
             const dateStr = now.toLocaleDateString('fr-FR') + " à " + now.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
 
             try {
-                // 1. Enregistrement Base de données Cloud Firestore
                 await addDoc(collection(db, "announcements"), {
                     title: title,
                     content: content,
                     createdAt: now
                 });
 
-                // 2. Envoi simultané sur Discord via Webhook
                 if (DISCORD_WEBHOOK_URL) {
                     sendToDiscordWebhook(title, content, dateStr);
                 }
@@ -438,7 +439,6 @@
             }).catch(err => console.error("Erreur Webhook Discord:", err));
         }
 
-        // Événements d'ouverture/fermeture UI
         adminGateBtn.onclick = () => modal.classList.add('active');
         closeModalBtn.onclick = () => modal.classList.remove('active');
         window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };

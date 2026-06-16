@@ -39,13 +39,14 @@ nav ul a:hover {
     color: #a855f7;
 }
  
-/* ── Logo Abysz (Remis en MAJUSCULES et style d'origine) ── */
+/* ── Petit Logo Abysz (REMIS EN VIOLET NÉON ET MAJUSCULES) ── */
 .logo {
     font-family: 'Orbitron', sans-serif;
     font-size: 2.5rem;
     font-weight: 700;
-    color: #ffffff; /* Remis en blanc si c'était sa couleur de base */
-    text-transform: uppercase; /* Force l'écriture en MAJUSCULES */
+    color: #a855f7; /* Violet néon */
+    text-shadow: 0 0 20px #a855f7; /* Effet brillant */
+    text-transform: uppercase; /* Force les MAJUSCULES */
     display: flex;
     align-items: center;
     gap: 10px;
@@ -58,12 +59,12 @@ nav ul a:hover {
     border-radius: 8px;
 }
  
-/* ── Hero (Correction absolue avec l'image GitHub) ── */
+/* ── Hero ── */
 .hero {
-    min-height: 90vh;
-    padding-top: 100px;
-    /* On utilise le lien direct de ton fichier baniere.png sur ton dépôt GitHub */
-    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url('https://raw.githubusercontent.com/Abysz-Esports/Site-abysz/main/baniere.png') no-repeat center center;
+    height: 100vh;
+    min-height: 600px;
+    background-repeat: no-repeat;
+    background-position: center center;
     background-size: cover;
     display: flex;
     flex-direction: column;
@@ -74,17 +75,17 @@ nav ul a:hover {
  
 .hero h1 {
     font-family: 'Orbitron', sans-serif;
-    font-size: 5.5rem;
+    font-size: 7rem;
     color: #ffffff;
-    text-shadow: 0 0 30px rgba(168, 85, 247, 0.8);
-    margin-bottom: 0.5rem;
+    text-shadow: 0 0 40px rgba(168, 85, 247, 0.9);
+    margin-bottom: 1rem;
 }
  
 .slogan {
-    font-size: 1.5rem;
+    font-size: 2rem;
     margin-bottom: 2.5rem;
-    color: #67e8f9;
-    text-shadow: 0 0 15px rgba(103, 232, 249, 0.6);
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(255,255,255,0.9), 0 0 40px rgba(255,255,255,0.5);
 }
  
 /* ── Boutons ── */

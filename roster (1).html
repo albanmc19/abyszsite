@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABYSZ | Roster</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        .roster-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .player-card {
+            background: #1a1a1a;
+            border-radius: 20px;
+            border: 2px solid #a855f7;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .player-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 40px rgba(168, 85, 247, 0.4);
+        }
+
+        .player-avatar-placeholder {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+        }
+
+        .player-avatar {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .player-info {
+            padding: 20px;
+        }
+
+        .player-pseudo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: #a855f7;
+            margin-bottom: 5px;
+        }
+
+        .player-role {
+            font-size: 0.85rem;
+            color: #67e8f9;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .voir-profil {
+            display: inline-block;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: #a855f7;
+            border: 1px solid #a855f7;
+            padding: 5px 14px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+        .player-card:hover .voir-profil {
+            background: #a855f7;
+            color: white;
+        }
+
+        /* ── POPUP ── */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .popup-overlay.active {
+            display: flex;
+        }
+
+        .popup {
+            background: #1a1a1a;
+            border: 2px solid #a855f7;
+            border-radius: 24px;
+            max-width: 600px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.85); opacity: 0; }
+            to   { transform: scale(1);    opacity: 1; }
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.8rem;
+            color: #aaa;
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+
+        .popup-close:hover { color: #fff; }
+
+        .popup-avatar-placeholder {
+            width: 100%;
+            height: 220px;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+        }
+
+        .popup-avatar {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .popup-body {
+            padding: 30px;
+        }
+
+        .popup-pseudo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            color: #a855f7;
+            margin-bottom: 5px;
+        }
+
+        .popup-role {
+            font-size: 0.9rem;
+            color: #67e8f9;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        .popup-stats {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            background: #111;
+            border-radius: 10px;
+            padding: 10px 14px;
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            color: #a855f7;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .popup-bio {
+            font-size: 0.95rem;
+            color: #aaa;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .popup-socials {
+            display: flex;
+            gap: 10px;
+        }
+
+        .social-btn {
+            background: #111;
+            color: #a855f7;
+            border: 1px solid #a855f7;
+            padding: 8px 18px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .social-btn:hover {
+            background: #a855f7;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <img src="logo.png" alt="Logo Abysz">
+            ABYSZ
+        </div>
+        <ul>
+            <li><a href="index.html">Accueil</a></li>
+            <li><a href="roster.html">Roster</a></li>
+            <li><a href="index.html#resultats">Résultats</a></li>
+            <li><a href="index.html#actualites">Actualités</a></li>
+            <li><a href="index.html#nous-rejoindre">Rejoindre</a></li>
+        </ul>
+    </nav>
+
+    <section style="padding-top: 160px;">
+        <h2>Notre Roster 2026</h2>
+        <div class="roster-grid">
+
+            <!-- ══ JOUEUR 1 ══ -->
+            <div class="player-card" onclick="openPopup('joueur1')">
+                <div class="player-avatar-placeholder"></div>
+                <div class="player-info">
+                    <div class="player-pseudo">TonPseudo</div>
+                    <div class="player-role">Capitaine</div>
+                    <span class="voir-profil">Voir le profil</span>
+                </div>
+            </div>
+
+            <!-- ══ JOUEUR 2 ══ -->
+            <div class="player-card" onclick="openPopup('joueur2')">
+                <div class="player-avatar-placeholder"></div>
+                <div class="player-info">
+                    <div class="player-pseudo">Pseudo2</div>
+                    <div class="player-role">Fragger</div>
+                    <span class="voir-profil">Voir le profil</span>
+                </div>
+            </div>
+
+            <!-- ══ JOUEUR 3 ══ -->
+            <div class="player-card" onclick="openPopup('joueur3')">
+                <div class="player-avatar-placeholder"></div>
+                <div class="player-info">
+                    <div class="player-pseudo">Pseudo3</div>
+                    <div class="player-role">Support</div>
+                    <span class="voir-profil">Voir le profil</span>
+                </div>
+            </div>
+
+            <!-- ══ JOUEUR 4 ══ -->
+            <div class="player-card" onclick="openPopup('joueur4')">
+                <div class="player-avatar-placeholder"></div>
+                <div class="player-info">
+                    <div class="player-pseudo">Pseudo4</div>
+                    <div class="player-role">IGL</div>
+                    <span class="voir-profil">Voir le profil</span>
+                </div>
+            </div>
+
+        </div>
+        <br><br>
+        <a href="index.html" class="btn">← Retour à l'accueil</a>
+    </section>
+
+    <!-- ══════════════════════════════════════
+         POPUPS — MODIFIE LES DONNÉES ICI
+    ══════════════════════════════════════ -->
+
+    <!-- POPUP JOUEUR 1 -->
+    <div class="popup-overlay" id="popup-joueur1" onclick="closeOnOverlay(event)">
+        <div class="popup">
+            <span class="popup-close" onclick="closePopup('joueur1')">✕</span>
+            <div class="player-avatar-placeholder"></div>
+            <!-- Pour ajouter une photo : remplace la ligne ci-dessus par :
+            <img src="photo1.jpg" alt="TonPseudo" class="popup-avatar"> -->
+            <div class="popup-body">
+                <div class="popup-pseudo">TonPseudo</div>
+                <div class="popup-role">Capitaine</div>
+                <div class="popup-stats">
+                    <div class="stat">
+                        <div class="stat-value">8.5</div>
+                        <div class="stat-label">K/D</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">TOP 1</div>
+                        <div class="stat-label">Best</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">142</div>
+                        <div class="stat-label">Wins</div>
+                    </div>
+                </div>
+                <div class="popup-bio">Bio du joueur ici. Spécialité, style de jeu, palmarès, etc.</div>
+                <div class="popup-socials">
+                    <a href="#" class="social-btn">Twitch</a>
+                    <a href="#" class="social-btn">Twitter</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP JOUEUR 2 -->
+    <div class="popup-overlay" id="popup-joueur2" onclick="closeOnOverlay(event)">
+        <div class="popup">
+            <span class="popup-close" onclick="closePopup('joueur2')">✕</span>
+            <div class="player-avatar-placeholder"></div>
+            <div class="popup-body">
+                <div class="popup-pseudo">Pseudo2</div>
+                <div class="popup-role">Fragger</div>
+                <div class="popup-stats">
+                    <div class="stat">
+                        <div class="stat-value">9.1</div>
+                        <div class="stat-label">K/D</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">TOP 2</div>
+                        <div class="stat-label">Best</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">98</div>
+                        <div class="stat-label">Wins</div>
+                    </div>
+                </div>
+                <div class="popup-bio">Bio du joueur ici.</div>
+                <div class="popup-socials">
+                    <a href="#" class="social-btn">Twitch</a>
+                    <a href="#" class="social-btn">Twitter</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP JOUEUR 3 -->
+    <div class="popup-overlay" id="popup-joueur3" onclick="closeOnOverlay(event)">
+        <div class="popup">
+            <span class="popup-close" onclick="closePopup('joueur3')">✕</span>
+            <div class="player-avatar-placeholder"></div>
+            <div class="popup-body">
+                <div class="popup-pseudo">Pseudo3</div>
+                <div class="popup-role">Support</div>
+                <div class="popup-stats">
+                    <div class="stat">
+                        <div class="stat-value">6.3</div>
+                        <div class="stat-label">K/D</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">TOP 3</div>
+                        <div class="stat-label">Best</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">75</div>
+                        <div class="stat-label">Wins</div>
+                    </div>
+                </div>
+                <div class="popup-bio">Bio du joueur ici.</div>
+                <div class="popup-socials">
+                    <a href="#" class="social-btn">Twitch</a>
+                    <a href="#" class="social-btn">Twitter</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP JOUEUR 4 -->
+    <div class="popup-overlay" id="popup-joueur4" onclick="closeOnOverlay(event)">
+        <div class="popup">
+            <span class="popup-close" onclick="closePopup('joueur4')">✕</span>
+            <div class="player-avatar-placeholder"></div>
+            <div class="popup-body">
+                <div class="popup-pseudo">Pseudo4</div>
+                <div class="popup-role">IGL</div>
+                <div class="popup-stats">
+                    <div class="stat">
+                        <div class="stat-value">7.8</div>
+                        <div class="stat-label">K/D</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">TOP 1</div>
+                        <div class="stat-label">Best</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">110</div>
+                        <div class="stat-label">Wins</div>
+                    </div>
+                </div>
+                <div class="popup-bio">Bio du joueur ici.</div>
+                <div class="popup-socials">
+                    <a href="#" class="social-btn">Twitch</a>
+                    <a href="#" class="social-btn">Twitter</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        function openPopup(id) {
+            document.getElementById('popup-' + id).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePopup(id) {
+            document.getElementById('popup-' + id).classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function closeOnOverlay(e) {
+            if (e.target.classList.contains('popup-overlay')) {
+                e.target.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+    </script>
+</body>
+</html>

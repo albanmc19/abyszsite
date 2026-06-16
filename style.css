@@ -57,12 +57,12 @@ nav ul a:hover {
     border-radius: 8px;
 }
  
-/* ── Hero ── (CORRIGÉ & OPTIMISÉ POUR BANIERE.JPG) */
+/* ── Hero ── (Mis à jour pour baniere.png) */
 .hero {
     min-height: 90vh;
-    padding-top: 100px; /* Évite que le texte passe sous la barre de navigation */
-    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url('baniere.jpg') no-repeat center center;
-    background-size: cover; /* Force l'image à s'adapter proprement sans s'écraser */
+    padding-top: 100px; /* Sécurité pour que le texte ne passe pas sous la nav fixed */
+    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url('baniere.png') no-repeat center center;
+    background-size: cover; /* Force l'image à s'adapter proprement */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -72,7 +72,7 @@ nav ul a:hover {
  
 .hero h1 {
     font-family: 'Orbitron', sans-serif;
-    font-size: 5.5rem; /* Ajusté légèrement pour une compatibilité parfaite sur tous les écrans */
+    font-size: 5.5rem;
     color: #ffffff;
     text-shadow: 0 0 30px rgba(168, 85, 247, 0.8);
     margin-bottom: 0.5rem;
@@ -81,7 +81,7 @@ nav ul a:hover {
 .slogan {
     font-size: 1.5rem;
     margin-bottom: 2.5rem;
-    color: #67e8f9; /* Superbe bleu néon qui ressort sur les éclairs de ta bannière */
+    color: #67e8f9; /* Bleu néon pour ressortir sur la bannière */
     text-shadow: 0 0 15px rgba(103, 232, 249, 0.6);
 }
  

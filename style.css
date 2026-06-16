@@ -57,12 +57,14 @@ nav ul a:hover {
     border-radius: 8px;
 }
  
-/* ── Hero ── (Mis à jour pour baniere.png) */
+/* ── Hero ── (CORRECTIF POUR SERVEUR EN LIGNE) */
 .hero {
     min-height: 90vh;
-    padding-top: 100px; /* Sécurité pour que le texte ne passe pas sous la nav fixed */
-    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url('baniere.png') no-repeat center center;
-    background-size: cover; /* Force l'image à s'adapter proprement */
+    padding-top: 100px;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url('./baniere.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -81,7 +83,7 @@ nav ul a:hover {
 .slogan {
     font-size: 1.5rem;
     margin-bottom: 2.5rem;
-    color: #67e8f9; /* Bleu néon pour ressortir sur la bannière */
+    color: #67e8f9;
     text-shadow: 0 0 15px rgba(103, 232, 249, 0.6);
 }
  

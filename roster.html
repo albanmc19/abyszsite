@@ -30,7 +30,7 @@
             <div class="player-card" onclick="openPopup('joueur1')">
                 <div class="player-avatar-placeholder"></div>
                 <div class="player-info">
-                    <div class="player-pseudo">TonPseudo</div>
+                    <div class="player-pseudo">Fxbio</div>
                     <div class="player-role">Capitaine</div>
                     <span class="voir-profil">Voir le profil</span>
                 </div>
@@ -102,7 +102,8 @@
                 <div class="popup-bio">Polonais</div>
                 <div class="popup-socials">
                     <a href="#" class="social-btn">Twitch</a>
-                    <a href="#" class="social-btn">Twitter</a>
+                    <a href="https://x.com/fxbio24" class="social-btn">Twitter</a>
+                    <a href="https://fortnitetracker.com/profile/all/ABZ%20Fxbio/events" class="social-btn">Tracker</a>
                 </div>
             </div>
         </div>
@@ -133,7 +134,8 @@
                 <div class="popup-bio">Bio du joueur ici.</div>
                 <div class="popup-socials">
                     <a href="#" class="social-btn">Twitch</a>
-                    <a href="#" class="social-btn">Twitter</a>
+                    <a href="https://x.com/ZeytooFN9" class="social-btn">Twitter</a>
+                    <a href="#" class="social-btn">Tracker</a>
                 </div>
             </div>
         </div>
@@ -165,6 +167,7 @@
                 <div class="popup-socials">
                     <a href="#" class="social-btn">Twitch</a>
                     <a href="#" class="social-btn">Twitter</a>
+                    <a href="#" class="social-btn">Tracker</a>
                 </div>
             </div>
         </div>
@@ -196,6 +199,7 @@
                 <div class="popup-socials">
                     <a href="#" class="social-btn">Twitch</a>
                     <a href="#" class="social-btn">Twitter</a>
+                    <a href="#" class="social-btn">Tracker</a>
                 </div>
             </div>
         </div>
@@ -205,6 +209,7 @@
         <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
     </footer>
 
+    <script src="script.js"></script>
     <script>
         function openPopup(id) {
             document.getElementById('popup-' + id).classList.add('active');
@@ -212,7 +217,6 @@
         }
 
         function closePopup(id) {
-            event.stopPropagation();
             document.getElementById('popup-' + id).classList.remove('active');
             document.body.style.overflow = '';
         }
@@ -223,14 +227,6 @@
                 document.body.style.overflow = '';
             }
         }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.social-btn').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                });
-            });
-        });
     </script>
 </body>
 </html>

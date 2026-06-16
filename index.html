@@ -13,16 +13,16 @@
             <img src="logo.png" alt="Logo Abysz">
             ABYSZ
             <div class="social-links">
-                <a href="https://www.tiktok.com/@abysz_o" target="_blank" aria-label="TikTok ABYSZ">
+                <a href="https://www.tiktok.com/@abysz" target="_blank" aria-label="TikTok ABYSZ">
                     <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.76a4.85 4.85 0 0 1-1.01-.07z"/></svg>
                 </a>
-                <a href="https://x.com/abysz_o" target="_blank" aria-label="X ABYSZ">
+                <a href="https://x.com/abysz" target="_blank" aria-label="X ABYSZ">
                     <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                 </a>
-                <a href="https://www.youtube.com/@abysz_o" target="_blank" aria-label="YouTube ABYSZ">
+                <a href="https://www.youtube.com/@abysz" target="_blank" aria-label="YouTube ABYSZ">
                     <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                 </a>
-                <a href="https://www.twitch.tv/abysz_o" target="_blank" aria-label="Twitch ABYSZ">
+                <a href="https://www.twitch.tv/abysz" target="_blank" aria-label="Twitch ABYSZ">
                     <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
                 </a>
             </div>
@@ -58,7 +58,29 @@
     <section id="actualites">
         <h2>Actualités</h2>
         <p class="subtitle">Dernières news de l'équipe</p>
-        <p>Prochains tournois et news ici</p>
+ 
+        <div id="admin-toggle" style="margin-bottom: 30px;">
+            <button class="btn-small" onclick="toggleAdmin()">🔒 Admin</button>
+        </div>
+ 
+        <div id="admin-panel" style="display:none; background:#1a1a1a; border:2px solid #a855f7; border-radius:20px; padding:30px; max-width:600px; margin:0 auto 40px;">
+            <h3 style="font-family:'Orbitron',sans-serif; color:#a855f7; margin-bottom:20px;">Poster une annonce</h3>
+            <div style="margin-bottom:15px;">
+                <input type="password" id="webhook-url" placeholder="URL de ton webhook Discord" style="width:100%; padding:12px; border-radius:10px; background:#111; border:1px solid #a855f7; color:#fff; font-size:0.9rem;">
+            </div>
+            <div style="margin-bottom:15px;">
+                <input type="text" id="annonce-titre" placeholder="Titre de l'annonce" style="width:100%; padding:12px; border-radius:10px; background:#111; border:1px solid #333; color:#fff; font-size:0.9rem;">
+            </div>
+            <div style="margin-bottom:20px;">
+                <textarea id="annonce-texte" placeholder="Contenu de l'annonce..." rows="4" style="width:100%; padding:12px; border-radius:10px; background:#111; border:1px solid #333; color:#fff; font-size:0.9rem; resize:vertical;"></textarea>
+            </div>
+            <button class="btn-small" onclick="posterAnnonce()">📢 Envoyer sur Discord</button>
+            <p id="admin-status" style="margin-top:15px; color:#00ff9d; font-size:0.9rem;"></p>
+        </div>
+ 
+        <div id="annonces-list" style="max-width:700px; margin:0 auto;">
+            <p style="color:#aaa;">Aucune annonce pour le moment.</p>
+        </div>
     </section>
  
     <section id="nous-rejoindre">
@@ -72,5 +94,87 @@
     </footer>
  
     <script src="script.js"></script>
+    <script>
+        // ── Admin toggle avec mot de passe ──
+        let adminUnlocked = false;
+ 
+        function toggleAdmin() {
+            if (adminUnlocked) {
+                document.getElementById('admin-panel').style.display = 'none';
+                adminUnlocked = false;
+                return;
+            }
+            const mdp = prompt('Mot de passe admin :');
+            if (mdp === 'ABYSZ2026') {
+                document.getElementById('admin-panel').style.display = 'block';
+                adminUnlocked = true;
+            } else {
+                alert('Mot de passe incorrect.');
+            }
+        }
+ 
+        // ── Poster une annonce vers Discord et l'afficher sur le site ──
+        async function posterAnnonce() {
+            const webhookUrl = document.getElementById('webhook-url').value.trim();
+            const titre = document.getElementById('annonce-titre').value.trim();
+            const texte = document.getElementById('annonce-texte').value.trim();
+            const status = document.getElementById('admin-status');
+ 
+            if (!webhookUrl || !titre || !texte) {
+                status.style.color = '#ff4444';
+                status.textContent = '⚠️ Remplis tous les champs.';
+                return;
+            }
+ 
+            const payload = {
+                embeds: [{
+                    title: '📢 ' + titre,
+                    description: texte,
+                    color: 11141290,
+                    footer: { text: 'ABYSZ Esports • Site officiel' },
+                    timestamp: new Date().toISOString()
+                }]
+            };
+ 
+            try {
+                const res = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+ 
+                if (res.ok) {
+                    status.style.color = '#00ff9d';
+                    status.textContent = '✅ Annonce envoyée sur Discord !';
+                    afficherAnnonce(titre, texte);
+                    document.getElementById('annonce-titre').value = '';
+                    document.getElementById('annonce-texte').value = '';
+                } else {
+                    status.style.color = '#ff4444';
+                    status.textContent = '❌ Erreur lors de l\'envoi. Vérifie l\'URL webhook.';
+                }
+            } catch (e) {
+                status.style.color = '#ff4444';
+                status.textContent = '❌ Erreur réseau.';
+            }
+        }
+ 
+        // ── Afficher l'annonce sur le site ──
+        function afficherAnnonce(titre, texte) {
+            const liste = document.getElementById('annonces-list');
+            const now = new Date().toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
+ 
+            if (liste.querySelector('p')) liste.innerHTML = '';
+ 
+            const card = document.createElement('div');
+            card.style.cssText = 'background:#1a1a1a; border:2px solid #a855f7; border-radius:20px; padding:25px; margin-bottom:20px; text-align:left;';
+            card.innerHTML = `
+                <div style="font-family:'Orbitron',sans-serif; font-size:1.1rem; color:#a855f7; margin-bottom:8px;">📢 ${titre}</div>
+                <div style="font-size:0.8rem; color:#67e8f9; margin-bottom:15px; text-transform:uppercase; letter-spacing:1px;">${now}</div>
+                <p style="color:#ccc; line-height:1.7;">${texte}</p>
+            `;
+            liste.prepend(card);
+        }
+    </script>
 </body>
 </html>

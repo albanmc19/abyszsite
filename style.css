@@ -3,14 +3,14 @@
     padding: 0;
     box-sizing: border-box;
 }
-
+ 
 body {
     font-family: 'Inter', sans-serif;
     background: #0a0a0a;
     color: #ffffff;
     line-height: 1.6;
 }
-
+ 
 nav {
     display: flex;
     justify-content: space-between;
@@ -21,7 +21,24 @@ nav {
     width: 100%;
     z-index: 100;
 }
-
+ 
+nav ul {
+    display: flex;
+    list-style: none;
+    gap: 30px;
+}
+ 
+nav ul a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+ 
+nav ul a:hover {
+    color: #a855f7;
+}
+ 
 .logo {
     font-family: 'Orbitron', sans-serif;
     font-size: 2.5rem;
@@ -32,26 +49,15 @@ nav {
     align-items: center;
     gap: 10px;
 }
-
+ 
 .logo img {
     height: 45px;
     width: 45px;
     object-fit: contain;
     border-radius: 8px;
 }
-
-/* === BOUTIQUE - Icône Panier (si besoin plus tard) === */
-.cart-icon {
-    font-size: 1.8rem;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.cart-icon:hover {
-    transform: scale(1.1);
-}
-
-/* === HERO & SECTIONS === */
+ 
+/* ── Hero ── */
 .hero {
     height: 100vh;
     background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('baniere.jpg') center/cover no-repeat;
@@ -61,7 +67,7 @@ nav {
     align-items: center;
     text-align: center;
 }
-
+ 
 .hero h1 {
     font-family: 'Orbitron', sans-serif;
     font-size: 7rem;
@@ -69,14 +75,15 @@ nav {
     text-shadow: 0 0 40px #a855f7;
     margin-bottom: 1rem;
 }
-
+ 
 .slogan {
     font-size: 2rem;
     margin-bottom: 2.5rem;
     color: #ffffff;
-    text-shadow: 0 0 20px rgba(255,255,255,0.9);
+    text-shadow: 0 0 20px rgba(255,255,255,0.9), 0 0 40px rgba(255,255,255,0.5);
 }
-
+ 
+/* ── Boutons ── */
 .btn {
     background: #a855f7;
     color: white;
@@ -87,13 +94,13 @@ nav {
     font-weight: 600;
     transition: all 0.3s;
 }
-
+ 
 .btn:hover {
     background: #c084fc;
     transform: scale(1.1);
     box-shadow: 0 0 30px #a855f7;
 }
-
+ 
 .btn-small {
     background: #a855f7;
     color: white;
@@ -106,30 +113,31 @@ nav {
     cursor: pointer;
     transition: all 0.3s;
 }
-
+ 
 .btn-small:hover {
     background: #c084fc;
     transform: scale(1.05);
 }
-
+ 
+/* ── Sections ── */
 section {
     padding: 120px 5% 100px;
     text-align: center;
 }
-
+ 
 h2 {
     font-family: 'Orbitron', sans-serif;
     font-size: 3rem;
     color: #a855f7;
     margin-bottom: 40px;
 }
-
+ 
 .subtitle {
     font-size: 1.3rem;
     color: #aaa;
     margin-bottom: 50px;
 }
-
+ 
 /* ── Roster ── */
 .roster-grid {
     display: grid;
@@ -138,8 +146,69 @@ h2 {
     max-width: 1200px;
     margin: 0 auto;
 }
-
-/* ── BOUTIQUE ── */
+ 
+.player-card {
+    background: #1a1a1a;
+    border-radius: 20px;
+    border: 2px solid #a855f7;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+ 
+.player-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 40px rgba(168, 85, 247, 0.4);
+}
+ 
+.player-avatar {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+}
+ 
+.player-avatar-placeholder {
+    width: 100%;
+    height: 180px;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+}
+ 
+.player-info {
+    padding: 20px;
+}
+ 
+.player-pseudo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    color: #a855f7;
+    margin-bottom: 5px;
+}
+ 
+.player-role {
+    font-size: 0.85rem;
+    color: #67e8f9;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+ 
+.voir-profil {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 0.85rem;
+    color: #a855f7;
+    border: 1px solid #a855f7;
+    padding: 5px 14px;
+    border-radius: 20px;
+    transition: all 0.3s;
+}
+ 
+.player-card:hover .voir-profil {
+    background: #a855f7;
+    color: white;
+}
+ 
+/* ── Boutique ── */
 .boutique-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -148,7 +217,7 @@ h2 {
     margin: 0 auto;
     padding: 20px;
 }
-
+ 
 .product-card {
     background: #1a1a1a;
     border-radius: 20px;
@@ -157,12 +226,12 @@ h2 {
     cursor: pointer;
     transition: all 0.3s ease;
 }
-
+ 
 .product-card:hover {
     transform: translateY(-12px);
     box-shadow: 0 20px 40px rgba(168, 85, 247, 0.4);
 }
-
+ 
 .product-image-placeholder {
     height: 260px;
     background: linear-gradient(135deg, #1a1a2e, #16213e);
@@ -174,57 +243,58 @@ h2 {
     color: #888;
     border-bottom: 1px solid #333;
 }
-
+ 
 .product-info {
     padding: 20px;
     text-align: center;
 }
-
+ 
 .product-name {
     font-family: 'Orbitron', sans-serif;
     font-size: 1.35rem;
     color: #ffffff;
     margin-bottom: 8px;
 }
-
+ 
 .product-price {
     font-size: 1.6rem;
     font-weight: 700;
     color: #00ff9d;
     margin-bottom: 15px;
 }
-
-/* ── Popup (Style identique au roster) ── */
+ 
+/* ── Popup ── */
 .popup-overlay {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.9);
+    background: rgba(0,0,0,0.85);
     z-index: 9999;
     justify-content: center;
     align-items: center;
     padding: 20px;
 }
-
+ 
 .popup-overlay.active {
     display: flex;
 }
-
+ 
 .popup {
     background: #1a1a1a;
     border: 2px solid #a855f7;
     border-radius: 24px;
-    max-width: 520px;
+    max-width: 600px;
     width: 100%;
     overflow: hidden;
+    position: relative;
     animation: popIn 0.3s ease;
 }
-
+ 
 @keyframes popIn {
-    from { transform: scale(0.8); opacity: 0; }
-    to   { transform: scale(1); opacity: 1; }
+    from { transform: scale(0.85); opacity: 0; }
+    to   { transform: scale(1);    opacity: 1; }
 }
-
+ 
 .popup-close {
     position: absolute;
     top: 15px;
@@ -232,31 +302,120 @@ h2 {
     font-size: 1.8rem;
     color: #aaa;
     cursor: pointer;
+    line-height: 1;
     z-index: 10000;
+    transition: color 0.2s;
 }
-
+ 
 .popup-close:hover { color: #fff; }
-
-.popup-product-img {
-    height: 280px !important;
+ 
+.popup-avatar {
     width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
 }
-
+ 
+.popup-avatar-placeholder {
+    width: 100%;
+    height: 220px;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+}
+ 
 .popup-body {
     padding: 30px;
 }
-
+ 
 .popup-pseudo {
     font-family: 'Orbitron', sans-serif;
-    font-size: 1.9rem;
+    font-size: 1.8rem;
     color: #a855f7;
     margin-bottom: 5px;
 }
-
+ 
 .popup-role {
-    font-size: 1.4rem;
-    color: #00ff9d;
-    font-weight: 700;
-   
-    gap: 30px;
-    max-width:
+    font-size: 0.9rem;
+    color: #67e8f9;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+}
+ 
+.popup-stats {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+ 
+.stat {
+    background: #111;
+    border-radius: 10px;
+    padding: 10px 14px;
+    text-align: center;
+    flex: 1;
+}
+ 
+.stat-value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    color: #a855f7;
+    word-break: break-word;
+}
+ 
+.stat-label {
+    font-size: 0.65rem;
+    color: #888;
+    text-transform: uppercase;
+}
+ 
+.popup-bio {
+    font-size: 0.95rem;
+    color: #aaa;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+ 
+.popup-socials {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+ 
+.social-btn {
+    background: #111;
+    color: #a855f7;
+    border: 1px solid #a855f7;
+    padding: 8px 18px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+}
+ 
+.social-btn:hover {
+    background: #a855f7;
+    color: white;
+}
+ 
+/* ── Divers ── */
+.cart-icon {
+    font-size: 1.8rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+ 
+.cart-icon:hover {
+    transform: scale(1.1);
+}
+ 
+#nous-rejoindre .btn {
+    margin-top: 40px;
+    display: inline-block;
+}
+ 
+footer {
+    padding: 40px;
+    background: #111;
+    margin-top: 50px;
+    text-align: center;
+}

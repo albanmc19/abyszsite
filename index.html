@@ -7,17 +7,28 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .logo-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: inherit;
+        }
+    </style>
 </head>
 <body>
 
     <nav>
         <div class="logo">
-            <img src="logo.png" alt="Logo Abysz">
-            ABYSZ
+            <a href="index.html" class="logo-link">
+                <img src="logo.png" alt="Logo ABYSZ">
+                ABYSZ
+            </a>
         </div>
         <ul>
-            <li><a href="#accueil">Accueil</a></li>
+            <li><a href="index.html">Accueil</a></li>
             <li><a href="roster.html">Roster</a></li>
             <li><a href="boutique.html">Boutique</a></li>
             <div class="social-links">
@@ -33,7 +44,7 @@
     <section id="accueil" class="hero" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url('./baniere.jpg');">
         <h1>ABYSZ</h1>
         <p class="slogan">LE NOUVEAU VISAGE DE L'ESPORT</p>
-        <a href="#rejoindre-commu" class="btn">Rejoindre la communauté</a>
+        <a href="roster.html" class="btn">Découvrir le roster</a>
     </section>
 
     <section id="rejoindre-commu">
@@ -43,7 +54,7 @@
     </section>
 
     <footer>
-        <p>&copy; 2025 Abysz Esports. Tous droits réservés.</p>
+        <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
     </footer>
 
 </body>

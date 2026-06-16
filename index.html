@@ -40,9 +40,18 @@
         </nav>
     </header>
  
-    <section id="accueil" class="hero">
-        <h1>ABYSZ</h1>
-        <p class="slogan">We drop hot • We win big</p>
+    <section id="accueil" class="hero" style="
+        background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('baniere.jpg') no-repeat center center/cover;
+        min-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 40px 20px;
+    ">
+        <h1 style="font-family:'Orbitron', sans-serif; font-size: 4.5rem; color: #ffffff; text-shadow: 0 0 20px rgba(168, 85, 247, 0.6); margin-bottom: 10px;">ABYSZ</h1>
+        <p class="slogan" style="font-size: 1.3rem; color: #67e8f9; margin-bottom: 30px; letter-spacing: 2px;">We drop hot • We win big</p>
         <a href="roster.html" class="btn">Découvrir le Roster</a>
     </section>
  
@@ -127,7 +136,6 @@
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
       import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-      // Configuration Firebase reliée à ton compte
       const firebaseConfig = {
         apiKey: "AIzaSyBFZpC8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
         authDomain: "abysz-esports.firebaseapp.com",
@@ -138,16 +146,13 @@
         measurementId: "G-HPQNQK5XL1"
       };
 
-      // Initialisation de Firebase
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
 
-      // Met ton URL de Webhook Discord entre les guillemets ci-dessous :
       const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1516291585351090206/i4pbx0B2sPw1yAD63cBN56s37-GSyrrGxYUca34GSgwlsRLUoxQWqD6oZmEwjrr6oJif"; 
 
       let adminUnlocked = false;
 
-      // FONCTION POUR CHARGER LES ANNONCES AVEC LEURS COULEURS CUSTOMS
       async function afficherAnnonces() {
           const liste = document.getElementById("annonces-list");
           try {
@@ -165,7 +170,6 @@
                   const annonce = documentUnique.data();
                   const docId = documentUnique.id;
 
-                  // Récupération des couleurs enregistrées (ou valeurs par défaut si anciennes annonces)
                   const colBordure = annonce.colorBordure || "#a855f7";
                   const colTitre = annonce.colorTitre || "#a855f7";
                   const colDate = annonce.colorDate || "#67e8f9";
@@ -194,7 +198,6 @@
                   liste.appendChild(card);
               });
 
-              // Événement de suppression en un clic
               if (adminUnlocked) {
                   document.querySelectorAll(".btn-supprimer").forEach(btn => {
                       btn.onclick = async function() {
@@ -208,26 +211,10 @@
               }
 
           } catch (error) {
-              console.error("Erreur d'accès Firebase, chargement alternatif simple sans filtre :", error);
-              const querySnapshot = await getDocs(collection(db, "actualites"));
-              liste.innerHTML = "";
-              querySnapshot.forEach((documentUnique) => {
-                  const annonce = documentUnique.data();
-                  const docId = documentUnique.id;
-                  const card = document.createElement("div");
-                  card.style.cssText = `background:#1a1a1a; border:2px solid ${annonce.colorBordure || '#a855f7'}; border-radius:20px; padding:25px; margin-bottom:20px; text-align:left;`;
-                  card.innerHTML = `
-                      <div style="font-family:'Orbitron',sans-serif; color:${annonce.colorTitre || '#a855f7'}; font-size:1.2rem;">📢 ${annonce.titre}</div>
-                      <div style="font-size:0.8rem; color:${annonce.colorDate || '#67e8f9'}; margin:10px 0;">${annonce.date || ''}</div>
-                      <p style="color:${annonce.colorTexte || '#ccc'}; font-size:${annonce.tailleTexte || '16px'}; line-height:1.7; white-space: pre-wrap;">${annonce.description}</p>
-                      ${adminUnlocked ? `<button class="btn-supprimer" data-id="${docId}" style="margin-top:15px; padding:8px 12px; border:none; border-radius:10px; background:#ff4444; color:white; cursor:pointer;">🗑 Supprimer</button>` : ""}
-                  `;
-                  liste.appendChild(card);
-              });
+              console.error("Erreur d'accès Firebase :", error);
           }
       }
 
-      // SYSTÈME DE CONNEXION ADMIN
       document.getElementById("btn-admin-login").onclick = function() {
           if (adminUnlocked) {
               adminUnlocked = false;
@@ -248,13 +235,11 @@
           }
       };
 
-      // PUBLIER SUR FIREBASE (AVEC ENREGISTREMENT DES COULEURS) + DISCORD WEBHOOK
       document.getElementById("btn-publier").onclick = async function() {
           const titre = document.getElementById("annonce-titre").value.trim();
           const texte = document.getElementById("annonce-texte").value.trim();
           const status = document.getElementById("admin-status");
 
-          // Récupération des choix de l'administrateur
           const cBordure = document.getElementById("style-bordure").value;
           const cTitre = document.getElementById("style-titre").value;
           const cDate = document.getElementById("style-date").value;
@@ -273,7 +258,6 @@
           const dateAujourdhui = new Date().toLocaleDateString("fr-FR");
 
           try {
-              // 1. Sauvegarde sur Firebase avec l'ensemble des personnalisations de couleurs
               await addDoc(collection(db, "actualites"), {
                   titre: titre,
                   description: texte,
@@ -288,16 +272,14 @@
 
               status.textContent = "✅ Design envoyé ! Envoi de l'alerte Discord...";
 
-              // 2. Envoi sur ton serveur Discord via Webhook
               if (DISCORD_WEBHOOK_URL && DISCORD_WEBHOOK_URL !== "") {
-                  // Conversion de la couleur hexadécimale en nombre entier pour l'embed Discord
                   const decimalColor = parseInt(cBordure.replace("#", ""), 16);
 
                   const discordPayload = {
                       embeds: [{
                           title: `📢 ${titre}`,
                           description: texte,
-                          color: decimalColor, // L'embed Discord prendra la même couleur que la bordure choisie !
+                          color: decimalColor,
                           footer: { text: "ABYSZ Esports - Site Officiel" },
                           timestamp: new Date().toISOString()
                       }]
@@ -314,12 +296,8 @@
               }
 
               status.style.color = "#00ff9d";
-              
-              // Nettoyage automatique du formulaire
               document.getElementById("annonce-titre").value = "";
               document.getElementById("annonce-texte").value = "";
-              
-              // Rechargement immédiat de la liste avec la nouvelle apparence
               afficherAnnonces();
 
           } catch (error) {

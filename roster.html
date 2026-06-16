@@ -8,13 +8,12 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        /* Ajout du style pour le logo cliquable avec le bon espacement */
         .logo-link {
             display: flex;
             align-items: center;
-            gap: 10px;             /* Garde l'espace parfait entre l'image et le texte */
+            gap: 10px;
             text-decoration: none;
-            color: inherit;        /* Conserve la couleur d'origine du texte */
+            color: inherit;
         }
     </style>
 </head>
@@ -29,9 +28,7 @@
         <ul>
             <li><a href="index.html">Accueil</a></li>
             <li><a href="roster.html">Roster</a></li>
-            <li><a href="index.html#resultats">Résultats</a></li>
-            <li><a href="index.html#actualites">Actualités</a></li>
-            <li><a href="index.html#nous-rejoindre">Rejoindre</a></li>
+            <li><a href="boutique.html">Boutique</a></li>
         </ul>
     </nav>
 
@@ -264,15 +261,12 @@
         <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
     </footer>
 
-    <script src="script.js"></script>
     <script>
         function openPopup(id) {
             const popup = document.getElementById('popup-' + id);
             if (popup) {
                 popup.classList.add('active');
                 document.body.style.overflow = 'hidden';
-            } else {
-                console.error("Popup introuvable : popup-" + id);
             }
         }
 

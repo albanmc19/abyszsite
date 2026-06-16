@@ -16,6 +16,171 @@
             text-decoration: none;
             color: inherit;
         }
+
+        /* ── SECTION ANNONCES ── */
+        .announcements-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+        .announcements-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        .admin-gate-btn {
+            background: transparent;
+            border: 1px solid #a855f7;
+            color: #a855f7;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            transition: all 0.3s ease;
+        }
+        .admin-gate-btn:hover {
+            background: #a855f7;
+            color: white;
+            box-shadow: 0 0 15px #a855f7;
+        }
+        .announcements-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            text-align: left;
+        }
+        .announcement-card {
+            background: #1a1a1a;
+            border-left: 4px solid #a855f7;
+            padding: 25px;
+            border-radius: 0 16px 16px 0;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .announcement-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #ffffff;
+            margin-bottom: 10px;
+            font-size: 1.4rem;
+        }
+        .announcement-card p {
+            color: #ccc;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+        }
+        .announcement-date {
+            font-size: 0.8rem;
+            color: #777;
+        }
+        .delete-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .delete-btn:hover {
+            background: #cc3333;
+        }
+
+        /* ── MODAL ADMIN ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: #1a1a1a;
+            border: 2px solid #a855f7;
+            border-radius: 24px;
+            max-width: 500px;
+            width: 100%;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(168, 85, 247, 0.2);
+        }
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.5rem;
+            color: #aaa;
+            cursor: pointer;
+        }
+        .modal h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #a855f7;
+            margin-bottom: 20px;
+            font-size: 1.6rem;
+            text-align: center;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            background: #111;
+            border: 1px solid #333;
+            color: white;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+        .input-group input:focus, .input-group textarea:focus {
+            border-color: #a855f7;
+            outline: none;
+        }
+        .form-btn {
+            background: #a855f7;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            transition: background 0.2s;
+        }
+        .form-btn:hover {
+            background: #c084fc;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .admin-header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: #111;
+            padding: 10px 15px;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
@@ -47,6 +212,15 @@
         <a href="roster.html" class="btn">Découvrir le roster</a>
     </section>
 
+    <section id="annonces" class="announcements-container">
+        <div class="announcements-header">
+            <h2>Annonces Récentes</h2>
+            <button class="admin-gate-btn" onclick="openAdminModal()">🔑 Espace Admin</button>
+        </div>
+        <div id="announcements-feed" class="announcements-feed">
+            </div>
+    </section>
+
     <section id="rejoindre-commu">
         <h2>REJOINDRE LA COMMUNAUTÉ</h2>
         <p class="subtitle">Entre dans l'univers Abysz, échange avec les joueurs et suis nos événements en direct !</p>
@@ -57,5 +231,168 @@
         <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
     </footer>
 
+    <div id="admin-modal" class="modal-overlay" onclick="closeAdminModalOnOverlay(event)">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeAdminModal()">&times;</span>
+            
+            <div id="admin-login-step">
+                <h3>Connexion Admin</h3>
+                <div class="input-group">
+                    <label for="admin-password">Mot de passe de gestion</label>
+                    <input type="password" id="admin-password" placeholder="Entrez le mot de passe">
+                </div>
+                <button class="form-btn" onclick="checkAdminPassword()">Se connecter</button>
+            </div>
+
+            <div id="admin-panel-step" class="hidden">
+                <h3>Publier une annonce</h3>
+                <div class="admin-header-actions">
+                    <span style="color:#a855f7; font-weight:600;">Connecté</span>
+                    <button onclick="adminLogout()" style="background:none; border:none; color:#ff4444; cursor:pointer;">Déconnexion</button>
+                </div>
+                <div class="input-group">
+                    <label for="annonce-title">Titre de l'actualité</label>
+                    <input type="text" id="annonce-title" placeholder="Ex: Match ce soir à 21h !">
+                </div>
+                <div class="input-group">
+                    <label for="annonce-content">Message</label>
+                    <textarea id="annonce-content" rows="5" placeholder="Écrivez le contenu de l'annonce..."></textarea>
+                </div>
+                <button class="form-btn" onclick="submitAnnonce()">Publier l'annonce</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // MOT DE PASSE PAR DÉFAUT POUR SE CONNECTER (Modifiable librement)
+        const ADMIN_HASH = "Abysz2026"; 
+        let isAdminConnected = false;
+
+        // Charger et afficher les annonces dès l'ouverture de la page
+        document.addEventListener("DOMContentLoaded", () => {
+            renderAnnonces();
+        });
+
+        function openAdminModal() {
+            document.getElementById('admin-modal').classList.add('active');
+            if(sessionStorage.getItem("admin_session") === "active") {
+                showAdminPanel();
+            }
+        }
+
+        function closeAdminModal() {
+            document.getElementById('admin-modal').classList.remove('active');
+            // Reset des champs
+            document.getElementById('admin-password').value = "";
+        }
+
+        function closeAdminModalOnOverlay(e) {
+            if(e.target.classList.contains('modal-overlay')) {
+                closeAdminModal();
+            }
+        }
+
+        function checkAdminPassword() {
+            const input = document.getElementById('admin-password').value;
+            if(input === ADMIN_HASH) {
+                sessionStorage.setItem("admin_session", "active");
+                showAdminPanel();
+            } else {
+                alert("Mot de passe administrateur incorrect.");
+            }
+        }
+
+        function showAdminPanel() {
+            isAdminConnected = true;
+            document.getElementById('admin-login-step').classList.add('hidden');
+            document.getElementById('admin-panel-step').classList.remove('hidden');
+            renderAnnonces(); // Rafraîchir pour voir les boutons "Supprimer"
+        }
+
+        function adminLogout() {
+            sessionStorage.removeItem("admin_session");
+            isAdminConnected = false;
+            document.getElementById('admin-login-step').classList.remove('hidden');
+            document.getElementById('admin-panel-step').classList.add('hidden');
+            closeAdminModal();
+            renderAnnonces();
+        }
+
+        // Récupérer la Database ou l'initialiser
+        function getDatabase() {
+            const db = localStorage.getItem("abysz_announcements");
+            return db ? JSON.parse(db) : [
+                {
+                    id: 1,
+                    title: "Bienvenue sur le nouveau portail ABYSZ !",
+                    content: "Retrouvez ici toutes les informations majeures de la structure, nos prochains matchs ainsi que nos lancements d'événements communautaires.",
+                    date: "16/06/2026 à 14:30"
+                }
+            ];
+        }
+
+        function renderAnnonces() {
+            const feed = document.getElementById("announcements-feed");
+            const annonces = getDatabase();
+            feed.innerHTML = "";
+
+            annonces.forEach(ann => {
+                const card = document.createElement("div");
+                card.className = "announcement-card";
+                
+                // Si l'admin est authentifié, on injecte un bouton de suppression
+                const deleteButtonHtml = isAdminConnected || sessionStorage.getItem("admin_session") === "active" 
+                    ? `<button class="delete-btn" onclick="deleteAnnonce(${ann.id})">Supprimer</button>` 
+                    : "";
+
+                card.innerHTML = `
+                    <h3>${ann.title}</h3>
+                    <p>${ann.content}</p>
+                    <div class="announcement-date">Posté le ${ann.date}</div>
+                    ${deleteButtonHtml}
+                `;
+                feed.appendChild(card);
+            });
+        }
+
+        function submitAnnonce() {
+            const titleInput = document.getElementById("annonce-title");
+            const contentInput = document.getElementById("annonce-content");
+
+            if(!titleInput.value.trim() || !contentInput.value.trim()) {
+                alert("Veuillez remplir tous les champs obligatoires.");
+                return;
+            }
+
+            const database = getDatabase();
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('fr-FR') + " à " + now.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+
+            const newAnnonce = {
+                id: Date.now(), // ID Unique basé sur le timestamp
+                title: titleInput.value.trim(),
+                content: contentInput.value.trim(),
+                date: dateStr
+            };
+
+            database.unshift(newAnnonce); // Ajoute en haut du flux
+            localStorage.setItem("abysz_announcements", JSON.stringify(database));
+
+            // Reset l'interface
+            titleInput.value = "";
+            contentInput.value = "";
+            closeAdminModal();
+            renderAnnonces();
+        }
+
+        function deleteAnnonce(id) {
+            if(confirm("Voulez-vous vraiment retirer cette annonce du flux de l'accueil ?")) {
+                let database = getDatabase();
+                database = database.filter(item => item.id !== id);
+                localStorage.setItem("abysz_announcements", JSON.stringify(database));
+                renderAnnonces();
+            }
+        }
+    </script>
 </body>
 </html>

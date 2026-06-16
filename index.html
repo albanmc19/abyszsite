@@ -66,17 +66,46 @@
             <button class="btn-small" id="btn-admin-login">🔒 Admin</button>
         </div>
  
-        <div id="admin-panel" style="display:none; background:#1a1a1a; border:2px solid #a855f7; border-radius:20px; padding:30px; max-width:600px; margin:0 auto 40px;">
-            <h3 style="font-family:'Orbitron',sans-serif; color:#a855f7; margin-bottom:20px;">Poster une annonce globale</h3>
+        <div id="admin-panel" style="display:none; background:#1a1a1a; border:2px solid #a855f7; border-radius:20px; padding:30px; max-width:600px; margin:0 auto 40px; text-align: left;">
+            <h3 style="font-family:'Orbitron',sans-serif; color:#a855f7; margin-bottom:20px; text-align: center;">🔧 Créer & Personnaliser l'annonce</h3>
             
             <div style="margin-bottom:15px;">
-                <input type="text" id="annonce-titre" placeholder="Titre de l'annonce" style="width:100%; padding:12px; border-radius:10px; background:#111; border:1px solid #333; color:#fff; font-size:0.9rem;">
+                <input type="text" id="annonce-titre" placeholder="Titre de l'annonce" style="width:100%; padding:12px; border-radius:10px; background:#111; border:1px solid #333; color:#fff; font-size:0.9rem; box-sizing: border-box;">
             </div>
             <div style="margin-bottom:20px;">
-                <textarea id="annonce-texte" placeholder="Contenu de l'annonce..." rows="4" style="width:100%; padding:12px; border-radius:10px; background:#111; border:1px solid #333; color:#fff; font-size:0.9rem; resize:vertical;"></textarea>
+                <textarea id="annonce-texte" placeholder="Contenu de l'annonce..." rows="4" style="width:100%; padding:12px; border-radius:10px; background:#111; border:1px solid #333; color:#fff; font-size:0.9rem; resize:vertical; box-sizing: border-box;"></textarea>
             </div>
-            <button class="btn-small" id="btn-publier">📢 Envoyer et Publier partout</button>
-            <p id="admin-status" style="margin-top:15px; color:#00ff9d; font-size:0.9rem;"></p>
+
+            <div style="background: #111; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #222;">
+                <h4 style="margin: 0 0 15px 0; font-family:'Orbitron',sans-serif; color: #67e8f9; font-size: 0.9rem;">🎨 Options de style :</h4>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 0.85rem; color: #ccc;">
+                    <label style="display: flex; align-items: center; gap: 10px;">
+                        <input type="color" id="style-bordure" value="#a855f7" style="border:none; background:none; width:30px; height:30px; cursor:pointer;">
+                        Couleur Bordure
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px;">
+                        <input type="color" id="style-titre" value="#a855f7" style="border:none; background:none; width:30px; height:30px; cursor:pointer;">
+                        Couleur Titre
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px;">
+                        <input type="color" id="style-date" value="#67e8f9" style="border:none; background:none; width:30px; height:30px; cursor:pointer;">
+                        Couleur Date
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px;">
+                        <input type="color" id="style-texte" value="#cccccc" style="border:none; background:none; width:30px; height:30px; cursor:pointer;">
+                        Couleur Texte
+                    </label>
+                </div>
+
+                <div style="margin-top: 15px; font-size: 0.85rem; color: #ccc;">
+                    <label style="display: block; margin-bottom: 5px;">Taille du texte de description : <span id="taille-val">16px</span></label>
+                    <input type="range" id="style-taille" min="12" max="24" value="16" style="width: 100%; accent-color: #a855f7;" oninput="document.getElementById('taille-val').textContent = this.value + 'px'">
+                </div>
+            </div>
+
+            <button class="btn-small" id="btn-publier" style="width: 100%;">📢 Envoyer et Publier partout</button>
+            <p id="admin-status" style="margin-top:15px; color:#00ff9d; font-size:0.9rem; text-align: center;"></p>
         </div>
  
         <div id="annonces-list" style="max-width:700px; margin:0 auto;">
@@ -114,15 +143,14 @@
       const db = getFirestore(app);
 
       // Met ton URL de Webhook Discord entre les guillemets ci-dessous :
-      const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1516291585351090206/i4pbx0B2sPw1yAD63cBN56s37-GSyrrGxYUca34GSgwlsRLUoxQWqD6oZmEwjrr6oJif"; 
+      const DISCORD_WEBHOOK_URL = ""; 
 
       let adminUnlocked = false;
 
-      // FONCTION POUR CHARGER LES ANNONCES DEPUIS FIREBASE
+      // FONCTION POUR CHARGER LES ANNONCES AVEC LEURS COULEURS CUSTOMS
       async function afficherAnnonces() {
           const liste = document.getElementById("annonces-list");
           try {
-              // On récupère les annonces triées par date (les plus récentes en premier)
               const q = query(collection(db, "actualites"), orderBy("timestamp", "desc"));
               const querySnapshot = await getDocs(q);
               
@@ -135,58 +163,64 @@
 
               querySnapshot.forEach((documentUnique) => {
                   const annonce = documentUnique.data();
-                  const docId = documentUnique.id; // Clé unique Firebase pour supprimer
+                  const docId = documentUnique.id;
+
+                  // Récupération des couleurs enregistrées (ou valeurs par défaut si anciennes annonces)
+                  const colBordure = annonce.colorBordure || "#a855f7";
+                  const colTitre = annonce.colorTitre || "#a855f7";
+                  const colDate = annonce.colorDate || "#67e8f9";
+                  const colTexte = annonce.colorTexte || "#cccccc";
+                  const txtTaille = annonce.tailleTexte || "16px";
 
                   const card = document.createElement("div");
-                  card.style.cssText = "background:#1a1a1a;border:2px solid #a855f7;border-radius:20px;padding:25px;margin-bottom:20px;text-align:left;position:relative;";
+                  card.style.cssText = `background:#1a1a1a; border:2px solid ${colBordure}; border-radius:20px; padding:25px; margin-bottom:20px; text-align:left; position:relative;`;
 
                   card.innerHTML = `
-                      <div style="font-family:'Orbitron',sans-serif;color:#a855f7;font-size:1.1rem;font-weight:700;">
+                      <div style="font-family:'Orbitron',sans-serif; color:${colTitre}; font-size:1.25rem; font-weight:700;">
                           📢 ${annonce.titre}
                       </div>
-                      <div style="font-size:0.8rem;color:#67e8f9;margin:10px 0;">
+                      <div style="font-size:0.8rem; color:${colDate}; margin:10px 0; font-family:'Inter',sans-serif;">
                           ${annonce.date}
                       </div>
-                      <p style="color:#ccc;line-height:1.7;white-space: pre-wrap;margin:0;">
+                      <p style="color:${colTexte}; font-size:${txtTaille}; line-height:1.7; white-space: pre-wrap; margin:0; font-family:'Inter',sans-serif;">
                           ${annonce.description}
                       </p>
                       ${adminUnlocked ? `
                       <button class="btn-supprimer" data-id="${docId}"
-                        style="margin-top:15px;padding:8px 12px;border:none;border-radius:10px;background:#ff4444;color:white;cursor:pointer;font-weight:600;font-size:0.8rem;">
+                        style="margin-top:15px; padding:8px 12px; border:none; border-radius:10px; background:#ff4444; color:white; cursor:pointer; font-weight:600; font-size:0.8rem; font-family:'Inter',sans-serif;">
                         🗑 Supprimer l'annonce
                       </button>` : ""}
                   `;
                   liste.appendChild(card);
               });
 
-              // Activer les événements sur les boutons supprimer s'ils existent
+              // Événement de suppression en un clic
               if (adminUnlocked) {
                   document.querySelectorAll(".btn-supprimer").forEach(btn => {
                       btn.onclick = async function() {
                           const id = this.getAttribute("data-id");
-                          if (confirm("Voulez-vous vraiment supprimer cette annonce définitivement de Firebase ?")) {
+                          if (confirm("Voulez-vous vraiment supprimer cette annonce définitivement ?")) {
                               await deleteDoc(doc(db, "actualites", id));
-                              afficherAnnonces(); // Recharge la liste
+                              afficherAnnonces(); 
                           }
                       };
                   });
               }
 
           } catch (error) {
-              console.error("Erreur de chargement Firebase :", error);
-              // Si ton index "timestamp" n'est pas encore créé, on utilise une requête simple
+              console.error("Erreur d'accès Firebase, chargement alternatif simple sans filtre :", error);
               const querySnapshot = await getDocs(collection(db, "actualites"));
               liste.innerHTML = "";
               querySnapshot.forEach((documentUnique) => {
                   const annonce = documentUnique.data();
                   const docId = documentUnique.id;
                   const card = document.createElement("div");
-                  card.style.cssText = "background:#1a1a1a;border:2px solid #a855f7;border-radius:20px;padding:25px;margin-bottom:20px;text-align:left;";
+                  card.style.cssText = `background:#1a1a1a; border:2px solid ${annonce.colorBordure || '#a855f7'}; border-radius:20px; padding:25px; margin-bottom:20px; text-align:left;`;
                   card.innerHTML = `
-                      <div style="font-family:'Orbitron',sans-serif;color:#a855f7;font-size:1.1rem;">📢 ${annonce.titre}</div>
-                      <div style="font-size:0.8rem;color:#67e8f9;margin:10px 0;">${annonce.date || ''}</div>
-                      <p style="color:#ccc;line-height:1.7;white-space: pre-wrap;">${annonce.description}</p>
-                      ${adminUnlocked ? `<button class="btn-supprimer" data-id="${docId}" style="margin-top:15px;padding:8px 12px;border:none;border-radius:10px;background:#ff4444;color:white;cursor:pointer;">🗑 Supprimer</button>` : ""}
+                      <div style="font-family:'Orbitron',sans-serif; color:${annonce.colorTitre || '#a855f7'}; font-size:1.2rem;">📢 ${annonce.titre}</div>
+                      <div style="font-size:0.8rem; color:${annonce.colorDate || '#67e8f9'}; margin:10px 0;">${annonce.date || ''}</div>
+                      <p style="color:${annonce.colorTexte || '#ccc'}; font-size:${annonce.tailleTexte || '16px'}; line-height:1.7; white-space: pre-wrap;">${annonce.description}</p>
+                      ${adminUnlocked ? `<button class="btn-supprimer" data-id="${docId}" style="margin-top:15px; padding:8px 12px; border:none; border-radius:10px; background:#ff4444; color:white; cursor:pointer;">🗑 Supprimer</button>` : ""}
                   `;
                   liste.appendChild(card);
               });
@@ -214,11 +248,18 @@
           }
       };
 
-      // ENVOYER SUR FIREBASE + DISCORD WEBHOOK
+      // PUBLIER SUR FIREBASE (AVEC ENREGISTREMENT DES COULEURS) + DISCORD WEBHOOK
       document.getElementById("btn-publier").onclick = async function() {
           const titre = document.getElementById("annonce-titre").value.trim();
           const texte = document.getElementById("annonce-texte").value.trim();
           const status = document.getElementById("admin-status");
+
+          // Récupération des choix de l'administrateur
+          const cBordure = document.getElementById("style-bordure").value;
+          const cTitre = document.getElementById("style-titre").value;
+          const cDate = document.getElementById("style-date").value;
+          const cTexte = document.getElementById("style-texte").value;
+          const tTaille = document.getElementById("style-taille").value + "px";
 
           if (!titre || !texte) {
               status.textContent = "⚠️ Remplis tous les champs (Titre et Contenu).";
@@ -226,29 +267,37 @@
               return;
           }
 
-          status.textContent = "⏳ Publication sur Firebase en cours...";
+          status.textContent = "⏳ Enregistrement de ton design sur Firebase...";
           status.style.color = "#ffaa00";
 
           const dateAujourdhui = new Date().toLocaleDateString("fr-FR");
 
           try {
-              // 1. Sauvegarde instantanée sur ton Firebase Cloud Firestore
+              // 1. Sauvegarde sur Firebase avec l'ensemble des personnalisations de couleurs
               await addDoc(collection(db, "actualites"), {
                   titre: titre,
                   description: texte,
                   date: dateAujourdhui,
-                  timestamp: Date.now()
+                  timestamp: Date.now(),
+                  colorBordure: cBordure,
+                  colorTitre: cTitre,
+                  colorDate: cDate,
+                  colorTexte: cTexte,
+                  tailleTexte: tTaille
               });
 
-              status.textContent = "✅ Enregistré sur Firebase ! Envoi Discord...";
+              status.textContent = "✅ Design envoyé ! Envoi de l'alerte Discord...";
 
-              // 2. Envoi sur Discord si l'URL est remplie
+              // 2. Envoi sur ton serveur Discord via Webhook
               if (DISCORD_WEBHOOK_URL && DISCORD_WEBHOOK_URL !== "") {
+                  // Conversion de la couleur hexadécimale en nombre entier pour l'embed Discord
+                  const decimalColor = parseInt(cBordure.replace("#", ""), 16);
+
                   const discordPayload = {
                       embeds: [{
                           title: `📢 ${titre}`,
                           description: texte,
-                          color: 11032055, // Couleur violette #a855f7
+                          color: decimalColor, // L'embed Discord prendra la même couleur que la bordure choisie !
                           footer: { text: "ABYSZ Esports - Site Officiel" },
                           timestamp: new Date().toISOString()
                       }]
@@ -259,28 +308,27 @@
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify(discordPayload)
                   });
-                  status.textContent = "🚀 En ligne ! Publié avec succès sur Firebase et Discord !";
+                  status.textContent = "🚀 En ligne ! Annonce personnalisée publiée sur le site et sur Discord !";
               } else {
-                  status.textContent = "✅ En ligne ! Publié sur Firebase (Webhook absent).";
+                  status.textContent = "✅ En ligne ! Publié sur le site (Webhook Discord non renseigné).";
               }
 
               status.style.color = "#00ff9d";
               
-              // On vide le formulaire
+              // Nettoyage automatique du formulaire
               document.getElementById("annonce-titre").value = "";
               document.getElementById("annonce-texte").value = "";
               
-              // On rafraîchit la liste des annonces visibles
+              // Rechargement immédiat de la liste avec la nouvelle apparence
               afficherAnnonces();
 
           } catch (error) {
-              console.error("Erreur de publication :", error);
-              status.textContent = "❌ Échec de la publication. Vérifie ton code.";
+              console.error("Erreur lors de la publication :", error);
+              status.textContent = "❌ Erreur réseau. Impossible de publier.";
               status.style.color = "#ff4444";
           }
       };
 
-      // Lancement automatique au chargement initial
       window.onload = afficherAnnonces;
     </script>
 </body>

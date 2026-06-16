@@ -7,8 +7,6 @@
     <title>ABYSZ | Boutique</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    
-    <!-- PayPal -->
     <script src="https://www.paypal.com/sdk/js?client-id=AQGUCu8DFjCMSlxSmnML5sqjT-18aYz1ZonWLL4o6OTO8q_HWH8Uk11gmRfmeuFhkcJZJ-adgsUaj7_7&currency=EUR"></script>
 </head>
 <body>
@@ -26,16 +24,14 @@
             <li><a href="index.html#nous-rejoindre">Rejoindre</a></li>
         </ul>
     </nav>
-
+ 
     <section style="padding-top: 160px;">
         <h2>Boutique ABYSZ</h2>
         <p class="subtitle">Merch officiel • Soutenez l'équipe</p>
         
         <div class="boutique-grid">
             <div class="product-card">
-                <div class="product-image-placeholder" style="background: linear-gradient(#2a1b4d, #6b21a8); font-size: 2.4rem; color: #e0bbff;">
-                    MAILLOT
-                </div>
+                <img src="maillot.png" alt="Maillot Officiel ABYSZ 2026" style="width:100%; height:260px; object-fit:contain; background:#0d0d1a; display:block;">
                 <div class="product-info">
                     <div class="product-name">Maillot Officiel ABYSZ 2026</div>
                     <div class="product-price">59,99 €</div>
@@ -45,61 +41,46 @@
                 </div>
             </div>
         </div>
-
+ 
         <br><br>
         <a href="index.html" class="btn">← Retour à l'accueil</a>
     </section>
-
-    <!-- Popup Style Roster -->
+ 
+    <!-- Popup -->
     <div class="popup-overlay" id="popup-prod1" onclick="closeOnOverlay(event)">
         <div class="popup">
             <span class="popup-close" onclick="closeProductPopup('prod1')">✕</span>
             
-            <div class="product-image-placeholder popup-product-img" style="background: linear-gradient(#2a1b4d, #6b21a8); height: 280px; font-size: 3rem; color: #e0bbff;">
-                MAILLOT OFFICIEL
-            </div>
+            <img src="maillot.png" alt="Maillot Officiel ABYSZ 2026" style="width:100%; height:280px; object-fit:contain; background:#0d0d1a; display:block;">
             
             <div class="popup-body">
                 <div class="popup-pseudo">Maillot Officiel ABYSZ 2026</div>
                 <div class="popup-role">59,99 €</div>
-                
                 <p class="popup-bio">Maillot premium 2026 • Tissu respirant • Logo brodé</p>
-                
                 <div style="margin: 25px 0; font-weight: 600;">
                     Tailles : S • M • L • XL
                 </div>
-
                 <div id="paypal-button-container"></div>
             </div>
         </div>
     </div>
-
+ 
     <footer>
         <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
     </footer>
-
+ 
     <script>
         function openProductPopup(id) {
-            console.log("✅ Popup ouvert :", id); // Debug
             document.getElementById('popup-' + id).classList.add('active');
             document.body.style.overflow = 'hidden';
-
             if (id === 'prod1') {
                 setTimeout(() => {
                     document.getElementById('paypal-button-container').innerHTML = '';
                     paypal.Buttons({
-                        style: {
-                            shape: 'rect',
-                            color: 'gold',
-                            layout: 'vertical',
-                            label: 'pay'
-                        },
+                        style: { shape: 'rect', color: 'gold', layout: 'vertical', label: 'pay' },
                         createOrder: function(data, actions) {
                             return actions.order.create({
-                                purchase_units: [{
-                                    amount: { value: '59.99', currency_code: 'EUR' },
-                                    description: "Maillot Officiel ABYSZ 2026"
-                                }]
+                                purchase_units: [{ amount: { value: '59.99', currency_code: 'EUR' }, description: "Maillot Officiel ABYSZ 2026" }]
                             });
                         },
                         onApprove: function(data, actions) {
@@ -107,27 +88,24 @@
                                 alert('✅ Paiement réussi ! Merci pour ton soutien à ABYSZ ❤️');
                             });
                         },
-                        onError: function(err) {
-                            alert('Erreur lors du paiement.');
-                        }
+                        onError: function(err) { alert('Erreur lors du paiement.'); }
                     }).render('#paypal-button-container');
                 }, 350);
             }
         }
-
+ 
         function closeProductPopup(id) {
             document.getElementById('popup-' + id).classList.remove('active');
             document.body.style.overflow = '';
         }
-
+ 
         function closeOnOverlay(e) {
             if (e.target.classList.contains('popup-overlay')) {
                 e.target.classList.remove('active');
                 document.body.style.overflow = '';
             }
         }
-
-        // Fermeture avec ESC
+ 
         document.addEventListener('keydown', (e) => {
             if (e.key === "Escape") {
                 document.querySelectorAll('.popup-overlay.active').forEach(p => p.classList.remove('active'));

@@ -26,7 +26,6 @@
     <section style="padding-top: 160px;">
         <h2>Notre Roster 2026</h2>
         <div class="roster-grid">
-            <!-- JOUEUR 1 -->
             <div class="player-card" onclick="openPopup('joueur1')">
                 <div class="player-avatar-placeholder"></div>
                 <div class="player-info">
@@ -35,7 +34,6 @@
                     <span class="voir-profil">Voir le profil</span>
                 </div>
             </div>
-            <!-- JOUEUR 2 -->
             <div class="player-card" onclick="openPopup('joueur2')">
                 <div class="player-avatar-placeholder"></div>
                 <div class="player-info">
@@ -44,7 +42,6 @@
                     <span class="voir-profil">Voir le profil</span>
                 </div>
             </div>
-            <!-- JOUEUR 3 -->
             <div class="player-card" onclick="openPopup('joueur3')">
                 <div class="player-avatar-placeholder"></div>
                 <div class="player-info">
@@ -53,7 +50,6 @@
                     <span class="voir-profil">Voir le profil</span>
                 </div>
             </div>
-            <!-- JOUEUR 4 -->
             <div class="player-card" onclick="openPopup('joueur4')">
                 <div class="player-avatar-placeholder"></div>
                 <div class="player-info">
@@ -99,8 +95,7 @@
         <a href="index.html" class="btn">← Retour à l'accueil</a>
     </section>
 
-    <!-- ====================== TOUS LES POPUPS ====================== -->
-
+    <!-- ====================== POPUPS ROSTER PRINCIPAL ====================== -->
     <!-- POPUP JOUEUR 1 -->
     <div class="popup-overlay" id="popup-joueur1" onclick="closeOnOverlay(event)">
         <div class="popup">
@@ -124,7 +119,7 @@
         </div>
     </div>
 
-    <!-- POPUP JOUEUR 2 - ZEyto -->
+    <!-- POPUP JOUEUR 2 -->
     <div class="popup-overlay" id="popup-joueur2" onclick="closeOnOverlay(event)">
         <div class="popup">
             <span class="popup-close" onclick="closePopup('joueur2')">✕</span>
@@ -193,8 +188,75 @@
         </div>
     </div>
 
-    <!-- Popups Académiques (déjà présents) -->
-    <!-- ... (je les garde identiques à la version précédente) -->
+    <!-- ====================== POPUPS JOUEURS ACADÉMIQUES ====================== -->
+    <!-- POPUP ACAD 1 -->
+    <div class="popup-overlay" id="popup-acad1" onclick="closeOnOverlay(event)">
+        <div class="popup">
+            <span class="popup-close" onclick="closePopup('acad1')">✕</span>
+            <div class="player-avatar-placeholder"></div>
+            <div class="popup-body">
+                <div class="popup-pseudo">AcadPlayer1</div>
+                <div class="popup-role">Joueur Académique</div>
+                <div class="popup-stats">
+                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Earning</div></div>
+                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Best</div></div>
+                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Wins</div></div>
+                </div>
+                <div class="popup-bio">Jeune talent en formation chez ABYSZ.</div>
+                <div class="popup-socials">
+                    <a href="#" class="social-btn">Twitch</a>
+                    <a href="#" class="social-btn">Twitter</a>
+                    <a href="#" class="social-btn">Tracker</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP ACAD 2 -->
+    <div class="popup-overlay" id="popup-acad2" onclick="closeOnOverlay(event)">
+        <div class="popup">
+            <span class="popup-close" onclick="closePopup('acad2')">✕</span>
+            <div class="player-avatar-placeholder"></div>
+            <div class="popup-body">
+                <div class="popup-pseudo">AcadPlayer2</div>
+                <div class="popup-role">Joueur Académique</div>
+                <div class="popup-stats">
+                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Earning</div></div>
+                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Best</div></div>
+                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Wins</div></div>
+                </div>
+                <div class="popup-bio">Bio du joueur académique ici.</div>
+                <div class="popup-socials">
+                    <a href="#" class="social-btn">Twitch</a>
+                    <a href="#" class="social-btn">Twitter</a>
+                    <a href="#" class="social-btn">Tracker</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP ACAD 3 -->
+    <div class="popup-overlay" id="popup-acad3" onclick="closeOnOverlay(event)">
+        <div class="popup">
+            <span class="popup-close" onclick="closePopup('acad3')">✕</span>
+            <div class="player-avatar-placeholder"></div>
+            <div class="popup-body">
+                <div class="popup-pseudo">AcadPlayer3</div>
+                <div class="popup-role">Joueur Académique</div>
+                <div class="popup-stats">
+                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Earning</div></div>
+                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Best</div></div>
+                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Wins</div></div>
+                </div>
+                <div class="popup-bio">Bio du joueur académique ici.</div>
+                <div class="popup-socials">
+                    <a href="#" class="social-btn">Twitch</a>
+                    <a href="#" class="social-btn">Twitter</a>
+                    <a href="#" class="social-btn">Tracker</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <footer>
         <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
@@ -208,7 +270,7 @@
                 popup.classList.add('active');
                 document.body.style.overflow = 'hidden';
             } else {
-                console.error("Popup non trouvé : popup-" + id);
+                console.error("Popup introuvable : popup-" + id);
             }
         }
 

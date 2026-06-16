@@ -32,9 +32,8 @@
         <p class="subtitle">Merch officiel • Soutenez l'équipe avec style</p>
         
         <div class="boutique-grid">
-            <!-- Produit 1 -->
             <div class="product-card" onclick="openProductPopup('prod1')">
-                <div class="product-image-placeholder" style="background: linear-gradient(#1a1a1a, #333);"></div>
+                <div class="product-image-placeholder">HOODIE</div>
                 <div class="product-info">
                     <div class="product-name">Hoodie ABYSZ 2026</div>
                     <div class="product-price">49,99 €</div>
@@ -42,9 +41,8 @@
                 </div>
             </div>
 
-            <!-- Produit 2 -->
             <div class="product-card" onclick="openProductPopup('prod2')">
-                <div class="product-image-placeholder" style="background: linear-gradient(#222, #444);"></div>
+                <div class="product-image-placeholder">T-SHIRT</div>
                 <div class="product-info">
                     <div class="product-name">T-shirt Logo ABYSZ</div>
                     <div class="product-price">24,99 €</div>
@@ -52,9 +50,8 @@
                 </div>
             </div>
 
-            <!-- Produit 3 -->
             <div class="product-card" onclick="openProductPopup('prod3')">
-                <div class="product-image-placeholder" style="background: linear-gradient(#1a1a1a, #555);"></div>
+                <div class="product-image-placeholder">CASQUETTE</div>
                 <div class="product-info">
                     <div class="product-name">Casquette Snapback ABYSZ</div>
                     <div class="product-price">19,99 €</div>
@@ -67,19 +64,17 @@
         <a href="index.html" class="btn">← Retour à l'accueil</a>
     </section>
 
-    <!-- ====================== POPUPS PRODUITS ====================== -->
-
-    <!-- Popup Hoodie -->
+    <!-- Popups -->
     <div class="popup-overlay" id="popup-prod1" onclick="closeOnOverlay(event)">
         <div class="popup">
             <span class="popup-close" onclick="closeProductPopup('prod1')">✕</span>
-            <div class="product-image-placeholder popup-product-img"></div>
+            <div class="product-image-placeholder popup-product-img">HOODIE ABYSZ</div>
             <div class="popup-body">
                 <div class="popup-pseudo">Hoodie ABYSZ 2026</div>
                 <div class="popup-role">49,99 €</div>
-                <p class="popup-bio">Sweat à capuche premium en coton bio. Logo brodé sur la poitrine et dans le dos. Parfait pour les sessions longues.</p>
+                <p class="popup-bio">Sweat à capuche premium en coton bio. Logo brodé sur la poitrine et dans le dos. Idéal pour les sessions compétitives.</p>
                 <div class="size-selector">
-                    <strong>Taille :</strong>
+                    <strong>Taille :</strong><br>
                     <button onclick="selectSize(this)">S</button>
                     <button onclick="selectSize(this)">M</button>
                     <button onclick="selectSize(this)">L</button>
@@ -90,17 +85,16 @@
         </div>
     </div>
 
-    <!-- Popup T-shirt -->
     <div class="popup-overlay" id="popup-prod2" onclick="closeOnOverlay(event)">
         <div class="popup">
             <span class="popup-close" onclick="closeProductPopup('prod2')">✕</span>
-            <div class="product-image-placeholder popup-product-img"></div>
+            <div class="product-image-placeholder popup-product-img">T-SHIRT ABYSZ</div>
             <div class="popup-body">
                 <div class="popup-pseudo">T-shirt Logo ABYSZ</div>
                 <div class="popup-role">24,99 €</div>
-                <p class="popup-bio">T-shirt 100% coton doux. Design minimaliste avec le logo ABYSZ. Idéal pour tous les jours.</p>
+                <p class="popup-bio">T-shirt 100% coton doux et confortable. Design minimaliste avec le logo de l'équipe.</p>
                 <div class="size-selector">
-                    <strong>Taille :</strong>
+                    <strong>Taille :</strong><br>
                     <button onclick="selectSize(this)">S</button>
                     <button onclick="selectSize(this)">M</button>
                     <button onclick="selectSize(this)">L</button>
@@ -111,15 +105,14 @@
         </div>
     </div>
 
-    <!-- Popup Casquette -->
     <div class="popup-overlay" id="popup-prod3" onclick="closeOnOverlay(event)">
         <div class="popup">
             <span class="popup-close" onclick="closeProductPopup('prod3')">✕</span>
-            <div class="product-image-placeholder popup-product-img"></div>
+            <div class="product-image-placeholder popup-product-img">CASQUETTE ABYSZ</div>
             <div class="popup-body">
                 <div class="popup-pseudo">Casquette Snapback ABYSZ</div>
                 <div class="popup-role">19,99 €</div>
-                <p class="popup-bio">Casquette ajustable de haute qualité. Logo brodé. Style streetwear parfait.</p>
+                <p class="popup-bio">Casquette ajustable de haute qualité streetwear. Logo brodé.</p>
                 <button class="btn" onclick="addToCartFromPopup(3)">Ajouter au panier</button>
             </div>
         </div>
@@ -129,7 +122,6 @@
         <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
     </footer>
 
-    <script src="script.js"></script>
     <script>
         let cartCount = 0;
 
@@ -153,11 +145,9 @@
         function addToCart(productId) {
             cartCount++;
             document.getElementById('cart-count').textContent = cartCount;
-            // Animation simple
             const cart = document.getElementById('cart-icon');
             cart.style.transform = 'scale(1.3)';
-            setTimeout(() => cart.style.transform = 'scale(1)', 200);
-            alert("Produit ajouté au panier ! 🛒");
+            setTimeout(() => cart.style.transform = '', 200);
         }
 
         function addToCartFromPopup(productId) {
@@ -166,12 +156,11 @@
         }
 
         function selectSize(btn) {
-            document.querySelectorAll('.size-selector button').forEach(b => b.style.background = '');
-            btn.style.background = '#ff00ff';
+            document.querySelectorAll('.size-selector button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
         }
 
-        // Fermeture avec ESC
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', (e) => {
             if (e.key === "Escape") {
                 document.querySelectorAll('.popup-overlay.active').forEach(p => p.classList.remove('active'));
                 document.body.style.overflow = '';

@@ -181,6 +181,8 @@
             padding: 10px 15px;
             border-radius: 8px;
         }
+        .error-message { color: #ff4444; font-size: 0.9rem; margin-top: 10px; text-align: center; }
+        .loading-text { color: #666; font-style: italic; text-align: center; }
     </style>
 </head>
 <body>
@@ -206,7 +208,7 @@
         </ul>
     </nav>
 
-    <section id="accueil" class="hero" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url('./baniere.jpg');">
+    <section id="accueil" class="hero" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url('./baniere.png');">
         <h1>ABYSZ</h1>
         <p class="slogan">LE NOUVEAU VISAGE DE L'ESPORT</p>
         <a href="roster.html" class="btn">Découvrir le roster</a>
@@ -215,10 +217,11 @@
     <section id="annonces" class="announcements-container">
         <div class="announcements-header">
             <h2>Annonces Récentes</h2>
-            <button class="admin-gate-btn" onclick="openAdminModal()">🔑 Espace Admin</button>
+            <button class="admin-gate-btn" id="admin-gate-btn">🔑 Espace Admin</button>
         </div>
         <div id="announcements-feed" class="announcements-feed">
-            </div>
+            <p class="loading-text">Connexion à la base de données Abysz...</p>
+        </div>
     </section>
 
     <section id="rejoindre-commu">
@@ -231,168 +234,214 @@
         <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
     </footer>
 
-    <div id="admin-modal" class="modal-overlay" onclick="closeAdminModalOnOverlay(event)">
+    <div id="admin-modal" class="modal-overlay">
         <div class="modal-content">
-            <span class="modal-close" onclick="closeAdminModal()">&times;</span>
+            <span class="modal-close" id="close-modal-btn">&times;</span>
             
             <div id="admin-login-step">
                 <h3>Connexion Admin</h3>
-                <div class="input-group">
-                    <label for="admin-password">Mot de passe de gestion</label>
-                    <input type="password" id="admin-password" placeholder="Entrez le mot de passe">
-                </div>
-                <button class="form-btn" onclick="checkAdminPassword()">Se connecter</button>
+                <form id="login-form" onsubmit="return false;">
+                    <div class="input-group">
+                        <label for="admin-email">Adresse Email</label>
+                        <input type="email" id="admin-email" placeholder="admin@abysz.com" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="admin-password">Mot de passe</label>
+                        <input type="password" id="admin-password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="form-btn" id="login-btn">Se connecter</button>
+                </form>
+                <p id="login-error" class="error-message hidden"></p>
             </div>
 
             <div id="admin-panel-step" class="hidden">
                 <h3>Publier une annonce</h3>
                 <div class="admin-header-actions">
-                    <span style="color:#a855f7; font-weight:600;">Connecté</span>
-                    <button onclick="adminLogout()" style="background:none; border:none; color:#ff4444; cursor:pointer;">Déconnexion</button>
+                    <span id="user-display-email" style="color:#a855f7; font-weight:600; font-size: 0.9rem;"></span>
+                    <button id="logout-btn" style="background:none; border:none; color:#ff4444; cursor:pointer; font-weight: 600;">Déconnexion</button>
                 </div>
-                <div class="input-group">
-                    <label for="annonce-title">Titre de l'actualité</label>
-                    <input type="text" id="annonce-title" placeholder="Ex: Match ce soir à 21h !">
-                </div>
-                <div class="input-group">
-                    <label for="annonce-content">Message</label>
-                    <textarea id="annonce-content" rows="5" placeholder="Écrivez le contenu de l'annonce..."></textarea>
-                </div>
-                <button class="form-btn" onclick="submitAnnonce()">Publier l'annonce</button>
+                <form id="announcement-form" onsubmit="return false;">
+                    <div class="input-group">
+                        <label for="annonce-title">Titre de l'actualité</label>
+                        <input type="text" id="annonce-title" placeholder="Ex: Match ce soir à 21h !" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="annonce-content">Message</label>
+                        <textarea id="annonce-content" rows="5" placeholder="Écrivez le contenu de l'annonce..." required></textarea>
+                    </div>
+                    <button type="submit" class="form-btn" id="publish-btn">Publier l'annonce</button>
+                </form>
             </div>
         </div>
     </div>
 
-    <script>
-        // MOT DE PASSE PAR DÉFAUT POUR SE CONNECTER (Modifiable librement)
-        const ADMIN_HASH = "Abysz2026"; 
-        let isAdminConnected = false;
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-        // Charger et afficher les annonces dès l'ouverture de la page
-        document.addEventListener("DOMContentLoaded", () => {
-            renderAnnonces();
-        });
+        // Configuration Firebase complétée avec tes identifiants
+        const firebaseConfig = {
+            apiKey: "AIzaSyBFZpc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
+            authDomain: "abysz-esports.firebaseapp.com",
+            projectId: "abysz-esports",
+            storageBucket: "abysz-esports.firebasestorage.app",
+            messagingSenderId: "200968659347",
+            appId: "1:200968659347:web:3a13d1614d00ed29968866",
+            measurementId: "G-HPQNQK5XL1"
+        };
 
-        function openAdminModal() {
-            document.getElementById('admin-modal').classList.add('active');
-            if(sessionStorage.getItem("admin_session") === "active") {
-                showAdminPanel();
-            }
-        }
+        // URL de ton Webhook Discord active
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1516291585351090206/i4pbx0B2sPw1yAD63cBN56s37-GSyrrGxYUca34GSgwlsRLUoxQWqD6oZmEwjrr6oJif";
 
-        function closeAdminModal() {
-            document.getElementById('admin-modal').classList.remove('active');
-            // Reset des champs
-            document.getElementById('admin-password').value = "";
-        }
+        // Initialisation globale
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        function closeAdminModalOnOverlay(e) {
-            if(e.target.classList.contains('modal-overlay')) {
-                closeAdminModal();
-            }
-        }
+        // Liaisons HTML
+        const modal = document.getElementById('admin-modal');
+        const adminGateBtn = document.getElementById('admin-gate-btn');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const loginForm = document.getElementById('login-form');
+        const announcementForm = document.getElementById('announcement-form');
+        const loginStep = document.getElementById('admin-login-step');
+        const panelStep = document.getElementById('admin-panel-step');
+        const loginError = document.getElementById('login-error');
+        const userDisplayEmail = document.getElementById('user-display-email');
+        const logoutBtn = document.getElementById('logout-btn');
+        const feed = document.getElementById("announcements-feed");
 
-        function checkAdminPassword() {
-            const input = document.getElementById('admin-password').value;
-            if(input === ADMIN_HASH) {
-                sessionStorage.setItem("admin_session", "active");
-                showAdminPanel();
-            } else {
-                alert("Mot de passe administrateur incorrect.");
-            }
-        }
+        let currentUser = null;
 
-        function showAdminPanel() {
-            isAdminConnected = true;
-            document.getElementById('admin-login-step').classList.add('hidden');
-            document.getElementById('admin-panel-step').classList.remove('hidden');
-            renderAnnonces(); // Rafraîchir pour voir les boutons "Supprimer"
-        }
-
-        function adminLogout() {
-            sessionStorage.removeItem("admin_session");
-            isAdminConnected = false;
-            document.getElementById('admin-login-step').classList.remove('hidden');
-            document.getElementById('admin-panel-step').classList.add('hidden');
-            closeAdminModal();
-            renderAnnonces();
-        }
-
-        // Récupérer la Database ou l'initialiser
-        function getDatabase() {
-            const db = localStorage.getItem("abysz_announcements");
-            return db ? JSON.parse(db) : [
-                {
-                    id: 1,
-                    title: "Bienvenue sur le nouveau portail ABYSZ !",
-                    content: "Retrouvez ici toutes les informations majeures de la structure, nos prochains matchs ainsi que nos lancements d'événements communautaires.",
-                    date: "16/06/2026 à 14:30"
-                }
-            ];
-        }
-
-        function renderAnnonces() {
-            const feed = document.getElementById("announcements-feed");
-            const annonces = getDatabase();
+        // ── FLUX LIVE DEPUIS CLOUD FIRESTORE ──
+        const q = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
+        
+        onSnapshot(q, (snapshot) => {
             feed.innerHTML = "";
+            if (snapshot.empty) {
+                feed.innerHTML = '<p class="loading-text">Aucune annonce publiée pour le moment.</p>';
+                return;
+            }
 
-            annonces.forEach(ann => {
+            snapshot.forEach((docSnap) => {
+                const ann = docSnap.data();
+                const dateRaw = ann.createdAt ? new Date(ann.createdAt.seconds * 1000) : new Date();
+                const dateStr = dateRaw.toLocaleDateString('fr-FR') + " à " + dateRaw.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+
                 const card = document.createElement("div");
                 card.className = "announcement-card";
-                
-                // Si l'admin est authentifié, on injecte un bouton de suppression
-                const deleteButtonHtml = isAdminConnected || sessionStorage.getItem("admin_session") === "active" 
-                    ? `<button class="delete-btn" onclick="deleteAnnonce(${ann.id})">Supprimer</button>` 
+
+                const deleteButtonHtml = currentUser 
+                    ? `<button class="delete-btn" data-id="${docSnap.id}">Supprimer</button>` 
                     : "";
 
                 card.innerHTML = `
                     <h3>${ann.title}</h3>
                     <p>${ann.content}</p>
-                    <div class="announcement-date">Posté le ${ann.date}</div>
+                    <div class="announcement-date">Posté le ${dateStr}</div>
                     ${deleteButtonHtml}
                 `;
                 feed.appendChild(card);
             });
-        }
 
-        function submitAnnonce() {
+            // Gérer les clics de suppression pour l'admin
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.onclick = async (e) => {
+                    if (confirm("Supprimer définitivement cette annonce de la base de données ?")) {
+                        const id = e.target.getAttribute('data-id');
+                        await deleteDoc(doc(db, "announcements", id));
+                    }
+                };
+            });
+        });
+
+        // ── GESTION DE LA CONNEXION (FIREBASE AUTH) ──
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                loginStep.classList.add('hidden');
+                panelStep.classList.remove('hidden');
+                userDisplayEmail.textContent = user.email;
+            } else {
+                loginStep.classList.remove('hidden');
+                panelStep.classList.add('hidden');
+                userDisplayEmail.textContent = '';
+            }
+        });
+
+        loginForm.addEventListener('submit', async () => {
+            loginError.classList.add('hidden');
+            const email = document.getElementById('admin-email').value.trim();
+            const password = document.getElementById('admin-password').value;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                loginError.textContent = "Identifiants invalides ou droits insuffisants.";
+                loginError.classList.remove('hidden');
+            }
+        });
+
+        logoutBtn.onclick = () => {
+            signOut(auth);
+            modal.classList.remove('active');
+        };
+
+        // ── ENVOI DE L'ANNONCE (FIRESTORE + DISCORD) ──
+        announcementForm.addEventListener('submit', async () => {
             const titleInput = document.getElementById("annonce-title");
             const contentInput = document.getElementById("annonce-content");
 
-            if(!titleInput.value.trim() || !contentInput.value.trim()) {
-                alert("Veuillez remplir tous les champs obligatoires.");
-                return;
-            }
-
-            const database = getDatabase();
+            const title = titleInput.value.trim();
+            const content = contentInput.value.trim();
             const now = new Date();
             const dateStr = now.toLocaleDateString('fr-FR') + " à " + now.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
 
-            const newAnnonce = {
-                id: Date.now(), // ID Unique basé sur le timestamp
-                title: titleInput.value.trim(),
-                content: contentInput.value.trim(),
-                date: dateStr
+            try {
+                // 1. Enregistrement Base de données Cloud Firestore
+                await addDoc(collection(db, "announcements"), {
+                    title: title,
+                    content: content,
+                    createdAt: now
+                });
+
+                // 2. Envoi simultané sur Discord via Webhook
+                if (DISCORD_WEBHOOK_URL) {
+                    sendToDiscordWebhook(title, content, dateStr);
+                }
+
+                titleInput.value = "";
+                contentInput.value = "";
+                modal.classList.remove('active');
+
+            } catch (error) {
+                alert("Erreur lors de la publication : " + error.message);
+            }
+        });
+
+        function sendToDiscordWebhook(title, content, dateStr) {
+            const embedData = {
+                username: "ABYSZ Bot",
+                embeds: [{
+                    title: "📢 NOUVELLE ANNONCE SITE : " + title,
+                    description: content,
+                    color: 11032055, 
+                    footer: { text: "Posté le " + dateStr + " • Abysz Esports" }
+                }]
             };
 
-            database.unshift(newAnnonce); // Ajoute en haut du flux
-            localStorage.setItem("abysz_announcements", JSON.stringify(database));
-
-            // Reset l'interface
-            titleInput.value = "";
-            contentInput.value = "";
-            closeAdminModal();
-            renderAnnonces();
+            fetch(DISCORD_WEBHOOK_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(embedData)
+            }).catch(err => console.error("Erreur Webhook Discord:", err));
         }
 
-        function deleteAnnonce(id) {
-            if(confirm("Voulez-vous vraiment retirer cette annonce du flux de l'accueil ?")) {
-                let database = getDatabase();
-                database = database.filter(item => item.id !== id);
-                localStorage.setItem("abysz_announcements", JSON.stringify(database));
-                renderAnnonces();
-            }
-        }
+        // Événements d'ouverture/fermeture UI
+        adminGateBtn.onclick = () => modal.classList.add('active');
+        closeModalBtn.onclick = () => modal.classList.remove('active');
+        window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
     </script>
 </body>
 </html>

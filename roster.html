@@ -95,7 +95,7 @@
         }
         .input-group {
             margin-bottom: 15px;
-            text-align: left;
+            text-align: text;
         }
         .input-group label {
             display: block;
@@ -203,9 +203,14 @@
             <p class="loading-text">Chargement de l'équipe principale...</p>
         </div>
 
+        <h2 style="margin-top: 80px;">Centre de Formation (CDF)</h2>
+        <p style="text-align:center; margin-bottom: 30px; color: #aaa;">Les futurs talents en pleine progression</p>
+        <div class="roster-grid" id="cdf-roster-grid">
+            <p class="loading-text">Chargement du centre de formation...</p>
+        </div>
+
         <h2 style="margin-top: 80px;">Joueurs Académiques</h2>
         <p style="text-align:center; margin-bottom: 30px; color: #aaa;">Notre équipe de développement et d'avenir</p>
-        
         <div class="roster-grid" id="academy-roster-grid">
             <p class="loading-text">Chargement de l'académie...</p>
         </div>
@@ -252,6 +257,7 @@
                         <label for="player-team">Catégorie d'équipe</label>
                         <select id="player-team">
                             <option value="main">Équipe Principale (Pro)</option>
+                            <option value="cdf">Centre de Formation (CDF)</option>
                             <option value="academy">Joueurs Académiques</option>
                         </select>
                     </div>
@@ -325,34 +331,36 @@
         const addPlayerBtn = document.getElementById('add-player-btn');
         
         const mainGrid = document.getElementById('main-roster-grid');
+        const cdfGrid = document.getElementById('cdf-roster-grid');
         const academyGrid = document.getElementById('academy-roster-grid');
         const popupsContainer = document.getElementById('popups-container');
 
         let currentUser = null;
-        let editingPlayerId = null; // Stocke l'ID du joueur qu'on modifie (null si création)
-        let cacheJoueurs = {}; // Permet de stocker temporairement les données pour l'édition rapide
+        let editingPlayerId = null;
+        let cacheJoueurs = {};
 
         // ÉCOUTE ET AFFICHAGE DES JOUEURS EN TEMPS RÉEL
         const q = query(collection(db, "roster"), orderBy("createdAt", "asc"));
         onSnapshot(q, (snapshot) => {
             mainGrid.innerHTML = "";
+            cdfGrid.innerHTML = "";
             academyGrid.innerHTML = "";
             popupsContainer.innerHTML = "";
             cacheJoueurs = {};
 
             let mainCount = 0;
+            let cdfCount = 0;
             let acadCount = 0;
 
             snapshot.forEach((docSnap) => {
                 const player = docSnap.data();
                 const id = docSnap.id;
-                cacheJoueurs[id] = player; // Sauvegarde dans le cache
+                cacheJoueurs[id] = player;
 
                 // Création de la carte HTML
                 const cardContainer = document.createElement('div');
                 cardContainer.className = "player-card-container";
 
-                // Boutons d'administration cachés par défaut via la classe .hidden si non connecté
                 const adminControlsHtml = `
                     <div class="admin-controls ${currentUser ? '' : 'hidden'}">
                         <button class="inline-edit-btn" data-id="${id}">✏️</button>
@@ -372,16 +380,18 @@
                     </div>
                 `;
 
-                // Clic sur la carte pour voir le profil public
                 cardContainer.querySelector('.player-card').addEventListener('click', () => {
                     document.getElementById(`popup-${id}`).classList.add('active');
                     document.body.style.overflow = 'hidden';
                 });
 
-                // Dispatch dans la bonne grille
+                // Dispatch dans la bonne grille (Désormais sur 3 choix possibles)
                 if (player.team === "main") {
                     mainGrid.appendChild(cardContainer);
                     mainCount++;
+                } else if (player.team === "cdf") {
+                    cdfGrid.appendChild(cardContainer);
+                    cdfCount++;
                 } else {
                     academyGrid.appendChild(cardContainer);
                     acadCount++;
@@ -413,7 +423,6 @@
                     </div>
                 `;
 
-                // Événements de fermeture du pop-up
                 popupOverlay.querySelector('.popup-close').onclick = () => {
                     popupOverlay.classList.remove('active');
                     document.body.style.overflow = '';
@@ -429,12 +438,13 @@
             });
 
             if (mainCount === 0) mainGrid.innerHTML = '<p class="loading-text">Aucun joueur dans l\'équipe principale.</p>';
+            if (cdfCount === 0) cdfGrid.innerHTML = '<p class="loading-text">Aucun joueur au centre de formation.</p>';
             if (acadCount === 0) academyGrid.innerHTML = '<p class="loading-text">Aucun joueur académique.</p>';
 
             // CONFIGURATION DES BOUTONS DE SUPPRESSION
             document.querySelectorAll('.inline-delete-btn').forEach(btn => {
                 btn.onclick = async (e) => {
-                    e.stopPropagation(); // Évite d'ouvrir le pop-up profil
+                    e.stopPropagation();
                     if (confirm("Voulez-vous vraiment retirer ce joueur du roster ABYSZ ?")) {
                         const id = e.target.getAttribute('data-id');
                         await deleteDoc(doc(db, "roster", id));
@@ -445,14 +455,13 @@
             // CONFIGURATION DES BOUTONS DE MODIFICATION (✏️)
             document.querySelectorAll('.inline-edit-btn').forEach(btn => {
                 btn.onclick = (e) => {
-                    e.stopPropagation(); // Évite d'ouvrir le pop-up profil
+                    e.stopPropagation();
                     const id = e.target.getAttribute('data-id');
                     const player = cacheJoueurs[id];
 
                     if (player) {
-                        editingPlayerId = id; // On passe en mode édition
+                        editingPlayerId = id;
                         
-                        // Remplissage automatique du formulaire avec les anciennes valeurs
                         document.getElementById('player-team').value = player.team;
                         document.getElementById('player-pseudo').value = player.pseudo;
                         document.getElementById('player-role').value = player.role;
@@ -464,11 +473,9 @@
                         document.getElementById('link-twitter').value = player.twitter;
                         document.getElementById('link-tracker').value = player.tracker;
 
-                        // Changement des textes de l'interface admin
                         panelTitle.textContent = "Modifier le joueur : " + player.pseudo;
                         addPlayerBtn.textContent = "Mettre à jour le joueur";
 
-                        // Ouvrir la modal d'édition directement
                         modal.classList.add('active');
                     }
                 };
@@ -508,7 +515,7 @@
             modal.classList.remove('active');
         };
 
-        // SOUMISSION DU FORMULAIRE : CRÉATION OU MODIFICATION AUTOMATIQUE
+        // SOUMISSION DU FORMULAIRE : CRÉATION OU MODIFICATION
         playerForm.addEventListener('submit', async () => {
             const dataJoueur = {
                 team: document.getElementById('player-team').value,
@@ -525,17 +532,14 @@
 
             try {
                 if (editingPlayerId) {
-                    // MODE MODIFICATION : On met à jour le document existant
                     await updateDoc(doc(db, "roster", editingPlayerId), dataJoueur);
                     alert("Joueur mis à jour avec succès !");
                 } else {
-                    // MODE CRÉATION : On ajoute un nouveau document
                     dataJoueur.createdAt = new Date();
                     await addDoc(collection(db, "roster"), dataJoueur);
                     alert("Joueur ajouté avec succès !");
                 }
 
-                // Reset complet du formulaire après action
                 reinitialiserFormulaire();
                 modal.classList.remove('active');
             } catch (error) {
@@ -553,9 +557,8 @@
             document.getElementById('link-tracker').value = "#";
         }
 
-        // Événements d'ouverture de l'espace admin
         adminGateBtn.onclick = () => {
-            reinitialiserFormulaire(); // On s'assure d'être en mode "Ajout" par défaut si on clique sur le bouton du haut
+            reinitialiserFormulaire();
             modal.classList.add('active');
         };
         closeModalBtn.onclick = () => modal.classList.remove('active');

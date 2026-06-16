@@ -46,7 +46,7 @@
             padding: 20px;
         }
 
-        /* Styles pour les images de joueurs */
+        /* ── IMAGES DES JOUEURS ── */
         .player-avatar-img {
             width: 100%;
             height: 200px;
@@ -54,15 +54,16 @@
             border-bottom: 2px solid #a855f7;
             background: #141414;
         }
+        /* Style de l'image dans le profil ouvert : Rectangle respectant l'image d'origine */
         .popup-avatar-img {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #a855f7;
-            margin: 0 auto 15px auto;
+            width: 100%;
+            max-height: 250px;
+            object-fit: contain; /* L'image s'affiche entièrement sans être déformée ni coupée */
+            border: 2px solid #a855f7;
+            border-radius: 12px;
+            margin: 0 auto 20px auto;
             display: block;
-            background: #141414;
+            background: #0a0a0a;
         }
 
         /* ── MODAL ADMIN ── */
@@ -134,6 +135,13 @@
             font-family: 'Inter', sans-serif;
             font-size: 0.9rem;
             box-sizing: border-box;
+        }
+        /* Style spécial pour le bouton d'importation de fichier */
+        .input-group input[type="file"] {
+            background: #141414;
+            border: 1px dashed #a855f7;
+            padding: 10px;
+            cursor: pointer;
         }
         .input-row {
             display: grid;
@@ -288,9 +296,11 @@
                         <label for="player-role">Rôle / Division</label>
                         <input type="text" id="player-role" placeholder="Ex: Capitaine ou Division 1" required>
                     </div>
+                    
                     <div class="input-group">
-                        <label for="player-image">Lien de la photo (Ex: images/photo.png ou URL)</label>
-                        <input type="text" id="player-image" placeholder="Laisse # pour l'avatar par défaut" value="#">
+                        <label for="player-file">Charger la photo du joueur depuis votre PC</label>
+                        <input type="file" id="player-file" accept="image/*">
+                        <p style="font-size:0.75rem; color:#aaa; margin:4px 0 0 0;">L'image par défaut (logo) sera utilisée si aucun fichier n'est sélectionné.</p>
                     </div>
 
                     <div class="input-group">
@@ -352,6 +362,7 @@
         const logoutBtn = document.getElementById('logout-btn');
         const panelTitle = document.getElementById('panel-title');
         const addPlayerBtn = document.getElementById('add-player-btn');
+        const playerFileInput = document.getElementById('player-file');
         
         const mainGrid = document.getElementById('main-roster-grid');
         const cdfGrid = document.getElementById('cdf-roster-grid');
@@ -361,6 +372,19 @@
         let currentUser = null;
         let editingPlayerId = null;
         let cacheJoueurs = {};
+        let base64ImageString = ""; // Stockera l'image convertie en texte
+
+        // ÉCOUTE DU CHANGEMENT DE FICHIER POUR CONVERSION BASE64
+        playerFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    base64ImageString = reader.result; // Contient les données de l'image
+                };
+                reader.readAsDataURL(file);
+            }
+        });
 
         // ÉCOUTE ET AFFICHAGE DES JOUEURS EN TEMPS RÉEL
         const q = query(collection(db, "roster"), orderBy("createdAt", "asc"));
@@ -380,10 +404,9 @@
                 const id = docSnap.id;
                 cacheJoueurs[id] = player;
 
-                // Image par défaut si aucune n'est fournie
+                // Si pas d'image enregistrée, on remet le logo par défaut
                 const imgSrc = (player.image && player.image !== "#") ? player.image : "logo.png";
 
-                // Création de la carte HTML
                 const cardContainer = document.createElement('div');
                 cardContainer.className = "player-card-container";
 
@@ -422,7 +445,7 @@
                     acadCount++;
                 }
 
-                // Création du Pop-up associé dans le DOM
+                // Création du Pop-up associé avec le nouveau style d'image d'origine rectangle complet
                 const popupOverlay = document.createElement('div');
                 popupOverlay.className = "popup-overlay";
                 popupOverlay.id = `popup-${id}`;
@@ -466,7 +489,7 @@
             if (cdfCount === 0) cdfGrid.innerHTML = '<p class="loading-text">Aucun joueur au centre de formation.</p>';
             if (acadCount === 0) academyGrid.innerHTML = '<p class="loading-text">Aucun joueur académique.</p>';
 
-            // CONFIGURATION DES BOUTONS DE SUPPRESSION
+            // BOUTONS DE SUPPRESSION
             document.querySelectorAll('.inline-delete-btn').forEach(btn => {
                 btn.onclick = async (e) => {
                     e.stopPropagation();
@@ -477,7 +500,7 @@
                 };
             });
 
-            // CONFIGURATION DES BOUTONS DE MODIFICATION (✏️)
+            // BOUTONS DE MODIFICATION (✏️)
             document.querySelectorAll('.inline-edit-btn').forEach(btn => {
                 btn.onclick = (e) => {
                     e.stopPropagation();
@@ -486,11 +509,13 @@
 
                     if (player) {
                         editingPlayerId = id;
+                        base64ImageString = player.image || "#"; // Garde l'ancienne image si on n'en choisit pas de nouvelle
                         
                         document.getElementById('player-team').value = player.team;
                         document.getElementById('player-pseudo').value = player.pseudo;
                         document.getElementById('player-role').value = player.role;
-                        document.getElementById('player-image').value = player.image || "#";
+                        playerFileInput.value = ""; // Reset du sélecteur de fichier visuel
+                        
                         document.getElementById('stat-earnings').value = player.earnings;
                         document.getElementById('stat-best').value = player.bestPlacement;
                         document.getElementById('stat-wins').value = player.wins;
@@ -508,7 +533,7 @@
             });
         });
 
-        // GESTION DU STATUT DE CONNEXION ADMIN
+        // CONNEXION ADMIN
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
@@ -541,13 +566,13 @@
             modal.classList.remove('active');
         };
 
-        // SOUMISSION DU FORMULAIRE : CRÉATION OU MODIFICATION
+        // ENREGISTREMENT OU MODIFICATION
         playerForm.addEventListener('submit', async () => {
             const dataJoueur = {
                 team: document.getElementById('player-team').value,
                 pseudo: document.getElementById('player-pseudo').value.trim(),
                 role: document.getElementById('player-role').value.trim(),
-                image: document.getElementById('player-image').value.trim(),
+                image: base64ImageString || "#", // On stocke la chaîne de caractères Base64 générée
                 earnings: document.getElementById('stat-earnings').value.trim(),
                 bestPlacement: document.getElementById('stat-best').value.trim(),
                 wins: document.getElementById('stat-wins').value.trim(),
@@ -576,10 +601,11 @@
 
         function reinitialiserFormulaire() {
             editingPlayerId = null;
+            base64ImageString = "";
             playerForm.reset();
+            playerFileInput.value = "";
             panelTitle.textContent = "Ajouter un joueur";
             addPlayerBtn.textContent = "Enregistrer le joueur";
-            document.getElementById('player-image').value = "#";
             document.getElementById('link-twitch').value = "#";
             document.getElementById('link-twitter').value = "#";
             document.getElementById('link-tracker').value = "#";

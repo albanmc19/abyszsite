@@ -7,12 +7,24 @@
     <title>ABYSZ | Roster 2026</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Ajout du style pour le logo cliquable avec le bon espacement */
+        .logo-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;             /* Garde l'espace parfait entre l'image et le texte */
+            text-decoration: none;
+            color: inherit;        /* Conserve la couleur d'origine du texte */
+        }
+    </style>
 </head>
 <body>
     <nav>
         <div class="logo">
-            <img src="logo.png" alt="Logo ABYSZ">
-            ABYSZ
+            <a href="index.html" class="logo-link">
+                <img src="logo.png" alt="Logo ABYSZ">
+                ABYSZ
+            </a>
         </div>
         <ul>
             <li><a href="index.html">Accueil</a></li>
@@ -60,7 +72,6 @@
             </div>
         </div>
 
-        <!-- Section Joueurs Académiques -->
         <h2 style="margin-top: 80px;">Joueurs Académiques</h2>
         <p style="text-align:center; margin-bottom: 30px; color: #aaa;">Notre équipe de développement et d'avenir</p>
         
@@ -95,8 +106,6 @@
         <a href="index.html" class="btn">← Retour à l'accueil</a>
     </section>
 
-    <!-- ====================== POPUPS ROSTER PRINCIPAL ====================== -->
-    <!-- POPUP JOUEUR 1 -->
     <div class="popup-overlay" id="popup-joueur1" onclick="closeOnOverlay(event)">
         <div class="popup">
             <span class="popup-close" onclick="closePopup('joueur1')">✕</span>
@@ -119,7 +128,6 @@
         </div>
     </div>
 
-    <!-- POPUP JOUEUR 2 -->
     <div class="popup-overlay" id="popup-joueur2" onclick="closeOnOverlay(event)">
         <div class="popup">
             <span class="popup-close" onclick="closePopup('joueur2')">✕</span>
@@ -142,7 +150,6 @@
         </div>
     </div>
 
-    <!-- POPUP JOUEUR 3 -->
     <div class="popup-overlay" id="popup-joueur3" onclick="closeOnOverlay(event)">
         <div class="popup">
             <span class="popup-close" onclick="closePopup('joueur3')">✕</span>
@@ -165,7 +172,6 @@
         </div>
     </div>
 
-    <!-- POPUP JOUEUR 4 -->
     <div class="popup-overlay" id="popup-joueur4" onclick="closeOnOverlay(event)">
         <div class="popup">
             <span class="popup-close" onclick="closePopup('joueur4')">✕</span>
@@ -188,8 +194,6 @@
         </div>
     </div>
 
-    <!-- ====================== POPUPS JOUEURS ACADÉMIQUES ====================== -->
-    <!-- POPUP ACAD 1 -->
     <div class="popup-overlay" id="popup-acad1" onclick="closeOnOverlay(event)">
         <div class="popup">
             <span class="popup-close" onclick="closePopup('acad1')">✕</span>
@@ -212,7 +216,6 @@
         </div>
     </div>
 
-    <!-- POPUP ACAD 2 -->
     <div class="popup-overlay" id="popup-acad2" onclick="closeOnOverlay(event)">
         <div class="popup">
             <span class="popup-close" onclick="closePopup('acad2')">✕</span>
@@ -235,7 +238,6 @@
         </div>
     </div>
 
-    <!-- POPUP ACAD 3 -->
     <div class="popup-overlay" id="popup-acad3" onclick="closeOnOverlay(event)">
         <div class="popup">
             <span class="popup-close" onclick="closePopup('acad3')">✕</span>

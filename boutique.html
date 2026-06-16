@@ -39,7 +39,9 @@
                 <div class="product-info">
                     <div class="product-name">Maillot Officiel ABYSZ 2026</div>
                     <div class="product-price">59,99 €</div>
-                    <button class="btn-small" onclick="event.stopImmediatePropagation(); openProductPopup('prod1')">Voir & Acheter</button>
+                    <button class="btn-small" onclick="event.stopImmediatePropagation(); openProductPopup('prod1'); return false;">
+                        Voir & Acheter
+                    </button>
                 </div>
             </div>
         </div>
@@ -58,4 +60,72 @@
             <div class="popup-body">
                 <div class="popup-pseudo">Maillot Officiel ABYSZ 2026</div>
                 <div class="popup-role">59,99 €</div>
-                <p class="popup-bio">Maillot premium édition 2026. Tissu respirant, logo brodé, design moderne
+                <p class="popup-bio">Maillot premium édition 2026. Tissu respirant, logo brodé, couleurs officielles.</p>
+                
+                <div style="margin: 25px 0; font-weight: 600;">
+                    Tailles disponibles : S • M • L • XL
+                </div>
+
+                <div id="paypal-button-container" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
+    </footer>
+
+    <script>
+        function openProductPopup(id) {
+            console.log("Ouverture du popup :", id); // Pour debug
+            document.getElementById('popup-' + id).classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            if (id === 'prod1') {
+                setTimeout(() => {
+                    document.getElementById('paypal-button-container').innerHTML = '';
+                    paypal.Buttons({
+                        style: { shape: 'rect', color: 'gold', layout: 'vertical', label: 'pay' },
+                        createOrder: function(data, actions) {
+                            return actions.order.create({
+                                purchase_units: [{
+                                    amount: { value: '59.99', currency_code: 'EUR' },
+                                    description: "Maillot Officiel ABYSZ 2026"
+                                }]
+                            });
+                        },
+                        onApprove: function(data, actions) {
+                            return actions.order.capture().then(function(details) {
+                                alert('✅ Paiement réussi ! Merci pour ton soutien à ABYSZ ❤️');
+                            });
+                        },
+                        onError: function(err) {
+                            alert('Erreur lors du paiement.');
+                        }
+                    }).render('#paypal-button-container');
+                }, 300);
+            }
+        }
+
+        function closeProductPopup(id) {
+            document.getElementById('popup-' + id).classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function closeOnOverlay(e) {
+            if (e.target.classList.contains('popup-overlay')) {
+                e.target.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Fermeture avec touche ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "Escape") {
+                document.querySelectorAll('.popup-overlay.active').forEach(p => p.classList.remove('active'));
+                document.body.style.overflow = '';
+            }
+        });
+    </script>
+</body>
+</html>

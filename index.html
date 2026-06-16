@@ -3,77 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="ABYSZ Esports - Équipe Fortnite compétitive">
-    <title>ABYSZ | Fortnite Esports</title>
+    <meta name="description" content="Boutique ABYSZ Esports - Maillot Officiel">
+    <title>ABYSZ | Boutique</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://www.paypal.com/sdk/js?client-id=AQGUCu8DFjCMSlxSmnML5sqjT-18aYz1ZonWLL4o6OTO8q_HWH8Uk11gmRfmeuFhkcJZJ-adgsUaj7_7&currency=EUR"></script>
+    <style>
+        .social-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 8px;
+            padding-left: 12px;
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.6);
+            transition: color 0.2s ease, transform 0.2s ease;
+            text-decoration: none;
+        }
+        .social-links a:hover {
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+    </style>
 </head>
 <body>
     <nav>
         <div class="logo">
             <img src="logo.png" alt="Logo Abysz">
             ABYSZ
+            <div class="social-links">
+                <a href="https://www.tiktok.com/@abysz" target="_blank" aria-label="TikTok ABYSZ">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.76a4.85 4.85 0 0 1-1.01-.07z"/></svg>
+                </a>
+                <a href="https://x.com/abysz" target="_blank" aria-label="X ABYSZ">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </a>
+                <a href="https://www.youtube.com/@abysz" target="_blank" aria-label="YouTube ABYSZ">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                </a>
+                <a href="https://www.twitch.tv/abysz" target="_blank" aria-label="Twitch ABYSZ">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
+                </a>
+            </div>
         </div>
         <ul>
-            <li><a href="#accueil">Accueil</a></li>
+            <li><a href="index.html">Accueil</a></li>
             <li><a href="roster.html">Roster</a></li>
             <li><a href="boutique.html">Boutique</a></li>
-            <li><a href="#palmares">Palmarès</a></li>
-            <li><a href="#actualites">Actualités</a></li>
-            <li><a href="#nous-rejoindre">Rejoindre</a></li>
+            <li><a href="index.html#palmares">Palmarès</a></li>
+            <li><a href="index.html#actualites">Actualités</a></li>
+            <li><a href="index.html#nous-rejoindre">Rejoindre</a></li>
         </ul>
     </nav>
 
-    <section id="accueil" class="hero">
-        <h1>ABYSZ</h1>
-        <p class="slogan">Alone we play • together we win</p>
-        <a href="roster.html" class="btn">Découvrir le Roster 2026</a>
-    </section>
-
-    <!-- Qui sommes-nous -->
-    <section id="quisommesnous">
-        <h2>Qui sommes-nous ?</h2>
-        <div class="content">
-            <p>ABYSZ Esports est une équipe française de Fortnite compétitif créée en 2025. Nous visons le haut niveau avec une structure professionnelle, un accompagnement sérieux et une ambiance familiale.</p>
-            <p>Notre objectif : former des joueurs, participer aux FNCS, Cash Cups et événements majeurs tout en développant nos talents académiques.</p>
-        </div>
-    </section>
-
-    <!-- Palmarès -->
-    <section id="palmares">
-        <h2>Palmarès</h2>
-        <div class="content">
-            <p>Section à compléter avec vos meilleurs résultats (Cash Cups, FNCS, Tournois, etc.).</p>
-        </div>
-    </section>
-
-    <!-- Boutique Teaser (nettoyé) -->
-    <section id="boutique">
+    <section style="padding-top: 160px;">
         <h2>Boutique ABYSZ</h2>
         <p class="subtitle">Merch officiel • Soutenez l'équipe</p>
         
-        <div style="text-align:center; margin-top: 40px;">
-            <a href="boutique.html" class="btn">Découvrir toute la Boutique →</a>
+        <div class="boutique-grid">
+            <div class="product-card">
+                <img src="maillot.png" alt="Maillot Officiel ABYSZ 2026" style="width:100%; height:260px; object-fit:contain; background:#0d0d1a; display:block;">
+                <div class="product-info">
+                    <div class="product-name">Maillot Officiel ABYSZ 2026</div>
+                    <div class="product-price">59,99 €</div>
+                    <button class="btn-small" onclick="openProductPopup('prod1'); event.stopImmediatePropagation(); return false;">
+                        Voir & Acheter
+                    </button>
+                </div>
+            </div>
         </div>
+
+        <br><br>
+        <a href="index.html" class="btn">← Retour à l'accueil</a>
     </section>
 
-    <!-- Actualités -->
-    <section id="actualites">
-        <h2>Actualités</h2>
-        <p>Prochains tournois et news ici</p>
-    </section>
-
-    <!-- Nous Rejoindre -->
-    <section id="nous-rejoindre">
-        <h2>Nous Rejoindre</h2>
-        <p>Tu veux intégrer Abysz ? Rejoins-nous !</p>
-        <a href="https://discord.gg/BgKKj8fxUb" class="btn" target="_blank">Rejoindre Discord</a>
-    </section>
+    <!-- Popup -->
+    <div class="popup-overlay" id="popup-prod1" onclick="closeOnOverlay(event)">
+        <div class="popup">
+            <span class="popup-close" onclick="closeProductPopup('prod1')">✕</span>
+            
+            <img src="maillot.png" alt="Maillot Officiel ABYSZ 2026" style="width:100%; height:280px; object-fit:contain; background:#0d0d1a; display:block;">
+            
+            <div class="popup-body">
+                <div class="popup-pseudo">Maillot Officiel ABYSZ 2026</div>
+                <div class="popup-role">59,99 €</div>
+                <p class="popup-bio">Maillot premium 2026 • Tissu respirant • Logo brodé</p>
+                <div style="margin: 25px 0; font-weight: 600;">
+                    Tailles : S • M • L • XL
+                </div>
+                <div id="paypal-button-container"></div>
+            </div>
+        </div>
+    </div>
 
     <footer>
-        <p>© 2026 Abysz Esports • Nous contacter : <a href="mailto:abyszofficial@gmail.com">abyszofficial@gmail.com</a></p>
+        <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
     </footer>
 
-    <script src="script.js"></script>
+    <script>
+        function openProductPopup(id) {
+            document.getElementById('popup-' + id).classList.add('active');
+            document.body.style.overflow = 'hidden';
+            if (id === 'prod1') {
+                setTimeout(() => {
+                    document.getElementById('paypal-button-container').innerHTML = '';
+                    paypal.Buttons({
+                        style: { shape: 'rect', color: 'gold', layout: 'vertical', label: 'pay' },
+                        createOrder: function(data, actions) {
+                            return actions.order.create({
+                                purchase_units: [{ amount: { value: '59.99', currency_code: 'EUR' }, description: "Maillot Officiel ABYSZ 2026" }]
+                            });
+                        },
+                        onApprove: function(data, actions) {
+                            return actions.order.capture().then(function(details) {
+                                alert('✅ Paiement réussi ! Merci pour ton soutien à ABYSZ ❤️');
+                            });
+                        },
+                        onError: function(err) { alert('Erreur lors du paiement.'); }
+                    }).render('#paypal-button-container');
+                }, 350);
+            }
+        }
+
+        function closeProductPopup(id) {
+            document.getElementById('popup-' + id).classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function closeOnOverlay(e) {
+            if (e.target.classList.contains('popup-overlay')) {
+                e.target.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "Escape") {
+                document.querySelectorAll('.popup-overlay.active').forEach(p => p.classList.remove('active'));
+                document.body.style.overflow = '';
+            }
+        });
+    </script>
 </body>
 </html>

@@ -15,6 +15,150 @@
             text-decoration: none;
             color: inherit;
         }
+        .roster-header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto 30px auto;
+            padding: 0 20px;
+        }
+        .admin-gate-btn {
+            background: transparent;
+            border: 1px solid #a855f7;
+            color: #a855f7;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            transition: all 0.3s ease;
+        }
+        .admin-gate-btn:hover {
+            background: #a855f7;
+            color: white;
+            box-shadow: 0 0 15px #a855f7;
+        }
+        .loading-text {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            grid-column: 1 / -1;
+            padding: 20px;
+        }
+
+        /* ── MODAL ADMIN ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: #141414;
+            border: 2px solid #a855f7;
+            border-radius: 24px;
+            max-width: 500px;
+            width: 100%;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.25);
+            box-sizing: border-box;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.8rem;
+            color: #777;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .modal-close:hover {
+            color: #ff4444;
+        }
+        .modal-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #ffffff;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #a855f7;
+            font-size: 0.8rem;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+        }
+        .input-group input, .input-group textarea, .input-group select {
+            width: 100%;
+            padding: 10px 14px;
+            background: #0a0a0a;
+            border: 1px solid #2a2a2a;
+            color: white;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+        }
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+        .form-btn {
+            background: #a855f7;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            transition: background 0.2s;
+        }
+        .form-btn:hover {
+            background: #b975ff;
+        }
+        .hidden { display: none !important; }
+        .error-message { color: #ff4444; font-size: 0.85rem; margin-top: 10px; text-align: center; }
+        
+        /* Bouton de suppression sur la carte */
+        .player-card-container {
+            position: relative;
+        }
+        .inline-delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: bold;
+            z-index: 10;
+            font-family: 'Inter', sans-serif;
+        }
+        .inline-delete-btn:hover { background: #cc3333; }
     </style>
 </head>
 <body>
@@ -33,257 +177,316 @@
     </nav>
 
     <section style="padding-top: 160px;">
-        <h2>Notre Roster 2026</h2>
-        <div class="roster-grid">
-            <div class="player-card" onclick="openPopup('joueur1')">
-                <div class="player-avatar-placeholder"></div>
-                <div class="player-info">
-                    <div class="player-pseudo">Fxbio</div>
-                    <div class="player-role">Capitaine</div>
-                    <span class="voir-profil">Voir le profil</span>
-                </div>
-            </div>
-            <div class="player-card" onclick="openPopup('joueur2')">
-                <div class="player-avatar-placeholder"></div>
-                <div class="player-info">
-                    <div class="player-pseudo">Zeyto</div>
-                    <div class="player-role">Fragger</div>
-                    <span class="voir-profil">Voir le profil</span>
-                </div>
-            </div>
-            <div class="player-card" onclick="openPopup('joueur3')">
-                <div class="player-avatar-placeholder"></div>
-                <div class="player-info">
-                    <div class="player-pseudo">Pseudo3</div>
-                    <div class="player-role">Support</div>
-                    <span class="voir-profil">Voir le profil</span>
-                </div>
-            </div>
-            <div class="player-card" onclick="openPopup('joueur4')">
-                <div class="player-avatar-placeholder"></div>
-                <div class="player-info">
-                    <div class="player-pseudo">Pseudo4</div>
-                    <div class="player-role">IGL</div>
-                    <span class="voir-profil">Voir le profil</span>
-                </div>
-            </div>
+        <div class="roster-header-container">
+            <h2>Notre Roster 2026</h2>
+            <button class="admin-gate-btn" id="admin-gate-btn">🔑 Équipe Admin</button>
+        </div>
+
+        <div class="roster-grid" id="main-roster-grid">
+            <p class="loading-text">Chargement de l'équipe principale...</p>
         </div>
 
         <h2 style="margin-top: 80px;">Joueurs Académiques</h2>
         <p style="text-align:center; margin-bottom: 30px; color: #aaa;">Notre équipe de développement et d'avenir</p>
         
-        <div class="roster-grid">
-            <div class="player-card" onclick="openPopup('acad1')">
-                <div class="player-avatar-placeholder"></div>
-                <div class="player-info">
-                    <div class="player-pseudo">AcadPlayer1</div>
-                    <div class="player-role">Academy</div>
-                    <span class="voir-profil">Voir le profil</span>
-                </div>
-            </div>
-            <div class="player-card" onclick="openPopup('acad2')">
-                <div class="player-avatar-placeholder"></div>
-                <div class="player-info">
-                    <div class="player-pseudo">AcadPlayer2</div>
-                    <div class="player-role">Academy</div>
-                    <span class="voir-profil">Voir le profil</span>
-                </div>
-            </div>
-            <div class="player-card" onclick="openPopup('acad3')">
-                <div class="player-avatar-placeholder"></div>
-                <div class="player-info">
-                    <div class="player-pseudo">AcadPlayer3</div>
-                    <div class="player-role">Academy</div>
-                    <span class="voir-profil">Voir le profil</span>
-                </div>
-            </div>
+        <div class="roster-grid" id="academy-roster-grid">
+            <p class="loading-text">Chargement de l'académie...</p>
         </div>
 
         <br><br>
         <a href="index.html" class="btn">← Retour à l'accueil</a>
     </section>
 
-    <div class="popup-overlay" id="popup-joueur1" onclick="closeOnOverlay(event)">
-        <div class="popup">
-            <span class="popup-close" onclick="closePopup('joueur1')">✕</span>
-            <div class="player-avatar-placeholder"></div>
-            <div class="popup-body">
-                <div class="popup-pseudo">Fxbio</div>
-                <div class="popup-role">Division 1</div>
-                <div class="popup-stats">
-                    <div class="stat"><div class="stat-value">500$</div><div class="stat-label">Earning</div></div>
-                    <div class="stat"><div class="stat-value">7</div><div class="stat-label">Final Cash cup solo</div></div>
-                    <div class="stat"><div class="stat-value">142</div><div class="stat-label">Wins</div></div>
-                </div>
-                <div class="popup-bio">Polonais</div>
-                <div class="popup-socials">
-                    <a href="#" class="social-btn">Twitch</a>
-                    <a href="https://x.com/fxbio24" class="social-btn">Twitter</a>
-                    <a href="https://fortnitetracker.com/profile/all/ABZ%20Fxbio/events" class="social-btn">Tracker</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="popup-overlay" id="popup-joueur2" onclick="closeOnOverlay(event)">
-        <div class="popup">
-            <span class="popup-close" onclick="closePopup('joueur2')">✕</span>
-            <div class="player-avatar-placeholder"></div>
-            <div class="popup-body">
-                <div class="popup-pseudo">Zeyto</div>
-                <div class="popup-role">Division 2</div>
-                <div class="popup-stats">
-                    <div class="stat"><div class="stat-value">Pas de donnée</div><div class="stat-label">Earning</div></div>
-                    <div class="stat"><div class="stat-value">Pas de donnée</div><div class="stat-label">Best</div></div>
-                    <div class="stat"><div class="stat-value">Pas de donnée</div><div class="stat-label">Wins</div></div>
-                </div>
-                <div class="popup-bio">Polonais</div>
-                <div class="popup-socials">
-                    <a href="#" class="social-btn">Twitch</a>
-                    <a href="https://x.com/ZeytooFN9" class="social-btn">Twitter</a>
-                    <a href="#" class="social-btn">Tracker</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="popup-overlay" id="popup-joueur3" onclick="closeOnOverlay(event)">
-        <div class="popup">
-            <span class="popup-close" onclick="closePopup('joueur3')">✕</span>
-            <div class="player-avatar-placeholder"></div>
-            <div class="popup-body">
-                <div class="popup-pseudo">Pseudo3</div>
-                <div class="popup-role">Support</div>
-                <div class="popup-stats">
-                    <div class="stat"><div class="stat-value">6.3</div><div class="stat-label">K/D</div></div>
-                    <div class="stat"><div class="stat-value">TOP 3</div><div class="stat-label">Best</div></div>
-                    <div class="stat"><div class="stat-value">75</div><div class="stat-label">Wins</div></div>
-                </div>
-                <div class="popup-bio">Bio du joueur ici.</div>
-                <div class="popup-socials">
-                    <a href="#" class="social-btn">Twitch</a>
-                    <a href="#" class="social-btn">Twitter</a>
-                    <a href="#" class="social-btn">Tracker</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="popup-overlay" id="popup-joueur4" onclick="closeOnOverlay(event)">
-        <div class="popup">
-            <span class="popup-close" onclick="closePopup('joueur4')">✕</span>
-            <div class="player-avatar-placeholder"></div>
-            <div class="popup-body">
-                <div class="popup-pseudo">Pseudo4</div>
-                <div class="popup-role">IGL</div>
-                <div class="popup-stats">
-                    <div class="stat"><div class="stat-value">7.8</div><div class="stat-label">K/D</div></div>
-                    <div class="stat"><div class="stat-value">TOP 1</div><div class="stat-label">Best</div></div>
-                    <div class="stat"><div class="stat-value">110</div><div class="stat-label">Wins</div></div>
-                </div>
-                <div class="popup-bio">Bio du joueur ici.</div>
-                <div class="popup-socials">
-                    <a href="#" class="social-btn">Twitch</a>
-                    <a href="#" class="social-btn">Twitter</a>
-                    <a href="#" class="social-btn">Tracker</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="popup-overlay" id="popup-acad1" onclick="closeOnOverlay(event)">
-        <div class="popup">
-            <span class="popup-close" onclick="closePopup('acad1')">✕</span>
-            <div class="player-avatar-placeholder"></div>
-            <div class="popup-body">
-                <div class="popup-pseudo">AcadPlayer1</div>
-                <div class="popup-role">Joueur Académique</div>
-                <div class="popup-stats">
-                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Earning</div></div>
-                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Best</div></div>
-                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Wins</div></div>
-                </div>
-                <div class="popup-bio">Jeune talent en formation chez ABYSZ.</div>
-                <div class="popup-socials">
-                    <a href="#" class="social-btn">Twitch</a>
-                    <a href="#" class="social-btn">Twitter</a>
-                    <a href="#" class="social-btn">Tracker</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="popup-overlay" id="popup-acad2" onclick="closeOnOverlay(event)">
-        <div class="popup">
-            <span class="popup-close" onclick="closePopup('acad2')">✕</span>
-            <div class="player-avatar-placeholder"></div>
-            <div class="popup-body">
-                <div class="popup-pseudo">AcadPlayer2</div>
-                <div class="popup-role">Joueur Académique</div>
-                <div class="popup-stats">
-                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Earning</div></div>
-                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Best</div></div>
-                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Wins</div></div>
-                </div>
-                <div class="popup-bio">Bio du joueur académique ici.</div>
-                <div class="popup-socials">
-                    <a href="#" class="social-btn">Twitch</a>
-                    <a href="#" class="social-btn">Twitter</a>
-                    <a href="#" class="social-btn">Tracker</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="popup-overlay" id="popup-acad3" onclick="closeOnOverlay(event)">
-        <div class="popup">
-            <span class="popup-close" onclick="closePopup('acad3')">✕</span>
-            <div class="player-avatar-placeholder"></div>
-            <div class="popup-body">
-                <div class="popup-pseudo">AcadPlayer3</div>
-                <div class="popup-role">Joueur Académique</div>
-                <div class="popup-stats">
-                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Earning</div></div>
-                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Best</div></div>
-                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Wins</div></div>
-                </div>
-                <div class="popup-bio">Bio du joueur académique ici.</div>
-                <div class="popup-socials">
-                    <a href="#" class="social-btn">Twitch</a>
-                    <a href="#" class="social-btn">Twitter</a>
-                    <a href="#" class="social-btn">Tracker</a>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div id="popups-container"></div>
 
     <footer>
         <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
     </footer>
 
-    <script>
-        function openPopup(id) {
-            const popup = document.getElementById('popup-' + id);
-            if (popup) {
-                popup.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-        }
+    <div id="admin-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close" id="close-modal-btn">&times;</span>
+            
+            <div id="admin-login-step">
+                <h3>Connexion Admin</h3>
+                <form id="login-form" onsubmit="return false;">
+                    <div class="input-group">
+                        <label for="admin-email">Adresse e-mail</label>
+                        <input type="email" id="admin-email" placeholder="exemple@abysz.com" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="admin-password">Mot de passe</label>
+                        <input type="password" id="admin-password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="form-btn" id="login-btn">Se connecter</button>
+                </form>
+                <p id="login-error" class="error-message hidden"></p>
+            </div>
 
-        function closePopup(id) {
-            const popup = document.getElementById('popup-' + id);
-            if (popup) {
-                popup.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        }
+            <div id="admin-panel-step" class="hidden">
+                <h3>Ajouter un joueur</h3>
+                <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:0.8rem; background:#0a0a0a; padding:8px; border-radius:6px;">
+                    <span id="user-display-email" style="color:#a855f7;"></span>
+                    <button id="logout-btn" style="background:none; border:none; color:#ff4444; cursor:pointer; font-weight:bold;">Déconnexion</button>
+                </div>
+                
+                <form id="player-form" onsubmit="return false;">
+                    <div class="input-group">
+                        <label for="player-team">Catégorie d'équipe</label>
+                        <select id="player-team">
+                            <option value="main">Équipe Principale (Pro)</option>
+                            <option value="academy">Joueurs Académiques</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="player-pseudo">Pseudo</label>
+                        <input type="text" id="player-pseudo" placeholder="Ex: Fxbio" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="player-role">Rôle / Division</label>
+                        <input type="text" id="player-role" placeholder="Ex: Capitaine ou Division 1" required>
+                    </div>
 
-        function closeOnOverlay(e) {
-            if (e.target.classList.contains('popup-overlay')) {
-                e.target.classList.remove('active');
-                document.body.style.overflow = '';
+                    <div class="input-group">
+                        <label>Statistiques du joueur</label>
+                        <div class="input-row">
+                            <input type="text" id="stat-earnings" placeholder="Earnings (Ex: 500$)" required>
+                            <input type="text" id="stat-best" placeholder="Best PR (Ex: Top 7)" required>
+                            <input type="text" id="stat-wins" placeholder="Wins (Ex: 142)" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="player-bio">Biographie / Infos</label>
+                        <textarea id="player-bio" rows="2" placeholder="Ex: Joueur Polonais" required></textarea>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Réseaux Sociaux (Mettre # si aucun)</label>
+                        <input type="text" id="link-twitch" placeholder="Lien Twitch" value="#">
+                        <input type="text" id="link-twitter" placeholder="Lien Twitter / X" value="#">
+                        <input type="text" id="link-tracker" placeholder="Lien Fortnite Tracker" value="#">
+                    </div>
+
+                    <button type="submit" class="form-btn" id="add-player-btn">Enregistrer le joueur</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        // Ta configuration Firebase exacte
+        const firebaseConfig = {
+            apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
+            authDomain: "abysz-esports.firebaseapp.com",
+            projectId: "abysz-esports",
+            storageBucket: "abysz-esports.firebasestorage.app",
+            messagingSenderId: "200968659347",
+            appId: "1:200968659347:web:3a13d1614d00ed29968866",
+            measurementId: "G-HPQNQK5XL1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // DOM Elements
+        const modal = document.getElementById('admin-modal');
+        const adminGateBtn = document.getElementById('admin-gate-btn');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const loginForm = document.getElementById('login-form');
+        const playerForm = document.getElementById('player-form');
+        const loginStep = document.getElementById('admin-login-step');
+        const panelStep = document.getElementById('admin-panel-step');
+        const loginError = document.getElementById('login-error');
+        const userDisplayEmail = document.getElementById('user-display-email');
+        const logoutBtn = document.getElementById('logout-btn');
+        
+        const mainGrid = document.getElementById('main-roster-grid');
+        const academyGrid = document.getElementById('academy-roster-grid');
+        const popupsContainer = document.getElementById('popups-container');
+
+        let currentUser = null;
+
+        // ÉCOUTE ET AFFICHAGE DES JOUEURS EN TEMPS RÉEL depuis Firestore
+        const q = query(collection(db, "roster"), orderBy("createdAt", "asc"));
+        onSnapshot(q, (snapshot) => {
+            mainGrid.innerHTML = "";
+            academyGrid.innerHTML = "";
+            popupsContainer.innerHTML = "";
+
+            let mainCount = 0;
+            let acadCount = 0;
+
+            snapshot.forEach((docSnap) => {
+                const player = docSnap.data();
+                const id = docSnap.id;
+
+                // Création de la carte HTML
+                const cardContainer = document.createElement('div');
+                cardContainer.className = "player-card-container";
+
+                // Si admin connecté, ajout d'un bouton de suppression rapide
+                const deleteBtnHtml = currentUser 
+                    ? `<button class="inline-delete-btn" data-id="${id}">X</button>` 
+                    : "";
+
+                cardContainer.innerHTML = `
+                    ${deleteBtnHtml}
+                    <div class="player-card" id="card-${id}">
+                        <div class="player-avatar-placeholder"></div>
+                        <div class="player-info">
+                            <div class="player-pseudo">${player.pseudo}</div>
+                            <div class="player-role">${player.role}</div>
+                            <span class="voir-profil">Voir le profil</span>
+                        </div>
+                    </div>
+                `;
+
+                // Attachement de l'événement de clic pour ouvrir son pop-up spécifique
+                cardContainer.querySelector('.player-card').addEventListener('click', () => {
+                    document.getElementById(`popup-${id}`).classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+
+                // Dispatch dans la bonne grille
+                if (player.team === "main") {
+                    mainGrid.appendChild(cardContainer);
+                    mainCount++;
+                } else {
+                    academyGrid.appendChild(cardContainer);
+                    acadCount++;
+                }
+
+                // Création du Pop-up associé dans le DOM
+                const popupOverlay = document.createElement('div');
+                popupOverlay.className = "popup-overlay";
+                popupOverlay.id = `popup-${id}`;
+                popupOverlay.innerHTML = `
+                    <div class="popup">
+                        <span class="popup-close">✕</span>
+                        <div class="player-avatar-placeholder"></div>
+                        <div class="popup-body">
+                            <div class="popup-pseudo">${player.pseudo}</div>
+                            <div class="popup-role">${player.role}</div>
+                            <div class="popup-stats">
+                                <div class="stat"><div class="stat-value">${player.earnings}</div><div class="stat-label">Earning</div></div>
+                                <div class="stat"><div class="stat-value">${player.bestPlacement}</div><div class="stat-label">Best</div></div>
+                                <div class="stat"><div class="stat-value">${player.wins}</div><div class="stat-label">Wins</div></div>
+                            </div>
+                            <div class="popup-bio">${player.bio}</div>
+                            <div class="popup-socials">
+                                <a href="${player.twitch}" target="_blank" class="social-btn">Twitch</a>
+                                <a href="${player.twitter}" target="_blank" class="social-btn">Twitter</a>
+                                <a href="${player.tracker}" target="_blank" class="social-btn">Tracker</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Événements de fermeture du pop-up
+                popupOverlay.querySelector('.popup-close').onclick = () => {
+                    popupOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                };
+                popupOverlay.onclick = (e) => {
+                    if (e.target === popupOverlay) {
+                        popupOverlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                };
+
+                popupsContainer.appendChild(popupOverlay);
+            });
+
+            // Afficher un texte si les grilles sont vides
+            if (mainCount === 0) mainGrid.innerHTML = '<p class="loading-text">Aucun joueur dans l\'équipe principale.</p>';
+            if (acadCount === 0) academyGrid.innerHTML = '<p class="loading-text">Aucun joueur académique.</p>';
+
+            // Configurer les actions de suppression pour l'admin
+            document.querySelectorAll('.inline-delete-btn').forEach(btn => {
+                btn.onclick = async (e) => {
+                    e.stopPropagation();
+                    if (confirm("Voulez-vous vraiment retirer ce joueur du roster ABYSZ ?")) {
+                        const id = e.target.getAttribute('data-id');
+                        await deleteDoc(doc(db, "roster", id));
+                    }
+                };
+            });
+        });
+
+        // AUTHENTICATION MANAGEMENT
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                loginStep.classList.add('hidden');
+                panelStep.classList.remove('hidden');
+                userDisplayEmail.textContent = `${user.email}`;
+                // Rafraîchir les boutons de suppression visuels
+                document.querySelectorAll('.inline-delete-btn').forEach(b => b.classList.remove('hidden'));
+            } else {
+                loginStep.classList.remove('hidden');
+                panelStep.classList.add('hidden');
+                userDisplayEmail.textContent = '';
+                document.querySelectorAll('.inline-delete-btn').forEach(b => b.classList.add('hidden'));
             }
-        }
+        });
+
+        loginForm.addEventListener('submit', async () => {
+            loginError.classList.add('hidden');
+            const email = document.getElementById('admin-email').value.trim();
+            const password = document.getElementById('admin-password').value;
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                loginError.textContent = "Identifiants incorrects.";
+                loginError.classList.remove('hidden');
+            }
+        });
+
+        logoutBtn.onclick = () => {
+            signOut(auth);
+            modal.classList.remove('active');
+        };
+
+        // ENREGISTRER UN NOUVEAU JOUEUR SUR FIRESTORE
+        playerForm.addEventListener('submit', async () => {
+            try {
+                await addDoc(collection(db, "roster"), {
+                    team: document.getElementById('player-team').value,
+                    pseudo: document.getElementById('player-pseudo').value.trim(),
+                    role: document.getElementById('player-role').value.trim(),
+                    earnings: document.getElementById('stat-earnings').value.trim(),
+                    bestPlacement: document.getElementById('stat-best').value.trim(),
+                    wins: document.getElementById('stat-wins').value.trim(),
+                    bio: document.getElementById('player-bio').value.trim(),
+                    twitch: document.getElementById('link-twitch').value.trim(),
+                    twitter: document.getElementById('link-twitter').value.trim(),
+                    tracker: document.getElementById('link-tracker').value.trim(),
+                    createdAt: new Date()
+                });
+
+                playerForm.reset();
+                // Remettre les '#' par défaut pour éviter les liens brisés
+                document.getElementById('link-twitch').value = "#";
+                document.getElementById('link-twitter').value = "#";
+                document.getElementById('link-tracker').value = "#";
+                
+                modal.classList.remove('active');
+                alert("Joueur ajouté avec succès !");
+            } catch (error) {
+                alert("Erreur lors de l'ajout : " + error.message);
+            }
+        });
+
+        // Ouverture / Fermeture de la fenêtre globale de configuration admin
+        adminGateBtn.onclick = () => modal.classList.add('active');
+        closeModalBtn.onclick = () => modal.classList.remove('active');
+        window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
     </script>
 </body>
 </html>

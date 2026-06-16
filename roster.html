@@ -140,3 +140,93 @@
             </div>
         </div>
     </div>
+
+    <!-- POPUP JOUEUR 3 -->
+    <div class="popup-overlay" id="popup-joueur3" onclick="closeOnOverlay(event)">
+        <div class="popup">
+            <span class="popup-close" onclick="closePopup('joueur3')">✕</span>
+            <div class="player-avatar-placeholder"></div>
+            <div class="popup-body">
+                <div class="popup-pseudo">Pseudo3</div>
+                <div class="popup-role">Support</div>
+                <div class="popup-stats">
+                    <div class="stat">
+                        <div class="stat-value">6.3</div>
+                        <div class="stat-label">K/D</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">TOP 3</div>
+                        <div class="stat-label">Best</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">75</div>
+                        <div class="stat-label">Wins</div>
+                    </div>
+                </div>
+                <div class="popup-bio">Bio du joueur ici.</div>
+                <div class="popup-socials">
+                    <a href="#" class="social-btn">Twitch</a>
+                    <a href="#" class="social-btn">Twitter</a>
+                    <a href="#" class="social-btn">Tracker</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP JOUEUR 4 -->
+    <div class="popup-overlay" id="popup-joueur4" onclick="closeOnOverlay(event)">
+        <div class="popup">
+            <span class="popup-close" onclick="closePopup('joueur4')">✕</span>
+            <div class="player-avatar-placeholder"></div>
+            <div class="popup-body">
+                <div class="popup-pseudo">Pseudo4</div>
+                <div class="popup-role">IGL</div>
+                <div class="popup-stats">
+                    <div class="stat">
+                        <div class="stat-value">7.8</div>
+                        <div class="stat-label">K/D</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">TOP 1</div>
+                        <div class="stat-label">Best</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">110</div>
+                        <div class="stat-label">Wins</div>
+                    </div>
+                </div>
+                <div class="popup-bio">Bio du joueur ici.</div>
+                <div class="popup-socials">
+                    <a href="#" class="social-btn">Twitch</a>
+                    <a href="#" class="social-btn">Twitter</a>
+                    <a href="#" class="social-btn">Tracker</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        function openPopup(id) {
+            document.getElementById('popup-' + id).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePopup(id) {
+            document.getElementById('popup-' + id).classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function closeOnOverlay(e) {
+            if (e.target.classList.contains('popup-overlay')) {
+                e.target.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+    </script>
+</body>
+</html>

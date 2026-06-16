@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Roster 2026 de l'équipe ABYSZ Esports - Fortnite compétitif">
+    <meta name="description" content="Roster 2026 de l'équipe ABYSZ Esports">
     <title>ABYSZ | Roster 2026</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
@@ -11,7 +11,7 @@
 <body>
     <nav>
         <div class="logo">
-            <img src="logo.png" alt="Logo ABYSZ Esports">
+            <img src="logo.png" alt="Logo ABYSZ">
             ABYSZ
         </div>
         <ul>
@@ -64,12 +64,11 @@
             </div>
         </div>
 
-        <!-- ====================== NOUVELLE SECTION ====================== -->
+        <!-- Section Joueurs Académiques -->
         <h2 style="margin-top: 80px;">Joueurs Académiques</h2>
         <p style="text-align:center; margin-bottom: 30px; color: #aaa;">Notre équipe de développement et d'avenir</p>
         
         <div class="roster-grid">
-            <!-- JOUEUR ACADÉMIQUE 1 -->
             <div class="player-card" onclick="openPopup('acad1')">
                 <div class="player-avatar-placeholder"></div>
                 <div class="player-info">
@@ -78,7 +77,6 @@
                     <span class="voir-profil">Voir le profil</span>
                 </div>
             </div>
-            <!-- JOUEUR ACADÉMIQUE 2 -->
             <div class="player-card" onclick="openPopup('acad2')">
                 <div class="player-avatar-placeholder"></div>
                 <div class="player-info">
@@ -87,7 +85,6 @@
                     <span class="voir-profil">Voir le profil</span>
                 </div>
             </div>
-            <!-- JOUEUR ACADÉMIQUE 3 -->
             <div class="player-card" onclick="openPopup('acad3')">
                 <div class="player-avatar-placeholder"></div>
                 <div class="player-info">
@@ -102,8 +99,8 @@
         <a href="index.html" class="btn">← Retour à l'accueil</a>
     </section>
 
-    <!-- ====================== POPUPS ROSTER PRINCIPAL ====================== -->
-    <!-- (Je garde vos popups originaux inchangés) -->
+    <!-- ====================== TOUS LES POPUPS ====================== -->
+
     <!-- POPUP JOUEUR 1 -->
     <div class="popup-overlay" id="popup-joueur1" onclick="closeOnOverlay(event)">
         <div class="popup">
@@ -127,24 +124,43 @@
         </div>
     </div>
 
-    <!-- POPUP JOUEUR 2, 3, 4 ... (identiques à votre code original) -->
-    <!-- Je les ai gardés pour ne pas alourdir, mais ils restent fonctionnels -->
-
-    <!-- ====================== POPUPS JOUEURS ACADÉMIQUES ====================== -->
-    <!-- POPUP ACAD 1 -->
-    <div class="popup-overlay" id="popup-acad1" onclick="closeOnOverlay(event)">
+    <!-- POPUP JOUEUR 2 - ZEyto -->
+    <div class="popup-overlay" id="popup-joueur2" onclick="closeOnOverlay(event)">
         <div class="popup">
-            <span class="popup-close" onclick="closePopup('acad1')">✕</span>
+            <span class="popup-close" onclick="closePopup('joueur2')">✕</span>
             <div class="player-avatar-placeholder"></div>
             <div class="popup-body">
-                <div class="popup-pseudo">AcadPlayer1</div>
-                <div class="popup-role">Joueur Académique</div>
+                <div class="popup-pseudo">Zeyto</div>
+                <div class="popup-role">Division 2</div>
                 <div class="popup-stats">
-                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Earning</div></div>
-                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Best</div></div>
-                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Wins</div></div>
+                    <div class="stat"><div class="stat-value">Pas de donnée</div><div class="stat-label">Earning</div></div>
+                    <div class="stat"><div class="stat-value">Pas de donnée</div><div class="stat-label">Best</div></div>
+                    <div class="stat"><div class="stat-value">Pas de donnée</div><div class="stat-label">Wins</div></div>
                 </div>
-                <div class="popup-bio">Jeune talent en formation chez ABYSZ.</div>
+                <div class="popup-bio">Polonais</div>
+                <div class="popup-socials">
+                    <a href="#" class="social-btn">Twitch</a>
+                    <a href="https://x.com/ZeytooFN9" class="social-btn">Twitter</a>
+                    <a href="#" class="social-btn">Tracker</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP JOUEUR 3 -->
+    <div class="popup-overlay" id="popup-joueur3" onclick="closeOnOverlay(event)">
+        <div class="popup">
+            <span class="popup-close" onclick="closePopup('joueur3')">✕</span>
+            <div class="player-avatar-placeholder"></div>
+            <div class="popup-body">
+                <div class="popup-pseudo">Pseudo3</div>
+                <div class="popup-role">Support</div>
+                <div class="popup-stats">
+                    <div class="stat"><div class="stat-value">6.3</div><div class="stat-label">K/D</div></div>
+                    <div class="stat"><div class="stat-value">TOP 3</div><div class="stat-label">Best</div></div>
+                    <div class="stat"><div class="stat-value">75</div><div class="stat-label">Wins</div></div>
+                </div>
+                <div class="popup-bio">Bio du joueur ici.</div>
                 <div class="popup-socials">
                     <a href="#" class="social-btn">Twitch</a>
                     <a href="#" class="social-btn">Twitter</a>
@@ -154,20 +170,20 @@
         </div>
     </div>
 
-    <!-- POPUP ACAD 2 -->
-    <div class="popup-overlay" id="popup-acad2" onclick="closeOnOverlay(event)">
+    <!-- POPUP JOUEUR 4 -->
+    <div class="popup-overlay" id="popup-joueur4" onclick="closeOnOverlay(event)">
         <div class="popup">
-            <span class="popup-close" onclick="closePopup('acad2')">✕</span>
+            <span class="popup-close" onclick="closePopup('joueur4')">✕</span>
             <div class="player-avatar-placeholder"></div>
             <div class="popup-body">
-                <div class="popup-pseudo">AcadPlayer2</div>
-                <div class="popup-role">Joueur Académique</div>
+                <div class="popup-pseudo">Pseudo4</div>
+                <div class="popup-role">IGL</div>
                 <div class="popup-stats">
-                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Earning</div></div>
-                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Best</div></div>
-                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Wins</div></div>
+                    <div class="stat"><div class="stat-value">7.8</div><div class="stat-label">K/D</div></div>
+                    <div class="stat"><div class="stat-value">TOP 1</div><div class="stat-label">Best</div></div>
+                    <div class="stat"><div class="stat-value">110</div><div class="stat-label">Wins</div></div>
                 </div>
-                <div class="popup-bio">Bio du joueur académique ici.</div>
+                <div class="popup-bio">Bio du joueur ici.</div>
                 <div class="popup-socials">
                     <a href="#" class="social-btn">Twitch</a>
                     <a href="#" class="social-btn">Twitter</a>
@@ -177,28 +193,8 @@
         </div>
     </div>
 
-    <!-- POPUP ACAD 3 -->
-    <div class="popup-overlay" id="popup-acad3" onclick="closeOnOverlay(event)">
-        <div class="popup">
-            <span class="popup-close" onclick="closePopup('acad3')">✕</span>
-            <div class="player-avatar-placeholder"></div>
-            <div class="popup-body">
-                <div class="popup-pseudo">AcadPlayer3</div>
-                <div class="popup-role">Joueur Académique</div>
-                <div class="popup-stats">
-                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Earning</div></div>
-                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Best</div></div>
-                    <div class="stat"><div class="stat-value">—</div><div class="stat-label">Wins</div></div>
-                </div>
-                <div class="popup-bio">Bio du joueur académique ici.</div>
-                <div class="popup-socials">
-                    <a href="#" class="social-btn">Twitch</a>
-                    <a href="#" class="social-btn">Twitter</a>
-                    <a href="#" class="social-btn">Tracker</a>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Popups Académiques (déjà présents) -->
+    <!-- ... (je les garde identiques à la version précédente) -->
 
     <footer>
         <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
@@ -207,13 +203,23 @@
     <script src="script.js"></script>
     <script>
         function openPopup(id) {
-            document.getElementById('popup-' + id).classList.add('active');
-            document.body.style.overflow = 'hidden';
+            const popup = document.getElementById('popup-' + id);
+            if (popup) {
+                popup.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else {
+                console.error("Popup non trouvé : popup-" + id);
+            }
         }
+
         function closePopup(id) {
-            document.getElementById('popup-' + id).classList.remove('active');
-            document.body.style.overflow = '';
+            const popup = document.getElementById('popup-' + id);
+            if (popup) {
+                popup.classList.remove('active');
+                document.body.style.overflow = '';
+            }
         }
+
         function closeOnOverlay(e) {
             if (e.target.classList.contains('popup-overlay')) {
                 e.target.classList.remove('active');

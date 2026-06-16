@@ -57,10 +57,12 @@ nav ul a:hover {
     border-radius: 8px;
 }
  
-/* ── Hero ── */
+/* ── Hero ── (CORRIGÉ & OPTIMISÉ POUR BANIERE.JPG) */
 .hero {
-    height: 100vh;
-    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('baniere.jpg') center/cover no-repeat;
+    min-height: 90vh;
+    padding-top: 100px; /* Évite que le texte passe sous la barre de navigation */
+    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url('baniere.jpg') no-repeat center center;
+    background-size: cover; /* Force l'image à s'adapter proprement sans s'écraser */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -70,17 +72,17 @@ nav ul a:hover {
  
 .hero h1 {
     font-family: 'Orbitron', sans-serif;
-    font-size: 7rem;
-    color: #a855f7;
-    text-shadow: 0 0 40px #a855f7;
-    margin-bottom: 1rem;
+    font-size: 5.5rem; /* Ajusté légèrement pour une compatibilité parfaite sur tous les écrans */
+    color: #ffffff;
+    text-shadow: 0 0 30px rgba(168, 85, 247, 0.8);
+    margin-bottom: 0.5rem;
 }
  
 .slogan {
-    font-size: 2rem;
+    font-size: 1.5rem;
     margin-bottom: 2.5rem;
-    color: #ffffff;
-    text-shadow: 0 0 20px rgba(255,255,255,0.9), 0 0 40px rgba(255,255,255,0.5);
+    color: #67e8f9; /* Superbe bleu néon qui ressort sur les éclairs de ta bannière */
+    text-shadow: 0 0 15px rgba(103, 232, 249, 0.6);
 }
  
 /* ── Boutons ── */
@@ -419,7 +421,7 @@ footer {
     margin-top: 50px;
     text-align: center;
 }
-
+ 
 /* ── Réseaux sociaux nav ── */
 .social-links {
     display: flex;
@@ -429,7 +431,7 @@ footer {
     padding-left: 12px;
     border-left: 1px solid rgba(255, 255, 255, 0.2);
 }
-
+ 
 .social-links a {
     display: flex;
     align-items: center;
@@ -438,7 +440,7 @@ footer {
     transition: color 0.2s ease, transform 0.2s ease;
     text-decoration: none;
 }
-
+ 
 .social-links a:hover {
     color: #a855f7;
     transform: translateY(-2px);

@@ -8,57 +8,79 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        /* ── ARCHITECTURE GLOBALE & NAV ── */
-        .logo-link { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
-        .roster-header-container { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto 30px auto; padding: 0 20px; }
-        .admin-gate-btn { background: transparent; border: 1px solid #a855f7; color: #a855f7; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-family: 'Orbitron', sans-serif; transition: all 0.3s ease; }
-        .admin-gate-btn:hover { background: #a855f7; color: white; box-shadow: 0 0 15px #a855f7; }
-        .loading-text { text-align: center; color: #666; font-style: italic; grid-column: 1/-1; padding: 20px; }
+        .logo-link { display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; }
+        .roster-header-container { display:flex; justify-content:space-between; align-items:center; max-width:1200px; margin:0 auto 30px auto; padding:0 20px; }
+        .admin-gate-btn { background:transparent; border:1px solid #a855f7; color:#a855f7; padding:8px 16px; border-radius:20px; cursor:pointer; font-family:'Orbitron',sans-serif; transition:all 0.3s ease; }
+        .admin-gate-btn:hover { background:#a855f7; color:white; box-shadow:0 0 15px #a855f7; }
+        .loading-text { text-align:center; color:#666; font-style:italic; grid-column:1/-1; padding:20px; }
 
         /* ── IMAGES ── */
-        .player-avatar-img { width: 100%; height: 200px; object-fit: cover; border-bottom: 2px solid #a855f7; background: #141414; }
-        .popup-avatar-img { width: 100%; max-height: 250px; object-fit: contain; border: 2px solid #a855f7; border-radius: 12px; margin: 0 auto 20px auto; display: block; background: #0a0a0a; }
+        .player-avatar-img { width:100%; height:200px; object-fit:cover; border-bottom:2px solid #a855f7; background:#141414; }
+        .popup-avatar-img { width:100%; max-height:250px; object-fit:contain; border:2px solid #a855f7; border-radius:12px; margin:0 auto 20px auto; display:block; background:#0a0a0a; }
 
-        /* ── MODAL & POPUPS ── */
-        .modal-overlay, .popup-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
-        .modal-overlay.active, .popup-overlay.active { display: flex; }
-        
-        .modal-content, .popup { background: #141414; border: 2px solid #a855f7; border-radius: 24px; max-width: 500px; width: 100%; padding: 30px; position: relative; box-shadow: 0 0 30px rgba(168,85,247,0.25); box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
-        .modal-close, .popup-close { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; color: #777; cursor: pointer; transition: color 0.2s; }
-        .modal-close:hover, .popup-close:hover { color: #ff4444; }
-        
-        .modal-content h3, .popup-pseudo { font-family: 'Orbitron', sans-serif; color: #fff; margin-top: 0; margin-bottom: 20px; font-size: 1.5rem; text-align: center; }
-        
-        /* ── FORMULAIRES ── */
-        .input-group { margin-bottom: 15px; text-align: left; }
-        .input-group label { display: block; margin-bottom: 6px; color: #a855f7; font-size: 0.8rem; font-family: 'Orbitron', sans-serif; font-weight: 600; }
-        .input-group input, .input-group textarea, .input-group select { width: 100%; padding: 10px 14px; background: #0a0a0a; border: 1px solid #2a2a2a; color: white; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.9rem; box-sizing: border-box; }
-        .input-group input[type="file"] { background: #141414; border: 1px dashed #a855f7; padding: 10px; cursor: pointer; }
-        .input-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        
-        .form-btn { background: #a855f7; color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: 'Orbitron', sans-serif; transition: background 0.2s; }
-        .form-btn:hover { background: #b975ff; }
-        .hidden { display: none !important; }
-        .error-message { color: #ff4444; font-size: 0.85rem; margin-top: 10px; text-align: center; }
+        /* ── MODAL ── */
+        .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center; padding:20px; }
+        .modal-overlay.active { display:flex; }
+        .modal-content { background:#141414; border:2px solid #a855f7; border-radius:24px; max-width:500px; width:100%; padding:30px; position:relative; box-shadow:0 0 30px rgba(168,85,247,0.25); box-sizing:border-box; max-height:90vh; overflow-y:auto; }
+        .modal-close { position:absolute; top:15px; right:20px; font-size:1.8rem; color:#777; cursor:pointer; transition:color 0.2s; }
+        .modal-close:hover { color:#ff4444; }
+        .modal-content h3 { font-family:'Orbitron',sans-serif; color:#fff; margin-top:0; margin-bottom:20px; font-size:1.5rem; text-align:center; }
+        .input-group { margin-bottom:15px; text-align:left; }
+        .input-group label { display:block; margin-bottom:6px; color:#a855f7; font-size:0.8rem; font-family:'Orbitron',sans-serif; font-weight:600; }
+        .input-group input, .input-group textarea, .input-group select { width:100%; padding:10px 14px; background:#0a0a0a; border:1px solid #2a2a2a; color:white; border-radius:8px; font-family:'Inter',sans-serif; font-size:0.9rem; box-sizing:border-box; }
+        .input-group input[type="file"] { background:#141414; border:1px dashed #a855f7; padding:10px; cursor:pointer; }
+        .input-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+        .form-btn { background:#a855f7; color:white; border:none; width:100%; padding:12px; border-radius:8px; font-weight:700; cursor:pointer; font-family:'Orbitron',sans-serif; transition:background 0.2s; }
+        .form-btn:hover { background:#b975ff; }
+        .form-btn-secondary { background:#1a1a1a; color:#a855f7; border:1px solid #a855f7; width:100%; padding:10px; border-radius:8px; font-weight:700; cursor:pointer; font-family:'Orbitron',sans-serif; font-size:0.85rem; transition:all 0.2s; margin-top:8px; }
+        .form-btn-secondary:hover { background:#a855f7; color:white; }
+        .hidden { display:none !important; }
+        .error-message { color:#ff4444; font-size:0.85rem; margin-top:10px; text-align:center; }
 
         /* ── ADMIN CONTROLS ── */
-        .player-card-container { position: relative; }
-        .admin-controls { position: absolute; top: 10px; right: 10px; display: flex; gap: 6px; z-index: 10; }
-        .inline-edit-btn, .inline-delete-btn { color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: bold; font-family: 'Inter', sans-serif; }
-        .inline-edit-btn { background: #a855f7; }
-        .inline-edit-btn:hover { background: #b975ff; }
-        .inline-delete-btn { background: #ff4444; }
-        .inline-delete-btn:hover { background: #cc3333; }
+        .player-card-container { position:relative; }
+        .admin-controls { position:absolute; top:10px; right:10px; display:flex; gap:6px; z-index:10; }
+        .inline-edit-btn { background:#a855f7; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold; font-family:'Inter',sans-serif; }
+        .inline-edit-btn:hover { background:#b975ff; }
+        .inline-delete-btn { background:#ff4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold; font-family:'Inter',sans-serif; }
+        .inline-delete-btn:hover { background:#cc3333; }
 
-        /* ── HISTORIQUE PR ── */
-        .pr-history-section { background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 12px; padding: 16px; margin: 16px 0; }
-        .pr-history-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
-        .pr-evolution-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: 700; margin-bottom: 14px; }
+        /* ── SECTION PR HISTORIQUE (dans le popup) ── */
+        .pr-history-section {
+            background: #0d0d0d;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        .pr-history-title {
+            font-family: 'Orbitron', sans-serif;
+            color: #a855f7;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .pr-evolution-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
         .pr-evolution-badge.positive { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
         .pr-evolution-badge.negative { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
         .pr-evolution-badge.neutral  { background: rgba(168,85,247,0.1); color: #a855f7; border: 1px solid rgba(168,85,247,0.3); }
-        
-        .pr-table { width: 100%; border-collapse: collapse; font-family: 'Inter', sans-serif; font-size: 0.82rem; }
+        .pr-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.82rem;
+        }
         .pr-table thead tr { border-bottom: 1px solid #2a2a2a; }
         .pr-table th { color: #666; font-weight: 600; padding: 4px 8px; text-align: left; font-size: 0.75rem; }
         .pr-table td { padding: 6px 8px; color: #ccc; border-bottom: 1px solid #1a1a1a; }
@@ -70,8 +92,26 @@
         .pr-delta-cell.neg { color: #ef4444; }
         .pr-delta-cell.neu { color: #666; }
 
-        .pr-add-zone { background: #0a0a0a; border: 1px solid #a855f7; border-radius: 10px; padding: 14px; margin-bottom: 14px; }
-        .pr-add-zone-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 0.75rem; letter-spacing: 1px; margin-bottom: 10px; }
+        /* ── SÉPARATEUR dans le formulaire admin ── */
+        .form-separator {
+            border: none;
+            border-top: 1px solid #2a2a2a;
+            margin: 16px 0;
+        }
+        .pr-add-zone {
+            background: #0a0a0a;
+            border: 1px solid #a855f7;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+        .pr-add-zone-title {
+            font-family: 'Orbitron', sans-serif;
+            color: #a855f7;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -121,6 +161,7 @@
         <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
     </footer>
 
+    <!-- MODAL ADMIN -->
     <div id="admin-modal" class="modal-overlay">
         <div class="modal-content">
             <span class="modal-close" id="close-modal-btn">&times;</span>
@@ -163,3 +204,401 @@
                     </div>
                     <div class="input-group">
                         <label for="player-role">Rôle / Division</label>
+                        <input type="text" id="player-role" placeholder="Ex: Capitaine ou Division 1" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="player-file">Charger la photo du joueur depuis votre PC</label>
+                        <input type="file" id="player-file" accept="image/*">
+                        <p style="font-size:0.75rem;color:#aaa;margin:4px 0 0 0;">L'image par défaut (logo) sera utilisée si aucun fichier n'est sélectionné.</p>
+                    </div>
+                    <div class="input-group">
+                        <label>Statistiques du joueur</label>
+                        <div class="input-row">
+                            <input type="text" id="stat-earnings" placeholder="Earnings (Ex: 500$)" required>
+                            <input type="text" id="stat-best" placeholder="Best PR (Ex: Top 7)" required>
+                            <input type="text" id="stat-wins" placeholder="Best Perf (Ex: 142)" required>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="player-bio">Biographie / Infos</label>
+                        <textarea id="player-bio" rows="2" placeholder="Ex: Joueur Polonais" required></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label>Réseaux Sociaux (Mettre # si aucun)</label>
+                        <input type="text" id="link-twitch" placeholder="Lien Twitch" value="#">
+                        <input type="text" id="link-twitter" placeholder="Lien Twitter / X" value="#">
+                        <input type="text" id="link-tracker" placeholder="Lien Fortnite Tracker" value="#">
+                    </div>
+
+                    <!-- ── ZONE AJOUT PR (visible seulement en mode édition) ── -->
+                    <div id="pr-add-zone" class="pr-add-zone hidden">
+                        <div class="pr-add-zone-title">📈 ENREGISTRER UN NOUVEAU PR</div>
+                        <div class="input-group" style="margin-bottom:8px;">
+                            <label for="new-pr-value">Valeur du PR (nombre entier)</label>
+                            <input type="number" id="new-pr-value" placeholder="Ex: 14500" min="0">
+                        </div>
+                        <div class="input-group" style="margin-bottom:0;">
+                            <label for="new-pr-date">Date du relevé</label>
+                            <input type="date" id="new-pr-date">
+                        </div>
+                        <p style="font-size:0.72rem;color:#666;margin:8px 0 0 0;">Laisse vide pour ne pas modifier l'historique PR.</p>
+                    </div>
+
+                    <button type="submit" class="form-btn" id="add-player-btn">Enregistrer le joueur</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, updateDoc, query, orderBy, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
+            authDomain: "abysz-esports.firebaseapp.com",
+            projectId: "abysz-esports",
+            storageBucket: "abysz-esports.firebasestorage.app",
+            messagingSenderId: "200968659347",
+            appId: "1:200968659347:web:3a13d1614d00ed29968866",
+            measurementId: "G-HPQNQK5XL1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const modal = document.getElementById('admin-modal');
+        const adminGateBtn = document.getElementById('admin-gate-btn');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const loginForm = document.getElementById('login-form');
+        const playerForm = document.getElementById('player-form');
+        const loginStep = document.getElementById('admin-login-step');
+        const panelStep = document.getElementById('admin-panel-step');
+        const loginError = document.getElementById('login-error');
+        const userDisplayEmail = document.getElementById('user-display-email');
+        const logoutBtn = document.getElementById('logout-btn');
+        const panelTitle = document.getElementById('panel-title');
+        const addPlayerBtn = document.getElementById('add-player-btn');
+        const playerFileInput = document.getElementById('player-file');
+        const prAddZone = document.getElementById('pr-add-zone');
+
+        const mainGrid = document.getElementById('main-roster-grid');
+        const cdfGrid = document.getElementById('cdf-roster-grid');
+        const academyGrid = document.getElementById('academy-roster-grid');
+        const popupsContainer = document.getElementById('popups-container');
+
+        let currentUser = null;
+        let editingPlayerId = null;
+        let cacheJoueurs = {};
+        let base64ImageString = "";
+
+        // ── HELPERS PR ──────────────────────────────────────────────
+        function calculerEvolution(historique) {
+            // historique = [{value, date}, ...] trié du plus ancien au plus récent
+            if (!historique || historique.length < 2) return null;
+            const dernier = historique[historique.length - 1].value;
+            const avantDernier = historique[historique.length - 2].value;
+            if (avantDernier === 0) return null;
+            const pct = ((dernier - avantDernier) / avantDernier * 100).toFixed(1);
+            return { pct: parseFloat(pct), dernier, avantDernier };
+        }
+
+        function badgeEvolution(evo) {
+            if (!evo) return '';
+            const signe = evo.pct >= 0 ? '+' : '';
+            const cls = evo.pct > 0 ? 'positive' : evo.pct < 0 ? 'negative' : 'neutral';
+            const icon = evo.pct > 0 ? '▲' : evo.pct < 0 ? '▼' : '●';
+            return `<div class="pr-evolution-badge ${cls}">${icon} ${signe}${evo.pct}% par rapport au relevé précédent</div>`;
+        }
+
+        function tableauHistorique(historique) {
+            if (!historique || historique.length === 0) return '';
+            // Trier du plus récent au plus ancien pour l'affichage
+            const sorted = [...historique].reverse();
+            let rows = '';
+            for (let i = 0; i < sorted.length; i++) {
+                const entry = sorted[i];
+                const isLatest = i === 0;
+                // Calculer le delta vs entrée précédente (dans l'ordre chrono = sorted[i+1])
+                let deltaHtml = '<span class="pr-delta-cell neu">—</span>';
+                if (i < sorted.length - 1) {
+                    const prev = sorted[i + 1].value;
+                    const curr = entry.value;
+                    const diff = curr - prev;
+                    const pct = prev !== 0 ? (diff / prev * 100).toFixed(1) : '0.0';
+                    const signe = diff >= 0 ? '+' : '';
+                    const cls = diff > 0 ? 'pos' : diff < 0 ? 'neg' : 'neu';
+                    deltaHtml = `<span class="pr-delta-cell ${cls}">${signe}${pct}%</span>`;
+                }
+                rows += `
+                    <tr class="${isLatest ? 'pr-latest' : ''}">
+                        <td>${entry.date || '—'}</td>
+                        <td>${Number(entry.value).toLocaleString('fr-FR')}</td>
+                        <td>${deltaHtml}</td>
+                    </tr>`;
+            }
+            return `
+                <div class="pr-history-section">
+                    <div class="pr-history-title">Historique PR</div>
+                    ${badgeEvolution(calculerEvolution(historique))}
+                    <table class="pr-table">
+                        <thead><tr><th>Date</th><th>PR</th><th>Évolution</th></tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>`;
+        }
+
+        // ── LECTURE FICHIER IMAGE ────────────────────────────────────
+        playerFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = () => { base64ImageString = reader.result; };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // ── ÉCOUTE FIRESTORE ─────────────────────────────────────────
+        const q = query(collection(db, "roster"), orderBy("createdAt", "asc"));
+        onSnapshot(q, (snapshot) => {
+            mainGrid.innerHTML = "";
+            cdfGrid.innerHTML = "";
+            academyGrid.innerHTML = "";
+            popupsContainer.innerHTML = "";
+            cacheJoueurs = {};
+
+            let mainCount = 0, cdfCount = 0, acadCount = 0;
+
+            snapshot.forEach((docSnap) => {
+                const player = docSnap.data();
+                const id = docSnap.id;
+                cacheJoueurs[id] = player;
+
+                const imgSrc = (player.image && player.image !== "#") ? player.image : "logo.png";
+                const historique = player.prHistory || [];
+
+                // ── Carte joueur ──
+                const cardContainer = document.createElement('div');
+                cardContainer.className = "player-card-container";
+                const adminControlsHtml = `
+                    <div class="admin-controls ${currentUser ? '' : 'hidden'}">
+                        <button class="inline-edit-btn" data-id="${id}">✏️</button>
+                        <button class="inline-delete-btn" data-id="${id}">X</button>
+                    </div>`;
+
+                cardContainer.innerHTML = `
+                    ${adminControlsHtml}
+                    <div class="player-card" id="card-${id}">
+                        <img src="${imgSrc}" class="player-avatar-img" alt="${player.pseudo}">
+                        <div class="player-info">
+                            <div class="player-pseudo">${player.pseudo}</div>
+                            <div class="player-role">${player.role}</div>
+                            <span class="voir-profil">Voir le profil</span>
+                        </div>
+                    </div>`;
+
+                cardContainer.querySelector('.player-card').addEventListener('click', () => {
+                    document.getElementById(`popup-${id}`).classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+
+                if (player.team === "main")        { mainGrid.appendChild(cardContainer); mainCount++; }
+                else if (player.team === "cdf")    { cdfGrid.appendChild(cardContainer); cdfCount++; }
+                else                               { academyGrid.appendChild(cardContainer); acadCount++; }
+
+                // ── Popup avec historique PR ──
+                const popupOverlay = document.createElement('div');
+                popupOverlay.className = "popup-overlay";
+                popupOverlay.id = `popup-${id}`;
+                popupOverlay.innerHTML = `
+                    <div class="popup">
+                        <span class="popup-close">✕</span>
+                        <img src="${imgSrc}" class="popup-avatar-img" alt="${player.pseudo}">
+                        <div class="popup-body">
+                            <div class="popup-pseudo">${player.pseudo}</div>
+                            <div class="popup-role">${player.role}</div>
+                            <div class="popup-stats">
+                                <div class="stat"><div class="stat-value">${player.earnings}</div><div class="stat-label">Earning</div></div>
+                                <div class="stat"><div class="stat-value">${player.bestPlacement}</div><div class="stat-label">Best PR</div></div>
+                                <div class="stat"><div class="stat-value">${player.wins}</div><div class="stat-label">Best Perf</div></div>
+                            </div>
+                            ${tableauHistorique(historique)}
+                            <div class="popup-bio">${player.bio}</div>
+                            <div class="popup-socials">
+                                <a href="${player.twitch}" target="_blank" class="social-btn">Twitch</a>
+                                <a href="${player.twitter}" target="_blank" class="social-btn">Twitter</a>
+                                <a href="${player.tracker}" target="_blank" class="social-btn">Tracker</a>
+                            </div>
+                        </div>
+                    </div>`;
+
+                popupOverlay.querySelector('.popup-close').onclick = () => {
+                    popupOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                };
+                popupOverlay.onclick = (e) => {
+                    if (e.target === popupOverlay) {
+                        popupOverlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                };
+                popupsContainer.appendChild(popupOverlay);
+            });
+
+            if (mainCount === 0) mainGrid.innerHTML = '<p class="loading-text">Aucun joueur dans l\'équipe principale.</p>';
+            if (acadCount === 0) academyGrid.innerHTML = '<p class="loading-text">Aucun joueur académique.</p>';
+            if (cdfCount === 0) cdfGrid.innerHTML = '<p class="loading-text">Aucun joueur au centre de formation.</p>';
+
+            // ── Boutons supprimer ──
+            document.querySelectorAll('.inline-delete-btn').forEach(btn => {
+                btn.onclick = async (e) => {
+                    e.stopPropagation();
+                    if (confirm("Voulez-vous vraiment retirer ce joueur du roster ABYSZ ?")) {
+                        await deleteDoc(doc(db, "roster", e.target.getAttribute('data-id')));
+                    }
+                };
+            });
+
+            // ── Boutons modifier ──
+            document.querySelectorAll('.inline-edit-btn').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    const id = e.target.getAttribute('data-id');
+                    const player = cacheJoueurs[id];
+                    if (!player) return;
+
+                    editingPlayerId = id;
+                    base64ImageString = player.image || "#";
+
+                    document.getElementById('player-team').value = player.team;
+                    document.getElementById('player-pseudo').value = player.pseudo;
+                    document.getElementById('player-role').value = player.role;
+                    playerFileInput.value = "";
+                    document.getElementById('stat-earnings').value = player.earnings;
+                    document.getElementById('stat-best').value = player.bestPlacement;
+                    document.getElementById('stat-wins').value = player.wins;
+                    document.getElementById('player-bio').value = player.bio;
+                    document.getElementById('link-twitch').value = player.twitch;
+                    document.getElementById('link-twitter').value = player.twitter;
+                    document.getElementById('link-tracker').value = player.tracker;
+
+                    // Pré-remplir la date du jour pour le champ PR
+                    document.getElementById('new-pr-value').value = "";
+                    document.getElementById('new-pr-date').value = new Date().toISOString().split('T')[0];
+
+                    // Afficher la zone PR uniquement en mode édition
+                    prAddZone.classList.remove('hidden');
+
+                    panelTitle.textContent = "Modifier : " + player.pseudo;
+                    addPlayerBtn.textContent = "Mettre à jour le joueur";
+                    modal.classList.add('active');
+                };
+            });
+        });
+
+        // ── AUTH ─────────────────────────────────────────────────────
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                loginStep.classList.add('hidden');
+                panelStep.classList.remove('hidden');
+                userDisplayEmail.textContent = user.email;
+                document.querySelectorAll('.admin-controls').forEach(c => c.classList.remove('hidden'));
+            } else {
+                loginStep.classList.remove('hidden');
+                panelStep.classList.add('hidden');
+                userDisplayEmail.textContent = '';
+                document.querySelectorAll('.admin-controls').forEach(c => c.classList.add('hidden'));
+            }
+        });
+
+        loginForm.addEventListener('submit', async () => {
+            loginError.classList.add('hidden');
+            try {
+                await signInWithEmailAndPassword(
+                    auth,
+                    document.getElementById('admin-email').value.trim(),
+                    document.getElementById('admin-password').value
+                );
+            } catch {
+                loginError.textContent = "Identifiants incorrects.";
+                loginError.classList.remove('hidden');
+            }
+        });
+
+        logoutBtn.onclick = () => { signOut(auth); modal.classList.remove('active'); };
+
+        // ── ENREGISTREMENT ───────────────────────────────────────────
+        playerForm.addEventListener('submit', async () => {
+            const dataJoueur = {
+                team:           document.getElementById('player-team').value,
+                pseudo:         document.getElementById('player-pseudo').value.trim(),
+                role:           document.getElementById('player-role').value.trim(),
+                image:          base64ImageString || "#",
+                earnings:       document.getElementById('stat-earnings').value.trim(),
+                bestPlacement:  document.getElementById('stat-best').value.trim(),
+                wins:           document.getElementById('stat-wins').value.trim(),
+                bio:            document.getElementById('player-bio').value.trim(),
+                twitch:         document.getElementById('link-twitch').value.trim(),
+                twitter:        document.getElementById('link-twitter').value.trim(),
+                tracker:        document.getElementById('link-tracker').value.trim(),
+            };
+
+            try {
+                if (editingPlayerId) {
+                    // Gestion de l'historique PR
+                    const newPrVal = document.getElementById('new-pr-value').value.trim();
+                    const newPrDate = document.getElementById('new-pr-date').value.trim();
+
+                    if (newPrVal !== "" && !isNaN(parseInt(newPrVal))) {
+                        const ancienHistorique = cacheJoueurs[editingPlayerId].prHistory || [];
+                        const nouvelleEntree = {
+                            value: parseInt(newPrVal),
+                            date: newPrDate || new Date().toLocaleDateString('fr-FR')
+                        };
+                        dataJoueur.prHistory = [...ancienHistorique, nouvelleEntree];
+                    } else {
+                        // Conserver l'historique existant sans modification
+                        dataJoueur.prHistory = cacheJoueurs[editingPlayerId].prHistory || [];
+                    }
+
+                    await updateDoc(doc(db, "roster", editingPlayerId), dataJoueur);
+                    alert("Joueur mis à jour avec succès !");
+                } else {
+                    // Nouveau joueur : historique vide
+                    dataJoueur.prHistory = [];
+                    dataJoueur.createdAt = new Date();
+                    await addDoc(collection(db, "roster"), dataJoueur);
+                    alert("Joueur ajouté avec succès !");
+                }
+
+                reinitialiserFormulaire();
+                modal.classList.remove('active');
+            } catch (error) {
+                alert("Une erreur est survenue : " + error.message);
+            }
+        });
+
+        function reinitialiserFormulaire() {
+            editingPlayerId = null;
+            base64ImageString = "";
+            playerForm.reset();
+            playerFileInput.value = "";
+            panelTitle.textContent = "Ajouter un joueur";
+            addPlayerBtn.textContent = "Enregistrer le joueur";
+            document.getElementById('link-twitch').value = "#";
+            document.getElementById('link-twitter').value = "#";
+            document.getElementById('link-tracker').value = "#";
+            document.getElementById('new-pr-value').value = "";
+            document.getElementById('new-pr-date').value = "";
+            prAddZone.classList.add('hidden'); // Cacher en mode ajout
+        }
+
+        adminGateBtn.onclick = () => { reinitialiserFormulaire(); modal.classList.add('active'); };
+        closeModalBtn.onclick = () => modal.classList.remove('active');
+        window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
+    </script>
+</body>
+</html>

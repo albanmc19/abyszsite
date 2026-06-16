@@ -46,6 +46,25 @@
             padding: 20px;
         }
 
+        /* Styles pour les images de joueurs */
+        .player-avatar-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 2px solid #a855f7;
+            background: #141414;
+        }
+        .popup-avatar-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #a855f7;
+            margin: 0 auto 15px auto;
+            display: block;
+            background: #141414;
+        }
+
         /* ── MODAL ADMIN ── */
         .modal-overlay {
             display: none;
@@ -95,7 +114,7 @@
         }
         .input-group {
             margin-bottom: 15px;
-            text-align: text;
+            text-align: left;
         }
         .input-group label {
             display: block;
@@ -269,6 +288,10 @@
                         <label for="player-role">Rôle / Division</label>
                         <input type="text" id="player-role" placeholder="Ex: Capitaine ou Division 1" required>
                     </div>
+                    <div class="input-group">
+                        <label for="player-image">Lien de la photo (Ex: images/photo.png ou URL)</label>
+                        <input type="text" id="player-image" placeholder="Laisse # pour l'avatar par défaut" value="#">
+                    </div>
 
                     <div class="input-group">
                         <label>Statistiques du joueur</label>
@@ -357,6 +380,9 @@
                 const id = docSnap.id;
                 cacheJoueurs[id] = player;
 
+                // Image par défaut si aucune n'est fournie
+                const imgSrc = (player.image && player.image !== "#") ? player.image : "logo.png";
+
                 // Création de la carte HTML
                 const cardContainer = document.createElement('div');
                 cardContainer.className = "player-card-container";
@@ -371,7 +397,7 @@
                 cardContainer.innerHTML = `
                     ${adminControlsHtml}
                     <div class="player-card" id="card-${id}">
-                        <div class="player-avatar-placeholder"></div>
+                        <img src="${imgSrc}" class="player-avatar-img" alt="${player.pseudo}">
                         <div class="player-info">
                             <div class="player-pseudo">${player.pseudo}</div>
                             <div class="player-role">${player.role}</div>
@@ -385,7 +411,6 @@
                     document.body.style.overflow = 'hidden';
                 });
 
-                // Dispatch dans la bonne grille (Désormais sur 3 choix possibles)
                 if (player.team === "main") {
                     mainGrid.appendChild(cardContainer);
                     mainCount++;
@@ -404,7 +429,7 @@
                 popupOverlay.innerHTML = `
                     <div class="popup">
                         <span class="popup-close">✕</span>
-                        <div class="player-avatar-placeholder"></div>
+                        <img src="${imgSrc}" class="popup-avatar-img" alt="${player.pseudo}">
                         <div class="popup-body">
                             <div class="popup-pseudo">${player.pseudo}</div>
                             <div class="popup-role">${player.role}</div>
@@ -465,6 +490,7 @@
                         document.getElementById('player-team').value = player.team;
                         document.getElementById('player-pseudo').value = player.pseudo;
                         document.getElementById('player-role').value = player.role;
+                        document.getElementById('player-image').value = player.image || "#";
                         document.getElementById('stat-earnings').value = player.earnings;
                         document.getElementById('stat-best').value = player.bestPlacement;
                         document.getElementById('stat-wins').value = player.wins;
@@ -521,6 +547,7 @@
                 team: document.getElementById('player-team').value,
                 pseudo: document.getElementById('player-pseudo').value.trim(),
                 role: document.getElementById('player-role').value.trim(),
+                image: document.getElementById('player-image').value.trim(),
                 earnings: document.getElementById('stat-earnings').value.trim(),
                 bestPlacement: document.getElementById('stat-best').value.trim(),
                 wins: document.getElementById('stat-wins').value.trim(),
@@ -552,6 +579,7 @@
             playerForm.reset();
             panelTitle.textContent = "Ajouter un joueur";
             addPlayerBtn.textContent = "Enregistrer le joueur";
+            document.getElementById('player-image').value = "#";
             document.getElementById('link-twitch').value = "#";
             document.getElementById('link-twitter').value = "#";
             document.getElementById('link-tracker').value = "#";

@@ -50,10 +50,14 @@
         .trend-down { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; }
         .trend-neutral { background: rgba(102, 102, 102, 0.15); color: #999; border: 1px solid #666; }
 
-        /* Réseaux sociaux stylisés (Match l'image ABYSZ) */
+        /* Réseaux sociaux stylisés */
         .social-links-container { display: flex; justify-content: center; gap: 20px; margin: 20px 0; align-items: center; }
         .social-icon-link { font-size: 1.3rem; color: #b3b3b3; text-decoration: none; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; }
         .social-icon-link:hover { color: #a855f7; transform: scale(1.2); filter: drop-shadow(0 0 8px #a855f7); }
+
+        /* Style de la scrollbar de la popup */
+        .popup::-webkit-scrollbar { width: 6px; }
+        .popup::-webkit-scrollbar-thumb { background: #a855f7; border-radius: 10px; }
 
         /* ── FORMULAIRES EDITION ── */
         .input-group { margin-bottom: 15px; text-align: left; }
@@ -332,7 +336,6 @@
                 }
             }
 
-            /* ── REMPLACEMENT DES EMOJIS PAR LES LOGOS OFFICIELS FONT AWESOME ── */
             let socialHtml = "";
             if (!isNewPlayer && (player.twitter || player.twitch || player.youtube || player.tiktok)) {
                 socialHtml = `<div class="social-links-container">`;
@@ -350,18 +353,22 @@
                         
                         <div id="view-mode-${playerId}" class="${startInEditMode ? 'hidden' : ''}">
                             <img src="${avatar}" class="popup-avatar-img" id="view-avatar-${playerId}" alt="">
+                            
                             <h3 class="popup-pseudo">${player.pseudo || 'Nouveau Joueur'}</h3>
                             
+                            <div style="text-align:center; font-size: 1.4rem; margin: 5px 0;">🐦</div>
+
+                            <p style="text-align:center; color:#aaa; margin-top:5px; margin-bottom:10px; font-family:'Inter', sans-serif;">${player.role || 'Rôle non défini'}</p>
+                            
+                            <p style="text-align:center; color:#22c55e; font-weight:600; font-family:'Orbitron', sans-serif; margin-bottom:15px;">Earnings : ${player.earnings || '0 €'}</p>
+                            
+                            <button class="form-btn edit-toggle-btn ${estAdmin ? '' : 'hidden'}" id="btn-to-edit-${playerId}">✏️ Éditer le profil / PR</button>
+
                             <div style="text-align:center; margin-bottom:5px;">
                                 ${trendHtml}
                             </div>
 
                             ${socialHtml}
-
-                            <p style="text-align:center; color:#aaa; margin-top:5px; margin-bottom:10px; font-family:'Inter', sans-serif;">${player.role || 'Rôle non défini'}</p>
-                            <p style="text-align:center; color:#22c55e; font-weight:600; font-family:'Orbitron', sans-serif; margin-bottom:15px;">Earnings : ${player.earnings || '0 €'}</p>
-                            
-                            <button class="form-btn edit-toggle-btn ${estAdmin ? '' : 'hidden'}" id="btn-to-edit-${playerId}">✏️ Éditer le profil / PR</button>
 
                             <div class="chart-container" id="chart-box-${playerId}">
                                 <canvas id="canvas-${playerId}"></canvas>

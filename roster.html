@@ -27,11 +27,20 @@
         .modal-overlay.active, .popup-overlay.active { display: flex; }
         
         .modal-content, .popup { background: #141414; border: 2px solid #a855f7; border-radius: 24px; max-width: 500px; width: 100%; padding: 30px; position: relative; box-shadow: 0 0 30px rgba(168,85,247,0.25); box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
-        .popup-close { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; color: #777; cursor: pointer; transition: color 0.2s; }
-        .popup-close:hover { color: #ff4444; }
+        .modal-close, .popup-close { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; color: #777; cursor: pointer; transition: color 0.2s; }
+        .modal-close:hover, .popup-close:hover { color: #ff4444; }
         
-        .popup-pseudo { font-family: 'Orbitron', sans-serif; color: #fff; margin-top: 0; margin-bottom: 20px; font-size: 1.5rem; text-align: center; }
+        .modal-content h3, .popup-pseudo { font-family: 'Orbitron', sans-serif; color: #fff; margin-top: 0; margin-bottom: 20px; font-size: 1.5rem; text-align: center; }
         
+        /* ── FORMULAIRES PANEL ── */
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 6px; color: #a855f7; font-size: 0.8rem; font-family: 'Orbitron', sans-serif; font-weight: 600; }
+        .input-group input, .input-group textarea, .input-group select { width: 100%; padding: 10px 14px; background: #0a0a0a; border: 1px solid #2a2a2a; color: white; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.9rem; box-sizing: border-box; }
+        
+        .form-btn { background: #a855f7; color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: 'Orbitron', sans-serif; transition: background 0.2s; margin-top: 10px; }
+        .form-btn:hover { background: #b975ff; }
+        .delete-btn { background: #ff4444 !important; margin-top: 5px; }
+        .delete-btn:hover { background: #ff6666 !important; }
         .hidden { display: none !important; }
 
         /* ── HISTORIQUE PR ── */
@@ -66,7 +75,7 @@
     <section style="padding-top: 160px; padding-bottom: 80px;">
         <div class="roster-header-container">
             <h2 style="font-family:'Orbitron', sans-serif; color:#fff; font-size:2rem; margin:0;">Notre Roster 2026</h2>
-            <button class="admin-gate-btn" id="admin-gate-btn">🔑 Équipe Admin</button>
+            <button class="admin-gate-btn" id="admin-gate-btn">⚙️ Panel Gestion</button>
         </div>
 
         <div class="roster-grid" id="main-roster-grid">
@@ -93,11 +102,48 @@
 
     <div id="popups-container"></div>
 
+    <div id="admin-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close" id="close-modal-btn">&times;</span>
+            <h3 id="modal-title">Ajouter / Modifier un Joueur</h3>
+            <form id="player-form" onsubmit="return false;">
+                <input type="hidden" id="player-id">
+                
+                <div class="input-group">
+                    <label for="player-pseudo">Pseudo</label>
+                    <input type="text" id="player-pseudo" required placeholder="Ex: Fxbio">
+                </div>
+                <div class="input-group">
+                    <label for="player-team">Catégorie d'équipe</label>
+                    <select id="player-team" required>
+                        <option value="main">Équipe Principale (Pro)</option>
+                        <option value="academy">Académie</option>
+                        <option value="cdf">Centre de Formation (CDF)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="player-role">Rôle / Division</label>
+                    <input type="text" id="player-role" required placeholder="Ex: Duelist / Radiant">
+                </div>
+                <div class="input-group">
+                    <label for="player-image">Lien de l'image (Avatar)</label>
+                    <input type="text" id="player-image" placeholder="Ex: logo.png ou lien https://">
+                </div>
+                <div class="input-group">
+                    <label for="player-earnings">Earnings</label>
+                    <input type="text" id="player-earnings" placeholder="Ex: 150 €">
+                </div>
+
+                <button type="submit" class="form-btn" id="save-btn">Enregistrer le joueur</button>
+                <button type="button" class="form-btn delete-btn hidden" id="delete-btn">Supprimer le joueur</button>
+            </form>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, deleteDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-        // Configuration identique à ton Dashboard
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
             authDomain: "abysz-esports.firebaseapp.com",
@@ -111,28 +157,28 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        let localPlayersList = [];
+
         document.addEventListener("DOMContentLoaded", () => {
             ecouterRosterFirestore();
-            setupAdminButton();
+            setupAdminModalEvents();
         });
 
-        // Lecture en temps réel de ta collection "roster"
         function ecouterRosterFirestore() {
             const q = query(collection(db, "roster"), orderBy("createdAt", "asc"));
             
             onSnapshot(q, (snapshot) => {
-                const joueurs = [];
+                localPlayersList = [];
                 snapshot.forEach((docSnap) => {
-                    joueurs.push({ id: docSnap.id, ...docSnap.data() });
+                    localPlayersList.push({ id: docSnap.id, ...docSnap.data() });
                 });
-                renderRosters(joueurs);
+                renderRosters(localPlayersList);
             }, (error) => {
-                console.error("Erreur Firestore Roster :", error);
-                displayErrorInGrids("Erreur lors de la synchronisation des données.");
+                console.error(error);
+                displayErrorInGrids("Erreur de synchronisation.");
             });
         }
 
-        // Distribution des cartes selon la catégorie ('main', 'academy', 'cdf')
         function renderRosters(players) {
             const grids = {
                 main: document.getElementById("main-roster-grid"),
@@ -141,11 +187,6 @@
             };
 
             Object.values(grids).forEach(grid => { if (grid) grid.innerHTML = ""; });
-
-            if (players.length === 0) {
-                displayErrorInGrids("Aucun membre actif trouvé dans l'équipe.");
-                return;
-            }
 
             players.forEach(player => {
                 const grid = grids[player.team];
@@ -168,13 +209,14 @@
 
                 card.querySelector(".player-card").addEventListener("mouseenter", function() { this.style.transform = "translateY(-5px)"; });
                 card.querySelector(".player-card").addEventListener("mouseleave", function() { this.style.transform = "translateY(0)"; });
+                
+                // Clic simple : ouvre la Pop-up classique
                 card.querySelector(".player-card").addEventListener("click", () => openPlayerPopup(player));
 
                 grid.appendChild(card);
             });
         }
 
-        // Fenêtre surgissante (Pop-up) au clic sur un joueur
         function openPlayerPopup(player) {
             const container = document.getElementById("popups-container");
             if (!container) return;
@@ -188,8 +230,10 @@
                         <img src="${avatar}" class="popup-avatar-img" alt="${player.pseudo}">
                         <h3 class="popup-pseudo">${player.pseudo}</h3>
                         <p style="text-align:center; color:#aaa; margin-top:-15px; margin-bottom:10px; font-family:'Inter', sans-serif;">${player.role || 'Joueur'}</p>
-                        <p style="text-align:center; color:#22c55e; font-weight:600; font-family:'Orbitron', sans-serif; margin-bottom:20px;">Earnings : ${player.earnings || '0 €'}</p>
+                        <p style="text-align:center; color:#22c55e; font-weight:600; font-family:'Orbitron', sans-serif; margin-bottom:15px;">Earnings : ${player.earnings || '0 €'}</p>
                         
+                        <button class="form-btn" id="quick-edit-${player.id}" style="padding:6px; font-size:0.8rem; margin-bottom:15px; background:#222; border:1px solid #a855f7;">✏️ Modifier la fiche</button>
+
                         <div class="pr-history-section">
                             <div class="pr-history-title">Historique des Compétitions (PR)</div>
                             <div id="pr-content-${player.id}"></div>
@@ -202,21 +246,20 @@
             const contentEl = document.getElementById(`pr-content-${player.id}`);
             const closeBtn = popupOverlay.querySelector(".popup-close");
 
-            const closePopup = () => {
+            popupOverlay.querySelector(`#quick-edit-${player.id}`).addEventListener("click", () => {
                 popupOverlay.classList.remove("active");
-                setTimeout(() => popupOverlay.remove(), 200);
-            };
-            closeBtn.addEventListener("click", closePopup);
-            popupOverlay.addEventListener("click", (e) => { if (e.target === popupOverlay) closePopup(); });
+                popupOverlay.remove();
+                openAdminModalForEdit(player);
+            });
 
-            // Remplissage de la table prHistory présente dans ton Firestore
+            closeBtn.addEventListener("click", () => { popupOverlay.classList.remove("active"); popupOverlay.remove(); });
+
             if (!player.prHistory || player.prHistory.length === 0) {
                 contentEl.innerHTML = `<div style="text-align:center; color:#666; font-size:0.85rem; padding:10px;">Aucun historique de PR répertorié.</div>`;
                 return;
             }
 
             let tableRows = "";
-            // Tri par historique décroissant si nécessaire
             player.prHistory.forEach((row, index) => {
                 const isLatest = index === player.prHistory.length - 1 ? "class='pr-latest'" : "";
                 tableRows += `
@@ -228,20 +271,75 @@
                 `;
             });
 
-            contentEl.innerHTML = `
-                <table class="pr-table">
-                    <thead>
-                        <tr>
-                            <th>DATE</th>
-                            <th>ÉVÉNEMENT</th>
-                            <th>PR TOTAL</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${tableRows}
-                    </tbody>
-                </table>
-            `;
+            contentEl.innerHTML = `<table class="pr-table"><thead><tr><th>DATE</th><th>ÉVÉNEMENT</th><th>PR TOTAL</th></tr></thead><tbody>${tableRows}</tbody></table>`;
+        }
+
+        // ── FONCTIONS DE MODIFICATION PANEL ──
+        function setupAdminModalEvents() {
+            const adminBtn = document.getElementById("admin-gate-btn");
+            const adminModal = document.getElementById("admin-modal");
+            const closeModalBtn = document.getElementById("close-modal-btn");
+            const playerForm = document.getElementById("player-form");
+            const deleteBtn = document.getElementById("delete-btn");
+
+            adminBtn.addEventListener("click", () => {
+                // Mode ajout de joueur classique
+                document.getElementById("player-id").value = "";
+                playerForm.reset();
+                document.getElementById("modal-title").innerText = "Ajouter un nouveau joueur";
+                deleteBtn.classList.add("hidden");
+                adminModal.classList.add("active");
+            });
+
+            closeModalBtn.addEventListener("click", () => adminModal.classList.remove("active"));
+
+            // Sauvegarde ou Modification
+            playerForm.addEventListener("submit", async () => {
+                const id = document.getElementById("player-id").value || "p_" + Date.now();
+                const pseudo = document.getElementById("player-pseudo").value;
+                const team = document.getElementById("player-team").value;
+                const role = document.getElementById("player-role").value;
+                const image = document.getElementById("player-image").value || "logo.png";
+                const earnings = document.getElementById("player-earnings").value || "0 €";
+
+                // On recherche si le joueur existait déjà pour garder son prHistory intact
+                const existingPlayer = localPlayersList.find(p => p.id === id);
+                const prHistory = existingPlayer ? (existingPlayer.prHistory || []) : [];
+                const createdAt = existingPlayer ? (existingPlayer.createdAt || Date.now()) : Date.now();
+
+                try {
+                    await setDoc(doc(db, "roster", id), {
+                        pseudo, team, role, image, earnings, prHistory, createdAt
+                    });
+                    adminModal.classList.remove("active");
+                    playerForm.reset();
+                } catch (err) {
+                    alert("Erreur lors de l'enregistrement Firestore.");
+                }
+            });
+
+            // Suppression du joueur
+            deleteBtn.addEventListener("click", async () => {
+                const id = document.getElementById("player-id").value;
+                if (id && confirm("Voulez-vous vraiment supprimer ce joueur ?")) {
+                    await deleteDoc(doc(db, "roster", id));
+                    adminModal.classList.remove("active");
+                    playerForm.reset();
+                }
+            });
+        }
+
+        function openAdminModalForEdit(player) {
+            document.getElementById("player-id").value = player.id;
+            document.getElementById("player-pseudo").value = player.pseudo || "";
+            document.getElementById("player-team").value = player.team || "main";
+            document.getElementById("player-role").value = player.role || "";
+            document.getElementById("player-image").value = player.image || "";
+            document.getElementById("player-earnings").value = player.earnings || "";
+            
+            document.getElementById("modal-title").innerText = "Modifier " + player.pseudo;
+            document.getElementById("delete-btn").classList.remove("hidden");
+            document.getElementById("admin-modal").classList.add("active");
         }
 
         function displayErrorInGrids(msg) {
@@ -250,15 +348,6 @@
                 const el = document.getElementById(id);
                 if (el) el.innerHTML = `<p class="loading-text" style="color:#ff4444;">${msg}</p>`;
             });
-        }
-
-        function setupAdminButton() {
-            const adminBtn = document.getElementById("admin-gate-btn");
-            if (adminBtn) {
-                adminBtn.addEventListener("click", () => {
-                    window.location.href = "dashboard.html";
-                });
-            }
         }
     </script>
 </body>

@@ -284,7 +284,6 @@
             fileStatus.style.color = "#ef4444";
         });
 
-        // Gestion de l'affichage de la modale d'administration/connexion
         adminGateBtn.addEventListener('click', () => {
             modal.classList.add('active');
         });
@@ -298,7 +297,6 @@
             prAddZone.classList.add('hidden');
         });
 
-        // Connexion Admin
         document.getElementById('login-btn').addEventListener('click', async () => {
             const email = document.getElementById('admin-email').value.trim();
             const password = document.getElementById('admin-password').value;
@@ -312,7 +310,6 @@
             }
         });
 
-        // Déconnexion Admin
         logoutBtn.addEventListener('click', async () => {
             await signOut(auth);
             modal.classList.remove('active');
@@ -353,4 +350,32 @@
                 card.innerHTML = `
                     ${adminHtml}
                     <div class="player-card" onclick="document.getElementById('popup-${id}').classList.add('active')">
-                        <img src="${playerImgSrc}" class="player-avatar-img
+                        <img src="${playerImgSrc}" class="player-avatar-img" alt="${p.pseudo}">
+                        <h3>${p.pseudo}</h3>
+                        <p>${p.role}</p>
+                    </div>
+                `;
+                if(targetGrid) targetGrid.appendChild(card);
+            });
+        });
+
+        // Écoute de l'état de connexion de l'utilisateur
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            const dashboardNav = document.getElementById('nav-dashboard');
+            if (user) {
+                if(dashboardNav) dashboardNav.classList.remove('hidden');
+                adminGateBtn.innerHTML = "⚙️ Panel Admin";
+                userDisplayEmail.textContent = user.email;
+                loginStep.classList.add('hidden');
+                panelStep.classList.remove('hidden');
+            } else {
+                if(dashboardNav) dashboardNav.classList.add('hidden');
+                adminGateBtn.innerHTML = "🔑 Connexion";
+                loginStep.classList.remove('hidden');
+                panelStep.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

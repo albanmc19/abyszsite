@@ -37,12 +37,19 @@
         .input-group label { display: block; margin-bottom: 6px; color: #a855f7; font-size: 0.8rem; font-family: 'Orbitron', sans-serif; font-weight: 600; }
         .input-group input, .input-group select { width: 100%; padding: 10px 14px; background: #0a0a0a; border: 1px solid #2a2a2a; color: white; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.9rem; box-sizing: border-box; }
         
+        /* Bouton upload personnalisé */
+        .file-upload-btn { display: block; text-align: center; background: #1a1a1a; border: 1px dashed #a855f7; color: #ccc; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; }
+        .file-upload-btn:hover { background: rgba(168,85,247,0.1); color: #fff; }
+        
         .form-btn { background: #a855f7; color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: 'Orbitron', sans-serif; transition: background 0.2s; margin-top: 10px; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; }
         .form-btn:hover { background: #b975ff; }
         .edit-toggle-btn { background: #222; border: 1px solid #a855f7; color: #fff; margin-bottom: 15px; }
         .edit-toggle-btn:hover { background: #a855f7; }
         .delete-btn { background: #ff4444 !important; margin-top: 5px; }
         .delete-btn:hover { background: #ff6666 !important; }
+        .image-actions { display: flex; gap: 10px; margin-top: 5px; }
+        .btn-remove-img { background: #331c1c; border: 1px solid #ff4444; color: #ff4444; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; width: 100%; font-family: 'Orbitron', sans-serif; }
+        .btn-remove-img:hover { background: #ff4444; color: #fff; }
         .hidden { display: none !important; }
 
         /* ── HISTORIQUE PR ── */
@@ -124,18 +131,17 @@
         const db = getFirestore(app);
 
         let localPlayersList = [];
-        let estAdmin = false; // Variable globale pour suivre le statut de connexion
+        let estAdmin = false;
 
         document.addEventListener("DOMContentLoaded", () => {
-            // ── VÉRIFICATION DE SÉCURITÉ (ADMIN OU PUBLIC) ──
             onAuthStateChanged(auth, (user) => {
                 const addBtn = document.getElementById("add-player-btn");
                 if (user) {
                     estAdmin = true;
-                    if (addBtn) addBtn.classList.remove("hidden"); // L'admin voit le bouton d'ajout
+                    if (addBtn) addBtn.classList.remove("hidden");
                 } else {
                     estAdmin = false;
-                    if (addBtn) addBtn.classList.add("hidden"); // Le public ne le voit pas
+                    if (addBtn) addBtn.classList.add("hidden");
                 }
             });
 
@@ -170,7 +176,8 @@
                 const card = document.createElement("div");
                 card.className = "player-card-container";
                 
-                const avatar = (player.image && player.image !== "#") ? player.image : "logo.png";
+                // Si pas d'image ou vide ou '#', on utilise logo.png automatiquement
+                const avatar = (player.image && player.image !== "#" && player.image.trim() !== "") ? player.image : "logo.png";
                 const pseudo = player.pseudo || "Inconnu";
                 const role = player.role || "Non spécifié";
 
@@ -196,9 +203,11 @@
 
             const isNewPlayer = !player.id;
             const playerId = player.id || "p_" + Date.now();
-            const avatar = (player.image && player.image !== "#") ? player.image : "logo.png";
+            
+            // Stockage temporaire de l'image en base64 pendant l'édition
+            let imageBase64String = player.image || "logo.png";
+            const avatar = (imageBase64String && imageBase64String !== "#" && imageBase64String.trim() !== "") ? imageBase64String : "logo.png";
 
-            // Sécurité supplémentaire : Si un malin force le mode édition mais n'est pas admin, on bloque
             if (startInEditMode && !estAdmin) startInEditMode = false;
 
             container.innerHTML = `
@@ -207,7 +216,7 @@
                         <span class="popup-close">&times;</span>
                         
                         <div id="view-mode-${playerId}" class="${startInEditMode ? 'hidden' : ''}">
-                            <img src="${avatar}" class="popup-avatar-img" alt="${player.pseudo || ''}">
+                            <img src="${avatar}" class="popup-avatar-img" id="view-avatar-${playerId}" alt="${player.pseudo || ''}">
                             <h3 class="popup-pseudo">${player.pseudo || 'Nouveau Joueur'}</h3>
                             <p style="text-align:center; color:#aaa; margin-top:-15px; margin-bottom:10px; font-family:'Inter', sans-serif;">${player.role || 'Rôle non défini'}</p>
                             <p style="text-align:center; color:#22c55e; font-weight:600; font-family:'Orbitron', sans-serif; margin-bottom:20px;">Earnings : ${player.earnings || '0 €'}</p>
@@ -225,7 +234,20 @@
                             <h3 style="font-family:'Orbitron', sans-serif; color:#a855f7; text-align:center; margin-bottom:20px;">
                                 ${isNewPlayer ? 'Créer le joueur' : 'Modifier le profil'}
                             </h3>
+                            
+                            <img src="${avatar}" class="popup-avatar-img" id="edit-preview-${playerId}" style="max-height: 120px;">
+
                             <form id="form-${playerId}" onsubmit="return false;">
+                                <div class="input-group">
+                                    <label>Photo du joueur (Depuis le PC)</label>
+                                    <label for="file-input-${playerId}" class="file-upload-btn">📁 Choisir un fichier image</label>
+                                    <input type="file" id="file-input-${playerId}" accept="image/*" class="hidden">
+                                    
+                                    <div class="image-actions">
+                                        <button type="button" class="btn-remove-img" id="btn-clear-img-${playerId}">🗑️ Supprimer l'image (Mettre le Logo)</button>
+                                    </div>
+                                </div>
+
                                 <div class="input-group">
                                     <label>Pseudo</label>
                                     <input type="text" id="input-pseudo-${playerId}" value="${player.pseudo || ''}" required placeholder="Ex: Fxbio">
@@ -241,10 +263,6 @@
                                 <div class="input-group">
                                     <label>Rôle / Division</label>
                                     <input type="text" id="input-role-${playerId}" value="${player.role || ''}" required placeholder="Ex: Duelist / Radiant">
-                                </div>
-                                <div class="input-group">
-                                    <label>Lien de l'image (Avatar)</label>
-                                    <input type="text" id="input-image-${playerId}" value="${player.image || ''}" placeholder="Ex: logo.png">
                                 </div>
                                 <div class="input-group">
                                     <label>Earnings</label>
@@ -265,12 +283,40 @@
             const popupOverlay = document.getElementById(`popup-${playerId}`);
             const viewModeDiv = document.getElementById(`view-mode-${playerId}`);
             const editModeDiv = document.getElementById(`edit-mode-${playerId}`);
+            const previewImg = document.getElementById(`edit-preview-${playerId}`);
             
             const closePopup = () => { popupOverlay.classList.remove("active"); setTimeout(() => popupOverlay.remove(), 200); };
             popupOverlay.querySelector(".popup-close").addEventListener("click", closePopup);
 
-            // Setup des écouteurs d'édition uniquement si l'utilisateur est admin
             if (estAdmin) {
+                const fileInput = document.getElementById(`file-input-${playerId}`);
+                const clearImgBtn = document.getElementById(`btn-clear-img-${playerId}`);
+
+                // GESTION DU CHARGEMENT DE L'IMAGE DEPUIS LE PC
+                fileInput.addEventListener("change", (e) => {
+                    const fichier = e.target.files[0];
+                    if (fichier) {
+                        // Limite de taille optionnelle à 1.5 Mo pour Firestore
+                        if (fichier.size > 1500000) {
+                            alert("L'image est trop lourde. Choisis une image de moins de 1.5 Mo.");
+                            return;
+                        }
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                            imageBase64String = reader.result; // Contient l'image convertie
+                            if (previewImg) previewImg.src = imageBase64String; // Changement de l'aperçu
+                        };
+                        reader.readAsDataURL(fichier);
+                    }
+                });
+
+                // SUPPRESSION DE L'IMAGE (RESET AU LOGO)
+                clearImgBtn.addEventListener("click", () => {
+                    imageBase64String = "logo.png";
+                    if (previewImg) previewImg.src = "logo.png";
+                    fileInput.value = ""; // Reset de l'input fichier
+                });
+
                 if (!isNewPlayer) {
                     popupOverlay.querySelector(`#btn-to-edit-${playerId}`).addEventListener("click", () => {
                         viewModeDiv.classList.add("hidden");
@@ -285,12 +331,11 @@
                     popupOverlay.querySelector(`#btn-cancel-${playerId}`).addEventListener("click", closePopup);
                 }
 
-                // Soumission de la modification
+                // SOUBOUMISSION DU FORMULAIRE ET ENVOI SUR FIRESTORE
                 popupOverlay.querySelector(`#form-${playerId}`).addEventListener("submit", async () => {
                     const pseudo = document.getElementById(`input-pseudo-${playerId}`).value;
                     const team = document.getElementById(`input-team-${playerId}`).value;
                     const role = document.getElementById(`input-role-${playerId}`).value;
-                    const image = document.getElementById(`input-image-${playerId}`).value || "logo.png";
                     const earnings = document.getElementById(`input-earnings-${playerId}`).value || "0 €";
 
                     const existingPlayer = localPlayersList.find(p => p.id === playerId);
@@ -299,15 +344,21 @@
 
                     try {
                         await setDoc(doc(db, "roster", playerId), {
-                            pseudo, team, role, image, earnings, prHistory, createdAt
+                            pseudo, 
+                            team, 
+                            role, 
+                            image: imageBase64String, // Sauvegarde de la chaîne de l'image (ou de "logo.png")
+                            earnings, 
+                            prHistory, 
+                            createdAt
                         });
                         closePopup();
                     } catch (err) {
+                        console.error(err);
                         alert("Erreur lors de la sauvegarde.");
                     }
                 });
 
-                // Suppression
                 if (!isNewPlayer) {
                     popupOverlay.querySelector(`#btn-delete-${playerId}`).addEventListener("click", async () => {
                         if (confirm(`Voulez-vous supprimer définitivement ${player.pseudo} ?`)) {
@@ -318,7 +369,7 @@
                 }
             }
 
-            // Affichage de l'historique PR (Toujours visible pour tous)
+            // Affichage de l'historique PR (Mode Public)
             if (!isNewPlayer) {
                 const tableContainer = document.getElementById(`pr-table-container-${playerId}`);
                 if (player.prHistory && player.prHistory.length > 0) {

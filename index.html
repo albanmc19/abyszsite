@@ -24,8 +24,8 @@
         .announcement-date { font-size: 0.8rem; color: #777; }
         .delete-btn { position: absolute; top: 20px; right: 20px; background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
         .delete-btn:hover { background: #cc3333; }
-        .modal-overlay { display: none !important; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
-        .modal-overlay.active { display: flex !important; }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
+        .modal-overlay.active { display: flex; }
         .modal-content { background: #141414; border: 2px solid #a855f7; border-radius: 24px; max-width: 450px; width: 100%; padding: 35px; position: relative; box-shadow: 0 0 30px rgba(168, 85, 247, 0.25); box-sizing: border-box; }
         .modal-close { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; color: #777; cursor: pointer; transition: color 0.2s; }
         .modal-close:hover { color: #ff4444; }
@@ -51,10 +51,10 @@
                 ABYSZ
             </a>
             <div class="social-links">
-                <a href="https://www.tiktok.com/@abysz_o" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.76a4.85 4.85 0 0 1-1.01-.07z"/></svg></a>
-                <a href="https://x.com/abysz_o" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
-                <a href="https://www.youtube.com/@abysz" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
-                <a href="https://www.twitch.tv/abysz_o" target="_blank"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg></a>
+                <a href="https://www.tiktok.com/@abysz_o" target="_blank" aria-label="TikTok ABYSZ"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.76a4.85 4.85 0 0 1-1.01-.07z"/></svg></a>
+                <a href="https://x.com/abysz_o" target="_blank" aria-label="X ABYSZ"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+                <a href="https://www.youtube.com/@abysz" target="_blank" aria-label="YouTube ABYSZ"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93$.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+                <a href="https://www.twitch.tv/abysz_o" target="_blank" aria-label="Twitch ABYSZ"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg></a>
             </div>
         </div>
         <ul>
@@ -115,8 +115,8 @@
             <div id="admin-panel-step" class="hidden">
                 <h3>Publier une annonce</h3>
                 <div class="admin-header-actions">
-                    <span id="user-display-email" style="color:#a855f7; font-weight:600; font-size: 0.85rem;"></span>
-                    <button id="logout-btn" style="background:none; border:none; color:#ff4444; cursor:pointer; font-weight: 600; font-family: 'Orbitron'; font-size:0.85rem;">Déconnexion</button>
+                    <span id="user-display-email" style="color:#a855f7; font-weight:600; font-size: 0.85rem; font-family: 'Inter', sans-serif;"></span>
+                    <button id="logout-btn" style="background:none; border:none; color:#ff4444; cursor:pointer; font-weight: 600; font-family: 'Orbitron', sans-serif; font-size:0.85rem;">Déconnexion</button>
                 </div>
                 <form id="announcement-form" onsubmit="return false;">
                     <div class="input-group">
@@ -168,8 +168,8 @@
 
         let currentUser = null;
 
-        // Écoute en direct des annonces Firestore
         const q = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
+        
         onSnapshot(q, (snapshot) => {
             feed.innerHTML = "";
             if (snapshot.empty) {
@@ -182,96 +182,83 @@
                 const dateStr = dateRaw.toLocaleDateString('fr-FR') + " à " + dateRaw.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
                 const card = document.createElement("div");
                 card.className = "announcement-card";
-                
-                // Si l'admin est connecté, on affiche le bouton Supprimer
                 const deleteButtonHtml = currentUser ? `<button class="delete-btn" data-id="${docSnap.id}">Supprimer</button>` : "";
-                
                 card.innerHTML = `<h3>${ann.title}</h3><p>${ann.content}</p><div class="announcement-date">Posté le ${dateStr}</div>${deleteButtonHtml}`;
                 feed.appendChild(card);
             });
 
-            // Gérer les clics de suppression
             document.querySelectorAll('.delete-btn').forEach(btn => {
                 btn.onclick = async (e) => {
-                    if (confirm("Supprimer cette annonce définitivement ?")) {
+                    if (confirm("Supprimer définitivement cette annonce de la base de données ?")) {
                         await deleteDoc(doc(db, "announcements", e.target.getAttribute('data-id')));
                     }
                 };
             });
         });
 
-        // Suivi de l'état de connexion admin
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
-            if (user) { 
-                loginStep.classList.add('hidden'); 
-                panelStep.classList.remove('hidden'); 
-                userDisplayEmail.textContent = `Admin : ${user.email}`; 
-            } else { 
-                loginStep.classList.remove('hidden'); 
-                panelStep.classList.add('hidden'); 
-                userDisplayEmail.textContent = ''; 
-            }
-            // Force le rafraîchissement des boutons supprimer du flux
-            if(feed.innerHTML !== "") {
-                const currentQ = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
+            if (user) {
+                loginStep.classList.add('hidden');
+                panelStep.classList.remove('hidden');
+                userDisplayEmail.textContent = `Admin : ${user.email}`;
+            } else {
+                loginStep.classList.remove('hidden');
+                panelStep.classList.add('hidden');
+                userDisplayEmail.textContent = '';
             }
         });
 
-        // Connexion
         loginForm.addEventListener('submit', async () => {
             loginError.classList.add('hidden');
             const email = document.getElementById('admin-email').value.trim();
             const password = document.getElementById('admin-password').value;
-            try { 
-                await signInWithEmailAndPassword(auth, email, password); 
-            } catch (error) { 
-                loginError.textContent = "Identifiants invalides."; 
-                loginError.classList.remove('hidden'); 
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                loginError.textContent = "Identifiants incorrects.";
+                loginError.classList.remove('hidden');
             }
         });
 
-        // Déconnexion
         logoutBtn.onclick = () => { signOut(auth); modal.classList.remove('active'); };
 
-        // Publication d'une annonce + Webhook Discord
         announcementForm.addEventListener('submit', async () => {
-            const title = document.getElementById("annonce-title").value.trim();
-            const content = document.getElementById("annonce-content").value.trim();
+            const titleInput = document.getElementById("annonce-title");
+            const contentInput = document.getElementById("annonce-content");
+            const title = titleInput.value.trim();
+            const content = contentInput.value.trim();
             const now = new Date();
             const dateStr = now.toLocaleDateString('fr-FR') + " à " + now.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
 
             try {
                 await addDoc(collection(db, "announcements"), { title, content, createdAt: now });
-                
-                // Envoi vers Discord
                 if (DISCORD_WEBHOOK_URL) {
-                    fetch(DISCORD_WEBHOOK_URL, { 
-                        method: "POST", 
-                        headers: { "Content-Type": "application/json" }, 
-                        body: JSON.stringify({ 
-                            username: "ABYSZ Bot", 
-                            embeds: [{ 
-                                title: "📢 NOUVELLE ANNONCE SITE : " + title, 
-                                description: content, 
-                                color: 11032055,
+                    fetch(DISCORD_WEBHOOK_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            username: "ABYSZ Bot",
+                            embeds: [{
+                                title: "📢 NOUVELLE ANNONCE SITE : " + title,
+                                description: content,
+                                color: 11032055, 
                                 footer: { text: "Posté le " + dateStr + " • Abysz Esports" }
-                            }] 
+                            }]
                         })
-                    }).catch(e => console.error(e));
+                    }).catch(err => console.error(err));
                 }
-
-                document.getElementById("annonce-title").value = "";
-                document.getElementById("annonce-content").value = "";
+                titleInput.value = "";
+                contentInput.value = "";
                 modal.classList.remove('active');
-            } catch (error) { alert("Erreur : " + error.message); }
+            } catch (error) { alert("Erreur lors de la publication : " + error.message); }
         });
 
         adminGateBtn.onclick = () => modal.classList.add('active');
         closeModalBtn.onclick = () => modal.classList.remove('active');
-        window.onclick = (e) => { if(e.target === modal) modal.classList.remove('active'); };
+        window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
 
-        // ── TRACKER DE STATISTIQUES AVANCÉ (Idée 1 & 4) ──
+        // ── TRACKER DE STATISTIQUES ACCUEIL ──
         async function trackIndexPage() {
             const support = window.innerWidth < 768 ? "Mobile" : "Ordinateur";
             try {

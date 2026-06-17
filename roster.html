@@ -318,22 +318,20 @@
                 card.innerHTML = `
                     ${adminHtml}
                     <div class="player-card" onclick="document.getElementById('popup-${id}').classList.add('active')">
-                        <img src="${playerImgSrc}" class="player-avatar-img" alt="${p.pseudo}">
+                        <img src="${playerImgSrc}" class="player-avatar-img" alt="${p.pseudo || 'Joueur'}" onerror="this.src='logo.png'">
                         <div class="player-info">
-                            <h3>${p.pseudo}</h3>
-                            <p class="role">${p.role}</p>
+                            <h3>${p.pseudo || 'Sans nom'}</h3>
+                            <p class="role">${p.role || ''}</p>
                         </div>
                     </div>
                 `;
-                targetGrid.appendChild(card);
+                if(targetGrid) targetGrid.appendChild(card);
 
-                // Récupération sécurisée du tableau prHistory
                 const prHistory = p.prHistory || [];
                 let prTableRows = "";
                 let evolutionBadge = `<div class="pr-evolution-badge neutral">▬ Stable</div>`;
 
-                if(prHistory.length > 0) {
-                    // Trier du plus récent au plus ancien
+                if(Array.isArray(prHistory) && prHistory.length > 0) {
                     const sortedPr = [...prHistory].sort((a,b) => new Date(b.date) - new Date(a.date));
                     
                     if(sortedPr.length >= 2) {
@@ -360,8 +358,7 @@
                         
                         let displayDate = "Date inconnue";
                         if(entry.date) {
-                            // Nettoyage de la date pour éviter le décalage de fuseau horaire
-                            const dateParts = entry.date.split('-');
+                            const dateParts = String(entry.date).split('-');
                             if(dateParts.length === 3) {
                                 displayDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
                             } else {
@@ -389,9 +386,9 @@
                     <div class="modal-content">
                         <span class="modal-close" onclick="document.getElementById('popup-${id}').classList.remove('active')">&times;</span>
                         <h3>Détails du Joueur</h3>
-                        <img src="${playerImgSrc}" class="popup-avatar-img">
-                        <h2 style="text-align:center;font-family:'Orbitron';margin-bottom:5px;">${p.pseudo}</h2>
-                        <p style="text-align:center;color:#a855f7;font-weight:600;margin-top:0;font-size:0.9rem;">${p.role}</p>
+                        <img src="${playerImgSrc}" class="popup-avatar-img" onerror="this.src='logo.png'">
+                        <h2 style="text-align:center;font-family:'Orbitron';margin-bottom:5px;">${p.pseudo || ''}</h2>
+                        <p style="text-align:center;color:#a855f7;font-weight:600;margin-top:0;font-size:0.9rem;">${p.role || ''}</p>
                         
                         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center;margin:20px 0;">
                             <div style="background:#0a0a0a;padding:10px;border-radius:8px;border:1px solid #2a2a2a;"><span style="color:#a855f7;font-size:0.8rem;display:block;">EARNINGS</span><strong>${p.earnings || '0$'}</strong></div>
@@ -470,11 +467,9 @@
             });
         });
 
-        // FIX TOTAL DE L'ENREGISTREMENT ET MODIFICATION
         playerForm.addEventListener('submit', async (e) => {
             e.preventDefault(); 
 
-            // Sauvegarde immédiate des éléments saisis par l'utilisateur
             const inputPseudo = document.getElementById('player-pseudo').value.trim();
             const inputRole = document.getElementById('player-role').value.trim();
             const inputTeam = document.getElementById('player-team').value;
@@ -486,29 +481,27 @@
             const inputTwitter = document.getElementById('link-twitter').value.trim();
             const inputTracker = document.getElementById('link-tracker').value.trim();
 
-            const newPrVal = document.getElementById('new-pr-value').value;
+            const newPrVal = document.getElementById('new-pr-value').value.trim();
             const newPrDate = document.getElementById('new-pr-date').value;
 
             const finalImage = base64ImageString || "#";
 
             try {
                 if (editingPlayerId) {
-                    // MODE UNIQUE : MODIFICATION
                     const docRef = fsDoc(db, "roster", editingPlayerId);
                     const currentPlayerData = playersDataCache[editingPlayerId];
                     
-                    // On garde le tableau existant intact
-                    let updatedPrHistory = currentPlayerData.prHistory || [];
+                    let updatedPrHistory = (currentPlayerData && Array.isArray(currentPlayerData.prHistory)) 
+                        ? [...currentPlayerData.prHistory] 
+                        : [];
 
-                    // Si l'admin a écrit une nouvelle valeur et choisi une date
-                    if(newPrVal && newPrDate) {
+                    if(newPrVal !== "" && newPrDate !== "") {
                         updatedPrHistory.push({
-                            date: newPrDate,
-                            value: parseInt(newPrVal)
+                            date: String(newPrDate),
+                            value: parseInt(newPrVal, 10)
                         });
                     }
 
-                    // Envoi complet des données nettoyées à Firebase
                     await fsUpdate(docRef, {
                         team: inputTeam,
                         pseudo: inputPseudo,
@@ -526,10 +519,12 @@
                     
                     alert("Joueur modifié avec succès !");
                 } else {
-                    // MODE UNIQUE : AJOUT NOUVEAU
                     let initialPrHistory = [];
-                    if(newPrVal && newPrDate) {
-                        initialPrHistory.push({ date: newPrDate, value: parseInt(newPrVal) });
+                    if(newPrVal !== "" && newPrDate !== "") {
+                        initialPrHistory.push({ 
+                            date: String(newPrDate), 
+                            value: parseInt(newPrVal, 10) 
+                        });
                     }
 
                     await addDoc(fsCol(db, "roster"), {
@@ -549,15 +544,14 @@
                     alert("Nouveau joueur ajouté avec succès !");
                 }
 
-                // Réinitialisation propre après l'envoi réussi
                 modal.classList.remove('active');
                 playerForm.reset();
                 base64ImageString = "";
                 fileStatus.textContent = "";
                 editingPlayerId = null;
             } catch(err) {
-                console.error("Erreur Firebase : ", err);
-                alert("Erreur lors de l'enregistrement. Vérifie ta console.");
+                console.error("Détail de l'erreur Firebase : ", err);
+                alert("Erreur lors de l'enregistrement : " + err.message);
             }
         });
 

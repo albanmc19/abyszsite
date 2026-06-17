@@ -20,25 +20,27 @@
 
         /* ── IMAGES ── */
         .player-avatar-img { width: 100%; height: 230px; object-fit: cover; border-bottom: 2px solid #a855f7; background: #141414; }
-        .popup-avatar-img { width: 100%; max-height: 250px; object-fit: contain; border: 2px solid #a855f7; border-radius: 12px; margin: 0 auto 20px auto; display: block; background: #0a0a0a; }
+        .popup-avatar-img { width: 100%; max-height: 200px; object-fit: contain; border: 2px solid #a855f7; border-radius: 12px; margin: 0 auto 20px auto; display: block; background: #0a0a0a; }
 
         /* ── MODAL & POPUPS ── */
-        .modal-overlay, .popup-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
-        .modal-overlay.active, .popup-overlay.active { display: flex; }
+        .popup-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
+        .popup-overlay.active { display: flex; }
         
-        .modal-content, .popup { background: #141414; border: 2px solid #a855f7; border-radius: 24px; max-width: 500px; width: 100%; padding: 30px; position: relative; box-shadow: 0 0 30px rgba(168,85,247,0.25); box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
-        .modal-close, .popup-close { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; color: #777; cursor: pointer; transition: color 0.2s; }
-        .modal-close:hover, .popup-close:hover { color: #ff4444; }
+        .popup { background: #141414; border: 2px solid #a855f7; border-radius: 24px; max-width: 500px; width: 100%; padding: 30px; position: relative; box-shadow: 0 0 30px rgba(168,85,247,0.25); box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
+        .popup-close { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; color: #777; cursor: pointer; transition: color 0.2s; }
+        .popup-close:hover { color: #ff4444; }
         
-        .modal-content h3, .popup-pseudo { font-family: 'Orbitron', sans-serif; color: #fff; margin-top: 0; margin-bottom: 20px; font-size: 1.5rem; text-align: center; }
+        .popup-pseudo { font-family: 'Orbitron', sans-serif; color: #fff; margin-top: 0; margin-bottom: 20px; font-size: 1.5rem; text-align: center; }
         
-        /* ── FORMULAIRES PANEL ── */
+        /* ── FORMULAIRES EDITION ── */
         .input-group { margin-bottom: 15px; text-align: left; }
         .input-group label { display: block; margin-bottom: 6px; color: #a855f7; font-size: 0.8rem; font-family: 'Orbitron', sans-serif; font-weight: 600; }
-        .input-group input, .input-group textarea, .input-group select { width: 100%; padding: 10px 14px; background: #0a0a0a; border: 1px solid #2a2a2a; color: white; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.9rem; box-sizing: border-box; }
+        .input-group input, .input-group select { width: 100%; padding: 10px 14px; background: #0a0a0a; border: 1px solid #2a2a2a; color: white; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.9rem; box-sizing: border-box; }
         
-        .form-btn { background: #a855f7; color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: 'Orbitron', sans-serif; transition: background 0.2s; margin-top: 10px; }
+        .form-btn { background: #a855f7; color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: 'Orbitron', sans-serif; transition: background 0.2s; margin-top: 10px; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; }
         .form-btn:hover { background: #b975ff; }
+        .edit-toggle-btn { background: #222; border: 1px solid #a855f7; color: #fff; margin-bottom: 15px; }
+        .edit-toggle-btn:hover { background: #a855f7; }
         .delete-btn { background: #ff4444 !important; margin-top: 5px; }
         .delete-btn:hover { background: #ff6666 !important; }
         .hidden { display: none !important; }
@@ -75,7 +77,7 @@
     <section style="padding-top: 160px; padding-bottom: 80px;">
         <div class="roster-header-container">
             <h2 style="font-family:'Orbitron', sans-serif; color:#fff; font-size:2rem; margin:0;">Notre Roster 2026</h2>
-            <button class="admin-gate-btn" id="admin-gate-btn">⚙️ Panel Gestion</button>
+            <button class="admin-gate-btn hidden" id="add-player-btn">➕ Nouveau Joueur</button>
         </div>
 
         <div class="roster-grid" id="main-roster-grid">
@@ -102,46 +104,9 @@
 
     <div id="popups-container"></div>
 
-    <div id="admin-modal" class="modal-overlay">
-        <div class="modal-content">
-            <span class="modal-close" id="close-modal-btn">&times;</span>
-            <h3 id="modal-title">Ajouter / Modifier un Joueur</h3>
-            <form id="player-form" onsubmit="return false;">
-                <input type="hidden" id="player-id">
-                
-                <div class="input-group">
-                    <label for="player-pseudo">Pseudo</label>
-                    <input type="text" id="player-pseudo" required placeholder="Ex: Fxbio">
-                </div>
-                <div class="input-group">
-                    <label for="player-team">Catégorie d'équipe</label>
-                    <select id="player-team" required>
-                        <option value="main">Équipe Principale (Pro)</option>
-                        <option value="academy">Académie</option>
-                        <option value="cdf">Centre de Formation (CDF)</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="player-role">Rôle / Division</label>
-                    <input type="text" id="player-role" required placeholder="Ex: Duelist / Radiant">
-                </div>
-                <div class="input-group">
-                    <label for="player-image">Lien de l'image (Avatar)</label>
-                    <input type="text" id="player-image" placeholder="Ex: logo.png ou lien https://">
-                </div>
-                <div class="input-group">
-                    <label for="player-earnings">Earnings</label>
-                    <input type="text" id="player-earnings" placeholder="Ex: 150 €">
-                </div>
-
-                <button type="submit" class="form-btn" id="save-btn">Enregistrer le joueur</button>
-                <button type="button" class="form-btn delete-btn hidden" id="delete-btn">Supprimer le joueur</button>
-            </form>
-        </div>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, deleteDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -155,27 +120,37 @@
         };
 
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
 
         let localPlayersList = [];
+        let estAdmin = false; // Variable globale pour suivre le statut de connexion
 
         document.addEventListener("DOMContentLoaded", () => {
+            // ── VÉRIFICATION DE SÉCURITÉ (ADMIN OU PUBLIC) ──
+            onAuthStateChanged(auth, (user) => {
+                const addBtn = document.getElementById("add-player-btn");
+                if (user) {
+                    estAdmin = true;
+                    if (addBtn) addBtn.classList.remove("hidden"); // L'admin voit le bouton d'ajout
+                } else {
+                    estAdmin = false;
+                    if (addBtn) addBtn.classList.add("hidden"); // Le public ne le voit pas
+                }
+            });
+
             ecouterRosterFirestore();
-            setupAdminModalEvents();
+            setupAddPlayerButton();
         });
 
         function ecouterRosterFirestore() {
             const q = query(collection(db, "roster"), orderBy("createdAt", "asc"));
-            
             onSnapshot(q, (snapshot) => {
                 localPlayersList = [];
                 snapshot.forEach((docSnap) => {
                     localPlayersList.push({ id: docSnap.id, ...docSnap.data() });
                 });
                 renderRosters(localPlayersList);
-            }, (error) => {
-                console.error(error);
-                displayErrorInGrids("Erreur de synchronisation.");
             });
         }
 
@@ -209,145 +184,169 @@
 
                 card.querySelector(".player-card").addEventListener("mouseenter", function() { this.style.transform = "translateY(-5px)"; });
                 card.querySelector(".player-card").addEventListener("mouseleave", function() { this.style.transform = "translateY(0)"; });
-                
-                // Clic simple : ouvre la Pop-up classique
                 card.querySelector(".player-card").addEventListener("click", () => openPlayerPopup(player));
 
                 grid.appendChild(card);
             });
         }
 
-        function openPlayerPopup(player) {
+        function openPlayerPopup(player, startInEditMode = false) {
             const container = document.getElementById("popups-container");
             if (!container) return;
 
+            const isNewPlayer = !player.id;
+            const playerId = player.id || "p_" + Date.now();
             const avatar = (player.image && player.image !== "#") ? player.image : "logo.png";
 
+            // Sécurité supplémentaire : Si un malin force le mode édition mais n'est pas admin, on bloque
+            if (startInEditMode && !estAdmin) startInEditMode = false;
+
             container.innerHTML = `
-                <div id="popup-${player.id}" class="popup-overlay active">
+                <div id="popup-${playerId}" class="popup-overlay active">
                     <div class="popup">
                         <span class="popup-close">&times;</span>
-                        <img src="${avatar}" class="popup-avatar-img" alt="${player.pseudo}">
-                        <h3 class="popup-pseudo">${player.pseudo}</h3>
-                        <p style="text-align:center; color:#aaa; margin-top:-15px; margin-bottom:10px; font-family:'Inter', sans-serif;">${player.role || 'Joueur'}</p>
-                        <p style="text-align:center; color:#22c55e; font-weight:600; font-family:'Orbitron', sans-serif; margin-bottom:15px;">Earnings : ${player.earnings || '0 €'}</p>
                         
-                        <button class="form-btn" id="quick-edit-${player.id}" style="padding:6px; font-size:0.8rem; margin-bottom:15px; background:#222; border:1px solid #a855f7;">✏️ Modifier la fiche</button>
+                        <div id="view-mode-${playerId}" class="${startInEditMode ? 'hidden' : ''}">
+                            <img src="${avatar}" class="popup-avatar-img" alt="${player.pseudo || ''}">
+                            <h3 class="popup-pseudo">${player.pseudo || 'Nouveau Joueur'}</h3>
+                            <p style="text-align:center; color:#aaa; margin-top:-15px; margin-bottom:10px; font-family:'Inter', sans-serif;">${player.role || 'Rôle non défini'}</p>
+                            <p style="text-align:center; color:#22c55e; font-weight:600; font-family:'Orbitron', sans-serif; margin-bottom:20px;">Earnings : ${player.earnings || '0 €'}</p>
+                            
+                            <button class="form-btn edit-toggle-btn ${estAdmin ? '' : 'hidden'}" id="btn-to-edit-${playerId}">✏️ Éditer le profil</button>
 
-                        <div class="pr-history-section">
-                            <div class="pr-history-title">Historique des Compétitions (PR)</div>
-                            <div id="pr-content-${player.id}"></div>
+                            <div class="pr-history-section">
+                                <div class="pr-history-title">Historique des Compétitions (PR)</div>
+                                <div id="pr-table-container-${playerId}"></div>
+                            </div>
                         </div>
+
+                        ${estAdmin ? `
+                        <div id="edit-mode-${playerId}" class="${startInEditMode ? '' : 'hidden'}">
+                            <h3 style="font-family:'Orbitron', sans-serif; color:#a855f7; text-align:center; margin-bottom:20px;">
+                                ${isNewPlayer ? 'Créer le joueur' : 'Modifier le profil'}
+                            </h3>
+                            <form id="form-${playerId}" onsubmit="return false;">
+                                <div class="input-group">
+                                    <label>Pseudo</label>
+                                    <input type="text" id="input-pseudo-${playerId}" value="${player.pseudo || ''}" required placeholder="Ex: Fxbio">
+                                </div>
+                                <div class="input-group">
+                                    <label>Catégorie d'équipe</label>
+                                    <select id="input-team-${playerId}">
+                                        <option value="main" ${player.team === 'main' ? 'selected' : ''}>Équipe Principale (Pro)</option>
+                                        <option value="academy" ${player.team === 'academy' ? 'selected' : ''}>Académie</option>
+                                        <option value="cdf" ${player.team === 'cdf' ? 'selected' : ''}>Centre de Formation (CDF)</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label>Rôle / Division</label>
+                                    <input type="text" id="input-role-${playerId}" value="${player.role || ''}" required placeholder="Ex: Duelist / Radiant">
+                                </div>
+                                <div class="input-group">
+                                    <label>Lien de l'image (Avatar)</label>
+                                    <input type="text" id="input-image-${playerId}" value="${player.image || ''}" placeholder="Ex: logo.png">
+                                </div>
+                                <div class="input-group">
+                                    <label>Earnings</label>
+                                    <input type="text" id="input-earnings-${playerId}" value="${player.earnings || ''}" placeholder="Ex: 150 €">
+                                </div>
+
+                                <button type="submit" class="form-btn">💾 Sauvegarder</button>
+                                ${!isNewPlayer ? `<button type="button" class="form-btn delete-btn" id="btn-delete-${playerId}">🗑️ Supprimer le joueur</button>` : ''}
+                                <button type="button" class="form-btn edit-toggle-btn" id="btn-cancel-${playerId}" style="margin-top:5px;">Annuler</button>
+                            </form>
+                        </div>
+                        ` : ''}
+
                     </div>
                 </div>
             `;
 
-            const popupOverlay = document.getElementById(`popup-${player.id}`);
-            const contentEl = document.getElementById(`pr-content-${player.id}`);
-            const closeBtn = popupOverlay.querySelector(".popup-close");
+            const popupOverlay = document.getElementById(`popup-${playerId}`);
+            const viewModeDiv = document.getElementById(`view-mode-${playerId}`);
+            const editModeDiv = document.getElementById(`edit-mode-${playerId}`);
+            
+            const closePopup = () => { popupOverlay.classList.remove("active"); setTimeout(() => popupOverlay.remove(), 200); };
+            popupOverlay.querySelector(".popup-close").addEventListener("click", closePopup);
 
-            popupOverlay.querySelector(`#quick-edit-${player.id}`).addEventListener("click", () => {
-                popupOverlay.classList.remove("active");
-                popupOverlay.remove();
-                openAdminModalForEdit(player);
-            });
+            // Setup des écouteurs d'édition uniquement si l'utilisateur est admin
+            if (estAdmin) {
+                if (!isNewPlayer) {
+                    popupOverlay.querySelector(`#btn-to-edit-${playerId}`).addEventListener("click", () => {
+                        viewModeDiv.classList.add("hidden");
+                        editModeDiv.classList.remove("hidden");
+                    });
+                    
+                    popupOverlay.querySelector(`#btn-cancel-${playerId}`).addEventListener("click", () => {
+                        editModeDiv.classList.add("hidden");
+                        viewModeDiv.classList.remove("hidden");
+                    });
+                } else {
+                    popupOverlay.querySelector(`#btn-cancel-${playerId}`).addEventListener("click", closePopup);
+                }
 
-            closeBtn.addEventListener("click", () => { popupOverlay.classList.remove("active"); popupOverlay.remove(); });
+                // Soumission de la modification
+                popupOverlay.querySelector(`#form-${playerId}`).addEventListener("submit", async () => {
+                    const pseudo = document.getElementById(`input-pseudo-${playerId}`).value;
+                    const team = document.getElementById(`input-team-${playerId}`).value;
+                    const role = document.getElementById(`input-role-${playerId}`).value;
+                    const image = document.getElementById(`input-image-${playerId}`).value || "logo.png";
+                    const earnings = document.getElementById(`input-earnings-${playerId}`).value || "0 €";
 
-            if (!player.prHistory || player.prHistory.length === 0) {
-                contentEl.innerHTML = `<div style="text-align:center; color:#666; font-size:0.85rem; padding:10px;">Aucun historique de PR répertorié.</div>`;
-                return;
+                    const existingPlayer = localPlayersList.find(p => p.id === playerId);
+                    const prHistory = existingPlayer ? (existingPlayer.prHistory || []) : [];
+                    const createdAt = existingPlayer ? (existingPlayer.createdAt || Date.now()) : Date.now();
+
+                    try {
+                        await setDoc(doc(db, "roster", playerId), {
+                            pseudo, team, role, image, earnings, prHistory, createdAt
+                        });
+                        closePopup();
+                    } catch (err) {
+                        alert("Erreur lors de la sauvegarde.");
+                    }
+                });
+
+                // Suppression
+                if (!isNewPlayer) {
+                    popupOverlay.querySelector(`#btn-delete-${playerId}`).addEventListener("click", async () => {
+                        if (confirm(`Voulez-vous supprimer définitivement ${player.pseudo} ?`)) {
+                            await deleteDoc(doc(db, "roster", playerId));
+                            closePopup();
+                        }
+                    });
+                }
             }
 
-            let tableRows = "";
-            player.prHistory.forEach((row, index) => {
-                const isLatest = index === player.prHistory.length - 1 ? "class='pr-latest'" : "";
-                tableRows += `
-                    <tr ${isLatest}>
-                        <td>${row.date || 'Saison'}</td>
-                        <td>${row.label || row.event || 'Tournoi'}</td>
-                        <td style="color:#a855f7; font-weight:600;">${Number(row.value).toLocaleString('fr-FR') || '0'}</td>
-                    </tr>
-                `;
-            });
-
-            contentEl.innerHTML = `<table class="pr-table"><thead><tr><th>DATE</th><th>ÉVÉNEMENT</th><th>PR TOTAL</th></tr></thead><tbody>${tableRows}</tbody></table>`;
-        }
-
-        // ── FONCTIONS DE MODIFICATION PANEL ──
-        function setupAdminModalEvents() {
-            const adminBtn = document.getElementById("admin-gate-btn");
-            const adminModal = document.getElementById("admin-modal");
-            const closeModalBtn = document.getElementById("close-modal-btn");
-            const playerForm = document.getElementById("player-form");
-            const deleteBtn = document.getElementById("delete-btn");
-
-            adminBtn.addEventListener("click", () => {
-                // Mode ajout de joueur classique
-                document.getElementById("player-id").value = "";
-                playerForm.reset();
-                document.getElementById("modal-title").innerText = "Ajouter un nouveau joueur";
-                deleteBtn.classList.add("hidden");
-                adminModal.classList.add("active");
-            });
-
-            closeModalBtn.addEventListener("click", () => adminModal.classList.remove("active"));
-
-            // Sauvegarde ou Modification
-            playerForm.addEventListener("submit", async () => {
-                const id = document.getElementById("player-id").value || "p_" + Date.now();
-                const pseudo = document.getElementById("player-pseudo").value;
-                const team = document.getElementById("player-team").value;
-                const role = document.getElementById("player-role").value;
-                const image = document.getElementById("player-image").value || "logo.png";
-                const earnings = document.getElementById("player-earnings").value || "0 €";
-
-                // On recherche si le joueur existait déjà pour garder son prHistory intact
-                const existingPlayer = localPlayersList.find(p => p.id === id);
-                const prHistory = existingPlayer ? (existingPlayer.prHistory || []) : [];
-                const createdAt = existingPlayer ? (existingPlayer.createdAt || Date.now()) : Date.now();
-
-                try {
-                    await setDoc(doc(db, "roster", id), {
-                        pseudo, team, role, image, earnings, prHistory, createdAt
+            // Affichage de l'historique PR (Toujours visible pour tous)
+            if (!isNewPlayer) {
+                const tableContainer = document.getElementById(`pr-table-container-${playerId}`);
+                if (player.prHistory && player.prHistory.length > 0) {
+                    let tableRows = "";
+                    player.prHistory.forEach((row, index) => {
+                        const isLatest = index === player.prHistory.length - 1 ? "class='pr-latest'" : "";
+                        tableRows += `
+                            <tr ${isLatest}>
+                                <td>${row.date || 'Saison'}</td>
+                                <td>${row.label || row.event || 'Tournoi'}</td>
+                                <td style="color:#a855f7; font-weight:600;">${Number(row.value).toLocaleString('fr-FR')}</td>
+                            </tr>
+                        `;
                     });
-                    adminModal.classList.remove("active");
-                    playerForm.reset();
-                } catch (err) {
-                    alert("Erreur lors de l'enregistrement Firestore.");
+                    tableContainer.innerHTML = `<table class="pr-table"><thead><tr><th>DATE</th><th>ÉVÉNEMENT</th><th>PR TOTAL</th></tr></thead><tbody>${tableRows}</tbody></table>`;
+                } else {
+                    tableContainer.innerHTML = `<div style="text-align:center; color:#666; font-size:0.85rem; padding:10px;">Aucun historique de PR.</div>`;
                 }
-            });
-
-            // Suppression du joueur
-            deleteBtn.addEventListener("click", async () => {
-                const id = document.getElementById("player-id").value;
-                if (id && confirm("Voulez-vous vraiment supprimer ce joueur ?")) {
-                    await deleteDoc(doc(db, "roster", id));
-                    adminModal.classList.remove("active");
-                    playerForm.reset();
-                }
-            });
+            }
         }
 
-        function openAdminModalForEdit(player) {
-            document.getElementById("player-id").value = player.id;
-            document.getElementById("player-pseudo").value = player.pseudo || "";
-            document.getElementById("player-team").value = player.team || "main";
-            document.getElementById("player-role").value = player.role || "";
-            document.getElementById("player-image").value = player.image || "";
-            document.getElementById("player-earnings").value = player.earnings || "";
-            
-            document.getElementById("modal-title").innerText = "Modifier " + player.pseudo;
-            document.getElementById("delete-btn").classList.remove("hidden");
-            document.getElementById("admin-modal").classList.add("active");
-        }
-
-        function displayErrorInGrids(msg) {
-            const grids = ["main-roster-grid", "academy-roster-grid", "cdf-roster-grid"];
-            grids.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.innerHTML = `<p class="loading-text" style="color:#ff4444;">${msg}</p>`;
-            });
+        function setupAddPlayerButton() {
+            const addBtn = document.getElementById("add-player-btn");
+            if (addBtn) {
+                addBtn.addEventListener("click", () => {
+                    if (estAdmin) openPlayerPopup({}, true);
+                });
+            }
         }
     </script>
 </body>

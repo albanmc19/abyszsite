@@ -40,6 +40,9 @@
         .admin-header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: #0a0a0a; padding: 12px 15px; border-radius: 8px; border: 1px solid #2a2a2a; }
         .error-message { color: #ff4444; font-size: 0.85rem; margin-top: 15px; text-align: center; font-family: 'Inter', sans-serif; line-height: 1.4; }
         .loading-text { color: #666; font-style: italic; text-align: center; }
+        
+        /* Style pour l'onglet Dashboard vert fluo comme sur Roster */
+        .nav-dashboard-link a { color: #22c55e !important; font-weight: bold; text-decoration: none; }
     </style>
 </head>
 <body>
@@ -63,6 +66,7 @@
             <li><a href="boutique.html">Boutique</a></li>
             <li><a href="#annonces">Actualités</a></li>
             <li><a href="#rejoindre-commu">Rejoindre</a></li>
+            <li id="nav-dashboard" class="nav-dashboard-link hidden"><a href="dashboard.html">📊 Dashboard</a></li>
         </ul>
     </nav>
 
@@ -202,10 +206,12 @@
                 loginStep.classList.add('hidden');
                 panelStep.classList.remove('hidden');
                 userDisplayEmail.textContent = `Admin : ${user.email}`;
+                document.getElementById('nav-dashboard')?.classList.remove('hidden'); // Affiche le bouton dashboard
             } else {
                 loginStep.classList.remove('hidden');
                 panelStep.classList.add('hidden');
                 userDisplayEmail.textContent = '';
+                document.getElementById('nav-dashboard')?.classList.add('hidden');
             }
         });
 
@@ -272,14 +278,17 @@
         }
         trackIndexPage();
 
+        // MODIFIÉ : Envoi structuré pour être comptabilisé par le Dashboard !
         document.getElementById('discord-btn').addEventListener('click', async () => {
+            const support = window.innerWidth < 768 ? "Mobile" : "Ordinateur";
             try {
-                await addDoc(collection(db, "events"), {
-                    type: "click_discord",
+                await addDoc(collection(db, "analytics"), {
                     date: new Date().toISOString().split('T')[0],
+                    page: "discord",
+                    device: support,
                     timestamp: new Date()
                 });
-            } catch(e) {}
+            } catch(e) { console.error("Discord Analytics Error:", e); }
         });
     </script>
 </body>

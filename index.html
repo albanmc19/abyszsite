@@ -16,7 +16,6 @@
         .announcements-container { max-width: 1200px; margin: 0 auto; padding: 60px 20px; }
         .announcements-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
         
-        /* Titre et petit bouton ajouter alignés */
         .title-area { display: flex; align-items: center; gap: 15px; }
         .add-announcement-btn { background: #a855f7; border: none; color: white; width: 32px; height: 32px; border-radius: 50%; font-size: 1.2rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; box-shadow: 0 0 10px rgba(168, 85, 247, 0.3); }
         .add-announcement-btn:hover { background: #b975ff; transform: scale(1.1); box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
@@ -27,26 +26,48 @@
         .admin-gate-btn.logged-in { border-color: #ff4444; color: #ff4444; }
         .admin-gate-btn.logged-in:hover { background: #ff4444; color: white; box-shadow: 0 0 15px #ff4444; }
 
-        .announcements-feed { display: flex; flex-direction: column; gap: 20px; text-align: left; }
-        .announcement-card { background: #1a1a1a; border-left: 4px solid #a855f7; padding: 25px; border-radius: 0 16px 16px 0; position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-        .announcement-card h3 { font-family: 'Orbitron', sans-serif; color: #ffffff; margin-bottom: 10px; font-size: 1.4rem; }
-        .announcement-card p { color: #ccc; font-size: 1rem; line-height: 1.6; margin-bottom: 15px; white-space: pre-wrap; }
-        .announcement-date { font-size: 0.8rem; color: #777; }
+        /* ── ENRICHISSEMENT DU FEED D'ANNONCES ── */
+        .announcements-feed { display: flex; flex-direction: column; gap: 25px; text-align: left; }
+        .announcement-card { background: #1a1a1a; border-left: 4px solid #a855f7; padding: 25px; border-radius: 0 16px 16px 0; position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 12px; }
+        .announcement-card.priority-urgent { border-left-color: #ff4444; background: linear-gradient(90deg, rgba(255,68,68,0.05) 0%, #1a1a1a 100%); }
+        
+        .announcement-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+        .badge { font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: bold; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; }
+        .badge-general { background: #a855f7; color: white; }
+        .badge-match { background: #3b82f6; color: white; }
+        .badge-recrutement { background: #10b981; color: white; }
+        .badge-evenement { background: #f59e0b; color: white; }
+        .badge-urgent { background: #ff4444; color: white; animation: pulse 1.5s infinite; }
+        
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+
+        .announcement-card h3 { font-family: 'Orbitron', sans-serif; color: #ffffff; margin: 0; font-size: 1.4rem; }
+        .announcement-card p { color: #ccc; font-size: 1rem; line-height: 1.6; margin: 0; white-space: pre-wrap; }
+        
+        .announcement-img { max-width: 100%; max-height: 350px; object-fit: cover; border-radius: 8px; border: 1px solid #2a2a2a; margin-top: 5px; }
+        .announcement-action-btn { background: #a855f7; color: white; text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: bold; padding: 10px 20px; border-radius: 6px; align-self: flex-start; transition: all 0.2s ease; margin-top: 5px; }
+        .announcement-action-btn:hover { background: #b975ff; box-shadow: 0 0 10px rgba(168, 85, 247, 0.4); }
+
+        .announcement-date { font-size: 0.8rem; color: #777; margin-top: 5px; }
         .delete-btn { position: absolute; top: 20px; right: 20px; background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
         .delete-btn:hover { background: #cc3333; }
         
+        /* ── MODAL ADAPTÉE POUR PLUS D'OPTIONS ── */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
         .modal-overlay.active { display: flex; }
-        .modal-content { background: #141414; border: 2px solid #a855f7; border-radius: 24px; max-width: 450px; width: 100%; padding: 35px; position: relative; box-shadow: 0 0 30px rgba(168, 85, 247, 0.25); box-sizing: border-box; }
+        .modal-content { background: #141414; border: 2px solid #a855f7; border-radius: 24px; max-width: 550px; width: 100%; padding: 35px; position: relative; box-shadow: 0 0 30px rgba(168, 85, 247, 0.25); box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
         .modal-close { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; color: #777; cursor: pointer; transition: color 0.2s; }
         .modal-close:hover { color: #ff4444; }
         .modal-content h3 { font-family: 'Orbitron', sans-serif; color: #ffffff; margin-top: 0; margin-bottom: 25px; font-size: 1.6rem; text-align: center; letter-spacing: 1px; }
         
+        .input-row { display: flex; gap: 15px; }
+        .input-row .input-group { flex: 1; }
         .input-group { margin-bottom: 20px; text-align: left; }
         .input-group label { display: block; margin-bottom: 8px; color: #a855f7; font-size: 0.85rem; font-family: 'Orbitron', sans-serif; font-weight: 600; }
-        .input-group input, .input-group textarea { width: 100%; padding: 12px 16px; background: #0a0a0a; border: 1px solid #2a2a2a; color: white; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.95rem; transition: border-color 0.3s, box-shadow 0.3s; box-sizing: border-box; }
-        .input-group input:focus, .input-group textarea:focus { border-color: #a855f7; outline: none; box-shadow: 0 0 10px rgba(168, 85, 247, 0.2); }
-        
+        .input-group input, .input-group textarea, .input-group select { width: 100%; padding: 12px 16px; background: #0a0a0a; border: 1px solid #2a2a2a; color: white; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.95rem; transition: border-color 0.3s, box-shadow 0.3s; box-sizing: border-box; }
+        .input-group input:focus, .input-group textarea:focus, .input-group select:focus { border-color: #a855f7; outline: none; box-shadow: 0 0 10px rgba(168, 85, 247, 0.2); }
+        .input-group select { appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='white'><path d='M0 0l5 6 5-6z'/></svg>"); background-repeat: no-repeat; background-position: right 16px center; }
+
         .form-btn { background: #a855f7; color: white; border: none; width: 100%; padding: 14px; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: 'Orbitron', sans-serif; font-size: 1rem; transition: background 0.2s, box-shadow 0.2s; margin-top: 10px; box-sizing: border-box; }
         .form-btn:hover { background: #b975ff; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
         .hidden { display: none !important; }
@@ -56,15 +77,8 @@
         
         .nav-dashboard-link a { color: #22c55e !important; font-weight: bold; text-decoration: none; }
 
-        .reveal {
-            opacity: 0;
-            transform: translateY(35px);
-            transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-        .reveal-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        .reveal { opacity: 0; transform: translateY(35px); transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1); }
+        .reveal-visible { opacity: 1; transform: translateY(0); }
     </style>
 </head>
 <body>
@@ -152,10 +166,47 @@
                         <label for="annonce-title">Titre de l'actualité</label>
                         <input type="text" id="annonce-title" placeholder="Ex: Match ce soir à 21h !" required>
                     </div>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="annonce-category">Catégorie / Tag</label>
+                            <select id="annonce-category">
+                                <option value="general">Général</option>
+                                <option value="match">Match / Tournoi</option>
+                                <option value="recrutement">Recrutement</option>
+                                <option value="evenement">Événement</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="annonce-priority">Importance</label>
+                            <select id="annonce-priority">
+                                <option value="normal">Normal</option>
+                                <option value="urgent">Urgent / Important</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="annonce-img-url">URL d'une Image d'illustration (Optionnel)</label>
+                        <input type="url" id="annonce-img-url" placeholder="https://lien-vers-mon-image.png">
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="annonce-btn-text">Texte du Bouton d'action (Optionnel)</label>
+                            <input type="text" id="annonce-btn-text" placeholder="Ex: Regarder le match">
+                        </div>
+                        <div class="input-group">
+                            <label for="annonce-btn-link">Lien du Bouton (Optionnel)</label>
+                            <input type="url" id="annonce-btn-link" placeholder="https://twitch.tv/...">
+                        </div>
+                    </div>
+
                     <div class="input-group">
                         <label for="annonce-content">Message</label>
-                        <textarea id="annonce-content" rows="5" placeholder="Écrivez le contenu de l'annonce..." required></textarea>
+                        <textarea id="annonce-content" rows="4" placeholder="Écrivez le contenu de l'annonce..." required></textarea>
                     </div>
+                    
                     <button type="submit" class="form-btn" id="publish-btn">Publier l'annonce</button>
                 </form>
             </div>
@@ -219,33 +270,49 @@
             snapshot.forEach((docSnap) => {
                 const ann = docSnap.data();
                 
-                let dateRaw;
-                if (ann.createdAt && typeof ann.createdAt.seconds === 'number') {
-                    dateRaw = new Date(ann.createdAt.seconds * 1000);
-                } else if (typeof ann.createdAt === 'number') {
-                    dateRaw = new Date(ann.createdAt);
-                } else {
-                    dateRaw = new Date();
+                let dateRaw = (ann.createdAt && typeof ann.createdAt.seconds === 'number') ? new Date(ann.createdAt.seconds * 1000) : (typeof ann.createdAt === 'number' ? new Date(ann.createdAt) : new Date());
+                const dateStr = dateRaw.toLocaleDateString('fr-FR') + " à " + dateRaw.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+                
+                const card = document.createElement("div");
+                card.className = `announcement-card ${ann.priority === 'urgent' ? 'priority-urgent' : ''}`;
+                
+                // Fabrication des badges (Catégorie + Importance)
+                let categoryLabels = { general: 'Général', match: 'Match / Tournoi', recrutement: 'Recrutement', evenement: 'Événement' };
+                let badgesHtml = `<span class="badge badge-${ann.category || 'general'}">${categoryLabels[ann.category || 'general']}</span>`;
+                if(ann.priority === 'urgent') {
+                    badgesHtml += `<span class="badge badge-urgent">🚨 Important</span>`;
                 }
 
-                const dateStr = dateRaw.toLocaleDateString('fr-FR') + " à " + dateRaw.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
-                const card = document.createElement("div");
-                card.className = "announcement-card";
+                // Image d'illustration
+                let imgHtml = ann.imageUrl ? `<img src="${ann.imageUrl}" class="announcement-img" alt="Illustration">` : '';
+                
+                // Bouton d'action optionnel
+                let actionBtnHtml = (ann.btnText && ann.btnLink) ? `<a href="${ann.btnLink}" target="_blank" class="announcement-action-btn">${ann.btnText} →</a>` : '';
+                
+                // Bouton supprimer si connecté
                 const deleteButtonHtml = currentUser ? `<button class="delete-btn" data-id="${docSnap.id}">Supprimer</button>` : "";
-                card.innerHTML = `<h3>${ann.title || 'Sans titre'}</h3><p>${ann.content || ''}</p><div class="announcement-date">Posté le ${dateStr}</div>${deleteButtonHtml}`;
+                
+                card.innerHTML = `
+                    <div class="announcement-meta">${badgesHtml}</div>
+                    <h3>${ann.title || 'Sans titre'}</h3>
+                    ${imgHtml}
+                    <p>${ann.content || ''}</p>
+                    ${actionBtnHtml}
+                    <div class="announcement-date">Posté le ${dateStr}</div>
+                    ${deleteButtonHtml}
+                `;
                 feed.appendChild(card);
             });
 
             document.querySelectorAll('.delete-btn').forEach(btn => {
                 btn.onclick = async (e) => {
-                    if (confirm("Supprimer définitivement cette annonce de la base de données ?")) {
+                    if (confirm("Supprimer définitivement cette annonce ?")) {
                         await deleteDoc(doc(db, "announcements", e.target.getAttribute('data-id')));
                     }
                 };
             });
         });
 
-        // Modification ici : Affiche / Cache le petit bouton '+' selon l'état de connexion
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
@@ -253,8 +320,7 @@
                 panelStep.classList.remove('hidden');
                 userDisplayEmail.textContent = `Admin : ${user.email}`;
                 document.getElementById('nav-dashboard')?.classList.remove('hidden');
-                quickAddBtn.classList.remove('hidden'); // On montre le bouton '+'
-                
+                quickAddBtn.classList.remove('hidden');
                 adminGateBtn.innerHTML = "🔒 Déconnexion";
                 adminGateBtn.classList.add("logged-in");
             } else {
@@ -262,8 +328,7 @@
                 panelStep.classList.add('hidden');
                 userDisplayEmail.textContent = '';
                 document.getElementById('nav-dashboard')?.classList.add('hidden');
-                quickAddBtn.classList.add('hidden'); // On cache le bouton '+'
-                
+                quickAddBtn.classList.add('hidden');
                 adminGateBtn.innerHTML = "🔑 Espace Admin";
                 adminGateBtn.classList.remove("logged-in");
             }
@@ -283,51 +348,56 @@
         });
 
         logoutBtn.onclick = () => { signOut(auth); modal.classList.remove('active'); };
-
-        adminGateBtn.onclick = () => {
-            if (currentUser) {
-                if (confirm("Voulez-vous vous déconnecter de votre espace administrateur ?")) {
-                    signOut(auth);
-                }
-            } else {
-                modal.classList.add('active');
-            }
-        };
-
-        // Ouvrir directement la création d'annonce au clic sur le '+'
-        quickAddBtn.onclick = () => {
-            if (currentUser) {
-                modal.classList.add('active');
-            }
-        };
+        adminGateBtn.onclick = () => { if (currentUser) { if (confirm("Se déconnecter ?")) { signOut(auth); } } else { modal.classList.add('active'); } };
+        quickAddBtn.onclick = () => { if (currentUser) modal.classList.add('active'); };
 
         announcementForm.addEventListener('submit', async () => {
             const titleInput = document.getElementById("annonce-title");
             const contentInput = document.getElementById("annonce-content");
+            const categoryInput = document.getElementById("annonce-category");
+            const priorityInput = document.getElementById("annonce-priority");
+            const imgInput = document.getElementById("annonce-img-url");
+            const btnTextInput = document.getElementById("annonce-btn-text");
+            const btnLinkInput = document.getElementById("annonce-btn-link");
+
             const title = titleInput.value.trim();
             const content = contentInput.value.trim();
+            const category = categoryInput.value;
+            const priority = priorityInput.value;
+            const imageUrl = imgInput.value.trim();
+            const btnText = btnTextInput.value.trim();
+            const btnLink = btnLinkInput.value.trim();
+
             const nowTimestamp = Date.now();
             const dateStr = new Date(nowTimestamp).toLocaleDateString('fr-FR') + " à " + new Date(nowTimestamp).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
 
             try {
-                await addDoc(collection(db, "announcements"), { title, content, createdAt: nowTimestamp });
+                await addDoc(collection(db, "announcements"), { 
+                    title, content, category, priority, imageUrl, btnText, btnLink, createdAt: nowTimestamp 
+                });
+                
                 if (DISCORD_WEBHOOK_URL) {
+                    let categoryLabels = { general: 'Général', match: 'Match / Tournoi', recrutement: 'Recrutement', evenement: 'Événement' };
+                    let prefix = priority === 'urgent' ? "🚨 [URGENT] " : "📢 ";
                     fetch(DISCORD_WEBHOOK_URL, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
                             username: "ABYSZ Bot",
                             embeds: [{
-                                title: "📢 NOUVELLE ANNONCE SITE : " + title,
-                                description: content,
-                                color: 11032055, 
+                                title: `${prefix}ANNONCE [${categoryLabels[category]}] : ${title}`,
+                                description: content + (btnLink ? `\n\n[${btnText || 'Lien'}](${btnLink})` : ''),
+                                color: priority === 'urgent' ? 16724036 : 11032055, 
+                                image: imageUrl ? { url: imageUrl } : null,
                                 footer: { text: "Posté le " + dateStr + " • Abysz Esports" }
                             }]
                         })
                     }).catch(err => console.error(err));
                 }
-                titleInput.value = "";
-                contentInput.value = "";
+                
+                // Reset formulaire
+                titleInput.value = ""; contentInput.value = ""; imgInput.value = ""; btnTextInput.value = ""; btnLinkInput.value = "";
+                categoryInput.value = "general"; priorityInput.value = "normal";
                 modal.classList.remove('active');
             } catch (error) { alert("Erreur lors de la publication : " + error.message); }
         });
@@ -337,28 +407,9 @@
 
         async function trackIndexPage() {
             const support = window.innerWidth < 768 ? "Mobile" : "Ordinateur";
-            try {
-                await addDoc(collection(db, "analytics"), {
-                    date: new Date().toISOString().split('T')[0],
-                    page: "index.html",
-                    device: support,
-                    timestamp: Date.now()
-                });
-            } catch (e) { console.error("Analytics Error:", e); }
+            try { await addDoc(collection(db, "analytics"), { date: new Date().toISOString().split('T')[0], page: "index.html", device: support, timestamp: Date.now() }); } catch (e) { console.error(e); }
         }
         trackIndexPage();
-
-        document.getElementById('discord-btn').addEventListener('click', async () => {
-            const support = window.innerWidth < 768 ? "Mobile" : "Ordinateur";
-            try {
-                await addDoc(collection(db, "analytics"), {
-                    date: new Date().toISOString().split('T')[0],
-                    page: "discord",
-                    device: support,
-                    timestamp: Date.now()
-                });
-            } catch(e) { console.error("Discord Analytics Error:", e); }
-        });
     </script>
 </body>
 </html>

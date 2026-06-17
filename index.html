@@ -85,7 +85,7 @@
     <section id="rejoindre-commu">
         <h2>REJOINDRE LA COMMUNAUTÉ</h2>
         <p class="subtitle">Entre dans l'univers Abysz, échange avec les joueurs et suis nos événements en direct !</p>
-        <a href="https://discord.gg/KeSPkvjBVy" target="_blank" class="btn" id="discord-join-btn">Rejoindre le Discord</a>
+        <a href="https://discord.gg/KeSPkvjBVy" target="_blank" class="btn" id="discord-btn">Rejoindre le Discord</a>
     </section>
 
     <footer>
@@ -95,6 +95,7 @@
     <div id="admin-modal" class="modal-overlay">
         <div class="modal-content">
             <span class="modal-close" id="close-modal-btn">&times;</span>
+            
             <div id="admin-login-step">
                 <h3>Connexion Admin</h3>
                 <form id="login-form" onsubmit="return false;">
@@ -110,6 +111,7 @@
                 </form>
                 <p id="login-error" class="error-message hidden"></p>
             </div>
+
             <div id="admin-panel-step" class="hidden">
                 <h3>Publier une annonce</h3>
                 <div class="admin-header-actions">
@@ -165,8 +167,9 @@
         const feed = document.getElementById("announcements-feed");
 
         let currentUser = null;
+
+        // Écoute en direct des annonces Firestore
         const q = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
-        
         onSnapshot(q, (snapshot) => {
             feed.innerHTML = "";
             if (snapshot.empty) {
@@ -179,68 +182,110 @@
                 const dateStr = dateRaw.toLocaleDateString('fr-FR') + " à " + dateRaw.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
                 const card = document.createElement("div");
                 card.className = "announcement-card";
+                
+                // Si l'admin est connecté, on affiche le bouton Supprimer
                 const deleteButtonHtml = currentUser ? `<button class="delete-btn" data-id="${docSnap.id}">Supprimer</button>` : "";
+                
                 card.innerHTML = `<h3>${ann.title}</h3><p>${ann.content}</p><div class="announcement-date">Posté le ${dateStr}</div>${deleteButtonHtml}`;
                 feed.appendChild(card);
             });
+
+            // Gérer les clics de suppression
             document.querySelectorAll('.delete-btn').forEach(btn => {
                 btn.onclick = async (e) => {
-                    if (confirm("Supprimer cette annonce ?")) {
+                    if (confirm("Supprimer cette annonce définitivement ?")) {
                         await deleteDoc(doc(db, "announcements", e.target.getAttribute('data-id')));
                     }
                 };
             });
         });
 
+        // Suivi de l'état de connexion admin
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
-            if (user) { loginStep.classList.add('hidden'); panelStep.classList.remove('hidden'); userDisplayEmail.textContent = `Admin : ${user.email}`; }
-            else { loginStep.classList.remove('hidden'); panelStep.classList.add('hidden'); userDisplayEmail.textContent = ''; }
+            if (user) { 
+                loginStep.classList.add('hidden'); 
+                panelStep.classList.remove('hidden'); 
+                userDisplayEmail.textContent = `Admin : ${user.email}`; 
+            } else { 
+                loginStep.classList.remove('hidden'); 
+                panelStep.classList.add('hidden'); 
+                userDisplayEmail.textContent = ''; 
+            }
+            // Force le rafraîchissement des boutons supprimer du flux
+            if(feed.innerHTML !== "") {
+                const currentQ = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
+            }
         });
 
+        // Connexion
         loginForm.addEventListener('submit', async () => {
             loginError.classList.add('hidden');
-            try { await signInWithEmailAndPassword(auth, document.getElementById('admin-email').value.trim(), document.getElementById('admin-password').value); }
-            catch (error) { loginError.textContent = "Identifiants incorrects."; loginError.classList.remove('hidden'); }
+            const email = document.getElementById('admin-email').value.trim();
+            const password = document.getElementById('admin-password').value;
+            try { 
+                await signInWithEmailAndPassword(auth, email, password); 
+            } catch (error) { 
+                loginError.textContent = "Identifiants invalides."; 
+                loginError.classList.remove('hidden'); 
+            }
         });
 
+        // Déconnexion
         logoutBtn.onclick = () => { signOut(auth); modal.classList.remove('active'); };
 
+        // Publication d'une annonce + Webhook Discord
         announcementForm.addEventListener('submit', async () => {
             const title = document.getElementById("annonce-title").value.trim();
             const content = document.getElementById("annonce-content").value.trim();
             const now = new Date();
+            const dateStr = now.toLocaleDateString('fr-FR') + " à " + now.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+
             try {
                 await addDoc(collection(db, "announcements"), { title, content, createdAt: now });
+                
+                // Envoi vers Discord
                 if (DISCORD_WEBHOOK_URL) {
-                    fetch(DISCORD_WEBHOOK_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: "ABYSZ Bot", embeds: [{ title: "📢 ANNONCE SITE : " + title, description: content, color: 11032055 }] })}).catch(e => {});
+                    fetch(DISCORD_WEBHOOK_URL, { 
+                        method: "POST", 
+                        headers: { "Content-Type": "application/json" }, 
+                        body: JSON.stringify({ 
+                            username: "ABYSZ Bot", 
+                            embeds: [{ 
+                                title: "📢 NOUVELLE ANNONCE SITE : " + title, 
+                                description: content, 
+                                color: 11032055,
+                                footer: { text: "Posté le " + dateStr + " • Abysz Esports" }
+                            }] 
+                        })
+                    }).catch(e => console.error(e));
                 }
+
                 document.getElementById("annonce-title").value = "";
                 document.getElementById("annonce-content").value = "";
                 modal.classList.remove('active');
-            } catch (error) { alert(error.message); }
+            } catch (error) { alert("Erreur : " + error.message); }
         });
 
         adminGateBtn.onclick = () => modal.classList.add('active');
         closeModalBtn.onclick = () => modal.classList.remove('active');
+        window.onclick = (e) => { if(e.target === modal) modal.classList.remove('active'); };
 
-        // ── 📊 ANALYTICS ADVANCED (Idée 1 & 4) ──
-        async function enregistrerVisite() {
-            const aujourdhui = new Date();
-            const dateCle = aujourdhui.toISOString().split('T')[0];
+        // ── TRACKER DE STATISTIQUES AVANCÉ (Idée 1 & 4) ──
+        async function trackIndexPage() {
             const support = window.innerWidth < 768 ? "Mobile" : "Ordinateur";
             try {
                 await addDoc(collection(db, "analytics"), {
-                    date: dateCle,
+                    date: new Date().toISOString().split('T')[0],
                     page: "index.html",
                     device: support,
-                    timestamp: aujourdhui
+                    timestamp: new Date()
                 });
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("Analytics Error:", e); }
         }
-        enregistrerVisite();
+        trackIndexPage();
 
-        document.getElementById('discord-join-btn').addEventListener('click', async () => {
+        document.getElementById('discord-btn').addEventListener('click', async () => {
             try {
                 await addDoc(collection(db, "events"), {
                     type: "click_discord",

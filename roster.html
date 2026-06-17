@@ -21,7 +21,7 @@
 
         /* ── IMAGES ── */
         .player-avatar-img { width: 100%; height: 230px; object-fit: cover; border-bottom: 2px solid #a855f7; background: #141414; }
-        .popup-avatar-img { width: 100%; max-height: 180px; object-fit: contain; border: 2px solid #a855f7; border-radius: 12px; margin: 0 auto 15px auto; display: block; background: #0a0a0a; }
+        .popup-avatar-img { width: 100%; max-height: 160px; object-fit: contain; border: 2px solid #a855f7; border-radius: 12px; margin: 0 auto 15px auto; display: block; background: #0a0a0a; }
 
         /* ── MODAL & POPUPS ── */
         .popup-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
@@ -31,13 +31,18 @@
         .popup-close { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; color: #777; cursor: pointer; transition: color 0.2s; }
         .popup-close:hover { color: #ff4444; }
         
-        .popup-pseudo { font-family: 'Orbitron', sans-serif; color: #fff; margin-top: 0; margin-bottom: 15px; font-size: 1.5rem; text-align: center; }
+        .popup-pseudo { font-family: 'Orbitron', sans-serif; color: #fff; margin-top: 0; margin-bottom: 5px; font-size: 1.5rem; text-align: center; }
         
         /* Badges d'évolution PR */
         .pr-trend-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: bold; font-family: 'Orbitron', sans-serif; margin-top: 5px; }
         .trend-up { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid #22c55e; }
         .trend-down { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; }
         .trend-neutral { background: rgba(102, 102, 102, 0.15); color: #999; border: 1px solid #666; }
+
+        /* Réseaux sociaux */
+        .social-links-container { display: flex; justify-content: center; gap: 15px; margin: 15px 0; }
+        .social-icon-link { font-size: 1.4rem; text-decoration: none; transition: transform 0.2s; }
+        .social-icon-link:hover { transform: scale(1.2); }
 
         /* ── FORMULAIRES EDITION ── */
         .input-group { margin-bottom: 15px; text-align: left; }
@@ -53,13 +58,19 @@
         .edit-toggle-btn:hover { background: #a855f7; }
         .delete-btn { background: #ff4444 !important; margin-top: 5px; }
         .delete-btn:hover { background: #ff6666 !important; }
+        
+        /* Section d'ajout PR rapide */
+        .pr-editor-box { background: #0d0d0d; border: 1px dashed #333; padding: 12px; border-radius: 10px; margin-top: 10px; }
+        .pr-editor-inputs { display: flex; gap: 8px; margin-bottom: 8px; }
+        .pr-editor-inputs input { padding: 6px 10px !important; font-size: 0.8rem !important; }
+
         .image-actions { display: flex; gap: 10px; margin-top: 5px; }
         .btn-remove-img { background: #331c1c; border: 1px solid #ff4444; color: #ff4444; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; width: 100%; font-family: 'Orbitron', sans-serif; }
         .btn-remove-img:hover { background: #ff4444; color: #fff; }
         .hidden { display: none !important; }
 
         /* ── GRAPHIQUE CONTENEUR ── */
-        .chart-container { background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 10px; margin: 15px 0; max-height: 180px; }
+        .chart-container { background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 10px; margin: 15px 0; max-height: 160px; }
 
         /* ── HISTORIQUE PR ── */
         .pr-history-section { background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 12px; padding: 16px; margin: 16px 0; }
@@ -215,21 +226,33 @@
             let imageBase64String = player.image || "logo.png";
             const avatar = (imageBase64String && imageBase64String !== "#" && imageBase64String.trim() !== "") ? imageBase64String : "logo.png";
 
+            // Copie locale modifiable de l'historique PR
+            let localPrHistory = player.prHistory ? [...player.prHistory] : [];
+
             if (startInEditMode && !estAdmin) startInEditMode = false;
 
-            // ── CALCUL DU POURCENTAGE D'ÉVOLUTION DU PR ──
+            // ── TREND CALCUL ──
             let trendHtml = "";
-            const history = player.prHistory || [];
-            if (history.length >= 2) {
-                const valAncienne = Number(history[history.length - 2].value) || 0;
-                const valActuelle = Number(history[history.length - 1].value) || 0;
-
+            if (localPrHistory.length >= 2) {
+                const valAncienne = Number(localPrHistory[localPrHistory.length - 2].value) || 0;
+                const valActuelle = Number(localPrHistory[localPrHistory.length - 1].value) || 0;
                 if (valAncienne > 0) {
                     const pourcentage = ((valActuelle - valAncienne) / valAncienne) * 100;
                     const signe = pourcentage >= 0 ? "+" : "";
                     const classeTrend = pourcentage > 0 ? "trend-up" : (pourcentage < 0 ? "trend-down" : "trend-neutral");
                     trendHtml = `<div class="pr-trend-badge ${classeTrend}">${signe}${pourcentage.toFixed(1)}% (PR)</div>`;
                 }
+            }
+
+            // ── STRUCTURE RÉSEAUX SOCIAUX (ICÔNES ET TEXTE) ──
+            let socialHtml = "";
+            if (!isNewPlayer && (player.twitter || player.twitch || player.youtube || player.tiktok)) {
+                socialHtml = `<div class="social-links-container">`;
+                if (player.twitter) socialHtml += `<a href="${player.twitter}" target="_blank" class="social-icon-link" title="Twitter / X">🐦</a>`;
+                if (player.twitch) socialHtml += `<a href="${player.twitch}" target="_blank" class="social-icon-link" title="Twitch">🎮</a>`;
+                if (player.youtube) socialHtml += `<a href="${player.youtube}" target="_blank" class="social-icon-link" title="YouTube">📺</a>`;
+                if (player.tiktok) socialHtml += `<a href="${player.tiktok}" target="_blank" class="social-icon-link" title="TikTok">🎵</a>`;
+                socialHtml += `</div>`;
             }
 
             container.innerHTML = `
@@ -239,15 +262,16 @@
                         
                         <div id="view-mode-${playerId}" class="${startInEditMode ? 'hidden' : ''}">
                             <img src="${avatar}" class="popup-avatar-img" id="view-avatar-${playerId}" alt="${player.pseudo || ''}">
-                            <h3 class="popup-pseudo" style="margin-bottom:5px;">${player.pseudo || 'Nouveau Joueur'}</h3>
+                            <h3 class="popup-pseudo">${player.pseudo || 'Nouveau Joueur'}</h3>
                             
-                            <div style="text-align:center; margin-bottom:15px;">
-                                ${trendHtml} </div>
+                            <div style="text-align:center; margin-bottom:5px;">
+                                ${trendHtml}
+                            </div>
 
-                            <p style="text-align:center; color:#aaa; margin-top:-5px; margin-bottom:10px; font-family:'Inter', sans-serif;">${player.role || 'Rôle non défini'}</p>
+                            ${socialHtml} <p style="text-align:center; color:#aaa; margin-top:5px; margin-bottom:10px; font-family:'Inter', sans-serif;">${player.role || 'Rôle non défini'}</p>
                             <p style="text-align:center; color:#22c55e; font-weight:600; font-family:'Orbitron', sans-serif; margin-bottom:15px;">Earnings : ${player.earnings || '0 €'}</p>
                             
-                            <button class="form-btn edit-toggle-btn ${estAdmin ? '' : 'hidden'}" id="btn-to-edit-${playerId}">✏️ Éditer le profil</button>
+                            <button class="form-btn edit-toggle-btn ${estAdmin ? '' : 'hidden'}" id="btn-to-edit-${playerId}">✏️ Éditer le profil / PR</button>
 
                             <div class="chart-container" id="chart-box-${playerId}">
                                 <canvas id="canvas-${playerId}"></canvas>
@@ -261,19 +285,19 @@
 
                         ${estAdmin ? `
                         <div id="edit-mode-${playerId}" class="${startInEditMode ? '' : 'hidden'}">
-                            <h3 style="font-family:'Orbitron', sans-serif; color:#a855f7; text-align:center; margin-bottom:20px;">
+                            <h3 style="font-family:'Orbitron', sans-serif; color:#a855f7; text-align:center; margin-bottom:15px;">
                                 ${isNewPlayer ? 'Créer le joueur' : 'Modifier le profil'}
                             </h3>
                             
-                            <img src="${avatar}" class="popup-avatar-img" id="edit-preview-${playerId}" style="max-height: 120px;">
+                            <img src="${avatar}" class="popup-avatar-img" id="edit-preview-${playerId}" style="max-height: 100px;">
 
                             <form id="form-${playerId}" onsubmit="return false;">
                                 <div class="input-group">
-                                    <label>Photo du joueur (Depuis le PC)</label>
+                                    <label>Photo du joueur</label>
                                     <label for="file-input-${playerId}" class="file-upload-btn">📁 Choisir un fichier image</label>
                                     <input type="file" id="file-input-${playerId}" accept="image/*" class="hidden">
                                     <div class="image-actions">
-                                        <button type="button" class="btn-remove-img" id="btn-clear-img-${playerId}">🗑️ Supprimer l'image (Logo par défaut)</button>
+                                        <button type="button" class="btn-remove-img" id="btn-clear-img-${playerId}">🗑️ Remettre le logo par défaut</button>
                                     </div>
                                 </div>
 
@@ -298,7 +322,30 @@
                                     <input type="text" id="input-earnings-${playerId}" value="${player.earnings || ''}">
                                 </div>
 
-                                <button type="submit" class="form-btn">💾 Sauvegarder</button>
+                                <div class="input-group">
+                                    <label>Évolution du PR (Historique)</label>
+                                    <div id="edit-pr-list-${playerId}" style="max-height:110px; overflow-y:auto; border:1px solid #222; padding:6px; border-radius:6px; background:#0a0a0a;"></div>
+                                    
+                                    <div class="pr-editor-box">
+                                        <span style="color:#a855f7; font-size:0.75rem; font-weight:bold; display:block; margin-bottom:5px;">➕ AJOUTER UNE ENTRÉE PR :</span>
+                                        <div class="pr-editor-inputs">
+                                            <input type="text" id="new-pr-date-${playerId}" placeholder="Ex: Janv 2026" style="width:35%">
+                                            <input type="text" id="new-pr-label-${playerId}" placeholder="Ex: FNCS Major 1" style="width:40%">
+                                            <input type="number" id="new-pr-value-${playerId}" placeholder="Ex: 550" style="width:25%">
+                                        </div>
+                                        <button type="button" class="form-btn" id="btn-add-pr-row-${playerId}" style="padding:6px; font-size:0.75rem; margin:0; background:#333; border:1px solid #a855f7;">Insérer la ligne</button>
+                                    </div>
+                                </div>
+
+                                <div class="input-group" style="border-top: 1px solid #222; padding-top:15px; margin-top:15px;">
+                                    <label style="color:#fff;">🔗 Liens des Réseaux Sociaux</label>
+                                    <input type="url" id="input-twitter-${playerId}" value="${player.twitter || ''}" placeholder="Lien Twitter / X (ex: https://x.com/...)" style="margin-bottom:8px;">
+                                    <input type="url" id="input-twitch-${playerId}" value="${player.twitch || ''}" placeholder="Lien Twitch (ex: https://twitch.tv/...)" style="margin-bottom:8px;">
+                                    <input type="url" id="input-youtube-${playerId}" value="${player.youtube || ''}" placeholder="Lien YouTube" style="margin-bottom:8px;">
+                                    <input type="url" id="input-tiktok-${playerId}" value="${player.tiktok || ''}" placeholder="Lien TikTok">
+                                </div>
+
+                                <button type="submit" class="form-btn" style="margin-top:20px; background:#a855f7;">💾 Sauvegarder tout le profil</button>
                                 ${!isNewPlayer ? `<button type="button" class="form-btn delete-btn" id="btn-delete-${playerId}">🗑️ Supprimer le joueur</button>` : ''}
                                 <button type="button" class="form-btn edit-toggle-btn" id="btn-cancel-${playerId}" style="margin-top:5px;">Annuler</button>
                             </form>
@@ -316,14 +363,43 @@
             const closePopup = () => { popupOverlay.classList.remove("active"); setTimeout(() => popupOverlay.remove(), 200); };
             popupOverlay.querySelector(".popup-close").addEventListener("click", closePopup);
 
-            // ── INITIALISATION DU GRAPHIQUE DYNAMIQUE ──
+            // ── RE-RENDU DES LOGS PR DANS LA ZONE D'ÉDITION ──
+            const rafraichirListeEditeurPR = () => {
+                const box = document.getElementById(`edit-pr-list-${playerId}`);
+                if (!box) return;
+                if (localPrHistory.length === 0) {
+                    box.innerHTML = `<p style="color:#555; font-size:0.8rem; margin:5px 0; text-align:center;">Aucun historique de points.</p>`;
+                    return;
+                }
+                let html = "";
+                localPrHistory.forEach((item, index) => {
+                    html += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:#111; padding:4px 8px; margin-bottom:4px; border-radius:4px; font-size:0.8rem; color:#ccc;">
+                            <span><b>${item.date}</b> - ${item.label || item.event} (${item.value} PR)</span>
+                            <span class="btn-del-pr-row" data-index="${index}" style="color:#ff4444; cursor:pointer; font-weight:bold; padding:0 4px;" title="Supprimer cette ligne">×</span>
+                        </div>
+                    `;
+                });
+                box.innerHTML = html;
+
+                // Brancher la suppression d'une ligne
+                box.querySelectorAll(".btn-del-pr-row").forEach(btn => {
+                    btn.addEventListener("click", (e) => {
+                        const idx = parseInt(e.target.getAttribute("data-index"));
+                        localPrHistory.splice(idx, 1);
+                        rafraichirListeEditeurPR();
+                    });
+                });
+            };
+
+            // ── INITIALISATION DU GRAPHIQUE ──
             if (!isNewPlayer) {
                 const canvasElement = document.getElementById(`canvas-${playerId}`);
                 const chartBox = document.getElementById(`chart-box-${playerId}`);
                 
-                if (history.length >= 2) {
-                    const labels = history.map(item => item.date || "Saison");
-                    const dataValues = history.map(item => Number(item.value) || 0);
+                if (localPrHistory.length >= 2) {
+                    const labels = localPrHistory.map(item => item.date || "Saison");
+                    const dataValues = localPrHistory.map(item => Number(item.value) || 0);
 
                     new Chart(canvasElement, {
                         type: 'line',
@@ -350,12 +426,40 @@
                         }
                     });
                 } else {
-                    // Masque le graphique s'il n'y a pas assez de points de données
                     if (chartBox) chartBox.style.display = "none";
                 }
             }
 
             if (estAdmin) {
+                rafraichirListeEditeurPR();
+
+                // BOUTON INSÉRER LIGNE PR
+                document.getElementById(`btn-add-pr-row-${playerId}`).addEventListener("click", () => {
+                    const inpDate = document.getElementById(`new-pr-date-${playerId}`);
+                    const inpLabel = document.getElementById(`new-pr-label-${playerId}`);
+                    const inpValue = document.getElementById(`new-pr-value-${playerId}`);
+
+                    if (!inpDate.value || !inpLabel.value || !inpValue.value) {
+                        alert("Veuillez remplir tous les champs de la ligne PR (Date, Événement et Valeur).");
+                        return;
+                    }
+
+                    localPrHistory.push({
+                        date: inpDate.value,
+                        label: inpLabel.value,
+                        event: inpLabel.value, // Par sécurité rétrocompatible
+                        value: Number(inpValue.value)
+                    });
+
+                    // Vider les petits champs
+                    inpDate.value = "";
+                    inpLabel.value = "";
+                    inpValue.value = "";
+
+                    rafraichirListeEditeurPR();
+                });
+
+                // IMAGE UPLOAD SYSTEM
                 const fileInput = document.getElementById(`file-input-${playerId}`);
                 const clearImgBtn = document.getElementById(`btn-clear-img-${playerId}`);
                 const previewImg = document.getElementById(`edit-preview-${playerId}`);
@@ -386,6 +490,7 @@
                     popupOverlay.querySelector(`#btn-to-edit-${playerId}`).addEventListener("click", () => {
                         viewModeDiv.classList.add("hidden");
                         editModeDiv.classList.remove("hidden");
+                        rafraichirListeEditeurPR();
                     });
                     popupOverlay.querySelector(`#btn-cancel-${playerId}`).addEventListener("click", () => {
                         editModeDiv.classList.add("hidden");
@@ -395,19 +500,28 @@
                     popupOverlay.querySelector(`#btn-cancel-${playerId}`).addEventListener("click", closePopup);
                 }
 
+                // SAUVEGARDE SUR FIRESTORE
                 popupOverlay.querySelector(`#form-${playerId}`).addEventListener("submit", async () => {
                     const pseudo = document.getElementById(`input-pseudo-${playerId}`).value;
                     const team = document.getElementById(`input-team-${playerId}`).value;
                     const role = document.getElementById(`input-role-${playerId}`).value;
                     const earnings = document.getElementById(`input-earnings-${playerId}`).value || "0 €";
 
+                    // Liens RS récupérés du formulaire
+                    const twitter = document.getElementById(`input-twitter-${playerId}`).value.trim();
+                    const twitch = document.getElementById(`input-twitch-${playerId}`).value.trim();
+                    const youtube = document.getElementById(`input-youtube-${playerId}`).value.trim();
+                    const tiktok = document.getElementById(`input-tiktok-${playerId}`).value.trim();
+
                     const existingPlayer = localPlayersList.find(p => p.id === playerId);
-                    const prHistory = existingPlayer ? (existingPlayer.prHistory || []) : [];
                     const createdAt = existingPlayer ? (existingPlayer.createdAt || Date.now()) : Date.now();
 
                     try {
                         await setDoc(doc(db, "roster", playerId), {
-                            pseudo, team, role, image: imageBase64String, earnings, prHistory, createdAt
+                            pseudo, team, role, earnings, createdAt,
+                            image: imageBase64String,
+                            prHistory: localPrHistory, // Sauvegarde la nouvelle liste PR construite
+                            twitter, twitch, youtube, tiktok // Sauvegarde des réseaux sociaux
                         });
                         closePopup();
                     } catch (err) {
@@ -425,13 +539,13 @@
                 }
             }
 
-            // Affichage du tableau historique (Sous le graphique)
+            // TABLEAU HISTORIQUE LECTURE PUBLIC
             if (!isNewPlayer) {
                 const tableContainer = document.getElementById(`pr-table-container-${playerId}`);
-                if (history.length > 0) {
+                if (localPrHistory.length > 0) {
                     let tableRows = "";
-                    history.forEach((row, index) => {
-                        const isLatest = index === history.length - 1 ? "class='pr-latest'" : "";
+                    localPrHistory.forEach((row, index) => {
+                        const isLatest = index === localPrHistory.length - 1 ? "class='pr-latest'" : "";
                         tableRows += `
                             <tr ${isLatest}>
                                 <td>${row.date || 'Saison'}</td>

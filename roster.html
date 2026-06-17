@@ -7,6 +7,7 @@
     <title>ABYSZ | Roster 2026</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* ── ARCHITECTURE GLOBALE & NAV ── */
         .logo-link { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
@@ -20,7 +21,7 @@
 
         /* ── IMAGES ── */
         .player-avatar-img { width: 100%; height: 230px; object-fit: cover; border-bottom: 2px solid #a855f7; background: #141414; }
-        .popup-avatar-img { width: 100%; max-height: 200px; object-fit: contain; border: 2px solid #a855f7; border-radius: 12px; margin: 0 auto 20px auto; display: block; background: #0a0a0a; }
+        .popup-avatar-img { width: 100%; max-height: 180px; object-fit: contain; border: 2px solid #a855f7; border-radius: 12px; margin: 0 auto 15px auto; display: block; background: #0a0a0a; }
 
         /* ── MODAL & POPUPS ── */
         .popup-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
@@ -30,14 +31,19 @@
         .popup-close { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; color: #777; cursor: pointer; transition: color 0.2s; }
         .popup-close:hover { color: #ff4444; }
         
-        .popup-pseudo { font-family: 'Orbitron', sans-serif; color: #fff; margin-top: 0; margin-bottom: 20px; font-size: 1.5rem; text-align: center; }
+        .popup-pseudo { font-family: 'Orbitron', sans-serif; color: #fff; margin-top: 0; margin-bottom: 15px; font-size: 1.5rem; text-align: center; }
         
+        /* Badges d'évolution PR */
+        .pr-trend-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: bold; font-family: 'Orbitron', sans-serif; margin-top: 5px; }
+        .trend-up { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid #22c55e; }
+        .trend-down { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; }
+        .trend-neutral { background: rgba(102, 102, 102, 0.15); color: #999; border: 1px solid #666; }
+
         /* ── FORMULAIRES EDITION ── */
         .input-group { margin-bottom: 15px; text-align: left; }
         .input-group label { display: block; margin-bottom: 6px; color: #a855f7; font-size: 0.8rem; font-family: 'Orbitron', sans-serif; font-weight: 600; }
         .input-group input, .input-group select { width: 100%; padding: 10px 14px; background: #0a0a0a; border: 1px solid #2a2a2a; color: white; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.9rem; box-sizing: border-box; }
         
-        /* Bouton upload personnalisé */
         .file-upload-btn { display: block; text-align: center; background: #1a1a1a; border: 1px dashed #a855f7; color: #ccc; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; }
         .file-upload-btn:hover { background: rgba(168,85,247,0.1); color: #fff; }
         
@@ -51,6 +57,9 @@
         .btn-remove-img { background: #331c1c; border: 1px solid #ff4444; color: #ff4444; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; width: 100%; font-family: 'Orbitron', sans-serif; }
         .btn-remove-img:hover { background: #ff4444; color: #fff; }
         .hidden { display: none !important; }
+
+        /* ── GRAPHIQUE CONTENEUR ── */
+        .chart-container { background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 10px; margin: 15px 0; max-height: 180px; }
 
         /* ── HISTORIQUE PR ── */
         .pr-history-section { background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 12px; padding: 16px; margin: 16px 0; }
@@ -176,7 +185,6 @@
                 const card = document.createElement("div");
                 card.className = "player-card-container";
                 
-                // Si pas d'image ou vide ou '#', on utilise logo.png automatiquement
                 const avatar = (player.image && player.image !== "#" && player.image.trim() !== "") ? player.image : "logo.png";
                 const pseudo = player.pseudo || "Inconnu";
                 const role = player.role || "Non spécifié";
@@ -204,11 +212,25 @@
             const isNewPlayer = !player.id;
             const playerId = player.id || "p_" + Date.now();
             
-            // Stockage temporaire de l'image en base64 pendant l'édition
             let imageBase64String = player.image || "logo.png";
             const avatar = (imageBase64String && imageBase64String !== "#" && imageBase64String.trim() !== "") ? imageBase64String : "logo.png";
 
             if (startInEditMode && !estAdmin) startInEditMode = false;
+
+            // ── CALCUL DU POURCENTAGE D'ÉVOLUTION DU PR ──
+            let trendHtml = "";
+            const history = player.prHistory || [];
+            if (history.length >= 2) {
+                const valAncienne = Number(history[history.length - 2].value) || 0;
+                const valActuelle = Number(history[history.length - 1].value) || 0;
+
+                if (valAncienne > 0) {
+                    const pourcentage = ((valActuelle - valAncienne) / valAncienne) * 100;
+                    const signe = pourcentage >= 0 ? "+" : "";
+                    const classeTrend = pourcentage > 0 ? "trend-up" : (pourcentage < 0 ? "trend-down" : "trend-neutral");
+                    trendHtml = `<div class="pr-trend-badge ${classeTrend}">${signe}${pourcentage.toFixed(1)}% (PR)</div>`;
+                }
+            }
 
             container.innerHTML = `
                 <div id="popup-${playerId}" class="popup-overlay active">
@@ -217,11 +239,19 @@
                         
                         <div id="view-mode-${playerId}" class="${startInEditMode ? 'hidden' : ''}">
                             <img src="${avatar}" class="popup-avatar-img" id="view-avatar-${playerId}" alt="${player.pseudo || ''}">
-                            <h3 class="popup-pseudo">${player.pseudo || 'Nouveau Joueur'}</h3>
-                            <p style="text-align:center; color:#aaa; margin-top:-15px; margin-bottom:10px; font-family:'Inter', sans-serif;">${player.role || 'Rôle non défini'}</p>
-                            <p style="text-align:center; color:#22c55e; font-weight:600; font-family:'Orbitron', sans-serif; margin-bottom:20px;">Earnings : ${player.earnings || '0 €'}</p>
+                            <h3 class="popup-pseudo" style="margin-bottom:5px;">${player.pseudo || 'Nouveau Joueur'}</h3>
+                            
+                            <div style="text-align:center; margin-bottom:15px;">
+                                ${trendHtml} </div>
+
+                            <p style="text-align:center; color:#aaa; margin-top:-5px; margin-bottom:10px; font-family:'Inter', sans-serif;">${player.role || 'Rôle non défini'}</p>
+                            <p style="text-align:center; color:#22c55e; font-weight:600; font-family:'Orbitron', sans-serif; margin-bottom:15px;">Earnings : ${player.earnings || '0 €'}</p>
                             
                             <button class="form-btn edit-toggle-btn ${estAdmin ? '' : 'hidden'}" id="btn-to-edit-${playerId}">✏️ Éditer le profil</button>
+
+                            <div class="chart-container" id="chart-box-${playerId}">
+                                <canvas id="canvas-${playerId}"></canvas>
+                            </div>
 
                             <div class="pr-history-section">
                                 <div class="pr-history-title">Historique des Compétitions (PR)</div>
@@ -242,15 +272,14 @@
                                     <label>Photo du joueur (Depuis le PC)</label>
                                     <label for="file-input-${playerId}" class="file-upload-btn">📁 Choisir un fichier image</label>
                                     <input type="file" id="file-input-${playerId}" accept="image/*" class="hidden">
-                                    
                                     <div class="image-actions">
-                                        <button type="button" class="btn-remove-img" id="btn-clear-img-${playerId}">🗑️ Supprimer l'image (Mettre le Logo)</button>
+                                        <button type="button" class="btn-remove-img" id="btn-clear-img-${playerId}">🗑️ Supprimer l'image (Logo par défaut)</button>
                                     </div>
                                 </div>
 
                                 <div class="input-group">
                                     <label>Pseudo</label>
-                                    <input type="text" id="input-pseudo-${playerId}" value="${player.pseudo || ''}" required placeholder="Ex: Fxbio">
+                                    <input type="text" id="input-pseudo-${playerId}" value="${player.pseudo || ''}" required>
                                 </div>
                                 <div class="input-group">
                                     <label>Catégorie d'équipe</label>
@@ -262,11 +291,11 @@
                                 </div>
                                 <div class="input-group">
                                     <label>Rôle / Division</label>
-                                    <input type="text" id="input-role-${playerId}" value="${player.role || ''}" required placeholder="Ex: Duelist / Radiant">
+                                    <input type="text" id="input-role-${playerId}" value="${player.role || ''}" required>
                                 </div>
                                 <div class="input-group">
                                     <label>Earnings</label>
-                                    <input type="text" id="input-earnings-${playerId}" value="${player.earnings || ''}" placeholder="Ex: 150 €">
+                                    <input type="text" id="input-earnings-${playerId}" value="${player.earnings || ''}">
                                 </div>
 
                                 <button type="submit" class="form-btn">💾 Sauvegarder</button>
@@ -283,38 +312,74 @@
             const popupOverlay = document.getElementById(`popup-${playerId}`);
             const viewModeDiv = document.getElementById(`view-mode-${playerId}`);
             const editModeDiv = document.getElementById(`edit-mode-${playerId}`);
-            const previewImg = document.getElementById(`edit-preview-${playerId}`);
             
             const closePopup = () => { popupOverlay.classList.remove("active"); setTimeout(() => popupOverlay.remove(), 200); };
             popupOverlay.querySelector(".popup-close").addEventListener("click", closePopup);
 
+            // ── INITIALISATION DU GRAPHIQUE DYNAMIQUE ──
+            if (!isNewPlayer) {
+                const canvasElement = document.getElementById(`canvas-${playerId}`);
+                const chartBox = document.getElementById(`chart-box-${playerId}`);
+                
+                if (history.length >= 2) {
+                    const labels = history.map(item => item.date || "Saison");
+                    const dataValues = history.map(item => Number(item.value) || 0);
+
+                    new Chart(canvasElement, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Points PR',
+                                data: dataValues,
+                                borderColor: '#a855f7',
+                                backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.3,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: { grid: { color: '#1a1a1a' }, ticks: { color: '#666', font: { size: 9 } } },
+                                y: { grid: { color: '#1a1a1a' }, ticks: { color: '#666', font: { size: 9 } } }
+                            }
+                        }
+                    });
+                } else {
+                    // Masque le graphique s'il n'y a pas assez de points de données
+                    if (chartBox) chartBox.style.display = "none";
+                }
+            }
+
             if (estAdmin) {
                 const fileInput = document.getElementById(`file-input-${playerId}`);
                 const clearImgBtn = document.getElementById(`btn-clear-img-${playerId}`);
+                const previewImg = document.getElementById(`edit-preview-${playerId}`);
 
-                // GESTION DU CHARGEMENT DE L'IMAGE DEPUIS LE PC
                 fileInput.addEventListener("change", (e) => {
                     const fichier = e.target.files[0];
                     if (fichier) {
-                        // Limite de taille optionnelle à 1.5 Mo pour Firestore
                         if (fichier.size > 1500000) {
-                            alert("L'image est trop lourde. Choisis une image de moins de 1.5 Mo.");
+                            alert("Image trop lourde (Max 1.5 Mo)");
                             return;
                         }
                         const reader = new FileReader();
                         reader.onloadend = () => {
-                            imageBase64String = reader.result; // Contient l'image convertie
-                            if (previewImg) previewImg.src = imageBase64String; // Changement de l'aperçu
+                            imageBase64String = reader.result;
+                            if (previewImg) previewImg.src = imageBase64String;
                         };
                         reader.readAsDataURL(fichier);
                     }
                 });
 
-                // SUPPRESSION DE L'IMAGE (RESET AU LOGO)
                 clearImgBtn.addEventListener("click", () => {
                     imageBase64String = "logo.png";
                     if (previewImg) previewImg.src = "logo.png";
-                    fileInput.value = ""; // Reset de l'input fichier
+                    fileInput.value = "";
                 });
 
                 if (!isNewPlayer) {
@@ -322,7 +387,6 @@
                         viewModeDiv.classList.add("hidden");
                         editModeDiv.classList.remove("hidden");
                     });
-                    
                     popupOverlay.querySelector(`#btn-cancel-${playerId}`).addEventListener("click", () => {
                         editModeDiv.classList.add("hidden");
                         viewModeDiv.classList.remove("hidden");
@@ -331,7 +395,6 @@
                     popupOverlay.querySelector(`#btn-cancel-${playerId}`).addEventListener("click", closePopup);
                 }
 
-                // SOUBOUMISSION DU FORMULAIRE ET ENVOI SUR FIRESTORE
                 popupOverlay.querySelector(`#form-${playerId}`).addEventListener("submit", async () => {
                     const pseudo = document.getElementById(`input-pseudo-${playerId}`).value;
                     const team = document.getElementById(`input-team-${playerId}`).value;
@@ -344,24 +407,17 @@
 
                     try {
                         await setDoc(doc(db, "roster", playerId), {
-                            pseudo, 
-                            team, 
-                            role, 
-                            image: imageBase64String, // Sauvegarde de la chaîne de l'image (ou de "logo.png")
-                            earnings, 
-                            prHistory, 
-                            createdAt
+                            pseudo, team, role, image: imageBase64String, earnings, prHistory, createdAt
                         });
                         closePopup();
                     } catch (err) {
-                        console.error(err);
                         alert("Erreur lors de la sauvegarde.");
                     }
                 });
 
                 if (!isNewPlayer) {
                     popupOverlay.querySelector(`#btn-delete-${playerId}`).addEventListener("click", async () => {
-                        if (confirm(`Voulez-vous supprimer définitivement ${player.pseudo} ?`)) {
+                        if (confirm(`Supprimer définitivement ${player.pseudo} ?`)) {
                             await deleteDoc(doc(db, "roster", playerId));
                             closePopup();
                         }
@@ -369,13 +425,13 @@
                 }
             }
 
-            // Affichage de l'historique PR (Mode Public)
+            // Affichage du tableau historique (Sous le graphique)
             if (!isNewPlayer) {
                 const tableContainer = document.getElementById(`pr-table-container-${playerId}`);
-                if (player.prHistory && player.prHistory.length > 0) {
+                if (history.length > 0) {
                     let tableRows = "";
-                    player.prHistory.forEach((row, index) => {
-                        const isLatest = index === player.prHistory.length - 1 ? "class='pr-latest'" : "";
+                    history.forEach((row, index) => {
+                        const isLatest = index === history.length - 1 ? "class='pr-latest'" : "";
                         tableRows += `
                             <tr ${isLatest}>
                                 <td>${row.date || 'Saison'}</td>

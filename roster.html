@@ -35,9 +35,9 @@
 
         .loading-text { text-align:center; color:#666; font-style:italic; grid-column:1/-1; padding:20px; }
 
-        /* ── IMAGES ── */
-        .player-avatar-img { width:100%; height:200px; object-fit:cover; border-bottom:2px solid #a855f7; background:#141414; cursor: pointer; }
-        .popup-avatar-img { width:100%; max-height:250px; object-fit:contain; border:2px solid #a855f7; border-radius:12px; margin:0 auto 20px auto; display:block; background:#0a0a0a; }
+        /* ── IMAGES AJUSTÉES AUTOMATIQUEMENT ── */
+        .player-avatar-img { width:100%; height:200px; object-fit:contain; border-bottom:2px solid #a855f7; background:#141414; cursor: pointer; padding: 10px; box-sizing: border-box; }
+        .popup-avatar-img { width:100%; max-height:250px; object-fit:contain; border:2px solid #a855f7; border-radius:12px; margin:0 auto 20px auto; display:block; background:#0a0a0a; padding: 10px; box-sizing: border-box; }
 
         /* ── MODAL & POPUPS ── */
         .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center; padding:20px; }
@@ -59,8 +59,8 @@
         /* ── ADMIN CONTROLS ── */
         .player-card-container { position:relative; }
         .admin-controls { position:absolute; top:10px; right:10px; display:flex; gap:6px; z-index:10; }
-        .inline-edit-btn { background:#a855f7; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold; font-family:'Inter',sans-serif; }
-        .inline-edit-btn:hover { background:#b975ff; }
+        .inline-edit-btn { background:#22c55e; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold; font-family:'Inter',sans-serif; }
+        .inline-edit-btn:hover { background:#16a34a; }
         .inline-delete-btn { background:#ff4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold; font-family:'Inter',sans-serif; }
         .inline-delete-btn:hover { background:#cc3333; }
 
@@ -178,8 +178,8 @@
                         <input type="text" id="player-role" placeholder="Ex: Capitaine ou Division 1" required>
                     </div>
                     <div class="input-group">
-                        <label for="player-file">Charger la photo du joueur depuis votre PC</label>
-                        <input type="file" id="player-file" accept="image/*">
+                        <label for="player-img-url">URL de la photo du joueur (Mettre # pour le logo par défaut)</label>
+                        <input type="text" id="player-img-url" placeholder="Lien de l'image ou #" value="#">
                     </div>
                     <div class="input-group">
                         <label>Statistiques du joueur</label>
@@ -221,7 +221,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore as fsGet, doc as fsDoc, updateDoc as fsUpdate, deleteDoc as fsDelete, collection as fsCol } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -235,7 +236,7 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
+        const db = fsGet(app);
 
         const modal = document.getElementById('admin-modal');
         const adminGateBtn = document.getElementById('admin-gate-btn');
@@ -247,12 +248,17 @@
         const userDisplayEmail = document.getElementById('user-display-email');
         const logoutBtn = document.getElementById('logout-btn');
         const popupsContainer = document.getElementById('popups-container');
+        const playerForm = document.getElementById('player-form');
+        const panelTitle = document.getElementById('panel-title');
+        const submitPlayerBtn = document.getElementById('submit-player-btn');
+        const prAddZone = document.getElementById('pr-add-zone');
 
         let currentUser = null;
         let playersDataCache = {};
+        let editingPlayerId = null; // Stocke l'ID du joueur en cours de modification
 
-        // Récupération en temps réel et rendu avec les pop-ups complexes et historique PR
-        onSnapshot(query(collection(db, "roster")), (snapshot) => {
+        // Récupération en temps réel
+        onSnapshot(fsCol(db, "roster"), (snapshot) => {
             const grids = {
                 main: document.getElementById("main-roster-grid"),
                 academy: document.getElementById("academy-roster-grid"),
@@ -272,10 +278,14 @@
                 const card = document.createElement("div");
                 card.className = "player-card-container";
                 
+                // Correction de la lecture de l'image (lit le champ 'image' de la BDD, sinon logo.png)
+                const playerImgSrc = (p.image && p.image !== '#') ? p.image : 'logo.png';
+
                 let adminHtml = "";
                 if(currentUser) {
                     adminHtml = `
                     <div class="admin-controls">
+                        <button class="inline-edit-btn" data-id="${id}">Modifier</button>
                         <button class="inline-delete-btn" data-id="${id}">X</button>
                     </div>`;
                 }
@@ -283,7 +293,7 @@
                 card.innerHTML = `
                     ${adminHtml}
                     <div class="player-card" onclick="document.getElementById('popup-${id}').classList.add('active')">
-                        <img src="${p.imageUrl || 'player-placeholder.png'}" class="player-avatar-img" alt="${p.pseudo}">
+                        <img src="${playerImgSrc}" class="player-avatar-img" alt="${p.pseudo}">
                         <div class="player-info">
                             <h3>${p.pseudo}</h3>
                             <p class="role">${p.role}</p>
@@ -298,10 +308,8 @@
                 let evolutionBadge = `<div class="pr-evolution-badge neutral">▬ Stable</div>`;
 
                 if(prHistory.length > 0) {
-                    // Tri décroissant sur les dates
                     const sortedPr = [...prHistory].sort((a,b) => new Date(b.date) - new Date(a.date));
                     
-                    // Calcul de l'évolution si au moins 2 entrées existent
                     if(sortedPr.length >= 2) {
                         const latest = parseInt(sortedPr[0].value);
                         const previous = parseInt(sortedPr[1].value);
@@ -342,14 +350,14 @@
                     <div class="modal-content">
                         <span class="modal-close" onclick="document.getElementById('popup-${id}').classList.remove('active')">&times;</span>
                         <h3>Détails du Joueur</h3>
-                        <img src="${p.imageUrl || 'player-placeholder.png'}" class="popup-avatar-img">
+                        <img src="${playerImgSrc}" class="popup-avatar-img">
                         <h2 style="text-align:center;font-family:'Orbitron';margin-bottom:5px;">${p.pseudo}</h2>
                         <p style="text-align:center;color:#a855f7;font-weight:600;margin-top:0;font-size:0.9rem;">${p.role}</p>
                         
                         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center;margin:20px 0;">
                             <div style="background:#0a0a0a;padding:10px;border-radius:8px;border:1px solid #2a2a2a;"><span style="color:#a855f7;font-size:0.8rem;display:block;">EARNINGS</span><strong>${p.earnings || '0$'}</strong></div>
-                            <div style="background:#0a0a0a;padding:10px;border-radius:8px;border:1px solid #2a2a2a;"><span style="color:#a855f7;font-size:0.8rem;display:block;">BEST PR</span><strong>${p.bestPr || 'N/A'}</strong></div>
-                            <div style="background:#0a0a0a;padding:10px;border-radius:8px;border:1px solid #2a2a2a;"><span style="color:#a855f7;font-size:0.8rem;display:block;">BEST PERF</span><strong>${p.bestWins || 'N/A'}</strong></div>
+                            <div style="background:#0a0a0a;padding:10px;border-radius:8px;border:1px solid #2a2a2a;"><span style="color:#a855f7;font-size:0.8rem;display:block;">BEST PR</span><strong>${p.bestPlacement || 'N/A'}</strong></div>
+                            <div style="background:#0a0a0a;padding:10px;border-radius:8px;border:1px solid #2a2a2a;"><span style="color:#a855f7;font-size:0.8rem;display:block;">BEST PERF</span><strong>${p.wins || 'N/A'}</strong></div>
                         </div>
 
                         <p style="background:#0a0a0a;padding:12px;border-radius:8px;border:1px solid #1a1a1a;font-size:0.9rem;line-height:1.5;">${p.bio || 'Aucune biographie fournie.'}</p>
@@ -373,15 +381,94 @@
                 popupsContainer.appendChild(popup);
             });
 
+            // Événement Modifier joueur
+            document.querySelectorAll('.inline-edit-btn').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    const id = e.target.getAttribute('data-id');
+                    const p = playersDataCache[id];
+                    if(!p) return;
+
+                    editingPlayerId = id;
+                    panelTitle.textContent = `Modifier ${p.pseudo}`;
+                    submitPlayerBtn.textContent = "Enregistrer les modifications";
+
+                    // Pré-remplissage complet du formulaire
+                    document.getElementById('player-team').value = p.team || 'main';
+                    document.getElementById('player-pseudo').value = p.pseudo || '';
+                    document.getElementById('player-role').value = p.role || '';
+                    document.getElementById('player-img-url').value = p.image || '#';
+                    document.getElementById('stat-earnings').value = p.earnings || '';
+                    document.getElementById('stat-best').value = p.bestPlacement || '';
+                    document.getElementById('stat-wins').value = p.wins || '';
+                    document.getElementById('player-bio').value = p.bio || '';
+                    document.getElementById('link-twitch').value = p.twitch || '#';
+                    document.getElementById('link-twitter').value = p.twitter || '#';
+                    document.getElementById('link-tracker').value = p.tracker || '#';
+
+                    // Afficher la zone PR lors d'une modification
+                    prAddZone.classList.remove('hidden');
+                    document.getElementById('new-pr-value').value = "";
+                    document.getElementById('new-pr-date').value = "";
+
+                    modal.classList.add('active');
+                };
+            });
+
             // Supprimer joueur
             document.querySelectorAll('.inline-delete-btn').forEach(btn => {
                 btn.onclick = async (e) => {
                     e.stopPropagation();
                     if(confirm("Supprimer définitivement ce joueur de la base de données ?")) {
-                        await deleteDoc(doc(db, "roster", e.target.getAttribute('data-id')));
+                        await fsDelete(fsDoc(db, "roster", e.target.getAttribute('data-id')));
                     }
                 };
             });
+        });
+
+        // Soumission du formulaire (Ajout ou Modification)
+        playerForm.addEventListener('submit', async () => {
+            const pseudo = document.getElementById('player-pseudo').value.trim();
+            const role = document.getElementById('player-role').value.trim();
+            const team = document.getElementById('player-team').value;
+            const image = document.getElementById('player-img-url').value.trim();
+            const earnings = document.getElementById('stat-earnings').value.trim();
+            const bestPlacement = document.getElementById('stat-best').value.trim();
+            const wins = document.getElementById('stat-wins').value.trim();
+            const bio = document.getElementById('player-bio').value.trim();
+            const twitch = document.getElementById('link-twitch').value.trim();
+            const twitter = document.getElementById('link-twitter').value.trim();
+            const tracker = document.getElementById('link-tracker').value.trim();
+
+            const newPrVal = document.getElementById('new-pr-value').value;
+            const newPrDate = document.getElementById('new-pr-date').value;
+
+            if(!editingPlayerId) return; // Sécurité
+
+            const docRef = fsDoc(db, "roster", editingPlayerId);
+            const currentPlayerData = playersDataCache[editingPlayerId];
+            let updatedPrHistory = currentPlayerData.prHistory || [];
+
+            // Si un nouveau PR est saisi, on l'ajoute à la liste historique
+            if(newPrVal && newPrDate) {
+                updatedPrHistory.push({
+                    date: newPrDate,
+                    value: parseInt(newPrVal)
+                });
+            }
+
+            try {
+                await fsUpdate(docRef, {
+                    team, pseudo, role, image, earnings, bestPlacement, wins, bio, twitch, twitter, tracker,
+                    prHistory: updatedPrHistory
+                });
+                alert("Joueur modifié avec succès !");
+                modal.classList.remove('active');
+                playerForm.reset();
+            } catch(err) {
+                console.error(err);
+                alert("Erreur lors de la mise à jour.");
+            }
         });
 
         // Gestion de l'affichage strict du Dashboard en fonction de la connexion
@@ -392,13 +479,13 @@
                 panelStep.classList.remove('hidden');
                 userDisplayEmail.textContent = user.email;
                 adminGateBtn.textContent = "⚙️ Panel Admin";
-                document.getElementById('nav-dashboard')?.classList.remove('hidden'); // S'affiche UNIQUEMENT si connecté
+                document.getElementById('nav-dashboard')?.classList.remove('hidden');
             } else {
                 loginStep.classList.remove('hidden');
                 panelStep.classList.add('hidden');
                 userDisplayEmail.textContent = '';
                 adminGateBtn.textContent = "🔑 Connexion";
-                document.getElementById('nav-dashboard')?.classList.add('hidden'); // Caché par défaut
+                document.getElementById('nav-dashboard')?.classList.add('hidden');
             }
         });
 
@@ -413,7 +500,14 @@
         });
 
         logoutBtn.onclick = () => { signOut(auth); modal.classList.remove('active'); };
-        adminGateBtn.onclick = () => modal.classList.add('active');
+        adminGateBtn.onclick = () => {
+            editingPlayerId = null;
+            panelTitle.textContent = "Ajouter un joueur";
+            submitPlayerBtn.textContent = "Enregistrer le joueur";
+            playerForm.reset();
+            prAddZone.classList.add('hidden');
+            modal.classList.add('active');
+        };
         closeModalBtn.onclick = () => modal.classList.remove('active');
     </script>
 </body>

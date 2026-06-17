@@ -14,16 +14,19 @@
         .restricted-zone { text-align: center; padding: 60px 20px; background: #0a0a0a; border: 2px dashed #ff4444; border-radius: 16px; max-width: 600px; margin: 100px auto; }
         .restricted-zone h2 { font-family: 'Orbitron', sans-serif; color: #ff4444; margin-bottom: 15px; }
 
+        /* ── SECTION TITRES ANALYTICS ── */
+        .section-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; max-width: 1200px; margin: 30px auto 15px auto; padding: 0 20px; }
+
         /* ── STATS CARDS ── */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto 40px auto; padding: 0 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto 30px auto; padding: 0 20px; }
         .stat-card { background: #141414; border: 1px solid #2a2a2a; border-left: 4px solid #a855f7; padding: 20px; border-radius: 12px; font-family: 'Orbitron', sans-serif; }
         .stat-card .num { font-size: 2rem; font-weight: 700; color: #fff; margin-top: 5px; }
         .stat-card .label { color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
 
         /* ── TABLEAU DES JOUEURS ── */
-        .dashboard-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .dashboard-container { max-width: 1200px; margin: 0 auto 80px auto; padding: 0 20px; }
         .db-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .db-header h2 { font-family: 'Orbitron', sans-serif; margin: 0; }
+        .db-header h2 { font-family: 'Orbitron', sans-serif; margin: 0; font-size: 1.4rem; }
         
         .db-table-wrapper { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; overflow: hidden; }
         .db-table { width: 100%; border-collapse: collapse; font-family: 'Inter', sans-serif; text-align: left; }
@@ -41,7 +44,7 @@
         .db-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid #a855f7; background: #0a0a0a; }
         .player-flex { display: flex; align-items: center; gap: 12px; font-weight: 600; color: #fff; }
         
-        .action-btn { background: #a855f7; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: bold; font-family: 'Inter', sans-serif; transition: background 0.2s; }
+        .action-btn { background: #a855f7; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: bold; font-family: 'Inter', sans-serif; transition: background 0.2s; text-decoration: none; }
         .action-btn:hover { background: #b975ff; }
         
         .hidden { display: none !important; }
@@ -70,8 +73,25 @@
         <a href="roster.html" class="btn">Retour au Roster pour se connecter</a>
     </div>
 
-    <section id="dashboard-content" style="padding-top: 160px;" class="hidden">
+    <section id="dashboard-content" style="padding-top: 140px;" class="hidden">
         
+        <div class="section-title">📈 Activité du site web</div>
+        <div class="stats-grid">
+            <div class="stat-card" style="border-left-color: #00bfff;">
+                <div class="label">Visites Totales</div>
+                <div id="site-visites" class="num">0</div>
+            </div>
+            <div class="stat-card" style="border-left-color: #ff007f;">
+                <div class="label">Clics Boutique</div>
+                <div id="boutique-clicks" class="num">0</div>
+            </div>
+            <div class="stat-card" style="border-left-color: #00ffcc;">
+                <div class="label">Dernière mise à jour</div>
+                <div id="analytics-date" class="num" style="font-size: 1.1rem; line-height: 2.2rem; white-space: nowrap;">—</div>
+            </div>
+        </div>
+
+        <div class="section-title">👥 Effectifs Roster</div>
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="label">Équipe Principale</div>
@@ -90,7 +110,7 @@
         <div class="dashboard-container">
             <div class="db-header">
                 <h2>Base de Données Roster 2026</h2>
-                <a href="roster.html" class="action-btn" style="background:#0a0a0a; border: 1px solid #a855f7; text-decoration:none; padding: 10px 15px;">⚙️ Ouvrir le Panel d'Ajout</a>
+                <a href="roster.html" class="action-btn" style="background:#0a0a0a; border: 1px solid #a855f7; padding: 10px 15px;">⚙️ Ouvrir le Panel d'Ajout</a>
             </div>
 
             <div class="db-table-wrapper">
@@ -122,7 +142,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -146,25 +166,46 @@
         const countAcademy = document.getElementById('count-academy');
         const countCdf = document.getElementById('count-cdf');
 
-        // ── VÉRIFICATION DE LA SÉCURITÉ CONNECTÉ/DÉCONNECTÉ ──
+        const siteVisitesNum = document.getElementById('site-visites');
+        const boutiqueClicksNum = document.getElementById('boutique-clicks');
+        const analyticsDateStr = document.getElementById('analytics-date');
+
+        // ── SÉCURITÉ ACCÈS ──
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 accessDeniedSec.classList.add('hidden');
                 dashboardContentSec.classList.remove('hidden');
                 chargerDonneesDashboard();
+                chargerStatistiquesSite();
             } else {
                 accessDeniedSec.classList.remove('hidden');
                 dashboardContentSec.classList.add('hidden');
             }
         });
 
-        // ── CHARGEMENT ET CALCUL EN TEMPS RÉEL ──
+        // ── CHARGEMENT DE VOS COMPTEURS DE VISITE EN TEMPS RÉEL ──
+        function chargerStatistiquesSite() {
+            // Remplacez "stats" et "global" si vos noms de collection/document diffèrent dans Firebase console
+            onSnapshot(doc(db, "stats", "global"), (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    
+                    // Assignation des variables issues de votre Firestore
+                    siteVisitesNum.textContent = Number(data.visites || 0).toLocaleString('fr-FR');
+                    boutiqueClicksNum.textContent = Number(data.clicks || 0).toLocaleString('fr-FR');
+                    analyticsDateStr.textContent = data.lastUpdate || "En direct";
+                } else {
+                    console.log("Document des statistiques d'activité introuvable.");
+                }
+            });
+        }
+
+        // ── CHARGEMENT DU ROSTER ──
         function chargerDonneesDashboard() {
             const q = query(collection(db, "roster"), orderBy("createdAt", "asc"));
             
             onSnapshot(q, (snapshot) => {
                 playersRows.innerHTML = "";
-                
                 let mCount = 0, aCount = 0, cCount = 0;
 
                 if(snapshot.empty) {
@@ -173,29 +214,23 @@
 
                 snapshot.forEach((docSnap) => {
                     const player = docSnap.data();
-                    const id = docSnap.id;
                     
-                    // Compteurs
                     if (player.team === "main") mCount++;
                     else if (player.team === "academy") aCount++;
                     else if (player.team === "cdf") cCount++;
 
-                    // Image de secours
                     const imgSrc = (player.image && player.image !== "#") ? player.image : "logo.png";
                     
-                    // Trouver la dernière valeur de PR entrée dans l'historique
                     let dernierPR = "Aucun";
                     if(player.prHistory && player.prHistory.length > 0) {
                         dernierPR = Number(player.prHistory[player.prHistory.length - 1].value).toLocaleString('fr-FR');
                     }
 
-                    // Traduction Propre du badge Équipe
                     let badgeClass = "main";
                     let labelTeam = "Pro";
                     if(player.team === "academy") { badgeClass = "academy"; labelTeam = "Académie"; }
                     if(player.team === "cdf") { badgeClass = "cdf"; labelTeam = "CDF"; }
 
-                    // Génération de la ligne du tableau
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td>
@@ -215,7 +250,6 @@
                     playersRows.appendChild(tr);
                 });
 
-                // Injection des statistiques calculées
                 countMain.textContent = mCount;
                 countAcademy.textContent = aCount;
                 countCdf.textContent = cCount;

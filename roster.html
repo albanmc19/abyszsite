@@ -72,17 +72,15 @@
         /* ── GRAPHIQUE CONTENEUR ── */
         .chart-container { background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 10px; margin: 15px 0; max-height: 160px; }
 
-        /* ── HISTORIQUE PR ── */
+        /* ── HISTORIQUE PR (STYLE SUR MESURE) ── */
         .pr-history-section { background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 12px; padding: 16px; margin: 16px 0; }
-        .pr-history-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+        .pr-history-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 15px; }
         
-        .pr-table { width: 100%; border-collapse: collapse; font-family: 'Inter', sans-serif; font-size: 0.82rem; }
-        .pr-table thead tr { border-bottom: 1px solid #2a2a2a; }
-        .pr-table th { color: #666; font-weight: 600; padding: 4px 8px; text-align: left; font-size: 0.75rem; }
-        .pr-table td { padding: 6px 8px; color: #ccc; border-bottom: 1px solid #1a1a1a; }
+        .pr-table { width: 100%; border-collapse: collapse; font-family: 'Inter', sans-serif; font-size: 0.85rem; text-align: left; }
+        .pr-table th { color: #666; font-weight: 600; padding: 8px; font-size: 0.75rem; border-bottom: 1px solid #2a2a2a; text-transform: uppercase; font-family: 'Orbitron', sans-serif; }
+        .pr-table td { padding: 10px 8px; color: #ccc; border-bottom: 1px solid #1a1a1a; }
         .pr-table tr:last-child td { border-bottom: none; }
-        .pr-table .pr-latest td { color: #fff; font-weight: 600; }
-        .pr-table .pr-latest td:first-child { color: #a855f7; }
+        .pr-table td.pr-val-col { color: #b975ff; font-weight: 700; font-family: 'Orbitron', sans-serif; }
     </style>
 </head>
 <body>
@@ -177,6 +175,8 @@
                     localPlayersList.push({ id: docSnap.id, ...docSnap.data() });
                 });
                 renderRosters(localPlayersList);
+            }, (error) => {
+                console.error("Erreur Firestore : ", error);
             });
         }
 
@@ -226,12 +226,11 @@
             let imageBase64String = player.image || "logo.png";
             const avatar = (imageBase64String && imageBase64String !== "#" && imageBase64String.trim() !== "") ? imageBase64String : "logo.png";
 
-            // Copie locale modifiable de l'historique PR
             let localPrHistory = player.prHistory ? [...player.prHistory] : [];
 
             if (startInEditMode && !estAdmin) startInEditMode = false;
 
-            // ── TREND CALCUL ──
+            // ── CALCUL TENDANCE (+10%) ──
             let trendHtml = "";
             if (localPrHistory.length >= 2) {
                 const valAncienne = Number(localPrHistory[localPrHistory.length - 2].value) || 0;
@@ -244,7 +243,7 @@
                 }
             }
 
-            // ── STRUCTURE RÉSEAUX SOCIAUX (ICÔNES ET TEXTE) ──
+            // ── RÉSEAUX SOCIAUX ──
             let socialHtml = "";
             if (!isNewPlayer && (player.twitter || player.twitch || player.youtube || player.tiktok)) {
                 socialHtml = `<div class="social-links-container">`;
@@ -261,14 +260,16 @@
                         <span class="popup-close">&times;</span>
                         
                         <div id="view-mode-${playerId}" class="${startInEditMode ? 'hidden' : ''}">
-                            <img src="${avatar}" class="popup-avatar-img" id="view-avatar-${playerId}" alt="${player.pseudo || ''}">
+                            <img src="${avatar}" class="popup-avatar-img" id="view-avatar-${playerId}" alt="">
                             <h3 class="popup-pseudo">${player.pseudo || 'Nouveau Joueur'}</h3>
                             
                             <div style="text-align:center; margin-bottom:5px;">
                                 ${trendHtml}
                             </div>
 
-                            ${socialHtml} <p style="text-align:center; color:#aaa; margin-top:5px; margin-bottom:10px; font-family:'Inter', sans-serif;">${player.role || 'Rôle non défini'}</p>
+                            ${socialHtml}
+
+                            <p style="text-align:center; color:#aaa; margin-top:5px; margin-bottom:10px; font-family:'Inter', sans-serif;">${player.role || 'Rôle non défini'}</p>
                             <p style="text-align:center; color:#22c55e; font-weight:600; font-family:'Orbitron', sans-serif; margin-bottom:15px;">Earnings : ${player.earnings || '0 €'}</p>
                             
                             <button class="form-btn edit-toggle-btn ${estAdmin ? '' : 'hidden'}" id="btn-to-edit-${playerId}">✏️ Éditer le profil / PR</button>
@@ -324,14 +325,14 @@
 
                                 <div class="input-group">
                                     <label>Évolution du PR (Historique)</label>
-                                    <div id="edit-pr-list-${playerId}" style="max-height:110px; overflow-y:auto; border:1px solid #222; padding:6px; border-radius:6px; background:#0a0a0a;"></div>
+                                    <div id="edit-pr-list-${playerId}" style="max-height:110px; overflow-y:auto; border:1px solid #222; padding:6px; border-radius:6px; background:#0a0a0a; margin-bottom: 10px;"></div>
                                     
                                     <div class="pr-editor-box">
                                         <span style="color:#a855f7; font-size:0.75rem; font-weight:bold; display:block; margin-bottom:5px;">➕ AJOUTER UNE ENTRÉE PR :</span>
                                         <div class="pr-editor-inputs">
-                                            <input type="text" id="new-pr-date-${playerId}" placeholder="Ex: Janv 2026" style="width:35%">
-                                            <input type="text" id="new-pr-label-${playerId}" placeholder="Ex: FNCS Major 1" style="width:40%">
-                                            <input type="number" id="new-pr-value-${playerId}" placeholder="Ex: 550" style="width:25%">
+                                            <input type="text" id="new-pr-date-${playerId}" placeholder="Ex: 2026-06-16" style="width:35%">
+                                            <input type="text" id="new-pr-label-${playerId}" placeholder="Ex: Tournoi" style="width:40%">
+                                            <input type="number" id="new-pr-value-${playerId}" placeholder="Ex: 28630" style="width:25%">
                                         </div>
                                         <button type="button" class="form-btn" id="btn-add-pr-row-${playerId}" style="padding:6px; font-size:0.75rem; margin:0; background:#333; border:1px solid #a855f7;">Insérer la ligne</button>
                                     </div>
@@ -339,13 +340,13 @@
 
                                 <div class="input-group" style="border-top: 1px solid #222; padding-top:15px; margin-top:15px;">
                                     <label style="color:#fff;">🔗 Liens des Réseaux Sociaux</label>
-                                    <input type="url" id="input-twitter-${playerId}" value="${player.twitter || ''}" placeholder="Lien Twitter / X (ex: https://x.com/...)" style="margin-bottom:8px;">
-                                    <input type="url" id="input-twitch-${playerId}" value="${player.twitch || ''}" placeholder="Lien Twitch (ex: https://twitch.tv/...)" style="margin-bottom:8px;">
+                                    <input type="url" id="input-twitter-${playerId}" value="${player.twitter || ''}" placeholder="Lien Twitter / X" style="margin-bottom:8px;">
+                                    <input type="url" id="input-twitch-${playerId}" value="${player.twitch || ''}" placeholder="Lien Twitch" style="margin-bottom:8px;">
                                     <input type="url" id="input-youtube-${playerId}" value="${player.youtube || ''}" placeholder="Lien YouTube" style="margin-bottom:8px;">
                                     <input type="url" id="input-tiktok-${playerId}" value="${player.tiktok || ''}" placeholder="Lien TikTok">
                                 </div>
 
-                                <button type="submit" class="form-btn" style="margin-top:20px; background:#a855f7;">💾 Sauvegarder tout le profil</button>
+                                <button type="submit" class="form-btn" style="margin-top:20px;">💾 Sauvegarder tout le profil</button>
                                 ${!isNewPlayer ? `<button type="button" class="form-btn delete-btn" id="btn-delete-${playerId}">🗑️ Supprimer le joueur</button>` : ''}
                                 <button type="button" class="form-btn edit-toggle-btn" id="btn-cancel-${playerId}" style="margin-top:5px;">Annuler</button>
                             </form>
@@ -363,26 +364,25 @@
             const closePopup = () => { popupOverlay.classList.remove("active"); setTimeout(() => popupOverlay.remove(), 200); };
             popupOverlay.querySelector(".popup-close").addEventListener("click", closePopup);
 
-            // ── RE-RENDU DES LOGS PR DANS LA ZONE D'ÉDITION ──
+            // ── EDITEUR PR EN DIRECT ──
             const rafraichirListeEditeurPR = () => {
                 const box = document.getElementById(`edit-pr-list-${playerId}`);
                 if (!box) return;
                 if (localPrHistory.length === 0) {
-                    box.innerHTML = `<p style="color:#555; font-size:0.8rem; margin:5px 0; text-align:center;">Aucun historique de points.</p>`;
+                    box.innerHTML = `<p style="color:#555; font-size:0.8rem; margin:5px 0; text-align:center;">Aucun historique.</p>`;
                     return;
                 }
                 let html = "";
                 localPrHistory.forEach((item, index) => {
                     html += `
                         <div style="display:flex; justify-content:space-between; align-items:center; background:#111; padding:4px 8px; margin-bottom:4px; border-radius:4px; font-size:0.8rem; color:#ccc;">
-                            <span><b>${item.date}</b> - ${item.label || item.event} (${item.value} PR)</span>
-                            <span class="btn-del-pr-row" data-index="${index}" style="color:#ff4444; cursor:pointer; font-weight:bold; padding:0 4px;" title="Supprimer cette ligne">×</span>
+                            <span><b>${item.date}</b> - ${item.label || item.event || 'Tournoi'} (${item.value} PR)</span>
+                            <span class="btn-del-pr-row" data-index="${index}" style="color:#ff4444; cursor:pointer; font-weight:bold; padding:0 4px;">×</span>
                         </div>
                     `;
                 });
                 box.innerHTML = html;
 
-                // Brancher la suppression d'une ligne
                 box.querySelectorAll(".btn-del-pr-row").forEach(btn => {
                     btn.addEventListener("click", (e) => {
                         const idx = parseInt(e.target.getAttribute("data-index"));
@@ -392,13 +392,45 @@
                 });
             };
 
-            // ── INITIALISATION DU GRAPHIQUE ──
+            // ── CONSTRUIRE LE TABLEAU ET LE GRAPHIQUE PUBLIC ──
             if (!isNewPlayer) {
                 const canvasElement = document.getElementById(`canvas-${playerId}`);
                 const chartBox = document.getElementById(`chart-box-${playerId}`);
+                const tableContainer = document.getElementById(`pr-table-container-${playerId}`);
                 
+                // Rendu du tableau exact à ta capture d'écran
+                if (localPrHistory.length > 0) {
+                    let tableRows = "";
+                    localPrHistory.forEach((row) => {
+                        tableRows += `
+                            <tr>
+                                <td>${row.date || ''}</td>
+                                <td>${row.label || row.event || 'Tournoi'}</td>
+                                <td class="pr-val-col">${Number(row.value).toLocaleString('fr-FR')}</td>
+                            </tr>
+                        `;
+                    });
+                    tableContainer.innerHTML = `
+                        <table class="pr-table">
+                            <thead>
+                                <tr>
+                                    <th>DATE</th>
+                                    <th>ÉVÉNEMENT</th>
+                                    <th>PR TOTAL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${tableRows}
+                            </tbody>
+                        </table>
+                    `;
+                } else {
+                    tableContainer.innerHTML = `<div style="text-align:center; color:#666; font-size:0.85rem; padding:10px;">Aucun historique de PR.</div>`;
+                }
+
+                // Rendu de la courbe Chart.js
                 if (localPrHistory.length >= 2) {
-                    const labels = localPrHistory.map(item => item.date || "Saison");
+                    const labels = localPrHistory.map(item => item.date || "");
                     const dataValues = localPrHistory.map(item => Number(item.value) || 0);
 
                     new Chart(canvasElement, {
@@ -406,7 +438,6 @@
                         data: {
                             labels: labels,
                             datasets: [{
-                                label: 'Points PR',
                                 data: dataValues,
                                 borderColor: '#a855f7',
                                 backgroundColor: 'rgba(168, 85, 247, 0.1)',
@@ -433,33 +464,29 @@
             if (estAdmin) {
                 rafraichirListeEditeurPR();
 
-                // BOUTON INSÉRER LIGNE PR
                 document.getElementById(`btn-add-pr-row-${playerId}`).addEventListener("click", () => {
                     const inpDate = document.getElementById(`new-pr-date-${playerId}`);
                     const inpLabel = document.getElementById(`new-pr-label-${playerId}`);
                     const inpValue = document.getElementById(`new-pr-value-${playerId}`);
 
                     if (!inpDate.value || !inpLabel.value || !inpValue.value) {
-                        alert("Veuillez remplir tous les champs de la ligne PR (Date, Événement et Valeur).");
+                        alert("Remplis tous les champs (Date, Événement, Valeur).");
                         return;
                     }
 
                     localPrHistory.push({
                         date: inpDate.value,
                         label: inpLabel.value,
-                        event: inpLabel.value, // Par sécurité rétrocompatible
+                        event: inpLabel.value,
                         value: Number(inpValue.value)
                     });
 
-                    // Vider les petits champs
                     inpDate.value = "";
                     inpLabel.value = "";
                     inpValue.value = "";
-
                     rafraichirListeEditeurPR();
                 });
 
-                // IMAGE UPLOAD SYSTEM
                 const fileInput = document.getElementById(`file-input-${playerId}`);
                 const clearImgBtn = document.getElementById(`btn-clear-img-${playerId}`);
                 const previewImg = document.getElementById(`edit-preview-${playerId}`);
@@ -500,14 +527,12 @@
                     popupOverlay.querySelector(`#btn-cancel-${playerId}`).addEventListener("click", closePopup);
                 }
 
-                // SAUVEGARDE SUR FIRESTORE
                 popupOverlay.querySelector(`#form-${playerId}`).addEventListener("submit", async () => {
                     const pseudo = document.getElementById(`input-pseudo-${playerId}`).value;
                     const team = document.getElementById(`input-team-${playerId}`).value;
                     const role = document.getElementById(`input-role-${playerId}`).value;
                     const earnings = document.getElementById(`input-earnings-${playerId}`).value || "0 €";
 
-                    // Liens RS récupérés du formulaire
                     const twitter = document.getElementById(`input-twitter-${playerId}`).value.trim();
                     const twitch = document.getElementById(`input-twitch-${playerId}`).value.trim();
                     const youtube = document.getElementById(`input-youtube-${playerId}`).value.trim();
@@ -520,8 +545,8 @@
                         await setDoc(doc(db, "roster", playerId), {
                             pseudo, team, role, earnings, createdAt,
                             image: imageBase64String,
-                            prHistory: localPrHistory, // Sauvegarde la nouvelle liste PR construite
-                            twitter, twitch, youtube, tiktok // Sauvegarde des réseaux sociaux
+                            prHistory: localPrHistory,
+                            twitter, twitch, youtube, tiktok
                         });
                         closePopup();
                     } catch (err) {
@@ -536,27 +561,6 @@
                             closePopup();
                         }
                     });
-                }
-            }
-
-            // TABLEAU HISTORIQUE LECTURE PUBLIC
-            if (!isNewPlayer) {
-                const tableContainer = document.getElementById(`pr-table-container-${playerId}`);
-                if (localPrHistory.length > 0) {
-                    let tableRows = "";
-                    localPrHistory.forEach((row, index) => {
-                        const isLatest = index === localPrHistory.length - 1 ? "class='pr-latest'" : "";
-                        tableRows += `
-                            <tr ${isLatest}>
-                                <td>${row.date || 'Saison'}</td>
-                                <td>${row.label || row.event || 'Tournoi'}</td>
-                                <td style="color:#a855f7; font-weight:600;">${Number(row.value).toLocaleString('fr-FR')}</td>
-                            </tr>
-                        `;
-                    });
-                    tableContainer.innerHTML = `<table class="pr-table"><thead><tr><th>DATE</th><th>ÉVÉNEMENT</th><th>PR TOTAL</th></tr></thead><tbody>${tableRows}</tbody></table>`;
-                } else {
-                    tableContainer.innerHTML = `<div style="text-align:center; color:#666; font-size:0.85rem; padding:10px;">Aucun historique de PR.</div>`;
                 }
             }
         }

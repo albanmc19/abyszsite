@@ -50,10 +50,10 @@
         .trend-down { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; }
         .trend-neutral { background: rgba(102, 102, 102, 0.15); color: #999; border: 1px solid #666; }
 
-        /* Style des réseaux sociaux pour les popups */
-        .social-links-container { display: flex; justify-content: center; gap: 15px; margin: 15px 0; align-items: center; }
-        .social-icon-link { font-size: 1.2rem; color: #b3b3b3; text-decoration: none; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; }
-        .social-icon-link:hover { color: #a855f7; transform: scale(1.25); filter: drop-shadow(0 0 6px #a855f7); }
+        /* Réseaux sociaux stylisés (Match l'image ABYSZ) */
+        .social-links-container { display: flex; justify-content: center; gap: 20px; margin: 20px 0; align-items: center; }
+        .social-icon-link { font-size: 1.3rem; color: #b3b3b3; text-decoration: none; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; }
+        .social-icon-link:hover { color: #a855f7; transform: scale(1.2); filter: drop-shadow(0 0 8px #a855f7); }
 
         /* ── FORMULAIRES EDITION ── */
         .input-group { margin-bottom: 15px; text-align: left; }
@@ -183,8 +183,6 @@
                     if (logoutBtn) logoutBtn.classList.add("hidden");
                     if (loginBtn) loginBtn.classList.remove("hidden");
                 }
-                // Actualise l'affichage pour appliquer les droits d'édition
-                renderRosters(localPlayersList);
             });
 
             const logoutBtn = document.getElementById("logout-btn");
@@ -192,6 +190,8 @@
                 logoutBtn.addEventListener("click", () => {
                     signOut(auth).then(() => {
                         alert("Déconnecté de l'espace administration.");
+                    }).catch((error) => {
+                        console.error("Erreur de déconnexion:", error);
                     });
                 });
             }
@@ -199,13 +199,6 @@
             const loginBtn = document.getElementById("login-btn");
             if (loginBtn) {
                 loginBtn.addEventListener("click", openLoginPopup);
-            }
-
-            const addBtn = document.getElementById("add-player-btn");
-            if (addBtn) {
-                addBtn.addEventListener("click", () => {
-                    openPlayerPopup({ pseudo: "", role: "", team: "main", earnings: "0 €", prHistory: [] }, true);
-                });
             }
 
             ecouterRosterFirestore();
@@ -220,6 +213,7 @@
                     <div class="popup" style="max-width: 360px;">
                         <span class="popup-close" id="close-login-popup">&times;</span>
                         <h3 style="font-family:'Orbitron', sans-serif; color:#a855f7; text-align:center; margin-bottom:20px; text-transform:uppercase; font-size:1.2rem;">Espace Admin</h3>
+                        
                         <form id="login-direct-form" onsubmit="return false;">
                             <div class="input-group">
                                 <label>Adresse E-mail</label>
@@ -237,16 +231,19 @@
 
             const overlay = document.getElementById("login-popup-overlay");
             const fermerPopup = () => { overlay.classList.remove("active"); setTimeout(() => overlay.remove(), 200); };
+            
             document.getElementById("close-login-popup").addEventListener("click", fermerPopup);
 
             document.getElementById("login-direct-form").addEventListener("submit", async () => {
                 const email = document.getElementById("login-email").value.trim();
                 const pass = document.getElementById("login-password").value;
+
                 try {
                     await signInWithEmailAndPassword(auth, email, pass);
                     fermerPopup();
                 } catch (error) {
-                    alert("Identifiants incorrects.");
+                    alert("Identifiants incorrects ou problème réseau.");
+                    console.error(error);
                 }
             });
         }
@@ -260,12 +257,14 @@
                 });
                 renderRosters(localPlayersList);
             }, (error) => {
+                console.error("Erreur Firestore : ", error);
                 showErrorMessageAllGrids();
             });
         }
 
         function showErrorMessageAllGrids() {
-            ["main-roster-grid", "academy-roster-grid", "cdf-roster-grid"].forEach(id => {
+            const gridIds = ["main-roster-grid", "academy-roster-grid", "cdf-roster-grid"];
+            gridIds.forEach(id => {
                 const g = document.getElementById(id);
                 if (g) g.innerHTML = `<p class="error-text">Erreur de chargement de l'équipe.</p>`;
             });
@@ -299,10 +298,9 @@
                     </div>
                 `;
 
-                const playerCard = card.querySelector(".player-card");
-                playerCard.addEventListener("mouseenter", function() { this.style.transform = "translateY(-5px)"; });
-                playerCard.addEventListener("mouseleave", function() { this.style.transform = "translateY(0)"; });
-                playerCard.addEventListener("click", () => openPlayerPopup(player));
+                card.querySelector(".player-card").addEventListener("mouseenter", function() { this.style.transform = "translateY(-5px)"; });
+                card.querySelector(".player-card").addEventListener("mouseleave", function() { this.style.transform = "translateY(0)"; });
+                card.querySelector(".player-card").addEventListener("click", () => openPlayerPopup(player));
 
                 grid.appendChild(card);
             });
@@ -334,13 +332,14 @@
                 }
             }
 
+            /* ── REMPLACEMENT DES EMOJIS PAR LES LOGOS OFFICIELS FONT AWESOME ── */
             let socialHtml = "";
             if (!isNewPlayer && (player.twitter || player.twitch || player.youtube || player.tiktok)) {
                 socialHtml = `<div class="social-links-container">`;
-                if (player.tiktok) socialHtml += `<a href="${player.tiktok}" target="_blank" class="social-icon-link"><i class="fa-brands fa-tiktok"></i></a>`;
-                if (player.twitter) html += `<a href="${player.twitter}" target="_blank" class="social-icon-link"><i class="fa-brands fa-x-twitter"></i></a>`;
-                if (player.youtube) socialHtml += `<a href="${player.youtube}" target="_blank" class="social-icon-link"><i class="fa-brands fa-youtube"></i></a>`;
-                if (player.twitch) socialHtml += `<a href="${player.twitch}" target="_blank" class="social-icon-link"><i class="fa-brands fa-twitch"></i></a>`;
+                if (player.tiktok) socialHtml += `<a href="${player.tiktok}" target="_blank" class="social-icon-link" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>`;
+                if (player.twitter) socialHtml += `<a href="${player.twitter}" target="_blank" class="social-icon-link" title="Twitter / X"><i class="fa-brands fa-x-twitter"></i></a>`;
+                if (player.youtube) socialHtml += `<a href="${player.youtube}" target="_blank" class="social-icon-link" title="YouTube"><i class="fa-brands fa-youtube"></i></a>`;
+                if (player.twitch) socialHtml += `<a href="${player.twitch}" target="_blank" class="social-icon-link" title="Twitch"><i class="fa-brands fa-twitch"></i></a>`;
                 socialHtml += `</div>`;
             }
 
@@ -352,13 +351,22 @@
                         <div id="view-mode-${playerId}" class="${startInEditMode ? 'hidden' : ''}">
                             <img src="${avatar}" class="popup-avatar-img" id="view-avatar-${playerId}" alt="">
                             <h3 class="popup-pseudo">${player.pseudo || 'Nouveau Joueur'}</h3>
-                            <div style="text-align:center; margin-bottom:5px;">${trendHtml}</div>
+                            
+                            <div style="text-align:center; margin-bottom:5px;">
+                                ${trendHtml}
+                            </div>
+
                             ${socialHtml}
+
                             <p style="text-align:center; color:#aaa; margin-top:5px; margin-bottom:10px; font-family:'Inter', sans-serif;">${player.role || 'Rôle non défini'}</p>
                             <p style="text-align:center; color:#22c55e; font-weight:600; font-family:'Orbitron', sans-serif; margin-bottom:15px;">Earnings : ${player.earnings || '0 €'}</p>
                             
                             <button class="form-btn edit-toggle-btn ${estAdmin ? '' : 'hidden'}" id="btn-to-edit-${playerId}">✏️ Éditer le profil / PR</button>
-                            <div class="chart-container" id="chart-box-${playerId}"><canvas id="canvas-${playerId}"></canvas></div>
+
+                            <div class="chart-container" id="chart-box-${playerId}">
+                                <canvas id="canvas-${playerId}"></canvas>
+                            </div>
+
                             <div class="pr-history-section">
                                 <div class="pr-history-title">Historique des Compétitions (PR)</div>
                                 <div id="pr-table-container-${playerId}"></div>
@@ -370,7 +378,9 @@
                             <h3 style="font-family:'Orbitron', sans-serif; color:#a855f7; text-align:center; margin-bottom:15px;">
                                 ${isNewPlayer ? 'Créer le joueur' : 'Modifier le profil'}
                             </h3>
+                            
                             <img src="${avatar}" class="popup-avatar-img" id="edit-preview-${playerId}" style="max-height: 100px;">
+
                             <form id="form-${playerId}" onsubmit="return false;">
                                 <div class="input-group">
                                     <label>Photo du joueur</label>
@@ -380,6 +390,7 @@
                                         <button type="button" class="btn-remove-img" id="btn-clear-img-${playerId}">🗑️ Remettre le logo par défaut</button>
                                     </div>
                                 </div>
+
                                 <div class="input-group">
                                     <label>Pseudo</label>
                                     <input type="text" id="input-pseudo-${playerId}" value="${player.pseudo || ''}" required>
@@ -400,19 +411,22 @@
                                     <label>Earnings</label>
                                     <input type="text" id="input-earnings-${playerId}" value="${player.earnings || ''}">
                                 </div>
+
                                 <div class="input-group">
                                     <label>Évolution du PR (Historique)</label>
                                     <div id="edit-pr-list-${playerId}" style="max-height:110px; overflow-y:auto; border:1px solid #222; padding:6px; border-radius:6px; background:#0a0a0a; margin-bottom: 10px;"></div>
+                                    
                                     <div class="pr-editor-box">
                                         <span style="color:#a855f7; font-size:0.75rem; font-weight:bold; display:block; margin-bottom:5px;">➕ AJOUTER UNE ENTRÉE PR :</span>
                                         <div class="pr-editor-inputs">
-                                            <input type="text" id="new-pr-date-${playerId}" placeholder="2026-06-18" style="width:35%">
-                                            <input type="text" id="new-pr-label-${playerId}" placeholder="Tournoi" style="width:40%">
-                                            <input type="number" id="new-pr-value-${playerId}" placeholder="12000" style="width:25%">
+                                            <input type="text" id="new-pr-date-${playerId}" placeholder="Ex: 2026-06-16" style="width:35%">
+                                            <input type="text" id="new-pr-label-${playerId}" placeholder="Ex: Tournoi" style="width:40%">
+                                            <input type="number" id="new-pr-value-${playerId}" placeholder="Ex: 28630" style="width:25%">
                                         </div>
                                         <button type="button" class="form-btn" id="btn-add-pr-row-${playerId}" style="padding:6px; font-size:0.75rem; margin:0; background:#333; border:1px solid #a855f7;">Insérer la ligne</button>
                                     </div>
                                 </div>
+
                                 <div class="input-group" style="border-top: 1px solid #222; padding-top:15px; margin-top:15px;">
                                     <label style="color:#fff;">🔗 Liens des Réseaux Sociaux</label>
                                     <input type="url" id="input-twitter-${playerId}" value="${player.twitter || ''}" placeholder="Lien Twitter / X" style="margin-bottom:8px;">
@@ -420,12 +434,14 @@
                                     <input type="url" id="input-youtube-${playerId}" value="${player.youtube || ''}" placeholder="Lien YouTube" style="margin-bottom:8px;">
                                     <input type="url" id="input-tiktok-${playerId}" value="${player.tiktok || ''}" placeholder="Lien TikTok">
                                 </div>
-                                <button type="submit" class="form-btn" id="btn-submit-save-${playerId}">💾 Sauvegarder tout le profil</button>
+
+                                <button type="submit" class="form-btn" style="margin-top:20px;">💾 Sauvegarder tout le profil</button>
                                 ${!isNewPlayer ? `<button type="button" class="form-btn delete-btn" id="btn-delete-${playerId}">🗑️ Supprimer le joueur</button>` : ''}
                                 <button type="button" class="form-btn edit-toggle-btn" id="btn-cancel-${playerId}" style="margin-top:5px;">Annuler</button>
                             </form>
                         </div>
                         ` : ''}
+
                     </div>
                 </div>
             `;
@@ -434,189 +450,36 @@
             const closePopup = () => { popupOverlay.classList.remove("active"); setTimeout(() => popupOverlay.remove(), 200); };
             popupOverlay.querySelector(".popup-close").addEventListener("click", closePopup);
 
-            // Remplir le tableau de PR en mode Lecture
-            const tableContainer = document.getElementById(`pr-table-container-${playerId}`);
-            if (tableContainer) {
+            if (!isNewPlayer) {
+                const tableContainer = document.getElementById(`pr-table-container-${playerId}`);
                 if (localPrHistory.length > 0) {
                     let tableRows = "";
-                    localPrHistory.forEach(row => {
-                        tableRows += `<tr><td>${row.date || ''}</td><td>${row.label || 'Tournoi'}</td><td class="pr-val-col">${Number(row.value).toLocaleString('fr-FR')}</td></tr>`;
+                    localPrHistory.forEach((row) => {
+                        tableRows += `
+                            <tr>
+                                <td>${row.date || ''}</td>
+                                <td>${row.label || row.event || 'Tournoi'}</td>
+                                <td class="pr-val-col">${Number(row.value).toLocaleString('fr-FR')}</td>
+                            </tr>
+                        `;
                     });
-                    tableContainer.innerHTML = `<table class="pr-table"><thead><tr><th>DATE</th><th>ÉVÉNEMENT</th><th>PR TOTAL</th></tr></thead><tbody>${tableRows}</tbody></table>`;
+                    tableContainer.innerHTML = `
+                        <table class="pr-table">
+                            <thead>
+                                <tr>
+                                    <th>DATE</th>
+                                    <th>ÉVÉNEMENT</th>
+                                    <th>PR TOTAL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${tableRows}
+                            </tbody>
+                        </table>
+                    `;
                 } else {
                     tableContainer.innerHTML = `<div style="text-align:center; color:#666; font-size:0.85rem; padding:10px;">Aucun historique de PR disponible.</div>`;
                 }
-            }
-
-            // Génération du graphique Chart.js
-            const ctx = document.getElementById(`canvas-${playerId}`);
-            if (ctx && localPrHistory.length > 0) {
-                const labels = localPrHistory.map(h => h.date || '');
-                const dataValues = localPrHistory.map(h => Number(h.value) || 0);
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'PR Evolution',
-                            data: dataValues,
-                            borderColor: '#a855f7',
-                            backgroundColor: 'rgba(168,85,247,0.1)',
-                            borderWidth: 2,
-                            tension: 0.2,
-                            fill: true
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { x: { display: false }, y: { grid: { color: '#222' }, ticks: { color: '#666', font: { size: 9 } } } }
-                    }
-                });
-            }
-
-            if (!estAdmin) return;
-
-            // Gestion de la bascule d'affichage Mode Lecture <-> Mode Édition
-            const viewModeDiv = document.getElementById(`view-mode-${playerId}`);
-            const editModeDiv = document.getElementById(`edit-mode-${playerId}`);
-            const btnToEdit = document.getElementById(`btn-to-edit-${playerId}`);
-            const btnCancel = document.getElementById(`btn-cancel-${playerId}`);
-
-            if (btnToEdit) {
-                btnToEdit.addEventListener("click", () => {
-                    viewModeDiv.classList.add("hidden");
-                    editModeDiv.classList.remove("hidden");
-                    renderEditPrRows();
-                });
-            }
-            if (btnCancel) {
-                btnCancel.addEventListener("click", () => {
-                    if (isNewPlayer) { closePopup(); } else { editModeDiv.classList.add("hidden"); viewModeDiv.classList.remove("hidden"); }
-                });
-            }
-
-            // Rendu de la liste d'édition des lignes PR existantes
-            const editPrListContainer = document.getElementById(`edit-pr-list-${playerId}`);
-            function renderEditPrRows() {
-                if (!editPrListContainer) return;
-                editPrListContainer.innerHTML = "";
-                localPrHistory.forEach((row, index) => {
-                    const d = document.createElement("div");
-                    d.style = "display:flex; gap:5px; margin-bottom:5px; align-items:center;";
-                    d.innerHTML = `
-                        <span style="font-size:0.75rem; color:#aaa; width:75%">${row.date} - ${row.label} (${row.value})</span>
-                        <button type="button" style="background:#ff4444; border:none; color:white; padding:2px 6px; border-radius:4px; cursor:pointer; font-size:0.75rem;" data-index="${index}">✕</button>
-                    `;
-                    d.querySelector("button").addEventListener("click", () => {
-                        localPrHistory.splice(index, 1);
-                        renderEditPrRows();
-                    });
-                    editPrListContainer.appendChild(d);
-                });
-            }
-
-            // Insertion d'une nouvelle ligne PR
-            const btnAddPrRow = document.getElementById(`btn-add-pr-row-${playerId}`);
-            if (btnAddPrRow) {
-                btnAddPrRow.addEventListener("click", () => {
-                    const inputDate = document.getElementById(`new-pr-date-${playerId}`);
-                    const inputLabel = document.getElementById(`new-pr-label-${playerId}`);
-                    const inputValue = document.getElementById(`new-pr-value-${playerId}`);
-                    if (!inputDate.value || !inputValue.value) {
-                        alert("Veuillez remplir au moins la date et la valeur du PR.");
-                        return;
-                    }
-                    localPrHistory.push({
-                        date: inputDate.value.trim(),
-                        label: inputLabel.value.trim() || "Tournoi",
-                        value: Number(inputValue.value) || 0
-                    });
-                    inputDate.value = ""; inputLabel.value = ""; inputValue.value = "";
-                    renderEditPrRows();
-                });
-            }
-
-            // Téléchargement d'image en Base64
-            const fileInput = document.getElementById(`file-input-${playerId}`);
-            if (fileInput) {
-                fileInput.addEventListener("change", (e) => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        imageBase64String = reader.result;
-                        document.getElementById(`edit-preview-${playerId}`).src = imageBase64String;
-                    };
-                    reader.readAsDataURL(file);
-                });
-            }
-
-            // Remettre le logo par défaut
-            const btnClearImg = document.getElementById(`btn-clear-img-${playerId}`);
-            if (btnClearImg) {
-                btnClearImg.addEventListener("click", () => {
-                    imageBase64String = "logo.png";
-                    document.getElementById(`edit-preview-${playerId}`).src = "logo.png";
-                });
-            }
-
-            // Soumission et sauvegarde définitive dans Firestore
-            const btnSubmitSave = document.getElementById(`btn-submit-save-${playerId}`);
-            if (btnSubmitSave) {
-                btnSubmitSave.addEventListener("click", async () => {
-                    const finalPseudo = document.getElementById(`input-pseudo-${playerId}`).value.trim();
-                    const finalRole = document.getElementById(`input-role-${playerId}`).value.trim();
-                    const finalTeam = document.getElementById(`input-team-${playerId}`).value;
-                    const finalEarnings = document.getElementById(`input-earnings-${playerId}`).value.trim();
-                    const finalTwitter = document.getElementById(`input-twitter-${playerId}`).value.trim();
-                    const finalTwitch = document.getElementById(`input-twitch-${playerId}`).value.trim();
-                    const finalYoutube = document.getElementById(`input-youtube-${playerId}`).value.trim();
-                    const finalTiktok = document.getElementById(`input-tiktok-${playerId}`).value.trim();
-
-                    if (!finalPseudo || !finalRole) {
-                        alert("Le pseudo et le rôle sont obligatoires.");
-                        return;
-                    }
-
-                    const docId = isNewPlayer ? "player_" + Date.now() : player.id;
-                    const payload = {
-                        pseudo: finalPseudo,
-                        role: finalRole,
-                        team: finalTeam,
-                        earnings: finalEarnings || "0 €",
-                        image: imageBase64String,
-                        twitter: finalTwitter,
-                        twitch: finalTwitch,
-                        youtube: finalYoutube,
-                        tiktok: finalTiktok,
-                        prHistory: localPrHistory,
-                        createdAt: player.createdAt || Date.now()
-                    };
-
-                    try {
-                        await setDoc(doc(db, "roster", docId), payload);
-                        closePopup();
-                    } catch (err) {
-                        alert("Erreur d'enregistrement.");
-                    }
-                });
-            }
-
-            // Suppression du joueur
-            const btnDelete = document.getElementById(`btn-delete-${playerId}`);
-            if (btnDelete) {
-                btnDelete.addEventListener("click", async () => {
-                    if (confirm(`Confirmez-vous la suppression définitive du joueur ${player.pseudo} ?`)) {
-                        try {
-                            await deleteDoc(doc(db, "roster", player.id));
-                            closePopup();
-                        } catch (err) {
-                            alert("Erreur lors de la suppression.");
-                        }
-                    }
-                });
             }
         }
     </script>

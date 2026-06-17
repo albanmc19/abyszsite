@@ -7,27 +7,45 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* Centrage parfait sur toute la hauteur et largeur de l'écran */
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #0a0a0a; /* Fond par défaut si style.css ne charge pas */
+        }
+
+        /* Conteneur adaptatif (Responsive) */
         .login-container {
-            max-width: 450px;
-            margin: 150px auto padding 20px;
-            padding: 40px;
+            width: 90%;             /* Occupe 90% de la largeur sur petit écran (téléphone) */
+            max-width: 450px;       /* Ne dépasse jamais 450px sur grand écran (ordinateur) */
+            padding: 40px 30px;
             background: #141414;
             border: 2px solid #a855f7;
             border-radius: 24px;
             box-shadow: 0 0 30px rgba(168, 85, 247, 0.25);
             box-sizing: border-box;
             text-align: center;
+            transition: all 0.3s ease;
         }
+
         .login-container h1 {
             font-family: 'Orbitron', sans-serif;
             color: #ffffff;
+            margin-top: 0;
             margin-bottom: 30px;
             letter-spacing: 2px;
+            font-size: 1.8rem;
         }
+
         .input-group {
             margin-bottom: 20px;
             text-align: left;
         }
+
         .input-group label {
             display: block;
             margin-bottom: 8px;
@@ -36,9 +54,10 @@
             font-family: 'Orbitron', sans-serif;
             font-weight: 600;
         }
+
         .input-group input {
             width: 100%;
-            padding: 12px 16px;
+            padding: 14px 16px;
             background: #0a0a0a;
             border: 1px solid #2a2a2a;
             color: white;
@@ -46,13 +65,15 @@
             font-family: 'Inter', sans-serif;
             font-size: 0.95rem;
             box-sizing: border-box;
-            transition: border-color 0.3s;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
+
         .input-group input:focus {
             border-color: #a855f7;
             outline: none;
             box-shadow: 0 0 10px rgba(168, 85, 247, 0.2);
         }
+
         .form-btn {
             background: #a855f7;
             color: white;
@@ -65,18 +86,34 @@
             font-family: 'Orbitron', sans-serif;
             font-size: 1rem;
             transition: background 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
         }
+
         .form-btn:hover {
             background: #b975ff;
             box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
         }
+
         .error-message { 
             color: #ff4444; 
             font-size: 0.85rem; 
             margin-top: 15px; 
             font-family: 'Inter', sans-serif;
         }
+
         .hidden { display: none !important; }
+
+        /* Ajustements spécifiques pour les très petits écrans de téléphone */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px; /* Moins de vide interne sur petit écran pour gagner de la place */
+                border-radius: 16px;
+            }
+            .login-container h1 {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -96,7 +133,7 @@
         </form>
         <p id="login-error" class="error-message hidden"></p>
         <br>
-        <a href="index.html" style="color: #666; text-decoration: none; font-size: 0.85rem;">← Retour au site</a>
+        <a href="index.html" style="color: #666; text-decoration: none; font-size: 0.85rem; font-family: 'Inter', sans-serif; transition: color 0.2s;" onmouseover="this.style.color='#a855f7'" onmouseout="this.style.color='#666'">← Retour au site</a>
     </div>
 
     <script type="module">
@@ -116,7 +153,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // Si déjà connecté, on envoie directement sur le dashboard
+        // Si déjà connecté, redirection automatique vers le dashboard
         onAuthStateChanged(auth, (user) => {
             if (user) { window.location.href = "dashboard.html"; }
         });

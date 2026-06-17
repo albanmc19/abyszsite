@@ -82,6 +82,17 @@
 
         .pr-add-zone { background: #0a0a0a; border: 1px solid #a855f7; border-radius: 10px; padding: 14px; margin-bottom: 14px; }
         .pr-add-zone-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 0.75rem; letter-spacing: 1px; margin-bottom: 10px; }
+        
+        /* Styles pour les popups d'informations des joueurs */
+        .player-popup-content { text-align: center; color: white; }
+        .player-popup-details { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 20px 0; background: #0a0a0a; padding: 15px; border-radius: 12px; border: 1px solid #2a2a2a; }
+        .stat-box { font-family: 'Orbitron', sans-serif; }
+        .stat-box span { display: block; font-size: 0.75rem; color: #a855f7; margin-bottom: 5px; }
+        .stat-box strong { font-size: 1rem; color: white; }
+        .player-bio-text { font-family: 'Inter', sans-serif; color: #aaa; font-size: 0.9rem; line-height: 1.5; margin-bottom: 20px; text-align: left; }
+        .social-links { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
+        .social-links a { color: #a855f7; text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; border: 1px solid #2a2a2a; padding: 6px 12px; border-radius: 6px; transition: all 0.2s; }
+        .social-links a:hover { background: #a855f7; color: white; border-color: #a855f7; }
     </style>
 </head>
 <body>
@@ -157,7 +168,7 @@
                     <button id="logout-btn" style="background:none;border:none;color:#ff4444;cursor:pointer;font-weight:bold;">Déconnexion</button>
                 </div>
 
-                <form id="player-form">
+                <form id="player-form" onsubmit="return false;">
                     <div class="input-group">
                         <label for="player-team">Catégorie d'équipe</label>
                         <select id="player-team">
@@ -259,6 +270,7 @@
         let editingPlayerId = null; 
         let base64ImageString = ""; 
 
+        // Encodage de la photo chargée localement en Base64
         playerFileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -292,6 +304,8 @@
             modal.classList.remove('active');
             playerForm.reset();
             editingPlayerId = null;
+            base64ImageString = "";
+            fileStatus.textContent = "";
             panelTitle.textContent = "Ajouter un joueur";
             submitPlayerBtn.textContent = "Enregistrer le joueur";
             prAddZone.classList.add('hidden');
@@ -315,7 +329,7 @@
             modal.classList.remove('active');
         });
 
-        // Écoute en temps réel de la collection Roster
+        // Écoute en temps réel de la collection Roster & Génération des cartes / popups
         onSnapshot(query(fsCol(db, "roster")), (snapshot) => {
             const grids = {
                 main: document.getElementById("main-roster-grid"),
@@ -356,7 +370,131 @@
                     </div>
                 `;
                 if(targetGrid) targetGrid.appendChild(card);
+
+                // Génération de la popup de détails du joueur
+                const popup = document.createElement("div");
+                popup.id = `popup-${id}`;
+                popup.className = "modal-overlay";
+                popup.innerHTML = `
+                    <div class="modal-content player-popup-content">
+                        <span class="modal-close" onclick="document.getElementById('popup-${id}').classList.remove('active')">&times;</span>
+                        <h3>${p.pseudo}</h3>
+                        <img src="${playerImgSrc}" class="popup-avatar-img" alt="${p.pseudo}">
+                        <p style="color:#a855f7; font-family:'Orbitron'; font-size:0.9rem; margin-bottom:15px;">${p.role}</p>
+                        
+                        <div class="player-popup-details">
+                            <div class="stat-box"><span>Earnings</span><strong>${p.earnings || '0$'}</strong></div>
+                            <div class="stat-box"><span>Best PR</span><strong>${p.bestPr || 'Aucun'}</strong></div>
+                            <div class="stat-box"><span>Best Perf</span><strong>${p.wins || 'Aucune'}</strong></div>
+                        </div>
+
+                        <p class="player-bio-text">${p.bio || 'Aucune biographie disponible pour le moment.'}</p>
+
+                        <div class="social-links">
+                            <a href="${p.twitch || '#'}" target="_blank">Twitch</a>
+                            <a href="${p.twitter || '#'}" target="_blank">Twitter / X</a>
+                            <a href="${p.tracker || '#'}" target="_blank">Tracker</a>
+                        </div>
+                    </div>
+                `;
+                popupsContainer.appendChild(popup);
             });
+
+            // Réactivation des écouteurs de clics d'administration sur les nouveaux boutons générés
+            if(currentUser) {
+                document.querySelectorAll('.inline-edit-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = btn.getAttribute('data-id');
+                        openEditPlayerForm(id);
+                    });
+                });
+
+                document.querySelectorAll('.inline-delete-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const id = btn.getAttribute('data-id');
+                        if(confirm(`Voulez-vous vraiment supprimer le joueur ${playersDataCache[id].pseudo} ?`)) {
+                            await fsDelete(fsDoc(db, "roster", id));
+                        }
+                    });
+                });
+            }
+        });
+
+        // Remplissage du formulaire pour la modification
+        function openEditPlayerForm(id) {
+            const p = playersDataCache[id];
+            editingPlayerId = id;
+            
+            document.getElementById('player-team').value = p.team || 'main';
+            document.getElementById('player-pseudo').value = p.pseudo || '';
+            document.getElementById('player-role').value = p.role || '';
+            document.getElementById('stat-earnings').value = p.earnings || '';
+            document.getElementById('stat-best').value = p.bestPr || '';
+            document.getElementById('stat-wins').value = p.wins || '';
+            document.getElementById('player-bio').value = p.bio || '';
+            document.getElementById('link-twitch').value = p.twitch || '#';
+            document.getElementById('link-twitter').value = p.twitter || '#';
+            document.getElementById('link-tracker').value = p.tracker || '#';
+
+            base64ImageString = p.image || '';
+            fileStatus.textContent = p.image && p.image !== '#' ? "📸 Image actuelle conservée" : "🔄 Logo par défaut conservé";
+            fileStatus.style.color = "#a855f7";
+
+            panelTitle.textContent = `Modifier ${p.pseudo}`;
+            submitPlayerBtn.textContent = "Enregistrer les modifications";
+            prAddZone.classList.remove('hidden'); // Affiche la zone PR lors d'une modification
+            modal.classList.add('active');
+        }
+
+        // Traitement de l'envoi du formulaire (Ajout ou Modification)
+        submitPlayerBtn.addEventListener('click', async () => {
+            const pseudo = document.getElementById('player-pseudo').value.trim();
+            const role = document.getElementById('player-role').value.trim();
+            
+            if(!pseudo || !role) {
+                alert("Veuillez remplir au moins le pseudo et le rôle du joueur.");
+                return;
+            }
+
+            const playerData = {
+                team: document.getElementById('player-team').value,
+                pseudo: pseudo,
+                role: role,
+                earnings: document.getElementById('stat-earnings').value.trim(),
+                bestPr: document.getElementById('stat-best').value.trim(),
+                wins: document.getElementById('stat-wins').value.trim(),
+                bio: document.getElementById('player-bio').value.trim(),
+                twitch: document.getElementById('link-twitch').value.trim(),
+                twitter: document.getElementById('link-twitter').value.trim(),
+                tracker: document.getElementById('link-tracker').value.trim(),
+                image: base64ImageString !== "" ? base64ImageString : "#"
+            };
+
+            try {
+                if (editingPlayerId) {
+                    // Si on a un ID d'édition, on effectue une MISE À JOUR
+                    await fsUpdate(fsDoc(db, "roster", editingPlayerId), playerData);
+                    
+                    // Gestion facultative de l'historique PR si des valeurs sont saisies
+                    const prVal = document.getElementById('new-pr-value').value;
+                    const prDate = document.getElementById('new-pr-date').value;
+                    if(prVal && prDate) {
+                        // Logique d'ajout d'historique PR s'il est configuré dans ton projet
+                        console.log("Nouveau PR saisi:", prVal, "le", prDate);
+                    }
+                } else {
+                    // Sinon, c'est une CRÉATION de nouveau joueur
+                    await addDoc(fsCol(db, "roster"), playerData);
+                }
+
+                // Fermeture de la modale et réinitialisation générale
+                closeModalBtn.click();
+            } catch (error) {
+                console.error("Erreur lors de l'enregistrement :", error);
+                alert("Une erreur est survenue lors de la sauvegarde sur Firebase.");
+            }
         });
 
         // Écoute de l'état de connexion de l'utilisateur

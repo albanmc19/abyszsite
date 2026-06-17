@@ -3,14 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABYSZ | Boutique Official</title>
+    <title>ABYSZ | Boutique Officielle</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .logo-link { display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; }
+        
+        /* ── CONFIGURATION DU MENU ET BOUTONS COHÉRENTS AVEC ROSTER ── */
+        .admin-gate-btn { 
+            background: transparent; 
+            border: 1px solid #a855f7; 
+            color: #a855f7; 
+            padding: 6px 14px; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 0.85rem;
+            transition: all 0.3s ease; 
+            margin-left: 15px;
+        }
+        .admin-gate-btn:hover { background:#a855f7; color:white; box-shadow:0 0 15px #a855f7; }
+        
+        .nav-dashboard-link a { color: #22c55e !important; font-weight: bold; }
+        .hidden { display:none !important; }
+
+        /* ── DESIGN DE LA PAGE BOUTIQUE MAILLOT ── */
+        .shop-container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+        
+        .shop-header { margin-bottom: 40px; }
+        .shop-header h2 { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; background: linear-gradient(to right, #fff, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .shop-header p { font-family: 'Inter', sans-serif; color: #aaa; font-size: 1.1rem; }
+
+        /* Bloc Présentation Produit Unique */
+        .product-highlight {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            background: #141414;
+            border: 1px solid #222;
+            border-radius: 24px;
+            padding: 40px;
+            align-items: center;
+            text-align: left;
+            box-shadow: 0 0 40px rgba(168, 85, 247, 0.05);
+            margin-bottom: 50px;
+        }
+
+        .product-image-side {
+            background: #0a0a0a;
+            border: 1px solid rgba(168, 85, 247, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 400px;
+        }
+        .product-image-side img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6));
+        }
+
+        .product-info-side {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .badge-new {
+            align-self: flex-start;
+            background: rgba(168, 85, 247, 0.15);
+            color: #a855f7;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+        .product-title { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; color: #fff; margin: 0 0 10px 0; }
+        .product-subtitle { font-family: 'Inter', sans-serif; color: #666; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 2px; margin-bottom: 20px; font-weight: 600; }
+        .product-description { font-family: 'Inter', sans-serif; color: #aaa; font-size: 1rem; line-height: 1.6; margin: 0 0 30px 0; }
+        
+        .price-tag { font-family: 'Orbitron', sans-serif; font-size: 2rem; color: #fff; font-weight: 700; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+        .price-tag span { font-size: 1rem; color: #555; text-decoration: line-through; font-weight: 400; }
+
+        .order-btn {
+            background: #a855f7;
+            color: #fff;
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            text-align: center;
+            padding: 16px 32px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+            display: inline-block;
+        }
+        .order-btn:hover { background: #b975ff; box-shadow: 0 0 30px #a855f7; transform: translateY(-3px); }
+
+        .back-home-btn {
+            display: inline-block;
+            background: transparent;
+            border: 1px solid #2a2a2a;
+            color: #aaa;
+            text-decoration: none;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 12px 28px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            margin-bottom: 60px;
+        }
+        .back-home-btn:hover { border-color: #fff; color: #fff; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .product-highlight { grid-template-columns: 1fr; gap: 30px; padding: 20px; }
+            .product-image-side { height: 300px; }
+            .product-title { font-size: 1.8rem; }
+        }
+    </style>
 </head>
 <body>
     <nav>
         <div class="logo">
-            <a href="index.html" style="display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit;">
+            <a href="index.html" class="logo-link">
                 <img src="logo.png" alt="Logo ABYSZ">
                 ABYSZ
             </a>
@@ -19,14 +143,43 @@
             <li><a href="index.html">Accueil</a></li>
             <li><a href="roster.html">Roster</a></li>
             <li><a href="boutique.html">Boutique</a></li>
+            <li id="nav-dashboard" class="nav-dashboard-link hidden"><a href="dashboard.html">📊 Dashboard</a></li>
+            <li><button class="admin-gate-btn" id="admin-gate-btn">🔑 Connexion</button></li>
         </ul>
     </nav>
 
     <section style="padding-top: 160px; text-align: center;">
-        <h2>Boutique Abysz Esports</h2>
-        <p style="color: #aaa; margin-top: 10px;">Le shop officiel arrive très bientôt pour la saison 2026 !</p>
-        <br><br>
-        <a href="index.html" class="btn">← Retour à l'accueil</a>
+        <div class="shop-container">
+            
+            <div class="shop-header">
+                <h2>Boutique Officielle</h2>
+                <p>Représentez l'équipe avec nos équipements certifiés</p>
+            </div>
+
+            <div class="product-highlight">
+                
+                <div class="product-image-side">
+                    <img src="maillot.png" alt="Maillot Officiel ABYSZ 2026">
+                </div>
+
+                <div class="product-info-side">
+                    <div class="badge-new">DISPONIBLE</div>
+                    <h3 class="product-title">Maillot Officiel 2026</h3>
+                    <div class="product-subtitle">Collection Pro Jersey</div>
+                    <p class="product-description">
+                        Arborez fièrement les couleurs d'ABYSZ Esports avec le maillot officiel de la saison 2026. Conçu avec un tissu respirant de haute qualité, il est identique à celui porté par nos joueurs pros lors des compétitions.
+                    </p>
+                    
+                    <div class="price-tag">49,99 €</div>
+
+                    <a href="#" target="_blank" class="order-btn">Commander sur Breakday →</a>
+                </div>
+
+            </div>
+
+            <a href="index.html" class="back-home-btn">← Retour à l'accueil</a>
+
+        </div>
     </section>
 
     <footer>
@@ -35,6 +188,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -48,9 +202,28 @@
         };
 
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // ── TRACKER DE STATISTIQUES BOUTIQUE ──
+        const navDashboard = document.getElementById('nav-dashboard');
+        const adminGateBtn = document.getElementById('admin-gate-btn');
+
+        // Écoute de la connexion pour le menu
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                adminGateBtn.textContent = "⚙️ Panel Admin";
+                navDashboard.classList.remove('hidden');
+            } else {
+                adminGateBtn.textContent = "🔑 Connexion";
+                navDashboard.classList.add('hidden');
+            }
+        });
+
+        adminGateBtn.onclick = () => {
+            window.location.href = "roster.html";
+        };
+
+        // Tracker de statistiques
         async function trackBoutiquePage() {
             const support = window.innerWidth < 768 ? "Mobile" : "Ordinateur";
             try {

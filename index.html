@@ -51,10 +51,10 @@
         
         .nav-dashboard-link a { color: #22c55e !important; font-weight: bold; text-decoration: none; }
 
-        /* ── CLASSES D'ANIMATION AU SCROLL ── */
+        /* ── CSS POUR LES ANIMATIONS AU SCROLL ── */
         .reveal {
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(35px);
             transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
         }
         .reveal-visible {
@@ -153,3 +153,199 @@
                 </form>
             </div>
         </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
+            authDomain: "abysz-esports.firebaseapp.com",
+            projectId: "abysz-esports",
+            storageBucket: "abysz-esports.firebasestorage.app",
+            messagingSenderId: "200968659347",
+            appId: "1:200968659347:web:3a13d1614d00ed29968866",
+            measurementId: "G-HPQNQK5XL1"
+        };
+
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1516291585351090206/i4pbx0B2sPw1yAD63cBN56s37-GSyrrGxYUca34GSgwlsRLUoxQWqD6oZmEwjrr6oJif";
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const modal = document.getElementById('admin-modal');
+        const adminGateBtn = document.getElementById('admin-gate-btn');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const loginForm = document.getElementById('login-form');
+        const announcementForm = document.getElementById('announcement-form');
+        const loginStep = document.getElementById('admin-login-step');
+        const panelStep = document.getElementById('admin-panel-step');
+        const loginError = document.getElementById('login-error');
+        const userDisplayEmail = document.getElementById('user-display-email');
+        const logoutBtn = document.getElementById('logout-btn');
+        const feed = document.getElementById("announcements-feed");
+
+        let currentUser = null;
+
+        // ── SCRIPT POUR DÉCLENCHER LES ANIMATIONS AU SCROLL ──
+        const scrollObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('reveal-visible');
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('.reveal').forEach((el) => scrollObserver.observe(el));
+
+
+        // ── GESTION DES ANNONCES (Correction date) ──
+        const q = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
+        
+        onSnapshot(q, (snapshot) => {
+            feed.innerHTML = "";
+            if (snapshot.empty) {
+                feed.innerHTML = '<p class="loading-text">Aucune annonce publiée pour le moment.</p>';
+                return;
+            }
+            snapshot.forEach((docSnap) => {
+                const ann = docSnap.data();
+                
+                // fallback si createdAt est un timestamp de secondes ou des millisecondes numériques
+                let dateRaw;
+                if (ann.createdAt && typeof ann.createdAt.seconds === 'number') {
+                    dateRaw = new Date(ann.createdAt.seconds * 1000);
+                } else if (typeof ann.createdAt === 'number') {
+                    dateRaw = new Date(ann.createdAt);
+                } else {
+                    dateRaw = new Date();
+                }
+
+                const dateStr = dateRaw.toLocaleDateString('fr-FR') + " à " + dateRaw.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+                const card = document.createElement("div");
+                card.className = "announcement-card";
+                const deleteButtonHtml = currentUser ? `<button class="delete-btn" data-id="${docSnap.id}">Supprimer</button>` : "";
+                card.innerHTML = `<h3>${ann.title || 'Sans titre'}</h3><p>${ann.content || ''}</p><div class="announcement-date">Posté le ${dateStr}</div>${deleteButtonHtml}`;
+                feed.appendChild(card);
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.onclick = async (e) => {
+                    if (confirm("Supprimer définitivement cette annonce de la base de données ?")) {
+                        await deleteDoc(doc(db, "announcements", e.target.getAttribute('data-id')));
+                    }
+                };
+            });
+        });
+
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                loginStep.classList.add('hidden');
+                panelStep.classList.remove('hidden');
+                userDisplayEmail.textContent = `Admin : ${user.email}`;
+                document.getElementById('nav-dashboard')?.classList.remove('hidden');
+                
+                adminGateBtn.innerHTML = "🔒 Déconnexion";
+                adminGateBtn.classList.add("logged-in");
+            } else {
+                loginStep.classList.remove('hidden');
+                panelStep.classList.add('hidden');
+                userDisplayEmail.textContent = '';
+                document.getElementById('nav-dashboard')?.classList.add('hidden');
+                
+                adminGateBtn.innerHTML = "🔑 Espace Admin";
+                adminGateBtn.classList.remove("logged-in");
+            }
+        });
+
+        loginForm.addEventListener('submit', async () => {
+            loginError.classList.add('hidden');
+            const email = document.getElementById('admin-email').value.trim();
+            const password = document.getElementById('admin-password').value;
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                modal.classList.remove('active');
+            } catch (error) {
+                loginError.textContent = "Identifiants incorrects.";
+                loginError.classList.remove('hidden');
+            }
+        });
+
+        logoutBtn.onclick = () => { signOut(auth); modal.classList.remove('active'); };
+
+        adminGateBtn.onclick = () => {
+            if (currentUser) {
+                if (confirm("Voulez-vous vous déconnecter de votre espace administrateur ?")) {
+                    signOut(auth);
+                }
+            } else {
+                modal.classList.add('active');
+            }
+        };
+
+        // Envoi corrigé pour éviter le crash Firebase
+        announcementForm.addEventListener('submit', async () => {
+            const titleInput = document.getElementById("annonce-title");
+            const contentInput = document.getElementById("annonce-content");
+            const title = titleInput.value.trim();
+            const content = contentInput.value.trim();
+            const nowTimestamp = Date.now();
+            const dateStr = new Date(nowTimestamp).toLocaleDateString('fr-FR') + " à " + new Date(nowTimestamp).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+
+            try {
+                await addDoc(collection(db, "announcements"), { title, content, createdAt: nowTimestamp });
+                if (DISCORD_WEBHOOK_URL) {
+                    fetch(DISCORD_WEBHOOK_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            username: "ABYSZ Bot",
+                            embeds: [{
+                                title: "📢 NOUVELLE ANNONCE SITE : " + title,
+                                description: content,
+                                color: 11032055, 
+                                footer: { text: "Posté le " + dateStr + " • Abysz Esports" }
+                            }]
+                        })
+                    }).catch(err => console.error(err));
+                }
+                titleInput.value = "";
+                contentInput.value = "";
+                modal.classList.remove('active');
+            } catch (error) { alert("Erreur lors de la publication : " + error.message); }
+        });
+
+        closeModalBtn.onclick = () => modal.classList.remove('active');
+        window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
+
+        async function trackIndexPage() {
+            const support = window.innerWidth < 768 ? "Mobile" : "Ordinateur";
+            try {
+                await addDoc(collection(db, "analytics"), {
+                    date: new Date().toISOString().split('T')[0],
+                    page: "index.html",
+                    device: support,
+                    timestamp: Date.now()
+                });
+            } catch (e) { console.error("Analytics Error:", e); }
+        }
+        trackIndexPage();
+
+        document.getElementById('discord-btn').addEventListener('click', async () => {
+            const support = window.innerWidth < 768 ? "Mobile" : "Ordinateur";
+            try {
+                await addDoc(collection(db, "analytics"), {
+                    date: new Date().toISOString().split('T')[0],
+                    page: "discord",
+                    device: support,
+                    timestamp: Date.now()
+                });
+            } catch(e) { console.error("Discord Analytics Error:", e); }
+        });
+    </script>
+</body>
+</html>

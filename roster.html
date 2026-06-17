@@ -12,8 +12,14 @@
         /* ── ARCHITECTURE GLOBALE & NAV ── */
         .logo-link { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
         .roster-header-container { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto 30px auto; padding: 0 20px; }
+        .admin-actions-header { display: flex; gap: 10px; align-items: center; }
+        
         .admin-gate-btn { background: transparent; border: 1px solid #a855f7; color: #a855f7; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-family: 'Orbitron', sans-serif; transition: all 0.3s ease; }
         .admin-gate-btn:hover { background: #a855f7; color: white; box-shadow: 0 0 15px #a855f7; }
+        
+        .logout-btn { border: 1px solid #ff4444; color: #ff4444; }
+        .logout-btn:hover { background: #ff4444; color: white; box-shadow: 0 0 15px #ff4444; }
+
         .loading-text { text-align: center; color: #666; font-style: italic; grid-column: 1/-1; padding: 20px; }
         .error-text { text-align: center; color: #ef4444; font-family: 'Orbitron', sans-serif; font-style: italic; grid-column: 1/-1; padding: 20px; font-size: 0.9rem; }
 
@@ -73,7 +79,7 @@
         /* ── GRAPHIQUE CONTENEUR ── */
         .chart-container { background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 10px; margin: 15px 0; max-height: 160px; }
 
-        /* ── HISTORIQUE PR (STYLE SUR MESURE EXACT RAPPORT IMAGE) ── */
+        /* ── HISTORIQUE PR ── */
         .pr-history-section { background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 12px; padding: 16px; margin: 16px 0; }
         .pr-history-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 15px; }
         
@@ -103,7 +109,10 @@
     <section style="padding-top: 160px; padding-bottom: 80px;">
         <div class="roster-header-container">
             <h2 style="font-family:'Orbitron', sans-serif; color:#fff; font-size:2rem; margin:0;">Notre Roster 2026</h2>
-            <button class="admin-gate-btn hidden" id="add-player-btn">➕ Nouveau Joueur</button>
+            <div class="admin-actions-header">
+                <button class="admin-gate-btn hidden" id="add-player-btn">➕ Nouveau Joueur</button>
+                <button class="admin-gate-btn logout-btn hidden" id="logout-btn">🔒 Déconnexion</button>
+            </div>
         </div>
 
         <div class="roster-grid" id="main-roster-grid">
@@ -132,7 +141,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, deleteDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -153,16 +162,33 @@
         let estAdmin = false;
 
         document.addEventListener("DOMContentLoaded", () => {
+            // Écoute de l'état de connexion
             onAuthStateChanged(auth, (user) => {
                 const addBtn = document.getElementById("add-player-btn");
+                const logoutBtn = document.getElementById("logout-btn");
+                
                 if (user) {
                     estAdmin = true;
                     if (addBtn) addBtn.classList.remove("hidden");
+                    if (logoutBtn) logoutBtn.classList.remove("hidden");
                 } else {
                     estAdmin = false;
                     if (addBtn) addBtn.classList.add("hidden");
+                    if (logoutBtn) logoutBtn.classList.add("hidden");
                 }
             });
+
+            // Action du bouton de déconnexion
+            const logoutBtn = document.getElementById("logout-btn");
+            if (logoutBtn) {
+                logoutBtn.addEventListener("click", () => {
+                    signOut(auth).then(() => {
+                        alert("Vous avez été déconnecté avec succès.");
+                    }).catch((error) => {
+                        console.error("Erreur déconnexion:", error);
+                    });
+                });
+            }
 
             ecouterRosterFirestore();
             setupAddPlayerButton();
@@ -236,7 +262,6 @@
             let imageBase64String = player.image || "logo.png";
             const avatar = (imageBase64String && imageBase64String !== "#" && imageBase64String.trim() !== "") ? imageBase64String : "logo.png";
 
-            // 🛟 SÉCURITÉ CRITIQUE : Si prHistory n'est pas une liste valide, on l'initialise vide pour empêcher le crash
             let localPrHistory = (player.prHistory && Array.isArray(player.prHistory)) ? [...player.prHistory] : [];
 
             if (startInEditMode && !estAdmin) startInEditMode = false;
@@ -409,7 +434,6 @@
                 const chartBox = document.getElementById(`chart-box-${playerId}`);
                 const tableContainer = document.getElementById(`pr-table-container-${playerId}`);
                 
-                // Rendu du tableau clean
                 if (localPrHistory.length > 0) {
                     let tableRows = "";
                     localPrHistory.forEach((row) => {
@@ -439,7 +463,6 @@
                     tableContainer.innerHTML = `<div style="text-align:center; color:#666; font-size:0.85rem; padding:10px;">Aucun historique de PR.</div>`;
                 }
 
-                // Rendu de la courbe Chart.js
                 if (localPrHistory.length >= 2) {
                     const labels = localPrHistory.map(item => item.date || "");
                     const dataValues = localPrHistory.map(item => Number(item.value) || 0);

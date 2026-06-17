@@ -41,7 +41,6 @@
         .error-message { color: #ff4444; font-size: 0.85rem; margin-top: 15px; text-align: center; font-family: 'Inter', sans-serif; line-height: 1.4; }
         .loading-text { color: #666; font-style: italic; text-align: center; }
         
-        /* Style pour l'onglet Dashboard vert fluo comme sur Roster */
         .nav-dashboard-link a { color: #22c55e !important; font-weight: bold; text-decoration: none; }
     </style>
 </head>
@@ -206,7 +205,7 @@
                 loginStep.classList.add('hidden');
                 panelStep.classList.remove('hidden');
                 userDisplayEmail.textContent = `Admin : ${user.email}`;
-                document.getElementById('nav-dashboard')?.classList.remove('hidden'); // Affiche le bouton dashboard
+                document.getElementById('nav-dashboard')?.classList.remove('hidden');
             } else {
                 loginStep.classList.remove('hidden');
                 panelStep.classList.add('hidden');
@@ -264,7 +263,6 @@
         closeModalBtn.onclick = () => modal.classList.remove('active');
         window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
 
-        // ── TRACKER DE STATISTIQUES ACCUEIL ──
         async function trackIndexPage() {
             const support = window.innerWidth < 768 ? "Mobile" : "Ordinateur";
             try {
@@ -278,7 +276,6 @@
         }
         trackIndexPage();
 
-        // MODIFIÉ : Envoi structuré pour être comptabilisé par le Dashboard !
         document.getElementById('discord-btn').addEventListener('click', async () => {
             const support = window.innerWidth < 768 ? "Mobile" : "Ordinateur";
             try {

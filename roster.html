@@ -164,7 +164,7 @@
                     <button id="logout-btn" style="background:none;border:none;color:#ff4444;cursor:pointer;font-weight:bold;">Déconnexion</button>
                 </div>
 
-                <form id="player-form" onsubmit="return false;">
+                <form id="player-form">
                     <div class="input-group">
                         <label for="player-team">Catégorie d'équipe</label>
                         <select id="player-team">
@@ -269,9 +269,7 @@
         // Convertir le fichier image local sélectionné en chaîne Base64 textuelle
         playerFileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
-            if (!file) {
-                return;
-            }
+            if (!file) return;
             if(file.size > 1500000) {
                 alert("Cette image est trop lourde. Choisissez une image de moins de 1.5 Mo.");
                 playerFileInput.value = "";
@@ -441,7 +439,6 @@
                     document.getElementById('link-twitter').value = p.twitter || '#';
                     document.getElementById('link-tracker').value = p.tracker || '#';
 
-                    // Préparation de l'état de l'image pour la modification
                     playerFileInput.value = "";
                     base64ImageString = p.image || "#"; 
                     if(p.image && p.image !== '#') {
@@ -471,8 +468,10 @@
             });
         });
 
-        // Envoi final (Ajout ou Modification d'un joueur)
-        playerForm.addEventListener('submit', async () => {
+        // ENREGISTREMENT SÉCURISÉ (Ajout ou Modification)
+        playerForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+
             const pseudo = document.getElementById('player-pseudo').value.trim();
             const role = document.getElementById('player-role').value.trim();
             const team = document.getElementById('player-team').value;
@@ -532,7 +531,7 @@
             }
         });
 
-        // Gestion de l'affichage strict du Dashboard en fonction de la connexion
+        // Gestion de la connexion
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
@@ -550,7 +549,8 @@
             }
         });
 
-        loginForm.addEventListener('submit', async () => {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
             loginError.classList.add('hidden');
             try {
                 await signInWithEmailAndPassword(auth, document.getElementById('admin-email').value.trim(), document.getElementById('admin-password').value);

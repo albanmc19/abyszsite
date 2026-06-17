@@ -50,9 +50,9 @@
         .trend-down { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; }
         .trend-neutral { background: rgba(102, 102, 102, 0.15); color: #999; border: 1px solid #666; }
 
-        /* Style des réseaux sociaux pour les cartes et popups */
-        .social-links-container { display: flex; justify-content: center; gap: 15px; margin: 10px 0; align-items: center; }
-        .social-icon-link { font-size: 1.1rem; color: #b3b3b3; text-decoration: none; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; z-index: 2; }
+        /* Style des réseaux sociaux pour les popups */
+        .social-links-container { display: flex; justify-content: center; gap: 15px; margin: 15px 0; align-items: center; }
+        .social-icon-link { font-size: 1.2rem; color: #b3b3b3; text-decoration: none; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; }
         .social-icon-link:hover { color: #a855f7; transform: scale(1.25); filter: drop-shadow(0 0 6px #a855f7); }
 
         /* ── FORMULAIRES EDITION ── */
@@ -270,7 +270,7 @@
             });
         }
 
-        /* ── INJECTION DES LOGOS DIRECTEMENT SUR LES CASES JOUEURS ── */
+        /* ── FILTRAGE CLASSIQUE : SANS ICONES SUR LES CASES JOUEURS ── */
         function renderRosters(players) {
             const grids = {
                 main: document.getElementById("main-roster-grid"),
@@ -291,37 +291,18 @@
                 const pseudo = player.pseudo || "Inconnu";
                 const role = player.role || "Non spécifié";
 
-                // Génération de la rangée des logos réseaux sociaux pour la case joueur
-                let cardSocialHtml = "";
-                if (player.tiktok || player.twitter || player.youtube || player.twitch) {
-                    cardSocialHtml = `<div class="social-links-container" style="margin-top: 10px; margin-bottom: 5px;">`;
-                    if (player.tiktok) cardSocialHtml += `<a href="${player.tiktok}" target="_blank" class="social-icon-link" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>`;
-                    if (player.twitter) cardSocialHtml += `<a href="${player.twitter}" target="_blank" class="social-icon-link" title="Twitter / X"><i class="fa-brands fa-x-twitter"></i></a>`;
-                    if (player.youtube) cardSocialHtml += `<a href="${player.youtube}" target="_blank" class="social-icon-link" title="YouTube"><i class="fa-brands fa-youtube"></i></a>`;
-                    if (player.twitch) cardSocialHtml += `<a href="${player.twitch}" target="_blank" class="social-icon-link" title="Twitch"><i class="fa-brands fa-twitch"></i></a>`;
-                    cardSocialHtml += `</div>`;
-                } else {
-                    // Espace vide pour garder l'alignement si aucun réseau n'est configuré
-                    cardSocialHtml = `<div class="social-links-container" style="margin-top: 10px; margin-bottom: 5px; height: 1.1rem;"></div>`;
-                }
-
                 card.innerHTML = `
-                    <div class="player-card" style="cursor:pointer; background:#141414; border-radius:12px; overflow:hidden; border: 1px solid #2a2a2a; text-align:center; padding-bottom:15px; transition: transform 0.2s; position: relative;">
-                        <div class="click-trigger" style="position: absolute; top:0; left:0; width:100%; height:80%; z-index:1;"></div>
+                    <div class="player-card" style="cursor:pointer; background:#141414; border-radius:12px; overflow:hidden; border: 1px solid #2a2a2a; text-align:center; padding-bottom:15px; transition: transform 0.2s;">
                         <img src="${avatar}" class="player-avatar-img" alt="${pseudo}">
                         <h3 style="font-family:'Orbitron', sans-serif; margin:15px 0 5px 0; color:#fff;">${pseudo}</h3>
                         <p style="color:#a855f7; font-size:0.9rem; margin:0; font-family:'Inter', sans-serif;">${role}</p>
-                        ${cardSocialHtml}
                     </div>
                 `;
 
-                // Gestion des animations au survol
                 const playerCard = card.querySelector(".player-card");
                 playerCard.addEventListener("mouseenter", function() { this.style.transform = "translateY(-5px)"; });
                 playerCard.addEventListener("mouseleave", function() { this.style.transform = "translateY(0)"; });
-                
-                // Clic sur la carte (zone déclencheur pour ne pas bloquer les liens des réseaux)
-                card.querySelector(".click-trigger").addEventListener("click", () => openPlayerPopup(player));
+                playerCard.addEventListener("click", () => openPlayerPopup(player));
 
                 grid.appendChild(card);
             });
@@ -353,6 +334,7 @@
                 }
             }
 
+            // Génération de la rangée des réseaux sociaux UNIQUEMENT pour l'affichage de la popup
             let socialHtml = "";
             if (!isNewPlayer && (player.twitter || player.twitch || player.youtube || player.tiktok)) {
                 socialHtml = `<div class="social-links-container">`;

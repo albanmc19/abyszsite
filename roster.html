@@ -184,8 +184,8 @@
                         <label>Statistiques du joueur</label>
                         <div class="input-row">
                             <input type="text" id="stat-earnings" placeholder="Earnings (Ex: 500$)" required>
-                            <input type="text" id="stat-best" placeholder="Best PR (Ex: Top 7)" required>
-                            <input type="text" id="stat-wins" placeholder="Best Perf (Ex: 142)" required>
+                            <input type="text" id="stat-best" placeholder="Best PR (Ex: 438)" required>
+                            <input type="text" id="stat-wins" placeholder="Best Perf (Ex: 1 qual solo)" required>
                         </div>
                     </div>
                     <div class="input-group">
@@ -284,6 +284,41 @@
             fileStatus.style.color = "#ef4444";
         });
 
+        // Gestion de l'affichage de la modale d'administration/connexion
+        adminGateBtn.addEventListener('click', () => {
+            modal.classList.add('active');
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+            playerForm.reset();
+            editingPlayerId = null;
+            panelTitle.textContent = "Ajouter un joueur";
+            submitPlayerBtn.textContent = "Enregistrer le joueur";
+            prAddZone.classList.add('hidden');
+        });
+
+        // Connexion Admin
+        document.getElementById('login-btn').addEventListener('click', async () => {
+            const email = document.getElementById('admin-email').value.trim();
+            const password = document.getElementById('admin-password').value;
+            loginError.classList.add('hidden');
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (err) {
+                loginError.textContent = "Identifiants incorrects.";
+                loginError.classList.remove('hidden');
+            }
+        });
+
+        // Déconnexion Admin
+        logoutBtn.addEventListener('click', async () => {
+            await signOut(auth);
+            modal.classList.remove('active');
+        });
+
+        // Écoute en temps réel de la collection Roster
         onSnapshot(query(fsCol(db, "roster")), (snapshot) => {
             const grids = {
                 main: document.getElementById("main-roster-grid"),
@@ -318,285 +353,4 @@
                 card.innerHTML = `
                     ${adminHtml}
                     <div class="player-card" onclick="document.getElementById('popup-${id}').classList.add('active')">
-                        <img src="${playerImgSrc}" class="player-avatar-img" alt="${p.pseudo || 'Joueur'}" onerror="this.src='logo.png'">
-                        <div class="player-info">
-                            <h3>${p.pseudo || 'Sans nom'}</h3>
-                            <p class="role">${p.role || ''}</p>
-                        </div>
-                    </div>
-                `;
-                if(targetGrid) targetGrid.appendChild(card);
-
-                const prHistory = p.prHistory || [];
-                let prTableRows = "";
-                let evolutionBadge = `<div class="pr-evolution-badge neutral">▬ Stable</div>`;
-
-                if(Array.isArray(prHistory) && prHistory.length > 0) {
-                    const sortedPr = [...prHistory].sort((a,b) => new Date(b.date) - new Date(a.date));
-                    
-                    if(sortedPr.length >= 2) {
-                        const latest = parseInt(sortedPr[0].value) || 0;
-                        const previous = parseInt(sortedPr[1].value) || 0;
-                        const diff = latest - previous;
-                        if(diff > 0) {
-                            evolutionBadge = `<div class="pr-evolution-badge positive">▲ +${diff} PR</div>`;
-                        } else if(diff < 0) {
-                            evolutionBadge = `<div class="pr-evolution-badge negative">▼ ${diff} PR</div>`;
-                        }
-                    }
-
-                    prTableRows = sortedPr.map((entry, index) => {
-                        let deltaStr = "▬";
-                        let deltaClass = "neu";
-                        if(index < sortedPr.length - 1) {
-                            const currentVal = parseInt(entry.value) || 0;
-                            const nextOldestVal = parseInt(sortedPr[index+1].value) || 0;
-                            const currentDiff = currentVal - nextOldestVal;
-                            if(currentDiff > 0) { deltaStr = `+${currentDiff}`; deltaClass = "pos"; }
-                            else if(currentDiff < 0) { deltaStr = `${currentDiff}`; deltaClass = "neg"; }
-                        }
-                        
-                        let displayDate = "Date inconnue";
-                        if(entry.date) {
-                            const dateParts = String(entry.date).split('-');
-                            if(dateParts.length === 3) {
-                                displayDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
-                            } else {
-                                const d = new Date(entry.date);
-                                if(!isNaN(d.getTime())) displayDate = d.toLocaleDateString('fr-FR');
-                            }
-                        }
-
-                        return `
-                            <tr class="${index === 0 ? 'pr-latest' : ''}">
-                                <td>${displayDate}</td>
-                                <td>${(parseInt(entry.value) || 0).toLocaleString()}</td>
-                                <td class="pr-delta-cell ${deltaClass}">${deltaStr}</td>
-                            </tr>
-                        `;
-                    }).join('');
-                } else {
-                    prTableRows = `<tr><td colspan="3" style="text-align:center;color:#666;">Aucun historique PR</td></tr>`;
-                }
-
-                const popup = document.createElement("div");
-                popup.id = `popup-${id}`;
-                popup.className = "modal-overlay";
-                popup.innerHTML = `
-                    <div class="modal-content">
-                        <span class="modal-close" onclick="document.getElementById('popup-${id}').classList.remove('active')">&times;</span>
-                        <h3>Détails du Joueur</h3>
-                        <img src="${playerImgSrc}" class="popup-avatar-img" onerror="this.src='logo.png'">
-                        <h2 style="text-align:center;font-family:'Orbitron';margin-bottom:5px;">${p.pseudo || ''}</h2>
-                        <p style="text-align:center;color:#a855f7;font-weight:600;margin-top:0;font-size:0.9rem;">${p.role || ''}</p>
-                        
-                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center;margin:20px 0;">
-                            <div style="background:#0a0a0a;padding:10px;border-radius:8px;border:1px solid #2a2a2a;"><span style="color:#a855f7;font-size:0.8rem;display:block;">EARNINGS</span><strong>${p.earnings || '0$'}</strong></div>
-                            <div style="background:#0a0a0a;padding:10px;border-radius:8px;border:1px solid #2a2a2a;"><span style="color:#a855f7;font-size:0.8rem;display:block;">BEST PR</span><strong>${p.bestPlacement || 'N/A'}</strong></div>
-                            <div style="background:#0a0a0a;padding:10px;border-radius:8px;border:1px solid #2a2a2a;"><span style="color:#a855f7;font-size:0.8rem;display:block;">BEST PERF</span><strong>${p.wins || 'N/A'}</strong></div>
-                        </div>
-
-                        <p style="background:#0a0a0a;padding:12px;border-radius:8px;border:1px solid #1a1a1a;font-size:0.9rem;line-height:1.5;">${p.bio || 'Aucune biographie fournie.'}</p>
-                        
-                        <div class="pr-history-section">
-                            <div class="pr-history-title">📈 Suivi d'Évolution PR</div>
-                            ${evolutionBadge}
-                            <table class="pr-table">
-                                <thead><tr><th>Date</th><th>Valeur</th><th>Évolution</th></tr></thead>
-                                <tbody>${prTableRows}</tbody>
-                            </table>
-                        </div>
-
-                        <div style="display:flex;justify-content:center;gap:15px;margin-top:20px;">
-                            ${p.twitch && p.twitch !== '#' ? `<a href="${p.twitch}" target="_blank" style="color:#a855f7;text-decoration:none;font-weight:600;">Twitch</a>` : ''}
-                            ${p.twitter && p.twitter !== '#' ? `<a href="${p.twitter}" target="_blank" style="color:#a855f7;text-decoration:none;font-weight:600;">Twitter</a>` : ''}
-                            ${p.tracker && p.tracker !== '#' ? `<a href="${p.tracker}" target="_blank" style="color:#a855f7;text-decoration:none;font-weight:600;">Tracker</a>` : ''}
-                        </div>
-                    </div>
-                `;
-                popupsContainer.appendChild(popup);
-            });
-
-            document.querySelectorAll('.inline-edit-btn').forEach(btn => {
-                btn.onclick = (e) => {
-                    e.stopPropagation();
-                    const id = e.target.getAttribute('data-id');
-                    const p = playersDataCache[id];
-                    if(!p) return;
-
-                    editingPlayerId = id;
-                    panelTitle.textContent = `Modifier ${p.pseudo}`;
-                    submitPlayerBtn.textContent = "Enregistrer les modifications";
-
-                    document.getElementById('player-team').value = p.team || 'main';
-                    document.getElementById('player-pseudo').value = p.pseudo || '';
-                    document.getElementById('player-role').value = p.role || '';
-                    document.getElementById('stat-earnings').value = p.earnings || '';
-                    document.getElementById('stat-best').value = p.bestPlacement || '';
-                    document.getElementById('stat-wins').value = p.wins || '';
-                    document.getElementById('player-bio').value = p.bio || '';
-                    document.getElementById('link-twitch').value = p.twitch || '#';
-                    document.getElementById('link-twitter').value = p.twitter || '#';
-                    document.getElementById('link-tracker').value = p.tracker || '#';
-
-                    playerFileInput.value = "";
-                    base64ImageString = p.image || "#"; 
-                    if(p.image && p.image !== '#') {
-                        fileStatus.textContent = "📸 Une photo personnalisée existe déjà.";
-                        fileStatus.style.color = "#22c55e";
-                    } else {
-                        fileStatus.textContent = "🔹 Utilise le logo ABYSZ de base.";
-                        fileStatus.style.color = "#aaa";
-                    }
-
-                    prAddZone.classList.remove('hidden');
-                    document.getElementById('new-pr-value').value = "";
-                    document.getElementById('new-pr-date').value = "";
-
-                    modal.classList.add('active');
-                };
-            });
-
-            document.querySelectorAll('.inline-delete-btn').forEach(btn => {
-                btn.onclick = async (e) => {
-                    e.stopPropagation();
-                    if(confirm("Supprimer définitivement ce joueur de la base de données ?")) {
-                        await fsDelete(fsDoc(db, "roster", e.target.getAttribute('data-id')));
-                    }
-                };
-            });
-        });
-
-        playerForm.addEventListener('submit', async (e) => {
-            e.preventDefault(); 
-
-            const inputPseudo = document.getElementById('player-pseudo').value.trim();
-            const inputRole = document.getElementById('player-role').value.trim();
-            const inputTeam = document.getElementById('player-team').value;
-            const inputEarnings = document.getElementById('stat-earnings').value.trim();
-            const inputBestPlacement = document.getElementById('stat-best').value.trim();
-            const inputWins = document.getElementById('stat-wins').value.trim();
-            const inputBio = document.getElementById('player-bio').value.trim();
-            const inputTwitch = document.getElementById('link-twitch').value.trim();
-            const inputTwitter = document.getElementById('link-twitter').value.trim();
-            const inputTracker = document.getElementById('link-tracker').value.trim();
-
-            const newPrVal = document.getElementById('new-pr-value').value.trim();
-            const newPrDate = document.getElementById('new-pr-date').value;
-
-            const finalImage = base64ImageString || "#";
-
-            try {
-                if (editingPlayerId) {
-                    const docRef = fsDoc(db, "roster", editingPlayerId);
-                    const currentPlayerData = playersDataCache[editingPlayerId];
-                    
-                    let updatedPrHistory = (currentPlayerData && Array.isArray(currentPlayerData.prHistory)) 
-                        ? [...currentPlayerData.prHistory] 
-                        : [];
-
-                    if(newPrVal !== "" && newPrDate !== "") {
-                        updatedPrHistory.push({
-                            date: String(newPrDate),
-                            value: parseInt(newPrVal, 10)
-                        });
-                    }
-
-                    await fsUpdate(docRef, {
-                        team: inputTeam,
-                        pseudo: inputPseudo,
-                        role: inputRole,
-                        image: finalImage,
-                        earnings: inputEarnings,
-                        bestPlacement: inputBestPlacement,
-                        wins: inputWins,
-                        bio: inputBio,
-                        twitch: inputTwitch,
-                        twitter: inputTwitter,
-                        tracker: inputTracker,
-                        prHistory: updatedPrHistory
-                    });
-                    
-                    alert("Joueur modifié avec succès !");
-                } else {
-                    let initialPrHistory = [];
-                    if(newPrVal !== "" && newPrDate !== "") {
-                        initialPrHistory.push({ 
-                            date: String(newPrDate), 
-                            value: parseInt(newPrVal, 10) 
-                        });
-                    }
-
-                    await addDoc(fsCol(db, "roster"), {
-                        team: inputTeam,
-                        pseudo: inputPseudo,
-                        role: inputRole,
-                        image: finalImage,
-                        earnings: inputEarnings,
-                        bestPlacement: inputBestPlacement,
-                        wins: inputWins,
-                        bio: inputBio,
-                        twitch: inputTwitch,
-                        twitter: inputTwitter,
-                        tracker: inputTracker,
-                        prHistory: initialPrHistory
-                    });
-                    alert("Nouveau joueur ajouté avec succès !");
-                }
-
-                modal.classList.remove('active');
-                playerForm.reset();
-                base64ImageString = "";
-                fileStatus.textContent = "";
-                editingPlayerId = null;
-            } catch(err) {
-                console.error("Détail de l'erreur Firebase : ", err);
-                alert("Erreur lors de l'enregistrement : " + err.message);
-            }
-        });
-
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            if (user) {
-                loginStep.classList.add('hidden');
-                panelStep.classList.remove('hidden');
-                userDisplayEmail.textContent = user.email;
-                adminGateBtn.textContent = "⚙️ Panel Admin";
-                document.getElementById('nav-dashboard')?.classList.remove('hidden');
-            } else {
-                loginStep.classList.remove('hidden');
-                panelStep.classList.add('hidden');
-                userDisplayEmail.textContent = '';
-                adminGateBtn.textContent = "🔑 Connexion";
-                document.getElementById('nav-dashboard')?.classList.add('hidden');
-            }
-        });
-
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            loginError.classList.add('hidden');
-            try {
-                await signInWithEmailAndPassword(auth, document.getElementById('admin-email').value.trim(), document.getElementById('admin-password').value);
-            } catch (error) {
-                loginError.textContent = "Identifiants incorrects.";
-                loginError.classList.remove('hidden');
-            }
-        });
-
-        logoutBtn.onclick = () => { signOut(auth); modal.classList.remove('active'); };
-        
-        adminGateBtn.onclick = () => {
-            editingPlayerId = null;
-            panelTitle.textContent = "Ajouter un joueur";
-            submitPlayerBtn.textContent = "Enregistrer le joueur";
-            playerForm.reset();
-            playerFileInput.value = "";
-            base64ImageString = "";
-            fileStatus.textContent = "";
-            prAddZone.classList.remove('hidden'); 
-            modal.classList.add('active');
-        };
-        closeModalBtn.onclick = () => modal.classList.remove('active');
-    </script>
-</body>
-</html>
+                        <img src="${playerImgSrc}" class="player-avatar-img

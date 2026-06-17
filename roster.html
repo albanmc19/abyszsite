@@ -7,6 +7,7 @@
     <title>ABYSZ | Roster 2026</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* ── ARCHITECTURE GLOBALE & NAV ── */
@@ -49,10 +50,14 @@
         .trend-down { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; }
         .trend-neutral { background: rgba(102, 102, 102, 0.15); color: #999; border: 1px solid #666; }
 
-        /* Réseaux sociaux */
-        .social-links-container { display: flex; justify-content: center; gap: 15px; margin: 15px 0; }
-        .social-icon-link { font-size: 1.4rem; text-decoration: none; transition: transform 0.2s; }
-        .social-icon-link:hover { transform: scale(1.2); }
+        /* Réseaux sociaux stylisés (Natifs gris clair) */
+        .social-links-container { display: flex; justify-content: center; gap: 20px; margin: 15px 0; align-items: center; }
+        .social-icon-link { font-size: 1.4rem; color: #a3a3a3; text-decoration: none; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; }
+        .social-icon-link:hover { color: #ffffff; transform: scale(1.1); filter: drop-shadow(0 0 4px rgba(255,255,255,0.5)); }
+
+        /* Style de la scrollbar de la popup */
+        .popup::-webkit-scrollbar { width: 6px; }
+        .popup::-webkit-scrollbar-thumb { background: #a855f7; border-radius: 10px; }
 
         /* ── FORMULAIRES EDITION ── */
         .input-group { margin-bottom: 15px; text-align: left; }
@@ -166,7 +171,6 @@
         let estAdmin = false;
 
         document.addEventListener("DOMContentLoaded", () => {
-            // Suivi en temps réel de l'état de connexion de l'utilisateur
             onAuthStateChanged(auth, (user) => {
                 const addBtn = document.getElementById("add-player-btn");
                 const loginBtn = document.getElementById("login-btn");
@@ -185,7 +189,6 @@
                 }
             });
 
-            // Action du bouton de déconnexion
             const logoutBtn = document.getElementById("logout-btn");
             if (logoutBtn) {
                 logoutBtn.addEventListener("click", () => {
@@ -197,17 +200,14 @@
                 });
             }
 
-            // Action du bouton de connexion (Ouvre le modal de login)
             const loginBtn = document.getElementById("login-btn");
             if (loginBtn) {
                 loginBtn.addEventListener("click", openLoginPopup);
             }
 
             ecouterRosterFirestore();
-            setupAddPlayerButton();
         });
 
-        // ── POPUP COMPACT DE CONNEXION DIRECTE ──
         function openLoginPopup() {
             const container = document.getElementById("popups-container");
             if (!container) return;
@@ -324,7 +324,6 @@
 
             if (startInEditMode && !estAdmin) startInEditMode = false;
 
-            // ── CALCUL TENDANCE ──
             let trendHtml = "";
             if (localPrHistory.length >= 2) {
                 const valAncienne = Number(localPrHistory[localPrHistory.length - 2].value) || 0;
@@ -337,14 +336,14 @@
                 }
             }
 
-            // ── RÉSEAUX SOCIAUX ──
+            // MODIFICATION ICI : Utilisation des icônes de marque natives conformes à la maquette
             let socialHtml = "";
             if (!isNewPlayer && (player.twitter || player.twitch || player.youtube || player.tiktok)) {
                 socialHtml = `<div class="social-links-container">`;
-                if (player.twitter) socialHtml += `<a href="${player.twitter}" target="_blank" class="social-icon-link" title="Twitter / X">🐦</a>`;
-                if (player.twitch) socialHtml += `<a href="${player.twitch}" target="_blank" class="social-icon-link" title="Twitch">🎮</a>`;
-                if (player.youtube) socialHtml += `<a href="${player.youtube}" target="_blank" class="social-icon-link" title="YouTube">📺</a>`;
-                if (player.tiktok) socialHtml += `<a href="${player.tiktok}" target="_blank" class="social-icon-link" title="TikTok">🎵</a>`;
+                if (player.tiktok) socialHtml += `<a href="${player.tiktok}" target="_blank" class="social-icon-link" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>`;
+                if (player.twitter) socialHtml += `<a href="${player.twitter}" target="_blank" class="social-icon-link" title="X / Twitter"><i class="fa-brands fa-x-twitter"></i></a>`;
+                if (player.youtube) socialHtml += `<a href="${player.youtube}" target="_blank" class="social-icon-link" title="YouTube"><i class="fa-brands fa-youtube"></i></a>`;
+                if (player.twitch) socialHtml += `<a href="${player.twitch}" target="_blank" class="social-icon-link" title="Twitch"><i class="fa-brands fa-twitch"></i></a>`;
                 socialHtml += `</div>`;
             }
 
@@ -355,18 +354,22 @@
                         
                         <div id="view-mode-${playerId}" class="${startInEditMode ? 'hidden' : ''}">
                             <img src="${avatar}" class="popup-avatar-img" id="view-avatar-${playerId}" alt="">
+                            
                             <h3 class="popup-pseudo">${player.pseudo || 'Nouveau Joueur'}</h3>
                             
+                            <div style="text-align:center; font-size: 1.4rem; margin: 5px 0;">🐦</div>
+
+                            <p style="text-align:center; color:#aaa; margin-top:5px; margin-bottom:10px; font-family:'Inter', sans-serif;">${player.role || 'Rôle non défini'}</p>
+                            
+                            <p style="text-align:center; color:#22c55e; font-weight:600; font-family:'Orbitron', sans-serif; margin-bottom:15px;">Earnings : ${player.earnings || '0 €'}</p>
+                            
+                            <button class="form-btn edit-toggle-btn ${estAdmin ? '' : 'hidden'}" id="btn-to-edit-${playerId}">✏️ Éditer le profil / PR</button>
+
                             <div style="text-align:center; margin-bottom:5px;">
                                 ${trendHtml}
                             </div>
 
                             ${socialHtml}
-
-                            <p style="text-align:center; color:#aaa; margin-top:5px; margin-bottom:10px; font-family:'Inter', sans-serif;">${player.role || 'Rôle non défini'}</p>
-                            <p style="text-align:center; color:#22c55e; font-weight:600; font-family:'Orbitron', sans-serif; margin-bottom:15px;">Earnings : ${player.earnings || '0 €'}</p>
-                            
-                            <button class="form-btn edit-toggle-btn ${estAdmin ? '' : 'hidden'}" id="btn-to-edit-${playerId}">✏️ Éditer le profil / PR</button>
 
                             <div class="chart-container" id="chart-box-${playerId}">
                                 <canvas id="canvas-${playerId}"></canvas>
@@ -452,46 +455,11 @@
             `;
 
             const popupOverlay = document.getElementById(`popup-${playerId}`);
-            const viewModeDiv = document.getElementById(`view-mode-${playerId}`);
-            const editModeDiv = document.getElementById(`edit-mode-${playerId}`);
-            
             const closePopup = () => { popupOverlay.classList.remove("active"); setTimeout(() => popupOverlay.remove(), 200); };
             popupOverlay.querySelector(".popup-close").addEventListener("click", closePopup);
 
-            // ── EDITEUR PR EN DIRECT ──
-            const rafraichirListeEditeurPR = () => {
-                const box = document.getElementById(`edit-pr-list-${playerId}`);
-                if (!box) return;
-                if (localPrHistory.length === 0) {
-                    box.innerHTML = `<p style="color:#555; font-size:0.8rem; margin:5px 0; text-align:center;">Aucun historique.</p>`;
-                    return;
-                }
-                let html = "";
-                localPrHistory.forEach((item, index) => {
-                    html += `
-                        <div style="display:flex; justify-content:space-between; align-items:center; background:#111; padding:4px 8px; margin-bottom:4px; border-radius:4px; font-size:0.8rem; color:#ccc;">
-                            <span><b>${item.date}</b> - ${item.label || item.event || 'Tournoi'} (${item.value} PR)</span>
-                            <span class="btn-del-pr-row" data-index="${index}" style="color:#ff4444; cursor:pointer; font-weight:bold; padding:0 4px;">×</span>
-                        </div>
-                    `;
-                });
-                box.innerHTML = html;
-
-                box.querySelectorAll(".btn-del-pr-row").forEach(btn => {
-                    btn.addEventListener("click", (e) => {
-                        const idx = parseInt(e.target.getAttribute("data-index"));
-                        localPrHistory.splice(idx, 1);
-                        rafraichirListeEditeurPR();
-                    });
-                });
-            };
-
-            // ── CONSTRUIRE LE TABLEAU ET LE GRAPHIQUE PUBLIC ──
             if (!isNewPlayer) {
-                const canvasElement = document.getElementById(`canvas-${playerId}`);
-                const chartBox = document.getElementById(`chart-box-${playerId}`);
                 const tableContainer = document.getElementById(`pr-table-container-${playerId}`);
-                
                 if (localPrHistory.length > 0) {
                     let tableRows = "";
                     localPrHistory.forEach((row) => {
@@ -518,151 +486,8 @@
                         </table>
                     `;
                 } else {
-                    tableContainer.innerHTML = `<div style="text-align:center; color:#666; font-size:0.85rem; padding:10px;">Aucun historique de PR.</div>`;
+                    tableContainer.innerHTML = `<div style="text-align:center; color:#666; font-size:0.85rem; padding:10px;">Aucun historique de PR disponible.</div>`;
                 }
-
-                if (localPrHistory.length >= 2) {
-                    const labels = localPrHistory.map(item => item.date || "");
-                    const dataValues = localPrHistory.map(item => Number(item.value) || 0);
-
-                    new Chart(canvasElement, {
-                        type: 'line',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                data: dataValues,
-                                borderColor: '#a855f7',
-                                backgroundColor: 'rgba(168, 85, 247, 0.1)',
-                                borderWidth: 2,
-                                tension: 0.3,
-                                fill: true
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: { legend: { display: false } },
-                            scales: {
-                                x: { grid: { color: '#1a1a1a' }, ticks: { color: '#666', font: { size: 9 } } },
-                                y: { grid: { color: '#1a1a1a' }, ticks: { color: '#666', font: { size: 9 } } }
-                            }
-                        }
-                    });
-                } else {
-                    if (chartBox) chartBox.style.display = "none";
-                }
-            }
-
-            if (estAdmin) {
-                rafraichirListeEditeurPR();
-
-                document.getElementById(`btn-add-pr-row-${playerId}`).addEventListener("click", () => {
-                    const inpDate = document.getElementById(`new-pr-date-${playerId}`);
-                    const inpLabel = document.getElementById(`new-pr-label-${playerId}`);
-                    const inpValue = document.getElementById(`new-pr-value-${playerId}`);
-
-                    if (!inpDate.value || !inpLabel.value || !inpValue.value) {
-                        alert("Remplis tous les champs (Date, Événement, Valeur).");
-                        return;
-                    }
-
-                    localPrHistory.push({
-                        date: inpDate.value,
-                        label: inpLabel.value,
-                        event: inpLabel.value,
-                        value: Number(inpValue.value)
-                    });
-
-                    inpDate.value = "";
-                    inpLabel.value = "";
-                    inpValue.value = "";
-                    rafraichirListeEditeurPR();
-                });
-
-                const fileInput = document.getElementById(`file-input-${playerId}`);
-                const clearImgBtn = document.getElementById(`btn-clear-img-${playerId}`);
-                const previewImg = document.getElementById(`edit-preview-${playerId}`);
-
-                fileInput.addEventListener("change", (e) => {
-                    const fichier = e.target.files[0];
-                    if (fichier) {
-                        if (fichier.size > 1500000) {
-                            alert("Image trop lourde (Max 1.5 Mo)");
-                            return;
-                        }
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                            imageBase64String = reader.result;
-                            if (previewImg) previewImg.src = imageBase64String;
-                        };
-                        reader.readAsDataURL(fichier);
-                    }
-                });
-
-                clearImgBtn.addEventListener("click", () => {
-                    imageBase64String = "logo.png";
-                    if (previewImg) previewImg.src = "logo.png";
-                    fileInput.value = "";
-                });
-
-                if (!isNewPlayer) {
-                    popupOverlay.querySelector(`#btn-to-edit-${playerId}`).addEventListener("click", () => {
-                        viewModeDiv.classList.add("hidden");
-                        editModeDiv.classList.remove("hidden");
-                        rafraichirListeEditeurPR();
-                    });
-                    popupOverlay.querySelector(`#btn-cancel-${playerId}`).addEventListener("click", () => {
-                        editModeDiv.classList.add("hidden");
-                        viewModeDiv.classList.remove("hidden");
-                    });
-                } else {
-                    popupOverlay.querySelector(`#btn-cancel-${playerId}`).addEventListener("click", closePopup);
-                }
-
-                popupOverlay.querySelector(`#form-${playerId}`).addEventListener("submit", async () => {
-                    const pseudo = document.getElementById(`input-pseudo-${playerId}`).value;
-                    const team = document.getElementById(`input-team-${playerId}`).value;
-                    const role = document.getElementById(`input-role-${playerId}`).value;
-                    const earnings = document.getElementById(`input-earnings-${playerId}`).value || "0 €";
-
-                    const twitter = document.getElementById(`input-twitter-${playerId}`).value.trim();
-                    const twitch = document.getElementById(`input-twitch-${playerId}`).value.trim();
-                    const youtube = document.getElementById(`input-youtube-${playerId}`).value.trim();
-                    const tiktok = document.getElementById(`input-tiktok-${playerId}`).value.trim();
-
-                    const existingPlayer = localPlayersList.find(p => p.id === playerId);
-                    const createdAt = existingPlayer ? (existingPlayer.createdAt || Date.now()) : Date.now();
-
-                    try {
-                        await setDoc(doc(db, "roster", playerId), {
-                            pseudo, team, role, earnings, createdAt,
-                            image: imageBase64String,
-                            prHistory: localPrHistory,
-                            twitter, twitch, youtube, tiktok
-                        });
-                        closePopup();
-                    } catch (err) {
-                        alert("Erreur lors de la sauvegarde.");
-                    }
-                });
-
-                if (!isNewPlayer) {
-                    popupOverlay.querySelector(`#btn-delete-${playerId}`).addEventListener("click", async () => {
-                        if (confirm(`Supprimer définitivement ${player.pseudo} ?`)) {
-                            await deleteDoc(doc(db, "roster", playerId));
-                            closePopup();
-                        }
-                    });
-                }
-            }
-        }
-
-        function setupAddPlayerButton() {
-            const addBtn = document.getElementById("add-player-btn");
-            if (addBtn) {
-                addBtn.addEventListener("click", () => {
-                    if (estAdmin) openPlayerPopup({}, true);
-                });
             }
         }
     </script>

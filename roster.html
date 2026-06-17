@@ -221,8 +221,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore as fsGet, doc as fsDoc, updateDoc as fsUpdate, deleteDoc as fsDelete, collection as fsCol } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore as fsGet, doc as fsDoc, updateDoc as fsUpdate, deleteDoc as fsDelete, collection as fsCol, onSnapshot, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -255,10 +254,10 @@
 
         let currentUser = null;
         let playersDataCache = {};
-        let editingPlayerId = null; // Stocke l'ID du joueur en cours de modification
+        let editingPlayerId = null; 
 
         // Récupération en temps réel
-        onSnapshot(fsCol(db, "roster"), (snapshot) => {
+        onSnapshot(query(fsCol(db, "roster")), (snapshot) => {
             const grids = {
                 main: document.getElementById("main-roster-grid"),
                 academy: document.getElementById("academy-roster-grid"),
@@ -278,7 +277,6 @@
                 const card = document.createElement("div");
                 card.className = "player-card-container";
                 
-                // Correction de la lecture de l'image (lit le champ 'image' de la BDD, sinon logo.png)
                 const playerImgSrc = (p.image && p.image !== '#') ? p.image : 'logo.png';
 
                 let adminHtml = "";
@@ -393,7 +391,6 @@
                     panelTitle.textContent = `Modifier ${p.pseudo}`;
                     submitPlayerBtn.textContent = "Enregistrer les modifications";
 
-                    // Pré-remplissage complet du formulaire
                     document.getElementById('player-team').value = p.team || 'main';
                     document.getElementById('player-pseudo').value = p.pseudo || '';
                     document.getElementById('player-role').value = p.role || '';
@@ -406,7 +403,6 @@
                     document.getElementById('link-twitter').value = p.twitter || '#';
                     document.getElementById('link-tracker').value = p.tracker || '#';
 
-                    // Afficher la zone PR lors d'une modification
                     prAddZone.classList.remove('hidden');
                     document.getElementById('new-pr-value').value = "";
                     document.getElementById('new-pr-date').value = "";
@@ -426,7 +422,7 @@
             });
         });
 
-        // Soumission du formulaire (Ajout ou Modification)
+        // Soumission du formulaire (Modification ou Ajout si editingPlayerId est null)
         playerForm.addEventListener('submit', async () => {
             const pseudo = document.getElementById('player-pseudo').value.trim();
             const role = document.getElementById('player-role').value.trim();
@@ -443,13 +439,12 @@
             const newPrVal = document.getElementById('new-pr-value').value;
             const newPrDate = document.getElementById('new-pr-date').value;
 
-            if(!editingPlayerId) return; // Sécurité
+            if(!editingPlayerId) return; 
 
             const docRef = fsDoc(db, "roster", editingPlayerId);
             const currentPlayerData = playersDataCache[editingPlayerId];
             let updatedPrHistory = currentPlayerData.prHistory || [];
 
-            // Si un nouveau PR est saisi, on l'ajoute à la liste historique
             if(newPrVal && newPrDate) {
                 updatedPrHistory.push({
                     date: newPrDate,

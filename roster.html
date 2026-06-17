@@ -15,6 +15,7 @@
         .admin-gate-btn { background: transparent; border: 1px solid #a855f7; color: #a855f7; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-family: 'Orbitron', sans-serif; transition: all 0.3s ease; }
         .admin-gate-btn:hover { background: #a855f7; color: white; box-shadow: 0 0 15px #a855f7; }
         .loading-text { text-align: center; color: #666; font-style: italic; grid-column: 1/-1; padding: 20px; }
+        .error-text { text-align: center; color: #ef4444; font-family: 'Orbitron', sans-serif; font-style: italic; grid-column: 1/-1; padding: 20px; font-size: 0.9rem; }
 
         /* ── ROSTER GRID ── */
         .roster-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
@@ -72,7 +73,7 @@
         /* ── GRAPHIQUE CONTENEUR ── */
         .chart-container { background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 10px; margin: 15px 0; max-height: 160px; }
 
-        /* ── HISTORIQUE PR (STYLE SUR MESURE) ── */
+        /* ── HISTORIQUE PR (STYLE SUR MESURE EXACT RAPPORT IMAGE) ── */
         .pr-history-section { background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 12px; padding: 16px; margin: 16px 0; }
         .pr-history-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 15px; }
         
@@ -177,6 +178,15 @@
                 renderRosters(localPlayersList);
             }, (error) => {
                 console.error("Erreur Firestore : ", error);
+                showErrorMessageAllGrids();
+            });
+        }
+
+        function showErrorMessageAllGrids() {
+            const gridIds = ["main-roster-grid", "academy-roster-grid", "cdf-roster-grid"];
+            gridIds.forEach(id => {
+                const g = document.getElementById(id);
+                if (g) g.innerHTML = `<p class="error-text">Erreur de chargement de l'équipe.</p>`;
             });
         }
 
@@ -226,11 +236,12 @@
             let imageBase64String = player.image || "logo.png";
             const avatar = (imageBase64String && imageBase64String !== "#" && imageBase64String.trim() !== "") ? imageBase64String : "logo.png";
 
-            let localPrHistory = player.prHistory ? [...player.prHistory] : [];
+            // 🛟 SÉCURITÉ CRITIQUE : Si prHistory n'est pas une liste valide, on l'initialise vide pour empêcher le crash
+            let localPrHistory = (player.prHistory && Array.isArray(player.prHistory)) ? [...player.prHistory] : [];
 
             if (startInEditMode && !estAdmin) startInEditMode = false;
 
-            // ── CALCUL TENDANCE (+10%) ──
+            // ── CALCUL TENDANCE ──
             let trendHtml = "";
             if (localPrHistory.length >= 2) {
                 const valAncienne = Number(localPrHistory[localPrHistory.length - 2].value) || 0;
@@ -398,7 +409,7 @@
                 const chartBox = document.getElementById(`chart-box-${playerId}`);
                 const tableContainer = document.getElementById(`pr-table-container-${playerId}`);
                 
-                // Rendu du tableau exact à ta capture d'écran
+                // Rendu du tableau clean
                 if (localPrHistory.length > 0) {
                     let tableRows = "";
                     localPrHistory.forEach((row) => {

@@ -3,90 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Roster 2026 de l'équipe ABYSZ Esports">
-    <title>ABYSZ | Roster 2026</title>
+    <meta name="description" content="Dashboard de gestion ABYSZ Esports">
+    <title>ABYSZ | Dashboard Admin</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
         .logo-link { display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; }
-        .roster-header-container { display:flex; justify-content:space-between; align-items:center; max-width:1200px; margin:0 auto 30px auto; padding:0 20px; }
         
-        /* ── BOUTON DE CONNEXION DANS LE MENU (NAV) ── */
-        .admin-gate-btn { 
-            background: transparent; 
-            border: 1px solid #a855f7; 
-            color: #a855f7; 
-            padding: 6px 14px; 
-            border-radius: 20px; 
-            cursor: pointer; 
-            font-family: 'Orbitron', sans-serif; 
-            font-size: 0.85rem;
-            transition: all 0.3s ease; 
-            margin-left: 15px;
-        }
-        .admin-gate-btn:hover { background:#a855f7; color:white; box-shadow:0 0 15px #a855f7; }
+        /* ── ZONE DE SÉCURITÉ (ACCÈS REFUSÉ) ── */
+        .restricted-zone { text-align: center; padding: 60px 20px; background: #0a0a0a; border: 2px dashed #ff4444; border-radius: 16px; max-width: 600px; margin: 100px auto; }
+        .restricted-zone h2 { font-family: 'Orbitron', sans-serif; color: #ff4444; margin-bottom: 15px; }
+
+        /* ── STATS CARDS ── */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto 40px auto; padding: 0 20px; }
+        .stat-card { background: #141414; border: 1px solid #2a2a2a; border-left: 4px solid #a855f7; padding: 20px; border-radius: 12px; font-family: 'Orbitron', sans-serif; }
+        .stat-card .num { font-size: 2rem; font-weight: 700; color: #fff; margin-top: 5px; }
+        .stat-card .label { color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* ── TABLEAU DES JOUEURS ── */
+        .dashboard-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .db-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .db-header h2 { font-family: 'Orbitron', sans-serif; margin: 0; }
         
-        /* Style de l'onglet Dashboard quand il devient visible */
-        .nav-dashboard-link a {
-            color: #22c55e !important;
-            font-weight: bold;
-        }
+        .db-table-wrapper { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; overflow: hidden; }
+        .db-table { width: 100%; border-collapse: collapse; font-family: 'Inter', sans-serif; text-align: left; }
+        .db-table th { background: #0a0a0a; color: #a855f7; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; padding: 16px; letter-spacing: 1px; border-bottom: 2px solid #2a2a2a; }
+        .db-table td { padding: 14px 16px; color: #ccc; border-bottom: 1px solid #1a1a1a; vertical-align: middle; }
+        .db-table tr:last-child td { border-bottom: none; }
+        .db-table tr:hover td { background: rgba(168, 85, 247, 0.02); }
 
-        .loading-text { text-align:center; color:#666; font-style:italic; grid-column:1/-1; padding:20px; }
+        /* Badges de catégories */
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; font-family: 'Orbitron', sans-serif; }
+        .badge.main { background: rgba(168,85,247,0.15); color: #a855f7; border: 1px solid rgba(168,85,247,0.3); }
+        .badge.academy { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+        .badge.cdf { background: rgba(234,179,8,0.15); color: #eab308; border: 1px solid rgba(234,179,8,0.3); }
 
-        /* ── IMAGES ── */
-        .player-avatar-img { width:100%; height:200px; object-fit:cover; border-bottom:2px solid #a855f7; background:#141414; }
-        .popup-avatar-img { width:100%; max-height:250px; object-fit:contain; border:2px solid #a855f7; border-radius:12px; margin:0 auto 20px auto; display:block; background:#0a0a0a; }
-
-        /* ── MODAL ── */
-        .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center; padding:20px; }
-        .modal-overlay.active { display:flex; }
-        .modal-content { background:#141414; border:2px solid #a855f7; border-radius:24px; max-width:500px; width:100%; padding:30px; position:relative; box-shadow:0 0 30px rgba(168,85,247,0.25); box-sizing:border-box; max-height:90vh; overflow-y:auto; }
-        .modal-close { position:absolute; top:15px; right:20px; font-size:1.8rem; color:#777; cursor:pointer; transition:color 0.2s; }
-        .modal-close:hover { color:#ff4444; }
-        .modal-content h3 { font-family:'Orbitron',sans-serif; color:#fff; margin-top:0; margin-bottom:20px; font-size:1.5rem; text-align:center; }
-        .input-group { margin-bottom:15px; text-align:left; }
-        .input-group label { display:block; margin-bottom:6px; color:#a855f7; font-size:0.8rem; font-family:'Orbitron',sans-serif; font-weight:600; }
-        .input-group input, .input-group textarea, .input-group select { width:100%; padding:10px 14px; background:#0a0a0a; border:1px solid #2a2a2a; color:white; border-radius:8px; font-family:'Inter',sans-serif; font-size:0.9rem; box-sizing:border-box; }
-        .input-group input[type="file"] { background:#141414; border:1px dashed #a855f7; padding:10px; cursor:pointer; }
-        .input-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
-        .form-btn { background:#a855f7; color:white; border:none; width:100%; padding:12px; border-radius:8px; font-weight:700; cursor:pointer; font-family:'Orbitron',sans-serif; transition:background 0.2s; }
-        .form-btn:hover { background:#b975ff; }
-        .hidden { display:none !important; }
-        .error-message { color:#ff4444; font-size:0.85rem; margin-top:10px; text-align:center; }
-
-        /* ── ADMIN CONTROLS ── */
-        .player-card-container { position:relative; }
-        .admin-controls { position:absolute; top:10px; right:10px; display:flex; gap:6px; z-index:10; }
-        .inline-edit-btn { background:#a855f7; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold; font-family:'Inter',sans-serif; }
-        .inline-edit-btn:hover { background:#b975ff; }
-        .inline-delete-btn { background:#ff4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold; font-family:'Inter',sans-serif; }
-        .inline-delete-btn:hover { background:#cc3333; }
-
-        /* ── SECTION PR HISTORIQUE ── */
-        .pr-history-section { background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 12px; padding: 16px; margin: 16px 0; }
-        .pr-history-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
-        .pr-evolution-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: 700; margin-bottom: 14px; }
-        .pr-evolution-badge.positive { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
-        .pr-evolution-badge.negative { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
-        .pr-evolution-badge.neutral  { background: rgba(168,85,247,0.1); color: #a855f7; border: 1px solid rgba(168,85,247,0.3); }
-        .pr-table { width: 100%; border-collapse: collapse; font-family: 'Inter', sans-serif; font-size: 0.82rem; }
-        .pr-table thead tr { border-bottom: 1px solid #2a2a2a; }
-        .pr-table th { color: #666; font-weight: 600; padding: 4px 8px; text-align: left; font-size: 0.75rem; }
-        .pr-table td { padding: 6px 8px; color: #ccc; border-bottom: 1px solid #1a1a1a; }
-        .pr-table tr:last-child td { border-bottom: none; }
-        .pr-table .pr-latest td { color: #fff; font-weight: 600; }
-        .pr-table .pr-latest td:first-child { color: #a855f7; }
-        .pr-delta-cell { font-weight: 700; }
-        .pr-delta-cell.pos { color: #22c55e; }
-        .pr-delta-cell.neg { color: #ef4444; }
-        .pr-delta-cell.neu { color: #666; }
-
-        .pr-add-zone { background: #0a0a0a; border: 1px solid #a855f7; border-radius: 10px; padding: 14px; margin-bottom: 14px; }
-        .pr-add-zone-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 0.75rem; letter-spacing: 1px; margin-bottom: 10px; }
+        .db-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid #a855f7; background: #0a0a0a; }
+        .player-flex { display: flex; align-items: center; gap: 12px; font-weight: 600; color: #fff; }
+        
+        .action-btn { background: #a855f7; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: bold; font-family: 'Inter', sans-serif; transition: background 0.2s; }
+        .action-btn:hover { background: #b975ff; }
+        
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
+
     <nav>
         <div class="logo">
             <a href="index.html" class="logo-link">
@@ -98,129 +60,69 @@
             <li><a href="index.html">Accueil</a></li>
             <li><a href="roster.html">Roster</a></li>
             <li><a href="boutique.html">Boutique</a></li>
-            <li id="nav-dashboard" class="nav-dashboard-link hidden"><a href="dashboard.html">📊 Dashboard</a></li>
-            <li><button class="admin-gate-btn" id="admin-gate-btn">🔑 Connexion</button></li>
+            <li id="nav-dashboard" class="nav-dashboard-link"><a href="dashboard.html">📊 Dashboard</a></li>
         </ul>
     </nav>
 
-    <section style="padding-top: 160px;">
-        <h2 style="text-align:center; margin-bottom:30px;">Notre Roster 2026</h2>
+    <div id="access-denied" class="restricted-zone hidden">
+        <h2>🔒 ACCÈS RESTREINT</h2>
+        <p style="color: #aaa; margin-bottom: 25px;">Vous devez être connecté avec un compte administrateur pour accéder au système de gestion.</p>
+        <a href="roster.html" class="btn">Retour au Roster pour se connecter</a>
+    </div>
 
-        <div class="roster-grid" id="main-roster-grid">
-            <p class="loading-text">Chargement de l'équipe principale...</p>
+    <section id="dashboard-content" style="padding-top: 160px;" class="hidden">
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="label">Équipe Principale</div>
+                <div id="count-main" class="num">0</div>
+            </div>
+            <div class="stat-card" style="border-left-color: #22c55e;">
+                <div class="label">Académie</div>
+                <div id="count-academy" class="num">0</div>
+            </div>
+            <div class="stat-card" style="border-left-color: #eab308;">
+                <div class="label">Centre de Formation</div>
+                <div id="count-cdf" class="num">0</div>
+            </div>
         </div>
 
-        <h2 style="margin-top:80px;">Joueurs Académiques</h2>
-        <p style="text-align:center;margin-bottom:30px;color:#aaa;">Notre équipe de développement et d'avenir</p>
-        <div class="roster-grid" id="academy-roster-grid">
-            <p class="loading-text">Chargement de l'académie...</p>
-        </div>
+        <div class="dashboard-container">
+            <div class="db-header">
+                <h2>Base de Données Roster 2026</h2>
+                <a href="roster.html" class="action-btn" style="background:#0a0a0a; border: 1px solid #a855f7; text-decoration:none; padding: 10px 15px;">⚙️ Ouvrir le Panel d'Ajout</a>
+            </div>
 
-        <h2 style="margin-top:80px;">Centre de Formation (CDF)</h2>
-        <p style="text-align:center;margin-bottom:30px;color:#aaa;">Les futurs talents en pleine progression</p>
-        <div class="roster-grid" id="cdf-roster-grid">
-            <p class="loading-text">Chargement du centre de formation...</p>
+            <div class="db-table-wrapper">
+                <table class="db-table">
+                    <thead>
+                        <tr>
+                            <th>Joueur</th>
+                            <th>Catégorie</th>
+                            <th>Rôle / Division</th>
+                            <th>Earnings</th>
+                            <th>PR Actuel</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="db-players-rows">
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: #666; font-style: italic; padding: 30px;">Chargement des données...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-
-        <br><br>
-        <a href="index.html" class="btn" style="display:block; width:fit-content; margin:0 auto;">← Retour à l'accueil</a>
     </section>
 
-    <div id="popups-container"></div>
-
     <footer>
-        <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
+        <p>© 2026 Abysz Esports • Espace Administration</p>
     </footer>
-
-    <div id="admin-modal" class="modal-overlay">
-        <div class="modal-content">
-            <span class="modal-close" id="close-modal-btn">&times;</span>
-
-            <div id="admin-login-step">
-                <h3>Connexion Admin</h3>
-                <form id="login-form" onsubmit="return false;">
-                    <div class="input-group">
-                        <label for="admin-email">Adresse e-mail</label>
-                        <input type="email" id="admin-email" placeholder="exemple@abysz.com" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="admin-password">Mot de passe</label>
-                        <input type="password" id="admin-password" placeholder="••••••••" required>
-                    </div>
-                    <button type="submit" class="form-btn" id="login-btn">Se connecter</button>
-                </form>
-                <p id="login-error" class="error-message hidden"></p>
-            </div>
-
-            <div id="admin-panel-step" class="hidden">
-                <h3 id="panel-title">Ajouter un joueur</h3>
-                <div style="display:flex;justify-content:space-between;margin-bottom:15px;font-size:0.8rem;background:#0a0a0a;padding:8px;border-radius:6px;align-items:center;">
-                    <span id="user-display-email" style="color:#a855f7; font-weight:600;"></span>
-                    <button id="logout-btn" style="background:none;border:none;color:#ff4444;cursor:pointer;font-weight:bold;">Déconnexion</button>
-                </div>
-
-                <form id="player-form" onsubmit="return false;">
-                    <div class="input-group">
-                        <label for="player-team">Catégorie d'équipe</label>
-                        <select id="player-team">
-                            <option value="main">Équipe Principale (Pro)</option>
-                            <option value="academy">Joueurs Académiques</option>
-                            <option value="cdf">Centre de Formation (CDF)</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label for="player-pseudo">Pseudo</label>
-                        <input type="text" id="player-pseudo" placeholder="Ex: Fxbio" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="player-role">Rôle / Division</label>
-                        <input type="text" id="player-role" placeholder="Ex: Capitaine ou Division 1" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="player-file">Charger la photo du joueur depuis votre PC</label>
-                        <input type="file" id="player-file" accept="image/*">
-                    </div>
-                    <div class="input-group">
-                        <label>Statistiques du joueur</label>
-                        <div class="input-row">
-                            <input type="text" id="stat-earnings" placeholder="Earnings (Ex: 500$)" required>
-                            <input type="text" id="stat-best" placeholder="Best PR (Ex: Top 7)" required>
-                            <input type="text" id="stat-wins" placeholder="Best Perf (Ex: 142)" required>
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <label for="player-bio">Biographie / Infos</label>
-                        <textarea id="player-bio" rows="2" placeholder="Ex: Joueur Polonais" required></textarea>
-                    </div>
-                    <div class="input-group">
-                        <label>Réseaux Sociaux (Mettre # si aucun)</label>
-                        <input type="text" id="link-twitch" placeholder="Lien Twitch" value="#">
-                        <input type="text" id="link-twitter" placeholder="Lien Twitter / X" value="#">
-                        <input type="text" id="link-tracker" placeholder="Lien Fortnite Tracker" value="#">
-                    </div>
-
-                    <div id="pr-add-zone" class="pr-add-zone hidden">
-                        <div class="pr-add-zone-title">📈 ENREGISTRER UN NOUVEAU PR</div>
-                        <div class="input-group" style="margin-bottom:8px;">
-                            <label for="new-pr-value">Valeur du PR (nombre entier)</label>
-                            <input type="number" id="new-pr-value" placeholder="Ex: 14500" min="0">
-                        </div>
-                        <div class="input-group" style="margin-bottom:0;">
-                            <label for="new-pr-date">Date du relevé</label>
-                            <input type="date" id="new-pr-date">
-                        </div>
-                    </div>
-
-                    <button type="submit" class="form-btn" id="add-player-btn">Enregistrer le joueur</button>
-                </form>
-            </div>
-        </div>
-    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, updateDoc, query, orderBy, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -236,268 +138,89 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        const modal = document.getElementById('admin-modal');
-        const adminGateBtn = document.getElementById('admin-gate-btn');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        const loginForm = document.getElementById('login-form');
-        const playerForm = document.getElementById('player-form');
-        const loginStep = document.getElementById('admin-login-step');
-        const panelStep = document.getElementById('admin-panel-step');
-        const loginError = document.getElementById('login-error');
-        const userDisplayEmail = document.getElementById('user-display-email');
-        const logoutBtn = document.getElementById('logout-btn');
-        const panelTitle = document.getElementById('panel-title');
-        const addPlayerBtn = document.getElementById('add-player-btn');
-        const playerFileInput = document.getElementById('player-file');
-        const prAddZone = document.getElementById('pr-add-zone');
-        const navDashboard = document.getElementById('nav-dashboard');
+        const accessDeniedSec = document.getElementById('access-denied');
+        const dashboardContentSec = document.getElementById('dashboard-content');
+        const playersRows = document.getElementById('db-players-rows');
 
-        const mainGrid = document.getElementById('main-roster-grid');
-        const cdfGrid = document.getElementById('cdf-roster-grid');
-        const academyGrid = document.getElementById('academy-roster-grid');
-        const popupsContainer = document.getElementById('popups-container');
+        const countMain = document.getElementById('count-main');
+        const countAcademy = document.getElementById('count-academy');
+        const countCdf = document.getElementById('count-cdf');
 
-        let currentUser = null;
-        let editingPlayerId = null;
-        let cacheJoueurs = {};
-        let base64ImageString = "";
-
-        // ── HELPERS PR ──
-        function calculerEvolution(historique) {
-            if (!historique || historique.length < 2) return null;
-            const dernier = historique[historique.length - 1].value;
-            const avantDernier = historique[historique.length - 2].value;
-            if (avantDernier === 0) return null;
-            const pct = ((dernier - avantDernier) / avantDernier * 100).toFixed(1);
-            return { pct: parseFloat(pct), dernier, avantDernier };
-        }
-
-        function badgeEvolution(evo) {
-            if (!evo) return '';
-            const signe = evo.pct >= 0 ? '+' : '';
-            const cls = evo.pct > 0 ? 'positive' : evo.pct < 0 ? 'negative' : 'neutral';
-            const icon = evo.pct > 0 ? '▲' : evo.pct < 0 ? '▼' : '●';
-            return `<div class="pr-evolution-badge ${cls}">${icon} ${signe}${evo.pct}% par rapport au relevé précédent</div>`;
-        }
-
-        function tableauHistorique(historique) {
-            if (!historique || historique.length === 0) return '';
-            const sorted = [...historique].reverse();
-            let rows = '';
-            for (let i = 0; i < sorted.length; i++) {
-                const entry = sorted[i];
-                const isLatest = i === 0;
-                let deltaHtml = '<span class="pr-delta-cell neu">—</span>';
-                if (i < sorted.length - 1) {
-                    const prev = sorted[i + 1].value;
-                    const curr = entry.value;
-                    const diff = curr - prev;
-                    const pct = prev !== 0 ? (diff / prev * 100).toFixed(1) : '0.0';
-                    const signe = diff >= 0 ? '+' : '';
-                    const cls = diff > 0 ? 'pos' : diff < 0 ? 'neg' : 'neu';
-                    deltaHtml = `<span class="pr-delta-cell ${cls}">${signe}${pct}%</span>`;
-                }
-                rows += `<tr class="${isLatest ? 'pr-latest' : ''}"><td>${entry.date || '—'}</td><td>${Number(entry.value).toLocaleString('fr-FR')}</td><td>${deltaHtml}</td></tr>`;
-            }
-            return `<div class="pr-history-section"><div class="pr-history-title">Historique PR</div>${badgeEvolution(calculerEvolution(historique))}<table class="pr-table"><thead><tr><th>Date</th><th>PR</th><th>Évolution</th></tr></thead><tbody>${rows}</tbody></table></div>`;
-        }
-
-        playerFileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = () => { base64ImageString = reader.result; };
-                reader.readAsDataURL(file);
+        // ── VÉRIFICATION DE LA SÉCURITÉ CONNECTÉ/DÉCONNECTÉ ──
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                accessDeniedSec.classList.add('hidden');
+                dashboardContentSec.classList.remove('hidden');
+                chargerDonneesDashboard();
+            } else {
+                accessDeniedSec.classList.remove('hidden');
+                dashboardContentSec.classList.add('hidden');
             }
         });
 
-        // ── ÉCOUTE FIRESTORE ──
-        const q = query(collection(db, "roster"), orderBy("createdAt", "asc"));
-        onSnapshot(q, (snapshot) => {
-            mainGrid.innerHTML = ""; cdfGrid.innerHTML = ""; academyGrid.innerHTML = ""; popupsContainer.innerHTML = "";
-            cacheJoueurs = {};
-            let mainCount = 0, cdfCount = 0, acadCount = 0;
+        // ── CHARGEMENT ET CALCUL EN TEMPS RÉEL ──
+        function chargerDonneesDashboard() {
+            const q = query(collection(db, "roster"), orderBy("createdAt", "asc"));
+            
+            onSnapshot(q, (snapshot) => {
+                playersRows.innerHTML = "";
+                
+                let mCount = 0, aCount = 0, cCount = 0;
 
-            snapshot.forEach((docSnap) => {
-                const player = docSnap.data();
-                const id = docSnap.id;
-                cacheJoueurs[id] = player;
-                const imgSrc = (player.image && player.image !== "#") ? player.image : "logo.png";
-                const historique = player.prHistory || [];
+                if(snapshot.empty) {
+                    playersRows.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #666; padding: 30px;">Aucun joueur enregistré.</td></tr>`;
+                }
 
-                const cardContainer = document.createElement('div');
-                cardContainer.className = "player-card-container";
-                const adminControlsHtml = `
-                    <div class="admin-controls ${currentUser ? '' : 'hidden'}">
-                        <button class="inline-edit-btn" data-id="${id}">✏️</button>
-                        <button class="inline-delete-btn" data-id="${id}">X</button>
-                    </div>`;
+                snapshot.forEach((docSnap) => {
+                    const player = docSnap.data();
+                    const id = docSnap.id;
+                    
+                    // Compteurs
+                    if (player.team === "main") mCount++;
+                    else if (player.team === "academy") aCount++;
+                    else if (player.team === "cdf") cCount++;
 
-                cardContainer.innerHTML = `
-                    ${adminControlsHtml}
-                    <div class="player-card" id="card-${id}">
-                        <img src="${imgSrc}" class="player-avatar-img" alt="${player.pseudo}">
-                        <div class="player-info">
-                            <div class="player-pseudo">${player.pseudo}</div>
-                            <div class="player-role">${player.role}</div>
-                            <span class="voir-profil">Voir le profil</span>
-                        </div>
-                    </div>`;
+                    // Image de secours
+                    const imgSrc = (player.image && player.image !== "#") ? player.image : "logo.png";
+                    
+                    // Trouver la dernière valeur de PR entrée dans l'historique
+                    let dernierPR = "Aucun";
+                    if(player.prHistory && player.prHistory.length > 0) {
+                        dernierPR = Number(player.prHistory[player.prHistory.length - 1].value).toLocaleString('fr-FR');
+                    }
 
-                cardContainer.querySelector('.player-card').addEventListener('click', () => {
-                    document.getElementById(`popup-${id}`).classList.add('active');
-                    document.body.style.overflow = 'hidden';
+                    // Traduction Propre du badge Équipe
+                    let badgeClass = "main";
+                    let labelTeam = "Pro";
+                    if(player.team === "academy") { badgeClass = "academy"; labelTeam = "Académie"; }
+                    if(player.team === "cdf") { badgeClass = "cdf"; labelTeam = "CDF"; }
+
+                    // Génération de la ligne du tableau
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>
+                            <div class="player-flex">
+                                <img src="${imgSrc}" class="db-avatar" alt="${player.pseudo}">
+                                <span>${player.pseudo}</span>
+                            </div>
+                        </td>
+                        <td><span class="badge ${badgeClass}">${labelTeam}</span></td>
+                        <td>${player.role}</td>
+                        <td style="color: #22c55e; font-weight:600;">${player.earnings}</td>
+                        <td style="font-family:'Orbitron'; font-size:0.85rem;">${dernierPR}</td>
+                        <td>
+                            <button class="action-btn" onclick="window.location.href='roster.html'">Modifier</button>
+                        </td>
+                    `;
+                    playersRows.appendChild(tr);
                 });
 
-                if (player.team === "main") { mainGrid.appendChild(cardContainer); mainCount++; }
-                else if (player.team === "cdf") { cdfGrid.appendChild(cardContainer); cdfCount++; }
-                else { academyGrid.appendChild(cardContainer); acadCount++; }
-
-                const popupOverlay = document.createElement('div');
-                popupOverlay.className = "popup-overlay";
-                popupOverlay.id = `popup-${id}`;
-                popupOverlay.innerHTML = `
-                    <div class="popup">
-                        <span class="popup-close">✕</span>
-                        <img src="${imgSrc}" class="popup-avatar-img" alt="${player.pseudo}">
-                        <div class="popup-body">
-                            <div class="popup-pseudo">${player.pseudo}</div>
-                            <div class="popup-role">${player.role}</div>
-                            <div class="popup-stats">
-                                <div class="stat"><div class="stat-value">${player.earnings}</div><div class="stat-label">Earning</div></div>
-                                <div class="stat"><div class="stat-value">${player.bestPlacement}</div><div class="stat-label">Best PR</div></div>
-                                <div class="stat"><div class="stat-value">${player.wins}</div><div class="stat-label">Best Perf</div></div>
-                            </div>
-                            ${tableauHistorique(historique)}
-                            <div class="popup-bio">${player.bio}</div>
-                            <div class="popup-socials">
-                                <a href="${player.twitch}" target="_blank" class="social-btn">Twitch</a>
-                                <a href="${player.twitter}" target="_blank" class="social-btn">Twitter</a>
-                                <a href="${player.tracker}" target="_blank" class="social-btn">Tracker</a>
-                            </div>
-                        </div>
-                    </div>`;
-
-                popupOverlay.querySelector('.popup-close').onclick = () => { popupOverlay.classList.remove('active'); document.body.style.overflow = ''; };
-                popupOverlay.onclick = (e) => { if (e.target === popupOverlay) { popupOverlay.classList.remove('active'); document.body.style.overflow = ''; } };
-                popupsContainer.appendChild(popupOverlay);
+                // Injection des statistiques calculées
+                countMain.textContent = mCount;
+                countAcademy.textContent = aCount;
+                countCdf.textContent = cCount;
             });
-
-            if (mainCount === 0) mainGrid.innerHTML = '<p class="loading-text">Aucun joueur dans l\'équipe principale.</p>';
-            if (acadCount === 0) academyGrid.innerHTML = '<p class="loading-text">Aucun joueur académique.</p>';
-            if (cdfCount === 0) cdfGrid.innerHTML = '<p class="loading-text">Aucun joueur au centre de formation.</p>';
-
-            document.querySelectorAll('.inline-delete-btn').forEach(btn => {
-                btn.onclick = async (e) => {
-                    e.stopPropagation();
-                    if (confirm("Voulez-vous vraiment retirer ce joueur ?")) {
-                        await deleteDoc(doc(db, "roster", e.target.getAttribute('data-id')));
-                    }
-                };
-            });
-
-            document.querySelectorAll('.inline-edit-btn').forEach(btn => {
-                btn.onclick = (e) => {
-                    e.stopPropagation();
-                    const id = e.target.getAttribute('data-id');
-                    const player = cacheJoueurs[id];
-                    if (!player) return;
-
-                    editingPlayerId = id;
-                    base64ImageString = player.image || "#";
-                    document.getElementById('player-team').value = player.team;
-                    document.getElementById('player-pseudo').value = player.pseudo;
-                    document.getElementById('player-role').value = player.role;
-                    playerFileInput.value = "";
-                    document.getElementById('stat-earnings').value = player.earnings;
-                    document.getElementById('stat-best').value = player.bestPlacement;
-                    document.getElementById('stat-wins').value = player.wins;
-                    document.getElementById('player-bio').value = player.bio;
-                    document.getElementById('link-twitch').value = player.twitch;
-                    document.getElementById('link-twitter').value = player.twitter;
-                    document.getElementById('link-tracker').value = player.tracker;
-                    document.getElementById('new-pr-value').value = "";
-                    document.getElementById('new-pr-date').value = new Date().toISOString().split('T')[0];
-                    prAddZone.classList.remove('hidden');
-                    panelTitle.textContent = "Modifier : " + player.pseudo;
-                    addPlayerBtn.textContent = "Mettre à jour";
-                    modal.classList.add('active');
-                };
-            });
-        });
-
-        // ── SYSTÈME DE SÉCURITÉ DE L'ONGLET DASHBOARD ──
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            if (user) {
-                loginStep.classList.add('hidden');
-                panelStep.classList.remove('hidden');
-                userDisplayEmail.textContent = user.email;
-                adminGateBtn.textContent = "⚙️ Panel Admin";
-                navDashboard.classList.remove('hidden');
-                document.querySelectorAll('.admin-controls').forEach(c => c.classList.remove('hidden'));
-            } else {
-                loginStep.classList.remove('hidden');
-                panelStep.classList.add('hidden');
-                userDisplayEmail.textContent = '';
-                adminGateBtn.textContent = "🔑 Connexion";
-                navDashboard.classList.add('hidden');
-                document.querySelectorAll('.admin-controls').forEach(c => c.classList.add('hidden'));
-            }
-        });
-
-        loginForm.addEventListener('submit', async () => {
-            loginError.classList.add('hidden');
-            try {
-                await signInWithEmailAndPassword(auth, document.getElementById('admin-email').value.trim(), document.getElementById('admin-password').value);
-                modal.classList.remove('active');
-            } catch { loginError.textContent = "Identifiants incorrects."; loginError.classList.remove('hidden'); }
-        });
-
-        logoutBtn.onclick = () => { signOut(auth); modal.classList.remove('active'); };
-
-        playerForm.addEventListener('submit', async () => {
-            const dataJoueur = {
-                team: document.getElementById('player-team').value,
-                pseudo: document.getElementById('player-pseudo').value.trim(),
-                role: document.getElementById('player-role').value.trim(),
-                image: base64ImageString || "#",
-                earnings: document.getElementById('stat-earnings').value.trim(),
-                bestPlacement: document.getElementById('stat-best').value.trim(),
-                wins: document.getElementById('stat-wins').value.trim(),
-                bio: document.getElementById('player-bio').value.trim(),
-                twitch: document.getElementById('link-twitch').value.trim(),
-                twitter: document.getElementById('link-twitter').value.trim(),
-                tracker: document.getElementById('link-tracker').value.trim(),
-            };
-
-            try {
-                if (editingPlayerId) {
-                    const newPrVal = document.getElementById('new-pr-value').value.trim();
-                    const newPrDate = document.getElementById('new-pr-date').value.trim();
-                    if (newPrVal !== "" && !isNaN(parseInt(newPrVal))) {
-                        const ancienHistorique = cacheJoueurs[editingPlayerId].prHistory || [];
-                        dataJoueur.prHistory = [...ancienHistorique, { value: parseInt(newPrVal), date: newPrDate || new Date().toLocaleDateString('fr-FR') }];
-                    } else { dataJoueur.prHistory = cacheJoueurs[editingPlayerId].prHistory || []; }
-                    await updateDoc(doc(db, "roster", editingPlayerId), dataJoueur);
-                } else {
-                    dataJoueur.prHistory = []; dataJoueur.createdAt = new Date();
-                    await addDoc(collection(db, "roster"), dataJoueur);
-                }
-                reinitialiserFormulaire(); modal.classList.remove('active');
-            } catch (error) { alert("Erreur : " + error.message); }
-        });
-
-        function reinitialiserFormulaire() {
-            editingPlayerId = null; base64ImageString = ""; playerForm.reset(); playerFileInput.value = "";
-            panelTitle.textContent = "Ajouter un joueur"; addPlayerBtn.textContent = "Enregistrer le joueur";
-            document.getElementById('link-twitch').value = "#"; document.getElementById('link-twitter').value = "#"; document.getElementById('link-tracker').value = "#";
-            prAddZone.classList.add('hidden');
         }
-
-        adminGateBtn.onclick = () => { reinitialiserFormulaire(); modal.classList.add('active'); };
-        closeModalBtn.onclick = () => modal.classList.remove('active');
-        window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
     </script>
 </body>
 </html>

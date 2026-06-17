@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Roster 2026 de l'équipe ABYSZ Esports">
     <title>ABYSZ | Roster 2026</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
@@ -13,213 +12,92 @@
         .admin-gate-btn { background:transparent; border:1px solid #a855f7; color:#a855f7; padding:8px 16px; border-radius:20px; cursor:pointer; font-family:'Orbitron',sans-serif; transition:all 0.3s ease; text-decoration: none; display: inline-block; }
         .admin-gate-btn:hover { background:#a855f7; color:white; box-shadow:0 0 15px #a855f7; }
         .loading-text { text-align:center; color:#666; font-style:italic; grid-column:1/-1; padding:20px; }
-
-        /* ── IMAGES ── */
         .player-avatar-img { width:100%; height:200px; object-fit:cover; border-bottom:2px solid #a855f7; background:#141414; }
         .popup-avatar-img { width:100%; max-height:250px; object-fit:contain; border:2px solid #a855f7; border-radius:12px; margin:0 auto 20px auto; display:block; background:#0a0a0a; }
-
+        .modal-overlay { display:none !important; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center; padding:20px; }
+        .modal-overlay.active { display:flex !important; }
         .hidden { display:none !important; }
-
-        /* ── ADMIN CONTROLS ── */
         .player-card-container { position:relative; }
         .admin-controls { position:absolute; top:10px; right:10px; display:flex; gap:6px; z-index:10; }
-        .inline-edit-btn { background:#a855f7; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold; font-family:'Inter',sans-serif; text-decoration: none; }
-        .inline-edit-btn:hover { background:#b975ff; }
-        .inline-delete-btn { background:#ff4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold; font-family:'Inter',sans-serif; }
-        .inline-delete-btn:hover { background:#cc3333; }
-
-        /* ── SECTION PR HISTORIQUE ── */
-        .pr-history-section {
-            background: #0d0d0d;
-            border: 1px solid #2a2a2a;
-            border-radius: 12px;
-            padding: 16px;
-            margin: 16px 0;
-        }
-        .pr-history-title {
-            font-family: 'Orbitron', sans-serif;
-            color: #a855f7;
-            font-size: 0.75rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-        }
-        .pr-evolution-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.85rem;
-            font-weight: 700;
-            margin-bottom: 14px;
-        }
+        .inline-edit-btn { background:#a855f7; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold; }
+        .inline-delete-btn { background:#ff4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold; }
+        .pr-history-section { background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 12px; padding: 16px; margin: 16px 0; }
+        .pr-history-title { font-family: 'Orbitron'; color: #a855f7; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 12px; }
+        .pr-evolution-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-family: 'Orbitron'; font-size: 0.85rem; font-weight: 700; margin-bottom: 14px; }
         .pr-evolution-badge.positive { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
         .pr-evolution-badge.negative { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
         .pr-evolution-badge.neutral  { background: rgba(168,85,247,0.1); color: #a855f7; border: 1px solid rgba(168,85,247,0.3); }
-        .pr-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.82rem;
-        }
-        .pr-table thead tr { border-bottom: 1px solid #2a2a2a; }
-        .pr-table th { color: #666; font-weight: 600; padding: 4px 8px; text-align: left; font-size: 0.75rem; }
+        .pr-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+        .pr-table th { color: #666; padding: 4px 8px; text-align: left; }
         .pr-table td { padding: 6px 8px; color: #ccc; border-bottom: 1px solid #1a1a1a; }
-        .pr-table tr:last-child td { border-bottom: none; }
-        .pr-table .pr-latest td { color: #fff; font-weight: 600; }
-        .pr-table .pr-latest td:first-child { color: #a855f7; }
-        .pr-delta-cell { font-weight: 700; }
-        .pr-delta-cell.pos { color: #22c55e; }
-        .pr-delta-cell.neg { color: #ef4444; }
-        .pr-delta-cell.neu { color: #666; }
+        .pr-delta-cell.pos { color: #22c55e; font-weight:700; }
+        .pr-delta-cell.neg { color: #ef4444; font-weight:700; }
     </style>
 </head>
 <body>
     <nav>
-        <div class="logo">
-            <a href="index.html" class="logo-link">
-                <img src="logo.png" alt="Logo ABYSZ">
-                ABYSZ
-            </a>
-        </div>
-        <ul>
-            <li><a href="index.html">Accueil</a></li>
-            <li><a href="roster.html">Roster</a></li>
-            <li><a href="boutique.html">Boutique</a></li>
-        </ul>
+        <div class="logo"><a href="index.html" class="logo-link"><img src="logo.png" alt="Logo ABYSZ"> ABYSZ</a></div>
+        <ul><li><a href="index.html">Accueil</a></li><li><a href="roster.html">Roster</a></li><li><a href="boutique.html">Boutique</a></li></ul>
     </nav>
 
     <section style="padding-top: 160px;">
-        <div class="roster-header-container">
-            <h2>Notre Roster 2026</h2>
-            <a href="login.html" class="admin-gate-btn">🔑 Équipe Admin</a>
-        </div>
-
-        <div class="roster-grid" id="main-roster-grid">
-            <p class="loading-text">Chargement de l'équipe principale...</p>
-        </div>
-
+        <div class="roster-header-container"><h2>Notre Roster 2026</h2><a href="login.html" class="admin-gate-btn">🔑 Équipe Admin</a></div>
+        <div class="roster-grid" id="main-roster-grid"><p class="loading-text">Chargement...</p></div>
         <h2 style="margin-top:80px;">Joueurs Académiques</h2>
-        <p style="text-align:center;margin-bottom:30px;color:#aaa;">Notre équipe de développement et d'avenir</p>
-        <div class="roster-grid" id="academy-roster-grid">
-            <p class="loading-text">Chargement de l'académie...</p>
-        </div>
-
+        <div class="roster-grid" id="academy-roster-grid"></div>
         <h2 style="margin-top:80px;">Centre de Formation (CDF)</h2>
-        <p style="text-align:center;margin-bottom:30px;color:#aaa;">Les futurs talents en pleine progression</p>
-        <div class="roster-grid" id="cdf-roster-grid">
-            <p class="loading-text">Chargement du centre de formation...</p>
-        </div>
-
-        <br><br>
-        <a href="index.html" class="btn">← Retour à l'accueil</a>
+        <div class="roster-grid" id="cdf-roster-grid"></div>
     </section>
 
     <div id="popups-container"></div>
-
-    <footer>
-        <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
-    </footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, query, orderBy, onSnapshot, deleteDoc, doc, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
-            authDomain: "abysz-esports.firebaseapp.com",
-            projectId: "abysz-esports",
-            storageBucket: "abysz-esports.firebasestorage.app",
-            messagingSenderId: "200968659347",
-            appId: "1:200968659347:web:3a13d1614d00ed29968866",
-            measurementId: "G-HPQNQK5XL1"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        const firebaseConfig = { apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ", authDomain: "abysz-esports.firebaseapp.com", projectId: "abysz-esports", storageBucket: "abysz-esports.firebasestorage.app", messagingSenderId: "200968659347", appId: "1:200968659347:web:3a13d1614d00ed29968866" };
+        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
 
         const mainGrid = document.getElementById('main-roster-grid');
         const cdfGrid = document.getElementById('cdf-roster-grid');
         const academyGrid = document.getElementById('academy-roster-grid');
         const popupsContainer = document.getElementById('popups-container');
-
         let currentUser = null;
 
-        // ── HELPERS PR ──────────────────────────────────────────────
-        function calculerEvolution(historique) {
-            if (!historique || historique.length < 2) return null;
-            const dernier = historique[historique.length - 1].value;
-            const avantDernier = historique[historique.length - 2].value;
-            if (avantDernier === 0) return null;
-            const pct = ((dernier - avantDernier) / avantDernier * 100).toFixed(1);
-            return { pct: parseFloat(pct), dernier, avantDernier };
-        }
+        function calculerEvolution(h) { if(!h || h.length<2) return null; const d=h[h.length-1].value, a=h[h.length-2].value; return a===0?null:{pct:((d-a)/a*100).toFixed(1)}; }
 
-        ... // [Le reste du traitement PR de roster.html reste le même]
-
-        // ── ÉCOUTE FIRESTORE ─────────────────────────────────────────
-        const q = query(collection(db, "roster"), orderBy("createdAt", "asc"));
-        
-        function renderRoster(snapshot) {
-            mainGrid.innerHTML = "";
-            cdfGrid.innerHTML = "";
-            academyGrid.innerHTML = "";
-            popupsContainer.innerHTML = "";
-
-            let mainCount = 0, cdfCount = 0, acadCount = 0;
-
+        onSnapshot(query(collection(db, "roster"), orderBy("createdAt", "asc")), (snapshot) => {
+            mainGrid.innerHTML = ""; cdfGrid.innerHTML = ""; academyGrid.innerHTML = ""; popupsContainer.innerHTML = "";
             snapshot.forEach((docSnap) => {
-                const player = docSnap.data();
-                const id = docSnap.id;
-                const imgSrc = (player.image && player.image !== "#") ? player.image : "logo.png";
-                const historique = player.prHistory || [];
-
-                const cardContainer = document.createElement('div');
-                cardContainer.className = "player-card-container";
+                const p = docSnap.data(); const id = docSnap.id; const imgSrc = p.image && p.image!=="#" ? p.image : "logo.png";
+                const card = document.createElement('div'); card.className = "player-card-container";
+                card.innerHTML = `<div class="admin-controls ${currentUser?'':'hidden'}"><a class="inline-edit-btn" href="dashboard.html?edit=${id}">✏️</a><button class="inline-delete-btn" data-id="${id}">X</button></div>
+                    <div class="player-card" id="card-${id}"><img src="${imgSrc}" class="player-avatar-img"><div class="player-info"><div class="player-pseudo">${p.pseudo}</div><div class="player-role">${p.role}</div><span class="voir-profil">Voir le profil</span></div></div>`;
                 
-                const adminControlsHtml = `
-                    <div class="admin-controls ${currentUser ? '' : 'hidden'}">
-                        <a class="inline-edit-btn" href="dashboard.html?edit=${id}">✏️</a>
-                        <button class="inline-delete-btn" data-id="${id}">X</button>
-                    </div>`;
+                if (p.team === "main") mainGrid.appendChild(card);
+                else if (p.team === "academy") academyGrid.appendChild(card);
+                else if (p.team === "cdf") cdfGrid.appendChild(card);
 
-                cardContainer.innerHTML = `
-                    ${adminControlsHtml}
-                    <div class="player-card" id="card-${id}">
-                        <img src="${imgSrc}" class="player-avatar-img" alt="${player.pseudo}">
-                        <div class="player-info">
-                            <div class="player-pseudo">${player.pseudo}</div>
-                            <div class="player-role">${player.role}</div>
-                            <span class="voir-profil">Voir le profil</span>
-                        </div>
-                    </div>`;
+                const modal = document.createElement('div'); modal.id = `popup-${id}`; modal.className = "modal-overlay";
+                modal.innerHTML = `<div class="modal-content" style="max-width:500px;"><span class="modal-close" id="close-${id}">&times;</span><img src="${imgSrc}" class="popup-avatar-img"><h3>${p.pseudo}</h3><p style="text-align:center;color:#a855f7;">${p.role}</p><p>${p.bio || ''}</p></div>`;
+                popupsContainer.appendChild(modal);
 
-                ... // [Création dynamique des popups et tris d'équipes identiques]
+                document.getElementById(`card-${id}`).onclick = () => {
+                    document.getElementById(`popup-${id}`).classList.add('active');
+                    // Idée 2 : Track de l'engagement joueur
+                    addDoc(collection(db, "events"), { type: "click_joueur", joueur: p.pseudo, timestamp: new Date() });
+                };
+                document.getElementById(`close-${id}`).onclick = (e) => { e.stopPropagation(); document.getElementById(`popup-${id}`).classList.remove('active'); };
             });
-        }
-
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            onSnapshot(q, (snapshot) => { renderRoster(snapshot); });
         });
 
-        // ── 📊 ÉTAPE 1 : TRACKER DE VISITES INTELLIGENT ──
+        onAuthStateChanged(auth, (user) => { currentUser = user; });
+
+        // ── 📊 ANALYTICS ADVANCED (Idée 1) ──
         async function enregistrerVisite() {
-            const aujourdhui = new Date();
-            const dateCle = aujourdhui.toISOString().split('T')[0];
-            try {
-                await addDoc(collection(db, "analytics"), {
-                    date: dateCle,
-                    page: "roster.html",
-                    timestamp: aujourdhui
-                });
-            } catch (e) {
-                console.error("Erreur d'enregistrement analytique roster.html :", e);
-            }
+            const support = window.innerWidth < 768 ? "Mobile" : "Ordinateur";
+            try { await addDoc(collection(db, "analytics"), { date: new Date().toISOString().split('T')[0], page: "roster.html", device: support, timestamp: new Date() }); } catch (e) {}
         }
         enregistrerVisite();
     </script>

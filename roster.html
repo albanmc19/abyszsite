@@ -9,57 +9,37 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
         /* ── ARCHITECTURE GLOBALE & NAV ── */
-        body { background-color: #0a0a0a; color: #fff; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
-        nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(10px); position: fixed; width: 100%; box-sizing: border-box; z-index: 100; border-bottom: 1px solid #1a1a1a; }
-        .logo { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; font-weight: 700; color: #a855f7; display: flex; align-items: center; gap: 10px; }
-        .logo img { height: 40px; width: auto; }
-        nav ul { display: flex; list-style: none; gap: 30px; margin: 0; padding: 0; align-items: center; }
-        nav ul li a { color: #aaa; text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 0.9rem; font-weight: 400; transition: color 0.3s, text-shadow 0.3s; }
-        nav ul li a:hover { color: #a855f7; text-shadow: 0 0 10px rgba(168, 85, 247, 0.6); }
         .logo-link { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
-        
-        section { max-width: 1200px; margin: 0 auto; padding: 40px 20px; text-align: center; }
-        h2 { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; background: linear-gradient(to right, #fff, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .btn { display: inline-block; background: transparent; border: 1px solid #a855f7; color: #a855f7; padding: 10px 20px; border-radius: 20px; text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 0.9rem; transition: all 0.3s; margin-top: 20px; }
-        .btn:hover { background: #a855f7; color: white; box-shadow: 0 0 15px #a855f7; }
-
         .roster-header-container { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto 30px auto; padding: 0 20px; }
         .admin-gate-btn { background: transparent; border: 1px solid #a855f7; color: #a855f7; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-family: 'Orbitron', sans-serif; transition: all 0.3s ease; }
         .admin-gate-btn:hover { background: #a855f7; color: white; box-shadow: 0 0 15px #a855f7; }
         .loading-text { text-align: center; color: #666; font-style: italic; grid-column: 1/-1; padding: 20px; }
-        .roster-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-top: 40px; justify-items: center; }
 
-        /* ── CARTES JOUEURS ── */
-        .player-card { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; overflow: hidden; transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s; width: 100%; max-width: 320px; position: relative; display: flex; flex-direction: column; }
-        .player-card:hover { transform: translateY(-5px); border-color: #a855f7; box-shadow: 0 10px 30px rgba(168, 85, 247, 0.2); }
-        .player-avatar-img { width: 100%; height: 200px; object-fit: contain; border-bottom: 2px solid #a855f7; background: #141414; cursor: pointer; padding: 10px; box-sizing: border-box; }
-        .player-info { padding: 20px; text-align: left; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .player-pseudo { font-family: 'Orbitron', sans-serif; font-size: 1.4rem; font-weight: 700; color: #fff; margin: 0 0 5px 0; text-align: left; }
-        .player-role { font-size: 0.9rem; color: #a855f7; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; }
+        /* ── IMAGES ── */
+        .player-avatar-img { width: 100%; height: 200px; object-fit: cover; border-bottom: 2px solid #a855f7; background: #141414; }
+        .popup-avatar-img { width: 100%; max-height: 250px; object-fit: contain; border: 2px solid #a855f7; border-radius: 12px; margin: 0 auto 20px auto; display: block; background: #0a0a0a; }
 
         /* ── MODAL & POPUPS ── */
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
-        .modal-overlay.active { display: flex; }
+        .modal-overlay, .popup-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
+        .modal-overlay.active, .popup-overlay.active { display: flex; }
         
-        .modal-content { background: #141414; border: 2px solid #a855f7; border-radius: 24px; max-width: 500px; width: 100%; padding: 30px; position: relative; box-shadow: 0 0 30px rgba(168,85,247,0.25); box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
-        .modal-close { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; color: #777; cursor: pointer; transition: color 0.2s; }
-        .modal-close:hover { color: #ff4444; }
-        .modal-content h3 { font-family: 'Orbitron', sans-serif; color: #fff; margin-top: 0; margin-bottom: 20px; font-size: 1.5rem; text-align: center; }
-        .popup-avatar-img { width: 100%; max-height: 250px; object-fit: contain; border: 2px solid #a855f7; border-radius: 12px; margin: 0 auto 20px auto; display: block; background: #0a0a0a; padding: 10px; box-sizing: border-box; }
-
+        .modal-content, .popup { background: #141414; border: 2px solid #a855f7; border-radius: 24px; max-width: 500px; width: 100%; padding: 30px; position: relative; box-shadow: 0 0 30px rgba(168,85,247,0.25); box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
+        .modal-close, .popup-close { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; color: #777; cursor: pointer; transition: color 0.2s; }
+        .modal-close:hover, .popup-close:hover { color: #ff4444; }
+        
+        .modal-content h3, .popup-pseudo { font-family: 'Orbitron', sans-serif; color: #fff; margin-top: 0; margin-bottom: 20px; font-size: 1.5rem; text-align: center; }
+        
         /* ── FORMULAIRES ── */
         .input-group { margin-bottom: 15px; text-align: left; }
         .input-group label { display: block; margin-bottom: 6px; color: #a855f7; font-size: 0.8rem; font-family: 'Orbitron', sans-serif; font-weight: 600; }
         .input-group input, .input-group textarea, .input-group select { width: 100%; padding: 10px 14px; background: #0a0a0a; border: 1px solid #2a2a2a; color: white; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.9rem; box-sizing: border-box; }
-        .input-group input[type="file"] { background: #141414; border: 1px dashed #a855f7; padding: 10px; cursor: pointer; color: #aaa; }
+        .input-group input[type="file"] { background: #141414; border: 1px dashed #a855f7; padding: 10px; cursor: pointer; }
         .input-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         
         .form-btn { background: #a855f7; color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: 'Orbitron', sans-serif; transition: background 0.2s; }
         .form-btn:hover { background: #b975ff; }
         .hidden { display: none !important; }
         .error-message { color: #ff4444; font-size: 0.85rem; margin-top: 10px; text-align: center; }
-        .reset-img-btn { background:#0a0a0a; border:1px solid #ff4444; color:#ff4444; padding:6px 12px; border-radius:6px; font-size:0.8rem; font-family:'Orbitron',sans-serif; cursor:pointer; margin-top:8px; display:inline-block; transition:all 0.2s; }
-        .reset-img-btn:hover { background:#ff4444; color:white; }
 
         /* ── ADMIN CONTROLS ── */
         .player-card-container { position: relative; }
@@ -70,24 +50,18 @@
         .inline-delete-btn { background: #ff4444; }
         .inline-delete-btn:hover { background: #cc3333; }
 
-        /* ── DETAILED POPUP & STATS ── */
-        .player-popup-details { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 20px 0; background: #0a0a0a; padding: 15px; border-radius: 12px; border: 1px solid #2a2a2a; }
-        .stat-box { font-family: 'Orbitron', sans-serif; text-align: center; }
-        .stat-box span { display: block; font-size: 0.75rem; color: #a855f7; margin-bottom: 5px; }
-        .stat-box strong { font-size: 1rem; color: white; }
-        .player-bio-text { font-family: 'Inter', sans-serif; color: #aaa; font-size: 0.9rem; line-height: 1.5; margin-bottom: 20px; text-align: left; }
-        .social-links { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
-        .social-links a { color: #a855f7; text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; border: 1px solid #2a2a2a; padding: 6px 12px; border-radius: 6px; transition: all 0.2s; }
-        .social-links a:hover { background: #a855f7; color: white; border-color: #a855f7; }
-
         /* ── HISTORIQUE PR ── */
         .pr-history-section { background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 12px; padding: 16px; margin: 16px 0; }
-        .pr-history-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; text-align: left; }
+        .pr-history-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+        .pr-evolution-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: 700; margin-bottom: 14px; }
+        .pr-evolution-badge.positive { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+        .pr-evolution-badge.negative { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+        .pr-evolution-badge.neutral  { background: rgba(168,85,247,0.1); color: #a855f7; border: 1px solid rgba(168,85,247,0.3); }
         
         .pr-table { width: 100%; border-collapse: collapse; font-family: 'Inter', sans-serif; font-size: 0.82rem; }
         .pr-table thead tr { border-bottom: 1px solid #2a2a2a; }
         .pr-table th { color: #666; font-weight: 600; padding: 4px 8px; text-align: left; font-size: 0.75rem; }
-        .pr-table td { padding: 6px 8px; color: #ccc; border-bottom: 1px solid #1a1a1a; text-align: left; }
+        .pr-table td { padding: 6px 8px; color: #ccc; border-bottom: 1px solid #1a1a1a; }
         .pr-table tr:last-child td { border-bottom: none; }
         .pr-table .pr-latest td { color: #fff; font-weight: 600; }
         .pr-table .pr-latest td:first-child { color: #a855f7; }
@@ -97,8 +71,7 @@
         .pr-delta-cell.neu { color: #666; }
 
         .pr-add-zone { background: #0a0a0a; border: 1px solid #a855f7; border-radius: 10px; padding: 14px; margin-bottom: 14px; }
-        .pr-add-zone-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 0.75rem; letter-spacing: 1px; margin-bottom: 10px; text-align: left; }
-        footer { text-align: center; padding: 40px 20px; color: #555; font-size: 0.85rem; border-top: 1px solid #1a1a1a; margin-top: 80px; }
+        .pr-add-zone-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 0.75rem; letter-spacing: 1px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -154,7 +127,7 @@
 
             <div id="admin-login-step">
                 <h3>Connexion Admin</h3>
-                <form id="login-form">
+                <form id="login-form" onsubmit="return false;">
                     <div class="input-group">
                         <label for="admin-email">Adresse e-mail</label>
                         <input type="email" id="admin-email" placeholder="exemple@abysz.com" required>
@@ -175,7 +148,7 @@
                     <button id="logout-btn" style="background:none;border:none;color:#ff4444;cursor:pointer;font-weight:bold;">Déconnexion</button>
                 </div>
 
-                <form id="player-form">
+                <form id="player-form" onsubmit="return false;">
                     <div class="input-group">
                         <label for="player-team">Catégorie d'équipe</label>
                         <select id="player-team">
@@ -190,397 +163,179 @@
                     </div>
                     <div class="input-group">
                         <label for="player-role">Rôle / Division</label>
-                        <input type="text" id="player-role" placeholder="Ex: Joueur IGL / Division 1" required>
+                        <input type="text" id="player-role" placeholder="Ex: Duelist / Radiant" required>
                     </div>
-                    <div class="input-group">
-                        <label for="player-file-input">Photo du joueur</label>
-                        <input type="file" id="player-file-input" accept="image/*">
-                        <p id="file-status" style="font-size:0.8rem; color:#aaa; margin:5px 0;"></p>
-                        <button type="button" class="reset-img-btn" id="reset-img-btn">Réinitialiser l'image</button>
-                    </div>
-                    <div class="input-group">
-                        <label>Statistiques actuelles</label>
-                        <div class="input-row">
-                            <input type="text" id="stat-earnings" placeholder="Earnings ($)">
-                            <input type="text" id="stat-best" placeholder="Best PR">
-                            <input type="text" id="stat-wins" placeholder="Top Perfs">
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <label for="player-bio">Biographie du joueur</label>
-                        <textarea id="player-bio" rows="3" placeholder="Parcours, accomplissements du joueur..."></textarea>
-                    </div>
-                    <div class="input-group">
-                        <label>Réseaux Sociaux (Mettre l'URL complète)</label>
-                        <div class="input-row">
-                            <input type="text" id="link-twitch" placeholder="Lien Twitch">
-                            <input type="text" id="link-twitter" placeholder="Lien Twitter / X">
-                            <input type="text" id="link-tracker" placeholder="Lien Tracker">
-                        </div>
-                    </div>
-
-                    <div id="pr-add-zone" class="pr-add-zone hidden">
-                        <div class="pr-add-zone-title">📈 AJOUTER UN NOUVEAU PR DANS L'HISTORIQUE</div>
-                        <div class="input-row" style="grid-template-columns: 1fr 1fr;">
-                            <input type="number" id="new-pr-value" placeholder="Position (ex: 120)">
-                            <input type="date" id="new-pr-date">
-                        </div>
-                    </div>
-
-                    <button type="submit" class="form-btn" id="submit-player-btn">Enregistrer le joueur</button>
+                    <button type="submit" class="form-btn" id="save-player-btn">Enregistrer le joueur</button>
                 </form>
             </div>
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, doc, updateDoc, deleteDoc, collection, onSnapshot, query, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    <script>
+        // Remplacez cette URL par l'adresse de votre API ou route Firebase/Supabase réelle
+        const API_BASE_URL = "https://api.abysz-esports.com"; 
 
-        // ⚠️ /!\ METS TES PARAMÈTRES FIREBASE ICI POUR RELIER TA DATABASE /!\ ⚠️
-        const firebaseConfig = {
-            apiKey: "TON_API_KEY",
-            authDomain: "TON_AUTH_DOMAIN",
-            projectId: "TON_PROJECT_ID",
-            storageBucket: "TON_STORAGE_BUCKET",
-            messagingSenderId: "TON_MESSAGING_SENDER_ID",
-            appId: "TON_APP_ID"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        let currentUser = null;
-        let playersDataCache = {};
-        let editingPlayerId = null;
-        let base64ImageString = "";
-
-        // Éléments du DOM
-        const modal = document.getElementById('admin-modal');
-        const adminGateBtn = document.getElementById('admin-gate-btn');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        const loginForm = document.getElementById('login-form');
-        const playerForm = document.getElementById('player-form');
-        const adminLoginStep = document.getElementById('admin-login-step');
-        const adminPanelStep = document.getElementById('admin-panel-step');
-        const loginError = document.getElementById('login-error');
-        const panelTitle = document.getElementById('panel-title');
-        const userDisplayEmail = document.getElementById('user-display-email');
-        const logoutBtn = document.getElementById('logout-btn');
-        const prAddZone = document.getElementById('pr-add-zone');
-        const playerFileInput = document.getElementById('player-file-input');
-        const fileStatus = document.getElementById('file-status');
-        const resetImgBtn = document.getElementById('reset-img-btn');
-
-        // Écoute de l'état de connexion
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            if (user) {
-                adminGateBtn.textContent = "⚙️ Panel Gestion Admin";
-                userDisplayEmail.textContent = user.email;
-            } else {
-                adminGateBtn.textContent = "🔑 Équipe Admin";
-                userDisplayEmail.textContent = "";
-            }
+        document.addEventListener("DOMContentLoaded", () => {
+            initApp();
+            setupAdminModal();
         });
 
-        // Gestion d'ouverture du bouton Admin
-        adminGateBtn.addEventListener('click', () => {
-            if (currentUser) {
-                // Si déjà connecté, on passe directement au formulaire
-                panelTitle.textContent = "Ajouter un joueur";
-                editingPlayerId = null;
-                playerForm.reset();
-                base64ImageString = "";
-                fileStatus.textContent = "";
-                prAddZone.classList.add('hidden');
-                adminLoginStep.classList.add('hidden');
-                adminPanelStep.classList.remove('hidden');
-                modal.classList.add('active');
-            } else {
-                // Sinon on affiche l'étape de connexion
-                loginForm.reset();
-                loginError.classList.add('hidden');
-                adminLoginStep.classList.remove('hidden');
-                adminPanelStep.classList.add('hidden');
-                modal.classList.add('active');
-            }
-        });
-
-        closeModalBtn.addEventListener('click', () => modal.classList.remove('active'));
-        logoutBtn.addEventListener('click', () => {
-            signOut(auth).then(() => {
-                modal.classList.remove('active');
-                alert("Vous êtes déconnecté !");
-            });
-        });
-
-        // Formulaire de connexion
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('admin-email').value.trim();
-            const password = document.getElementById('admin-password').value;
-            loginError.classList.add('hidden');
-
+        async function initApp() {
             try {
-                await signInWithEmailAndPassword(auth, email, password);
-                panelTitle.textContent = "Ajouter un joueur";
-                editingPlayerId = null;
-                playerForm.reset();
-                base64ImageString = "";
-                fileStatus.textContent = "";
-                prAddZone.classList.add('hidden');
-                adminLoginStep.classList.add('hidden');
-                adminPanelStep.classList.remove('hidden');
-            } catch (err) {
-                loginError.textContent = "Identifiants invalides ou problème réseau.";
-                loginError.classList.remove('hidden');
+                const response = await fetch(`${API_BASE_URL}/players`);
+                if (!response.ok) throw new Error();
+                const players = await response.json();
+                renderRosters(players);
+            } catch (error) {
+                console.error("Erreur d'initialisation :", error);
+                displayErrorInGrids();
             }
-        });
+        }
 
-        // Conversion photo en Base64 string
-        playerFileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                base64ImageString = reader.result;
-                fileStatus.textContent = "📸 Photo chargée avec succès !";
-            };
-            reader.readAsDataURL(file);
-        });
-
-        resetImgBtn.addEventListener('click', () => {
-            playerFileInput.value = "";
-            base64ImageString = "";
-            fileStatus.textContent = "Image réinitialisée.";
-        });
-
-        // Soumission ou mise à jour joueur
-        playerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const prVal = document.getElementById('new-pr-value').value;
-            const prDate = document.getElementById('new-pr-date').value;
-            let currentHistory = (editingPlayerId && playersDataCache[editingPlayerId].prHistory) ? [...playersDataCache[editingPlayerId].prHistory] : [];
-
-            if (prVal && prDate) {
-                currentHistory.push({ value: parseInt(prVal), date: prDate });
-                currentHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
-            }
-
-            let finalImage = base64ImageString;
-            if (editingPlayerId && !base64ImageString) {
-                finalImage = playersDataCache[editingPlayerId].image || "#";
-            } else if (!finalImage) {
-                finalImage = "#";
-            }
-
-            const playerData = {
-                team: document.getElementById('player-team').value,
-                pseudo: document.getElementById('player-pseudo').value,
-                role: document.getElementById('player-role').value,
-                earnings: document.getElementById('stat-earnings').value || "0",
-                bestPr: document.getElementById('stat-best').value || "N/A",
-                wins: document.getElementById('stat-wins').value || "0",
-                bio: document.getElementById('player-bio').value || "",
-                twitch: document.getElementById('link-twitch').value || "#",
-                twitter: document.getElementById('link-twitter').value || "#",
-                tracker: document.getElementById('link-tracker').value || "#",
-                image: finalImage,
-                prHistory: currentHistory
+        function renderRosters(players) {
+            const grids = {
+                main: document.getElementById("main-roster-grid"),
+                academy: document.getElementById("academy-roster-grid"),
+                cdf: document.getElementById("cdf-roster-grid")
             };
 
-            try {
-                if (editingPlayerId) {
-                    await updateDoc(doc(db, "roster", editingPlayerId), playerData);
-                } else {
-                    await addDoc(collection(db, "roster"), playerData);
-                }
-                modal.classList.remove('active');
-                playerForm.reset();
-                base64ImageString = "";
-            } catch (err) {
-                alert("Erreur lors de la sauvegarde : " + err.message);
-            }
-        });
+            Object.values(grids).forEach(grid => { if (grid) grid.innerHTML = ""; });
 
-        // Abonnement en direct à la collection Firestore "roster"
-        onSnapshot(query(collection(db, "roster")), (snapshot) => {
-            const mainGrid = document.getElementById("main-roster-grid");
-            const academyGrid = document.getElementById("academy-roster-grid");
-            const cdfGrid = document.getElementById("cdf-roster-grid");
-            const popupsContainer = document.getElementById("popups-container");
-
-            mainGrid.innerHTML = "";
-            academyGrid.innerHTML = "";
-            cdfGrid.innerHTML = "";
-            popupsContainer.innerHTML = "";
-
-            let counts = { main: 0, academy: 0, cdf: 0 };
-
-            snapshot.forEach((docSnap) => {
-                const id = docSnap.id;
-                const p = docSnap.data();
-                playersDataCache[id] = p;
-                counts[p.team]++;
+            players.forEach(player => {
+                const grid = grids[player.team];
+                if (!grid) return;
 
                 const card = document.createElement("div");
                 card.className = "player-card-container";
-
-                let adminButtonsHTML = "";
-                if (currentUser) {
-                    adminButtonsHTML = `
-                        <div class="admin-controls">
-                            <button class="inline-edit-btn" data-id="${id}">✏️</button>
-                            <button class="inline-delete-btn" data-id="${id}">🗑️</button>
-                        </div>`;
-                }
+                
+                const avatar = player.avatar || "logo.png";
+                const pseudo = player.pseudo || "Joueur";
+                const role = player.role || "Non défini";
 
                 card.innerHTML = `
-                    ${adminButtonsHTML}
-                    <div class="player-card">
-                        <img src="${p.image && p.image !== "#" ? p.image : 'placeholder.png'}" class="player-avatar-img" data-id="${id}">
-                        <div class="player-info">
-                            <div>
-                                <h3 class="player-pseudo">${p.pseudo}</h3>
-                                <p class="player-role">${p.role}</p>
-                            </div>
-                        </div>
-                    </div>`;
+                    <div class="player-card" style="cursor:pointer; background:#141414; border-radius:12px; overflow:hidden; border: 1px solid #2a2a2a; text-align:center; padding-bottom:15px;">
+                        <img src="${avatar}" class="player-avatar-img" alt="${pseudo}">
+                        <h3 style="font-family:'Orbitron', sans-serif; margin:15px 0 5px 0; color:#fff;">${pseudo}</h3>
+                        <p style="color:#a855f7; font-size:0.9rem; margin:0;">${role}</p>
+                    </div>
+                `;
 
-                if (p.team === "main") mainGrid.appendChild(card);
-                else if (p.team === "academy") academyGrid.appendChild(card);
-                else if (p.team === "cdf") cdfGrid.appendChild(card);
+                card.querySelector(".player-card").addEventListener("click", () => {
+                    openPlayerPopup(player);
+                });
 
-                // Génération des lignes du tableau d'historique PR
-                let tableRows = "";
-                if (p.prHistory && p.prHistory.length > 0) {
-                    p.prHistory.forEach((pr, i) => {
-                        let delta = 0;
-                        let deltaClass = "neu";
-                        let deltaText = "0";
+                grid.appendChild(card);
+            });
+        }
 
-                        if (i < p.prHistory.length - 1) {
-                            delta = p.prHistory[i + 1].value - pr.value;
-                            if (delta > 0) { deltaClass = "pos"; deltaText = `+${delta}`; }
-                            else if (delta < 0) { deltaClass = "neg"; deltaText = `${delta}`; }
-                        }
+        async function openPlayerPopup(player) {
+            const container = document.getElementById("popups-container");
+            if (!container) return;
 
-                        tableRows += `
-                            <tr class="${i === 0 ? 'pr-latest' : ''}">
-                                <td>#${pr.value}</td>
-                                <td>${pr.date}</td>
-                                <td class="pr-delta-cell ${deltaClass}">${i === p.prHistory.length - 1 ? '-' : deltaText}</td>
-                            </tr>`;
-                    });
-                } else {
-                    tableRows = `<tr><td colspan="3" style="text-align:center; color:#555;">Aucun historique disponible</td></tr>`;
-                }
-
-                // Popup détails du joueur
-                const popup = document.createElement("div");
-                popup.id = `popup-${id}`;
-                popup.className = "modal-overlay";
-                popup.innerHTML = `
-                    <div class="modal-content">
-                        <span class="modal-close" onclick="document.getElementById('popup-${id}').classList.remove('active')">&times;</span>
-                        <h3>${p.pseudo}</h3>
-                        <img src="${p.image && p.image !== "#" ? p.image : 'placeholder.png'}" class="popup-avatar-img">
+            // Structure du popup affichée TOUT DE SUITE sans attendre les données réseau lente
+            container.innerHTML = `
+                <div id="popup-${player.id}" class="popup-overlay active">
+                    <div class="popup">
+                        <span class="popup-close">&times;</span>
+                        <img src="${player.avatar || 'logo.png'}" class="popup-avatar-img" alt="${player.pseudo}">
+                        <h3 class="popup-pseudo">${player.pseudo}</h3>
+                        <p style="text-align:center; color:#aaa; margin-top:-15px; margin-bottom:20px;">${player.role || 'Joueur'}</p>
                         
-                        <div class="player-popup-details">
-                            <div class="stat-box"><span>Earnings</span><strong>${p.earnings}</strong></div>
-                            <div class="stat-box"><span>Best PR</span><strong>#${p.bestPr}</strong></div>
-                            <div class="stat-box"><span>Top Perfs</span><strong>${p.wins}</strong></div>
-                        </div>
-
-                        <p class="player-bio-text">${p.bio ? p.bio : "Aucune biographie disponible pour le moment."}</p>
-
                         <div class="pr-history-section">
-                            <div class="pr-history-title">📈 Historique de Progression PR</div>
-                            <table class="pr-table">
-                                <thead>
-                                    <tr><th>PR Placement</th><th>Date</th><th>Évolution</th></tr>
-                                </thead>
-                                <tbody>${tableRows}</tbody>
-                            </table>
+                            <div class="pr-history-title">Historique Rank / PR</div>
+                            <div id="pr-loading-${player.id}" style="text-align:center; color:#666; font-size:0.85rem; padding:10px;">
+                                ⚡ Connexion aux serveurs de jeu en cours...
+                            </div>
+                            <div id="pr-content-${player.id}" class="hidden"></div>
                         </div>
+                    </div>
+                </div>
+            `;
 
-                        <div class="social-links">
-                            ${p.twitch && p.twitch !== "#" ? `<a href="${p.twitch}" target="_blank">Twitch</a>` : ''}
-                            ${p.twitter && p.twitter !== "#" ? `<a href="${p.twitter}" target="_blank">Twitter</a>` : ''}
-                            ${p.tracker && p.tracker !== "#" ? `<a href="${p.tracker}" target="_blank">Fortnite Tracker</a>` : ''}
-                        </div>
-                    </div>`;
-                popupsContainer.appendChild(popup);
+            const popupOverlay = document.getElementById(`popup-${player.id}`);
+            const closeBtn = popupOverlay.querySelector(".popup-close");
+
+            const closePopup = () => {
+                popupOverlay.classList.remove("active");
+                setTimeout(() => popupOverlay.remove(), 200);
+            };
+            closeBtn.addEventListener("click", closePopup);
+            popupOverlay.addEventListener("click", (e) => { if (e.target === popupOverlay) closePopup(); });
+
+            // Chargement asynchrone découplé du PR
+            try {
+                const response = await fetch(`${API_BASE_URL}/pr-history/${player.id}`);
+                if (!response.ok) throw new Error();
+                const prData = await response.json();
+                renderPRData(player.id, prData);
+            } catch (error) {
+                const loadingEl = document.getElementById(`pr-loading-${player.id}`);
+                if (loadingEl) loadingEl.innerText = "❌ Impossible de charger les données du PR.";
+            }
+        }
+
+        function renderPRData(playerId, prData) {
+            const loadingEl = document.getElementById(`pr-loading-${playerId}`);
+            const contentEl = document.getElementById(`pr-content-${playerId}`);
+            
+            if (!loadingEl || !contentEl) return;
+            if (!prData || !prData.history || prData.history.length === 0) {
+                loadingEl.innerText = "Aucun historique de PR disponible.";
+                return;
+            }
+
+            let tableRows = "";
+            prData.history.forEach((row, index) => {
+                const isLatest = index === 0 ? "class='pr-latest'" : "";
+                tableRows += `
+                    <tr ${isLatest}>
+                        <td>${row.date || ''}</td>
+                        <td>${row.event || ''}</td>
+                        <td>${row.pr || ''}</td>
+                        <td class="pr-delta-cell ${row.deltaClass || 'neu'}">${row.delta || ''}</td>
+                    </tr>
+                `;
             });
 
-            // Affichage si vide
-            if (counts.main === 0) mainGrid.innerHTML = '<p class="loading-text">Aucun joueur dans l\'équipe principale.</p>';
-            if (counts.academy === 0) academyGrid.innerHTML = '<p class="loading-text">Aucun joueur dans l\'académie.</p>';
-            if (counts.cdf === 0) cdfGrid.innerHTML = '<p class="loading-text">Aucun joueur dans le centre de formation.</p>';
+            contentEl.innerHTML = `
+                <div class="pr-evolution-badge ${prData.evolution || 'neutral'}">
+                    <span>📈</span> ${prData.badgeText || 'Prêt pour la saison'}
+                </div>
+                <table class="pr-table">
+                    <thead>
+                        <tr>
+                            <th>DATE</th>
+                            <th>ÉVÉNEMENT</th>
+                            <th>PR</th>
+                            <th>DIFF.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tableRows}
+                    </tbody>
+                </table>
+            `;
 
-            // Événement clic sur une carte pour voir les détails
-            document.querySelectorAll('.player-avatar-img').forEach(img => {
-                img.addEventListener('click', (e) => {
-                    const id = e.target.getAttribute('data-id');
-                    const targetPopup = document.getElementById(`popup-${id}`);
-                    if (targetPopup) targetPopup.classList.add('active');
-                });
+            loadingEl.classList.add("hidden");
+            contentEl.classList.remove("hidden");
+        }
+
+        function displayErrorInGrids() {
+            const grids = ["main-roster-grid", "academy-roster-grid", "cdf-roster-grid"];
+            grids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = `<p class="loading-text" style="color:#ff4444;">Erreur de chargement de l'équipe.</p>`;
             });
+        }
 
-            // Boutons d'édition rapide (mode Admin)
-            document.querySelectorAll('.inline-edit-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const id = e.target.getAttribute('data-id');
-                    openEditModal(id);
-                });
-            });
+        function setupAdminModal() {
+            const adminBtn = document.getElementById("admin-gate-btn");
+            const adminModal = document.getElementById("admin-modal");
+            const closeModalBtn = document.getElementById("close-modal-btn");
 
-            // Boutons de suppression rapide (mode Admin)
-            document.querySelectorAll('.inline-delete-btn').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
-                    e.stopPropagation();
-                    const id = e.target.getAttribute('data-id');
-                    if (confirm(`Supprimer définitivement le joueur ${playersDataCache[id].pseudo} ?`)) {
-                        try {
-                            await deleteDoc(doc(db, "roster", id));
-                        } catch (err) { alert("Erreur suppression : " + err.message); }
-                    }
-                });
-            });
-        });
-
-        // Chargement d'un profil joueur pour édition
-        function openEditModal(id) {
-            const p = playersDataCache[id];
-            editingPlayerId = id;
-
-            panelTitle.textContent = `Modifier ${p.pseudo}`;
-            document.getElementById('player-team').value = p.team;
-            document.getElementById('player-pseudo').value = p.pseudo;
-            document.getElementById('player-role').value = p.role;
-            document.getElementById('stat-earnings').value = p.earnings;
-            document.getElementById('stat-best').value = p.bestPr;
-            document.getElementById('stat-wins').value = p.wins;
-            document.getElementById('player-bio').value = p.bio;
-            document.getElementById('link-twitch').value = p.twitch === "#" ? "" : p.twitch;
-            document.getElementById('link-twitter').value = p.twitter === "#" ? "" : p.twitter;
-            document.getElementById('link-tracker').value = p.tracker === "#" ? "" : p.tracker;
-
-            base64ImageString = ""; 
-            fileStatus.textContent = p.image && p.image !== "#" ? "📸 Une image existe déjà (laisser vide pour la conserver)" : "Aucune image définie.";
-
-            document.getElementById('new-pr-value').value = "";
-            document.getElementById('new-pr-date').value = "";
-            prAddZone.classList.remove('hidden');
-
-            adminLoginStep.classList.add('hidden');
-            adminPanelStep.classList.remove('hidden');
-            modal.classList.add('active');
+            if (adminBtn && adminModal) adminBtn.addEventListener("click", () => adminModal.classList.add("active"));
+            if (closeModalBtn && adminModal) closeModalBtn.addEventListener("click", () => adminModal.classList.remove("active"));
+            window.addEventListener("click", (e) => { if (e.target === adminModal) adminModal.classList.remove("active"); });
         }
     </script>
 </body>

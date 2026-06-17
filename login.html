@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABYSZ | Connexion Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .login-container {
+            max-width: 450px;
+            margin: 150px auto padding 20px;
+            padding: 40px;
+            background: #141414;
+            border: 2px solid #a855f7;
+            border-radius: 24px;
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.25);
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .login-container h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #ffffff;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #a855f7;
+            font-size: 0.85rem;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: #0a0a0a;
+            border: 1px solid #2a2a2a;
+            color: white;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        .input-group input:focus {
+            border-color: #a855f7;
+            outline: none;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.2);
+        }
+        .form-btn {
+            background: #a855f7;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        .form-btn:hover {
+            background: #b975ff;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+        }
+        .error-message { 
+            color: #ff4444; 
+            font-size: 0.85rem; 
+            margin-top: 15px; 
+            font-family: 'Inter', sans-serif;
+        }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h1>ABYSZ ADMIN</h1>
+        <form id="login-form" onsubmit="return false;">
+            <div class="input-group">
+                <label for="admin-email">Adresse e-mail</label>
+                <input type="email" id="admin-email" placeholder="exemple@abysz.com" required>
+            </div>
+            <div class="input-group">
+                <label for="admin-password">Mot de passe</label>
+                <input type="password" id="admin-password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="form-btn" id="login-btn">Se connecter</button>
+        </form>
+        <p id="login-error" class="error-message hidden"></p>
+        <br>
+        <a href="index.html" style="color: #666; text-decoration: none; font-size: 0.85rem;">← Retour au site</a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
+            authDomain: "abysz-esports.firebaseapp.com",
+            projectId: "abysz-esports",
+            storageBucket: "abysz-esports.firebasestorage.app",
+            messagingSenderId: "200968659347",
+            appId: "1:200968659347:web:3a13d1614d00ed29968866",
+            measurementId: "G-HPQNQK5XL1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Si déjà connecté, on envoie directement sur le dashboard
+        onAuthStateChanged(auth, (user) => {
+            if (user) { window.location.href = "dashboard.html"; }
+        });
+
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+
+        loginForm.addEventListener('submit', async () => {
+            loginError.classList.add('hidden');
+            const email = document.getElementById('admin-email').value.trim();
+            const password = document.getElementById('admin-password').value;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                window.location.href = "dashboard.html";
+            } catch (error) {
+                loginError.textContent = "Identifiants incorrects.";
+                loginError.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

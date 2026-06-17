@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABYSZ | Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .dashboard-container { max-width: 1200px; margin: 120px auto 40px auto; padding: 0 20px; }
+        .dash-header { display: flex; justify-content: space-between; align-items: center; background: #141414; padding: 20px 30px; border-radius: 16px; border: 1px solid #2a2a2a; margin-bottom: 40px; }
+        .dash-header h1 { font-family: 'Orbitron', sans-serif; color: white; margin: 0; font-size: 1.8rem; }
+        
+        .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        @media (max-width: 900px) { .dash-grid { grid-template-columns: 1fr; } }
+
+        .dash-card { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; padding: 30px; }
+        .dash-card h2 { font-family: 'Orbitron', sans-serif; color: #a855f7; margin-top: 0; margin-bottom: 25px; font-size: 1.3rem; border-bottom: 1px solid #2a2a2a; padding-bottom: 10px; }
+
+        /* Formulaires */
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 6px; color: #aaa; font-size: 0.85rem; font-family: 'Orbitron', sans-serif; }
+        .input-group input, .input-group textarea, .input-group select { width: 100%; padding: 12px; background: #0a0a0a; border: 1px solid #2a2a2a; color: white; border-radius: 8px; font-family: 'Inter', sans-serif; box-sizing: border-box; }
+        .input-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .form-btn { background: #a855f7; color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: 'Orbitron', sans-serif; transition: background 0.2s; }
+        .form-btn:hover { background: #b975ff; }
+        
+        .logout-btn { background: #ff4444; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-family: 'Orbitron', sans-serif; font-weight: bold; transition: background 0.2s; }
+        .logout-btn:hover { background: #cc3333; }
+        
+        /* Protection d'écran pendant la vérification de session */
+        .guard-screen { position: fixed; inset: 0; background: #0a0a0a; z-index: 99999; display: flex; justify-content: center; align-items: center; color: white; font-family: 'Orbitron', sans-serif; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div id="guard-screen" class="guard-screen">
+        <p>VÉRIFICATION DE L'ACCÈS DE L'ABYSZ CRU...</p>
+    </div>
+
+    <nav>
+        <div class="logo">
+            <a href="index.html" class="logo-link" style="display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit;">
+                <img src="logo.png" alt="Logo ABYSZ">
+                ABYSZ DASHBOARD
+            </a>
+        </div>
+        <ul>
+            <li><a href="index.html">Voir le Site</a></li>
+            <li><a href="roster.html">Roster</a></li>
+        </ul>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="dash-header">
+            <div>
+                <h1>Espace Administrateur</h1>
+                <span id="user-display-email" style="color: #666; font-size: 0.9rem;"></span>
+            </div>
+            <button id="logout-btn" class="logout-btn">Déconnexion</button>
+        </div>
+
+        <div class="dash-grid">
+            <div class="dash-card">
+                <h2>📢 Publier une actualité</h2>
+                <form id="announcement-form" onsubmit="return false;">
+                    <div class="input-group">
+                        <label for="annonce-title">Titre de l'actualité</label>
+                        <input type="text" id="annonce-title" placeholder="Ex: Match ce soir à 21h !" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="annonce-content">Message</label>
+                        <textarea id="annonce-content" rows="5" placeholder="Écrivez le contenu de l'annonce..." required></textarea>
+                    </div>
+                    <button type="submit" class="form-btn" id="publish-btn">Publier sur le site & Discord</button>
+                </form>
+            </div>
+
+            <div class="dash-card">
+                <h2>👤 Ajouter un joueur au Roster</h2>
+                <form id="player-form" onsubmit="return false;">
+                    <div class="input-group">
+                        <label for="player-team">Catégorie d'équipe</label>
+                        <select id="player-team">
+                            <option value="main">Équipe Principale (Pro)</option>
+                            <option value="academy">Joueurs Académiques</option>
+                            <option value="cdf">Centre de Formation (CDF)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="player-pseudo">Pseudo</label>
+                        <input type="text" id="player-pseudo" placeholder="Ex: Fxbio" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="player-role">Rôle / Division</label>
+                        <input type="text" id="player-role" placeholder="Ex: Joueur" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="player-file">Photo du joueur (Laisser vide pour logo par défaut)</label>
+                        <input type="file" id="player-file" accept="image/*" style="border: 1px dashed #a855f7; padding: 5px;">
+                    </div>
+                    <div class="input-group">
+                        <label>Statistiques</label>
+                        <div class="input-row">
+                            <input type="text" id="stat-earnings" placeholder="Earnings" required>
+                            <input type="text" id="stat-best" placeholder="Best PR" required>
+                            <input type="text" id="stat-wins" placeholder="Best Perf" required>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="player-bio">Biographie</label>
+                        <textarea id="player-bio" rows="2" placeholder="Infos complémentaires..." required></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label>Réseaux Sociaux</label>
+                        <input type="text" id="link-twitch" placeholder="Lien Twitch" value="#">
+                        <input type="text" id="link-twitter" placeholder="Lien Twitter" value="#">
+                        <input type="text" id="link-tracker" placeholder="Lien Tracker" value="#">
+                    </div>
+                    <button type="submit" class="form-btn">Enregistrer le joueur</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
+            authDomain: "abysz-esports.firebaseapp.com",
+            projectId: "abysz-esports",
+            storageBucket: "abysz-esports.firebasestorage.app",
+            messagingSenderId: "200968659347",
+            appId: "1:200968659347:web:3a13d1614d00ed29968866",
+            measurementId: "G-HPQNQK5XL1"
+        };
+
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1516291585351090206/i4pbx0B2sPw1yAD63cBN56s37-GSyrrGxYUca34GSgwlsRLUoxQWqD6oZmEwjrr6oJif";
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const guardScreen = document.getElementById('guard-screen');
+        const userDisplayEmail = document.getElementById('user-display-email');
+        const logoutBtn = document.getElementById('logout-btn');
+        let base64ImageString = "";
+
+        // Verrou de sécurité global
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = "login.html"; // Redirection si non connecté
+            } else {
+                userDisplayEmail.textContent = `Connecté en tant que : ${user.email}`;
+                guardScreen.classList.add('hidden'); // On lève le rideau protecteur
+            }
+        });
+
+        // Déconnexion
+        logoutBtn.onclick = () => {
+            signOut(auth).then(() => { window.location.href = "login.html"; });
+        };
+
+        // Gestion de l'image Base64
+        document.getElementById('player-file').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = () => { base64ImageString = reader.result; };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Soumission Annonce
+        document.getElementById('announcement-form').addEventListener('submit', async () => {
+            const title = document.getElementById("annonce-title").value.trim();
+            const content = document.getElementById("annonce-content").value.trim();
+            const now = new Date();
+
+            try {
+                await addDoc(collection(db, "announcements"), { title, content, createdAt: now });
+                
+                // Envoi Discord
+                fetch(DISCORD_WEBHOOK_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        username: "ABYSZ Bot",
+                        embeds: [{ title: "📢 NOUVELLE ANNONCE : " + title, description: content, color: 11032055 }]
+                    })
+                });
+
+                alert("Annonce publiée !");
+                document.getElementById('announcement-form').reset();
+            } catch (err) { alert(err.message); }
+        });
+
+        // Soumission Joueur
+        document.getElementById('player-form').addEventListener('submit', async () => {
+            const dataJoueur = {
+                team: document.getElementById('player-team').value,
+                pseudo: document.getElementById('player-pseudo').value.trim(),
+                role: document.getElementById('player-role').value.trim(),
+                image: base64ImageString || "#",
+                earnings: document.getElementById('stat-earnings').value.trim(),
+                bestPlacement: document.getElementById('stat-best').value.trim(),
+                wins: document.getElementById('stat-wins').value.trim(),
+                bio: document.getElementById('player-bio').value.trim(),
+                twitch: document.getElementById('link-twitch').value.trim(),
+                twitter: document.getElementById('link-twitter').value.trim(),
+                tracker: document.getElementById('link-tracker').value.trim(),
+                prHistory: [],
+                createdAt: new Date()
+            };
+
+            try {
+                await addDoc(collection(db, "roster"), dataJoueur);
+                alert("Joueur ajouté au roster !");
+                document.getElementById('player-form').reset();
+                base64ImageString = "";
+            } catch (err) { alert(err.message); }
+        });
+    </script>
+</body>
+</html>

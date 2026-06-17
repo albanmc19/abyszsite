@@ -133,7 +133,7 @@
                 <form id="login-form">
                     <div class="input-group"><label>Email</label><input type="email" id="admin-email" required></div>
                     <div class="input-group"><label>Mot de passe</label><input type="password" id="admin-password" required></div>
-                    <button type="submit" class="form-btn">Se connecter</button>
+                    <button type="submit" class="form-btn" id="login-submit-btn">Se connecter</button>
                 </form>
                 <p id="login-error" class="error-message hidden"></p>
             </div>
@@ -195,7 +195,7 @@
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, doc, updateDoc, deleteDoc, collection, onSnapshot, query, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-        // /!\ REMPLACE AVEC TES PARAMÈTRES FIREBASE DE CONFIANCE /!\
+        // /!\ METS TES PARAMÈTRES FIREBASE ICI /!\
         const firebaseConfig = {
             apiKey: "TON_API_KEY",
             authDomain: "TON_AUTH_DOMAIN",
@@ -253,6 +253,7 @@
                 panelTitle.textContent = "Ajouter un joueur";
                 editingPlayerId = null;
                 playerForm.reset();
+                loginForm.reset();
                 base64ImageString = "";
                 fileStatus.textContent = "";
                 prAddZone.classList.add('hidden');
@@ -278,17 +279,22 @@
 
         closeModalBtn.addEventListener('click', () => modal.classList.remove('active'));
 
-        // Connexion Admin
+        // Connexion Admin (MISE À JOUR CORRIGÉE POUR AGIR)
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('admin-email').value;
+            const email = document.getElementById('admin-email').value.trim();
             const password = document.getElementById('admin-password').value;
+            
+            loginError.classList.add('hidden');
+
             try {
                 await signInWithEmailAndPassword(auth, email, password);
                 adminLoginStep.classList.add('hidden');
                 adminPanelStep.classList.remove('hidden');
+                modal.classList.remove('active'); // Ferme la modale après connexion réussie
             } catch (err) {
-                loginError.textContent = "Identifiants invalides.";
+                console.error(err);
+                loginError.textContent = "Identifiants invalides ou problème réseau.";
                 loginError.classList.remove('hidden');
             }
         });
@@ -319,14 +325,11 @@
             const prDate = document.getElementById('new-pr-date').value;
             let currentHistory = (editingPlayerId && playersDataCache[editingPlayerId].prHistory) ? [...playersDataCache[editingPlayerId].prHistory] : [];
 
-            // Si un nouveau PR est saisi, on l'ajoute au tableau historique
             if (prVal && prDate) {
                 currentHistory.push({ value: parseInt(prVal), date: prDate });
-                // Tri du plus récent au plus ancien
                 currentHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
             }
 
-            // Conserver l'ancienne image si aucune nouvelle image n'est importée en mode édition
             let finalImage = base64ImageString;
             if (editingPlayerId && !base64ImageString) {
                 finalImage = playersDataCache[editingPlayerId].image || "#";
@@ -380,11 +383,10 @@
             snapshot.forEach((docSnap) => {
                 const id = docSnap.id;
                 const p = docSnap.data();
-                playersDataCache[id] = p; // Mise en cache
+                playersDataCache[id] = p;
 
                 counts[p.team]++;
 
-                // 1. Création de la Carte Joueur
                 const card = document.createElement("div");
                 card.className = "player-card-container";
                 
@@ -413,7 +415,6 @@
                 else if (p.team === "academy") academyGrid.appendChild(card);
                 else if (p.team === "cdf") cdfGrid.appendChild(card);
 
-                // 2. Génération dynamique des lignes de l'historique PR
                 let tableRows = "";
                 if (p.prHistory && p.prHistory.length > 0) {
                     p.prHistory.forEach((pr, i) => {
@@ -421,9 +422,8 @@
                         let deltaClass = "neu";
                         let deltaText = "0";
 
-                        // Calcul de la différence avec le PR précédent (chronologiquement)
                         if (i < p.prHistory.length - 1) {
-                            delta = p.prHistory[i + 1].value - pr.value; // Moins on a de PR, meilleur est le classement
+                            delta = p.prHistory[i + 1].value - pr.value;
                             if (delta > 0) { deltaClass = "pos"; deltaText = `+${delta}`; }
                             else if (delta < 0) { deltaClass = "neg"; deltaText = `${delta}`; }
                         }
@@ -439,7 +439,6 @@
                     tableRows = `<tr><td colspan="3" style="text-align:center; color:#555;">Aucun historique disponible</td></tr>`;
                 }
 
-                // 3. Création du Popup Détails du Joueur (CORRIGÉ ICI)
                 const popup = document.createElement("div");
                 popup.id = `popup-${id}`;
                 popup.className = "modal-overlay";
@@ -476,12 +475,10 @@
                 popupsContainer.appendChild(popup);
             });
 
-            // Affichage de messages vides si pas de joueurs
             if (counts.main === 0) mainGrid.innerHTML = '<p class="loading-text">Aucun joueur dans le roster principal.</p>';
             if (counts.academy === 0) academyGrid.innerHTML = '<p class="loading-text">Aucun joueur dans l\'academy.</p>';
             if (counts.cdf === 0) cdfGrid.innerHTML = '<p class="loading-text">Aucun joueur dans le centre de formation.</p>';
 
-            // Écouteur d'ouverture des popups au clic sur l'image d'une carte
             document.querySelectorAll('.player-avatar-img').forEach(img => {
                 img.addEventListener('click', (e) => {
                     const id = e.target.getAttribute('data-id');
@@ -490,7 +487,6 @@
                 });
             });
 
-            // Écouteurs pour l'édition et la suppression en ligne (Admin)
             document.querySelectorAll('.inline-edit-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -512,7 +508,6 @@
             });
         });
 
-        // Remplissage du formulaire pour passage en mode "Édition"
         function openEditModal(id) {
             const p = playersDataCache[id];
             editingPlayerId = id;
@@ -532,7 +527,6 @@
             base64ImageString = ""; 
             fileStatus.textContent = p.image && p.image !== "#" ? "📸 Une image existe déjà (laisser vide pour la conserver)" : "Aucune image définie.";
 
-            // Reset et affichage de la zone d'ajout de PR
             document.getElementById('new-pr-value').value = "";
             document.getElementById('new-pr-date').value = "";
             prAddZone.classList.remove('hidden');

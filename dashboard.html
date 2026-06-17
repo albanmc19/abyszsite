@@ -7,26 +7,39 @@
     <title>ABYSZ | Dashboard Admin</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .logo-link { display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; }
         
-        /* ── ZONE DE SÉCURITÉ (ACCÈS REFUSÉ) ── */
+        /* ── ZONE ACCÈS REFUSÉ ── */
         .restricted-zone { text-align: center; padding: 60px 20px; background: #0a0a0a; border: 2px dashed #ff4444; border-radius: 16px; max-width: 600px; margin: 100px auto; }
         .restricted-zone h2 { font-family: 'Orbitron', sans-serif; color: #ff4444; margin-bottom: 15px; }
 
-        /* ── SECTION TITRES ANALYTICS ── */
-        .section-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; max-width: 1200px; margin: 30px auto 15px auto; padding: 0 20px; }
+        /* ── CORPS DU DASHBOARD ── */
+        .dashboard-wrapper { max-width: 1200px; margin: 0 auto 80px auto; padding: 0 20px; }
+        .main-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 2.2rem; font-weight: 700; margin-bottom: 40px; text-shadow: 0 0 10px rgba(168, 85, 247, 0.3); }
+        .section-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; margin: 40px 0 20px 0; border-bottom: 1px solid #2a2a2a; padding-bottom: 8px; }
 
-        /* ── STATS CARDS ── */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto 30px auto; padding: 0 20px; }
-        .stat-card { background: #141414; border: 1px solid #2a2a2a; border-left: 4px solid #a855f7; padding: 20px; border-radius: 12px; font-family: 'Orbitron', sans-serif; }
-        .stat-card .num { font-size: 2rem; font-weight: 700; color: #fff; margin-top: 5px; }
-        .stat-card .label { color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        /* ── LES 3 BLOCS DE VOTRE CAPTURE ── */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .stat-card { background: #111111; border: 1px solid #222222; border-radius: 12px; padding: 25px; text-align: center; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
+        .stat-card .num { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; font-weight: 700; color: #a855f7; margin-bottom: 8px; }
+        .stat-card .label { color: #555; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
 
-        /* ── TABLEAU DES JOUEURS ── */
-        .dashboard-container { max-width: 1200px; margin: 0 auto 80px auto; padding: 0 20px; }
+        /* FILTRE ET ZONE GRAPHIQUE */
+        .filter-container { display: flex; justify-content: flex-end; margin-bottom: 15px; }
+        .page-selector { background: #0a0a0a; color: #fff; border: 1px solid #333; padding: 8px 16px; border-radius: 8px; font-family: 'Inter', sans-serif; cursor: pointer; outline: none; }
+        .chart-container { background: #0d0d0d; border: 1px solid #1a1a1a; padding: 20px; border-radius: 16px; margin-bottom: 40px; min-height: 250px; }
+
+        /* ── EFFECTIFS ROSTER BLOCS ── */
+        .roster-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .roster-card { background: #141414; border-left: 3px solid #a855f7; padding: 15px 20px; border-radius: 8px; font-family: 'Orbitron', sans-serif; }
+        .roster-card .num { font-size: 1.5rem; color: #fff; font-weight: bold; }
+        .roster-card .label { color: #666; font-size: 0.75rem; text-transform: uppercase; }
+
+        /* ── TABLEAU PARFAIT DES JOUEURS ── */
         .db-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .db-header h2 { font-family: 'Orbitron', sans-serif; margin: 0; font-size: 1.4rem; }
+        .db-header h3 { font-family: 'Orbitron', sans-serif; margin: 0; font-size: 1.3rem; color: #fff; }
         
         .db-table-wrapper { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; overflow: hidden; }
         .db-table { width: 100%; border-collapse: collapse; font-family: 'Inter', sans-serif; text-align: left; }
@@ -35,7 +48,6 @@
         .db-table tr:last-child td { border-bottom: none; }
         .db-table tr:hover td { background: rgba(168, 85, 247, 0.02); }
 
-        /* Badges de catégories */
         .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; font-family: 'Orbitron', sans-serif; }
         .badge.main { background: rgba(168,85,247,0.15); color: #a855f7; border: 1px solid rgba(168,85,247,0.3); }
         .badge.academy { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
@@ -73,67 +85,79 @@
         <a href="roster.html" class="btn">Retour au Roster pour se connecter</a>
     </div>
 
-    <section id="dashboard-content" style="padding-top: 140px;" class="hidden">
+    <main id="dashboard-content" style="padding-top: 140px;" class="dashboard-wrapper hidden">
         
-        <div class="section-title">📈 Activité du site web</div>
+        <h1 class="main-title">📊 Tableau de Bord des Données Récoltées</h1>
+
         <div class="stats-grid">
-            <div class="stat-card" style="border-left-color: #00bfff;">
-                <div class="label">Visites Totales</div>
+            <div class="stat-card">
                 <div id="site-visites" class="num">0</div>
+                <div class="label">Visites Totales (Brut)</div>
             </div>
-            <div class="stat-card" style="border-left-color: #ff007f;">
-                <div class="label">Clics Boutique</div>
-                <div id="boutique-clicks" class="num">0</div>
+            <div class="stat-card">
+                <div id="discord-clicks" class="num">0</div>
+                <div class="label">Redirections vers Discord</div>
             </div>
-            <div class="stat-card" style="border-left-color: #00ffcc;">
-                <div class="label">Dernière mise à jour</div>
-                <div id="analytics-date" class="num" style="font-size: 1.1rem; line-height: 2.2rem; white-space: nowrap;">—</div>
+            <div class="stat-card">
+                <div id="top-player-click" class="num" style="font-size: 1.5rem; line-height: 2.2rem;">Aucun clic</div>
+                <div class="label">Joueur le plus cliqué</div>
             </div>
         </div>
 
-        <div class="section-title">👥 Effectifs Roster</div>
-        <div class="stats-grid">
-            <div class="stat-card">
+        <div class="filter-container">
+            <select id="page-filter" class="page-selector">
+                <option value="index.html">Page Accueil (index.html)</option>
+                <option value="roster.html">Page Roster (roster.html)</option>
+                <option value="boutique.html">Page Boutique (boutique.html)</option>
+            </select>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="analyticsChart" style="max-height: 300px; width: 100%;"></canvas>
+        </div>
+
+        <div class="section-title">👥 Gestion des Effectifs & Roster</div>
+        
+        <div class="roster-stats">
+            <div class="roster-card">
                 <div class="label">Équipe Principale</div>
                 <div id="count-main" class="num">0</div>
             </div>
-            <div class="stat-card" style="border-left-color: #22c55e;">
+            <div class="roster-card" style="border-left-color: #22c55e;">
                 <div class="label">Académie</div>
                 <div id="count-academy" class="num">0</div>
             </div>
-            <div class="stat-card" style="border-left-color: #eab308;">
+            <div class="roster-card" style="border-left-color: #eab308;">
                 <div class="label">Centre de Formation</div>
                 <div id="count-cdf" class="num">0</div>
             </div>
         </div>
 
-        <div class="dashboard-container">
-            <div class="db-header">
-                <h2>Base de Données Roster 2026</h2>
-                <a href="roster.html" class="action-btn" style="background:#0a0a0a; border: 1px solid #a855f7; padding: 10px 15px;">⚙️ Ouvrir le Panel d'Ajout</a>
-            </div>
-
-            <div class="db-table-wrapper">
-                <table class="db-table">
-                    <thead>
-                        <tr>
-                            <th>Joueur</th>
-                            <th>Catégorie</th>
-                            <th>Rôle / Division</th>
-                            <th>Earnings</th>
-                            <th>PR Actuel</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="db-players-rows">
-                        <tr>
-                            <td colspan="6" style="text-align: center; color: #666; font-style: italic; padding: 30px;">Chargement des données...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div class="db-header">
+            <h3>Base de Données Roster 2026</h3>
+            <a href="roster.html" class="action-btn" style="background:#0a0a0a; border: 1px solid #a855f7; padding: 10px 15px;">⚙️ Ouvrir le Panel d'Ajout</a>
         </div>
-    </section>
+
+        <div class="db-table-wrapper">
+            <table class="db-table">
+                <thead>
+                    <tr>
+                        <th>Joueur</th>
+                        <th>Catégorie</th>
+                        <th>Rôle / Division</th>
+                        <th>Earnings</th>
+                        <th>PR Actuel</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="db-players-rows">
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: #666; font-style: italic; padding: 30px;">Chargement des données...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
 
     <footer>
         <p>© 2026 Abysz Esports • Espace Administration</p>
@@ -167,43 +191,75 @@
         const countCdf = document.getElementById('count-cdf');
 
         const siteVisitesNum = document.getElementById('site-visites');
-        const boutiqueClicksNum = document.getElementById('boutique-clicks');
-        const analyticsDateStr = document.getElementById('analytics-date');
+        const discordClicksNum = document.getElementById('discord-clicks');
+        const topPlayerClickStr = document.getElementById('top-player-click');
+        const pageFilter = document.getElementById('page-filter');
 
-        // ── SÉCURITÉ ACCÈS ──
+        let myChart = null;
+
+        // ── SÉCURITÉ ET CONNEXION ──
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 accessDeniedSec.classList.add('hidden');
                 dashboardContentSec.classList.remove('hidden');
                 chargerDonneesDashboard();
-                chargerStatistiquesSite();
+                initialiserGraphiqueEtStats();
             } else {
                 accessDeniedSec.classList.remove('hidden');
                 dashboardContentSec.classList.add('hidden');
             }
         });
 
-        // ── CHARGEMENT DE VOS COMPTEURS DE VISITE EN TEMPS RÉEL ──
-        function chargerStatistiquesSite() {
-            // Remplacez "stats" et "global" si vos noms de collection/document diffèrent dans Firebase console
-            onSnapshot(doc(db, "stats", "global"), (docSnap) => {
+        // ── CHARGEMENT DE VOS DONNÉES DE VISITES D'ORIGINE ──
+        function initialiserGraphiqueEtStats() {
+            // Configuration initiale vide de votre graphique Chart.js
+            const ctx = document.getElementById('analyticsChart').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'], // Exemple temporaire
+                    datasets: [
+                        { label: 'Ordinateur (PC)', data: [6, 0, 0, 0, 0, 0, 0], borderColor: '#a855f7', backgroundColor: 'transparent', tension: 0.2 },
+                        { label: 'Mobile / Smartphone', data: [0, 0, 0, 0, 0, 0, 0], borderColor: '#00bfff', backgroundColor: 'transparent', tension: 0.2 }
+                    ]
+                },
+                options: { responsive: true, plugins: { legend: { labels: { color: '#fff' } } }, scales: { y: { grid: { color: '#222' }, ticks: { color: '#666' } }, x: { grid: { color: '#222' }, ticks: { color: '#666' } } } }
+            });
+
+            // ÉCOUTE DE VOTRE ANCIENNE COLLECTION DE STATS
+            // 💡 CONSEIL DE LIAISON : Si vos données réelles ne chargent pas, modifiez "analytics" ou "visites" 
+            // et "global" ci-dessous selon le nom exact présent dans votre console Firebase Firestore.
+            onSnapshot(doc(db, "analytics", "global"), (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
+                    siteVisitesNum.textContent = data.visitesTotales || 0;
+                    discordClicksNum.textContent = data.discordClicks || 0;
+                    topPlayerClickStr.textContent = data.topPlayer || "Aucun clic";
                     
-                    // Assignation des variables issues de votre Firestore
-                    siteVisitesNum.textContent = Number(data.visites || 0).toLocaleString('fr-FR');
-                    boutiqueClicksNum.textContent = Number(data.clicks || 0).toLocaleString('fr-FR');
-                    analyticsDateStr.textContent = data.lastUpdate || "En direct";
+                    // Si vous stockez les tableaux de données PC/Mobile dans Firestore :
+                    if(data.pcData && data.mobileData) {
+                        myChart.data.datasets[0].data = data.pcData;
+                        myChart.data.datasets[1].data = data.mobileData;
+                        if(data.labels) myChart.data.labels = data.labels;
+                        myChart.update();
+                    }
                 } else {
-                    console.log("Document des statistiques d'activité introuvable.");
+                    // Test de secours sur une seconde option de nom fréquemment utilisée ("stats" / "general")
+                    onSnapshot(doc(db, "stats", "general"), (fallbackSnap) => {
+                        if(fallbackSnap.exists()) {
+                            const d = fallbackSnap.data();
+                            siteVisitesNum.textContent = d.visites || 0;
+                            discordClicksNum.textContent = d.discord || 0;
+                            topPlayerClickStr.textContent = d.topPlayer || "Aucun clic";
+                        }
+                    });
                 }
             });
         }
 
-        // ── CHARGEMENT DU ROSTER ──
+        // ── CHARGEMENT DU TABLEAU ROSTER ET CALCUL EN TEMPS RÉEL ──
         function chargerDonneesDashboard() {
             const q = query(collection(db, "roster"), orderBy("createdAt", "asc"));
-            
             onSnapshot(q, (snapshot) => {
                 playersRows.innerHTML = "";
                 let mCount = 0, aCount = 0, cCount = 0;
@@ -214,13 +270,11 @@
 
                 snapshot.forEach((docSnap) => {
                     const player = docSnap.data();
-                    
                     if (player.team === "main") mCount++;
                     else if (player.team === "academy") aCount++;
                     else if (player.team === "cdf") cCount++;
 
                     const imgSrc = (player.image && player.image !== "#") ? player.image : "logo.png";
-                    
                     let dernierPR = "Aucun";
                     if(player.prHistory && player.prHistory.length > 0) {
                         dernierPR = Number(player.prHistory[player.prHistory.length - 1].value).toLocaleString('fr-FR');

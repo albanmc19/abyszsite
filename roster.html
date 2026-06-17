@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
         .logo-link { display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; }
+        .roster-header-container { display:flex; justify-content:space-between; align-items:center; max-width:1200px; margin:0 auto 30px auto; padding:0 20px; }
         
         /* ── BOUTON DE CONNEXION DANS LE MENU (NAV) ── */
         .admin-gate-btn { 
@@ -29,6 +30,7 @@
         .nav-dashboard-link a {
             color: #22c55e !important;
             font-weight: bold;
+            text-decoration: none;
         }
 
         .loading-text { text-align:center; color:#666; font-style:italic; grid-column:1/-1; padding:20px; }
@@ -425,7 +427,7 @@
             });
         });
 
-        // ── SYSTÈME DE SÉCURITÉ DE L'ONGLET DASHBOARD ──
+        // ── SYSTÈME DE SÉCURITÉ ET AFFICHAGE DE L'ONGLET DASHBOARD ──
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
@@ -433,14 +435,14 @@
                 panelStep.classList.remove('hidden');
                 userDisplayEmail.textContent = user.email;
                 adminGateBtn.textContent = "⚙️ Panel Admin";
-                navDashboard.classList.remove('hidden'); // REND LE DASHBOARD TOTALEMENT VISIBLE ET CLIQUABLE
+                if (navDashboard) navDashboard.classList.remove('hidden'); 
                 document.querySelectorAll('.admin-controls').forEach(c => c.classList.remove('hidden'));
             } else {
                 loginStep.classList.remove('hidden');
                 panelStep.classList.add('hidden');
                 userDisplayEmail.textContent = '';
                 adminGateBtn.textContent = "🔑 Connexion";
-                navDashboard.classList.add('hidden'); // REND LE DASHBOARD TOTALEMENT INVISIBLE ET INACCESSIBLE
+                if (navDashboard) navDashboard.classList.add('hidden'); 
                 document.querySelectorAll('.admin-controls').forEach(c => c.classList.add('hidden'));
             }
         });

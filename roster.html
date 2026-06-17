@@ -56,6 +56,10 @@
         .hidden { display:none !important; }
         .error-message { color:#ff4444; font-size:0.85rem; margin-top:10px; text-align:center; }
 
+        /* Bouton de réinitialisation d'image */
+        .reset-img-btn { background:#0a0a0a; border:1px solid #ff4444; color:#ff4444; padding:6px 12px; border-radius:6px; font-size:0.8rem; font-family:'Orbitron',sans-serif; cursor:pointer; margin-top:8px; display:inline-block; transition:all 0.2s; }
+        .reset-img-btn:hover { background:#ff4444; color:white; }
+
         /* ── ADMIN CONTROLS ── */
         .player-card-container { position:relative; }
         .admin-controls { position:absolute; top:10px; right:10px; display:flex; gap:6px; z-index:10; }
@@ -178,9 +182,10 @@
                         <input type="text" id="player-role" placeholder="Ex: Capitaine ou Division 1" required>
                     </div>
                     <div class="input-group">
-                        <label for="player-file-input">Charger la photo du joueur depuis votre appareil (Laissez vide pour garder le logo de base)</label>
+                        <label for="player-file-input">Charger la photo du joueur depuis votre appareil</label>
                         <input type="file" id="player-file-input" accept="image/*">
                         <p id="file-status" style="font-size:0.75rem; color:#22c55e; margin-top:5px;"></p>
+                        <button type="button" class="reset-img-btn" id="reset-img-btn">❌ Réinitialiser (Logo ABYSZ par défaut)</button>
                     </div>
                     <div class="input-group">
                         <label>Statistiques du joueur</label>
@@ -254,21 +259,19 @@
         const prAddZone = document.getElementById('pr-add-zone');
         const playerFileInput = document.getElementById('player-file-input');
         const fileStatus = document.getElementById('file-status');
+        const resetImgBtn = document.getElementById('reset-img-btn');
 
         let currentUser = null;
         let playersDataCache = {};
         let editingPlayerId = null; 
-        let base64ImageString = ""; // Contiendra l'image convertie en texte pour la BDD
+        let base64ImageString = ""; 
 
         // Convertir le fichier image local sélectionné en chaîne Base64 textuelle
         playerFileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) {
-                base64ImageString = "";
-                fileStatus.textContent = "";
                 return;
             }
-            // Compression basique si l'image dépasse 1.5 Mo pour préserver les limites Firestore
             if(file.size > 1500000) {
                 alert("Cette image est trop lourde. Choisissez une image de moins de 1.5 Mo.");
                 playerFileInput.value = "";
@@ -279,8 +282,17 @@
             reader.onload = function(event) {
                 base64ImageString = event.target.result;
                 fileStatus.textContent = "📸 Image prête à être enregistrée !";
+                fileStatus.style.color = "#22c55e";
             };
             reader.readAsDataURL(file);
+        });
+
+        // Action du bouton Réinitialiser l'image
+        resetImgBtn.addEventListener('click', () => {
+            playerFileInput.value = "";
+            base64ImageString = "#"; 
+            fileStatus.textContent = "🔄 Image réinitialisée. Logo ABYSZ par défaut.";
+            fileStatus.style.color = "#ef4444";
         });
 
         // Récupération en temps réel
@@ -429,10 +441,16 @@
                     document.getElementById('link-twitter').value = p.twitter || '#';
                     document.getElementById('link-tracker').value = p.tracker || '#';
 
-                    // Reset du sélecteur de fichier
+                    // Préparation de l'état de l'image pour la modification
                     playerFileInput.value = "";
                     base64ImageString = p.image || "#"; 
-                    fileStatus.textContent = p.image && p.image !== '#' ? "📸 Une photo personnalisée existe déjà." : "🔹 Utilise le logo ABYSZ de base.";
+                    if(p.image && p.image !== '#') {
+                        fileStatus.textContent = "📸 Une photo personnalisée existe déjà.";
+                        fileStatus.style.color = "#22c55e";
+                    } else {
+                        fileStatus.textContent = "🔹 Utilise le logo ABYSZ de base.";
+                        fileStatus.style.color = "#aaa";
+                    }
 
                     prAddZone.classList.remove('hidden');
                     document.getElementById('new-pr-value').value = "";
@@ -469,7 +487,6 @@
             const newPrVal = document.getElementById('new-pr-value').value;
             const newPrDate = document.getElementById('new-pr-date').value;
 
-            // Si aucune nouvelle image n'a été chargée et qu'on ne modifie rien, on met '#' par défaut
             const finalImage = base64ImageString || "#";
 
             try {
@@ -553,7 +570,7 @@
             playerFileInput.value = "";
             base64ImageString = "";
             fileStatus.textContent = "";
-            prAddZone.classList.remove('hidden'); // Laisse la zone PR visible pour l'ajouter dès la création
+            prAddZone.classList.remove('hidden'); 
             modal.classList.add('active');
         };
         closeModalBtn.onclick = () => modal.classList.remove('active');

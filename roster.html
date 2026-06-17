@@ -49,7 +49,7 @@
         .input-group { margin-bottom:15px; text-align:left; }
         .input-group label { display:block; margin-bottom:6px; color:#a855f7; font-size:0.8rem; font-family:'Orbitron',sans-serif; font-weight:600; }
         .input-group input, .input-group textarea, .input-group select { width:100%; padding:10px 14px; background:#0a0a0a; border:1px solid #2a2a2a; color:white; border-radius:8px; font-family:'Inter',sans-serif; font-size:0.9rem; box-sizing:border-box; }
-        .input-group input[type="file"] { background:#141414; border:1px dashed #a855f7; padding:10px; cursor:pointer; }
+        .input-group input[type="file"] { background:#141414; border:1px dashed #a855f7; padding:10px; cursor:pointer; color: #aaa; }
         .input-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
         .form-btn { background:#a855f7; color:white; border:none; width:100%; padding:12px; border-radius:8px; font-weight:700; cursor:pointer; font-family:'Orbitron',sans-serif; transition:background 0.2s; }
         .form-btn:hover { background:#b975ff; }
@@ -178,8 +178,9 @@
                         <input type="text" id="player-role" placeholder="Ex: Capitaine ou Division 1" required>
                     </div>
                     <div class="input-group">
-                        <label for="player-img-url">URL de la photo du joueur (Mettre # pour le logo par défaut)</label>
-                        <input type="text" id="player-img-url" placeholder="Lien de l'image ou #" value="#">
+                        <label for="player-file-input">Charger la photo du joueur depuis votre appareil (Laissez vide pour garder le logo de base)</label>
+                        <input type="file" id="player-file-input" accept="image/*">
+                        <p id="file-status" style="font-size:0.75rem; color:#22c55e; margin-top:5px;"></p>
                     </div>
                     <div class="input-group">
                         <label>Statistiques du joueur</label>
@@ -221,7 +222,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore as fsGet, doc as fsDoc, updateDoc as fsUpdate, deleteDoc as fsDelete, collection as fsCol, onSnapshot, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore as fsGet, doc as fsDoc, updateDoc as fsUpdate, deleteDoc as fsDelete, collection as fsCol, onSnapshot, query, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -251,10 +252,36 @@
         const panelTitle = document.getElementById('panel-title');
         const submitPlayerBtn = document.getElementById('submit-player-btn');
         const prAddZone = document.getElementById('pr-add-zone');
+        const playerFileInput = document.getElementById('player-file-input');
+        const fileStatus = document.getElementById('file-status');
 
         let currentUser = null;
         let playersDataCache = {};
         let editingPlayerId = null; 
+        let base64ImageString = ""; // Contiendra l'image convertie en texte pour la BDD
+
+        // Convertir le fichier image local sélectionné en chaîne Base64 textuelle
+        playerFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) {
+                base64ImageString = "";
+                fileStatus.textContent = "";
+                return;
+            }
+            // Compression basique si l'image dépasse 1.5 Mo pour préserver les limites Firestore
+            if(file.size > 1500000) {
+                alert("Cette image est trop lourde. Choisissez une image de moins de 1.5 Mo.");
+                playerFileInput.value = "";
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                base64ImageString = event.target.result;
+                fileStatus.textContent = "📸 Image prête à être enregistrée !";
+            };
+            reader.readAsDataURL(file);
+        });
 
         // Récupération en temps réel
         onSnapshot(query(fsCol(db, "roster")), (snapshot) => {
@@ -394,7 +421,6 @@
                     document.getElementById('player-team').value = p.team || 'main';
                     document.getElementById('player-pseudo').value = p.pseudo || '';
                     document.getElementById('player-role').value = p.role || '';
-                    document.getElementById('player-img-url').value = p.image || '#';
                     document.getElementById('stat-earnings').value = p.earnings || '';
                     document.getElementById('stat-best').value = p.bestPlacement || '';
                     document.getElementById('stat-wins').value = p.wins || '';
@@ -402,6 +428,11 @@
                     document.getElementById('link-twitch').value = p.twitch || '#';
                     document.getElementById('link-twitter').value = p.twitter || '#';
                     document.getElementById('link-tracker').value = p.tracker || '#';
+
+                    // Reset du sélecteur de fichier
+                    playerFileInput.value = "";
+                    base64ImageString = p.image || "#"; 
+                    fileStatus.textContent = p.image && p.image !== '#' ? "📸 Une photo personnalisée existe déjà." : "🔹 Utilise le logo ABYSZ de base.";
 
                     prAddZone.classList.remove('hidden');
                     document.getElementById('new-pr-value').value = "";
@@ -422,12 +453,11 @@
             });
         });
 
-        // Soumission du formulaire (Modification ou Ajout si editingPlayerId est null)
+        // Envoi final (Ajout ou Modification d'un joueur)
         playerForm.addEventListener('submit', async () => {
             const pseudo = document.getElementById('player-pseudo').value.trim();
             const role = document.getElementById('player-role').value.trim();
             const team = document.getElementById('player-team').value;
-            const image = document.getElementById('player-img-url').value.trim();
             const earnings = document.getElementById('stat-earnings').value.trim();
             const bestPlacement = document.getElementById('stat-best').value.trim();
             const wins = document.getElementById('stat-wins').value.trim();
@@ -439,30 +469,49 @@
             const newPrVal = document.getElementById('new-pr-value').value;
             const newPrDate = document.getElementById('new-pr-date').value;
 
-            if(!editingPlayerId) return; 
-
-            const docRef = fsDoc(db, "roster", editingPlayerId);
-            const currentPlayerData = playersDataCache[editingPlayerId];
-            let updatedPrHistory = currentPlayerData.prHistory || [];
-
-            if(newPrVal && newPrDate) {
-                updatedPrHistory.push({
-                    date: newPrDate,
-                    value: parseInt(newPrVal)
-                });
-            }
+            // Si aucune nouvelle image n'a été chargée et qu'on ne modifie rien, on met '#' par défaut
+            const finalImage = base64ImageString || "#";
 
             try {
-                await fsUpdate(docRef, {
-                    team, pseudo, role, image, earnings, bestPlacement, wins, bio, twitch, twitter, tracker,
-                    prHistory: updatedPrHistory
-                });
-                alert("Joueur modifié avec succès !");
+                if (editingPlayerId) {
+                    // MODE MODIFICATION
+                    const docRef = fsDoc(db, "roster", editingPlayerId);
+                    const currentPlayerData = playersDataCache[editingPlayerId];
+                    let updatedPrHistory = currentPlayerData.prHistory || [];
+
+                    if(newPrVal && newPrDate) {
+                        updatedPrHistory.push({
+                            date: newPrDate,
+                            value: parseInt(newPrVal)
+                        });
+                    }
+
+                    await fsUpdate(docRef, {
+                        team, pseudo, role, image: finalImage, earnings, bestPlacement, wins, bio, twitch, twitter, tracker,
+                        prHistory: updatedPrHistory
+                    });
+                    alert("Joueur modifié avec succès !");
+                } else {
+                    // MODE AJOUT NOUVEAU JOUEUR
+                    let initialPrHistory = [];
+                    if(newPrVal && newPrDate) {
+                        initialPrHistory.push({ date: newPrDate, value: parseInt(newPrVal) });
+                    }
+
+                    await addDoc(fsCol(db, "roster"), {
+                        team, pseudo, role, image: finalImage, earnings, bestPlacement, wins, bio, twitch, twitter, tracker,
+                        prHistory: initialPrHistory
+                    });
+                    alert("Nouveau joueur ajouté avec succès !");
+                }
+
                 modal.classList.remove('active');
                 playerForm.reset();
+                base64ImageString = "";
+                fileStatus.textContent = "";
             } catch(err) {
                 console.error(err);
-                alert("Erreur lors de la mise à jour.");
+                alert("Erreur lors de l'enregistrement.");
             }
         });
 
@@ -495,12 +544,16 @@
         });
 
         logoutBtn.onclick = () => { signOut(auth); modal.classList.remove('active'); };
+        
         adminGateBtn.onclick = () => {
             editingPlayerId = null;
             panelTitle.textContent = "Ajouter un joueur";
             submitPlayerBtn.textContent = "Enregistrer le joueur";
             playerForm.reset();
-            prAddZone.classList.add('hidden');
+            playerFileInput.value = "";
+            base64ImageString = "";
+            fileStatus.textContent = "";
+            prAddZone.classList.remove('hidden'); // Laisse la zone PR visible pour l'ajouter dès la création
             modal.classList.add('active');
         };
         closeModalBtn.onclick = () => modal.classList.remove('active');

@@ -9,12 +9,42 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
         .logo-link { display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; }
-        .roster-header-container { display:flex; justify-content:space-between; align-items:center; max-width:1200px; margin:0 auto 30px auto; padding:0 20px; }
-        .admin-gate-btn { background:transparent; border:1px solid #a855f7; color:#a855f7; padding:8px 16px; border-radius:20px; cursor:pointer; font-family:'Orbitron',sans-serif; transition:all 0.3s ease; }
+        
+        /* ── POSITIONNEMENT DU BOUTON ADMIN TOUT EN HAUT À DROITE ── */
+        .admin-gate-btn { 
+            position: absolute;
+            top: 25px;
+            right: 20px;
+            background: transparent; 
+            border: 1px solid #a855f7; 
+            color: #a855f7; 
+            padding: 8px 16px; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            font-family: 'Orbitron', sans-serif; 
+            transition: all 0.3s ease; 
+            z-index: 10000; /* Reste au-dessus de tout pour être cliquable */
+        }
         .admin-gate-btn:hover { background:#a855f7; color:white; box-shadow:0 0 15px #a855f7; }
+        
+        @media (max-width: 768px) {
+            .admin-gate-btn {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin: 20px auto;
+                display: block;
+                width: fit-content;
+            }
+        }
+
         .loading-text { text-align:center; color:#666; font-style:italic; grid-column:1/-1; padding:20px; }
+
+        /* ── IMAGES ── */
         .player-avatar-img { width:100%; height:200px; object-fit:cover; border-bottom:2px solid #a855f7; background:#141414; }
         .popup-avatar-img { width:100%; max-height:250px; object-fit:contain; border:2px solid #a855f7; border-radius:12px; margin:0 auto 20px auto; display:block; background:#0a0a0a; }
+
+        /* ── MODAL ── */
         .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center; padding:20px; }
         .modal-overlay.active { display:flex; }
         .modal-content { background:#141414; border:2px solid #a855f7; border-radius:24px; max-width:500px; width:100%; padding:30px; position:relative; box-shadow:0 0 30px rgba(168,85,247,0.25); box-sizing:border-box; max-height:90vh; overflow-y:auto; }
@@ -28,14 +58,20 @@
         .input-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
         .form-btn { background:#a855f7; color:white; border:none; width:100%; padding:12px; border-radius:8px; font-weight:700; cursor:pointer; font-family:'Orbitron',sans-serif; transition:background 0.2s; }
         .form-btn:hover { background:#b975ff; }
+        .form-btn-secondary { background:#1a1a1a; color:#a855f7; border:1px solid #a855f7; width:100%; padding:10px; border-radius:8px; font-weight:700; cursor:pointer; font-family:'Orbitron',sans-serif; font-size:0.85rem; transition:all 0.2s; margin-top:8px; }
+        .form-btn-secondary:hover { background:#a855f7; color:white; }
         .hidden { display:none !important; }
         .error-message { color:#ff4444; font-size:0.85rem; margin-top:10px; text-align:center; }
+
+        /* ── ADMIN CONTROLS ── */
         .player-card-container { position:relative; }
         .admin-controls { position:absolute; top:10px; right:10px; display:flex; gap:6px; z-index:10; }
         .inline-edit-btn { background:#a855f7; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold; font-family:'Inter',sans-serif; }
         .inline-edit-btn:hover { background:#b975ff; }
         .inline-delete-btn { background:#ff4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold; font-family:'Inter',sans-serif; }
         .inline-delete-btn:hover { background:#cc3333; }
+
+        /* ── SECTION PR HISTORIQUE (dans le popup) ── */
         .pr-history-section { background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 12px; padding: 16px; margin: 16px 0; }
         .pr-history-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
         .pr-evolution-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: 700; margin-bottom: 14px; }
@@ -53,6 +89,7 @@
         .pr-delta-cell.pos { color: #22c55e; }
         .pr-delta-cell.neg { color: #ef4444; }
         .pr-delta-cell.neu { color: #666; }
+
         .pr-add-zone { background: #0a0a0a; border: 1px solid #a855f7; border-radius: 10px; padding: 14px; margin-bottom: 14px; }
         .pr-add-zone-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 0.75rem; letter-spacing: 1px; margin-bottom: 10px; }
     </style>
@@ -70,13 +107,11 @@
             <li><a href="roster.html">Roster</a></li>
             <li><a href="boutique.html">Boutique</a></li>
         </ul>
+        <button class="admin-gate-btn" id="admin-gate-btn">🔑 Équipe Admin</button>
     </nav>
 
     <section style="padding-top: 160px;">
-        <div class="roster-header-container">
-            <h2>Notre Roster 2026</h2>
-            <button class="admin-gate-btn" id="admin-gate-btn">🔑 Équipe Admin</button>
-        </div>
+        <h2 style="text-align:center; margin-bottom:30px;">Notre Roster 2026</h2>
 
         <div class="roster-grid" id="main-roster-grid">
             <p class="loading-text">Chargement de l'équipe principale...</p>
@@ -95,7 +130,7 @@
         </div>
 
         <br><br>
-        <a href="index.html" class="btn">← Retour à l'accueil</a>
+        <a href="index.html" class="btn" style="display:block; width:fit-content; margin:0 auto;">← Retour à l'accueil</a>
     </section>
 
     <div id="popups-container"></div>
@@ -126,8 +161,9 @@
 
             <div id="admin-panel-step" class="hidden">
                 <h3 id="panel-title">Ajouter un joueur</h3>
-                <div style="display:flex;justify-content:space-between;margin-bottom:15px;font-size:0.8rem;background:#0a0a0a;padding:8px;border-radius:6px;">
-                    <span id="user-display-email" style="color:#a855f7;"></span>
+                <div style="display:flex;justify-content:space-between;margin-bottom:15px;font-size:0.8rem;background:#0a0a0a;padding:8px;border-radius:6px;align-items:center;">
+                    <span id="user-display-email" style="color:#a855f7; font-weight:600;"></span>
+                    <a href="dashboard.html" style="color:#22c55e; text-decoration:none; font-weight:bold; font-family:'Orbitron',sans-serif;">📊 Dashboard</a>
                     <button id="logout-btn" style="background:none;border:none;color:#ff4444;cursor:pointer;font-weight:bold;">Déconnexion</button>
                 </div>
 
@@ -151,6 +187,7 @@
                     <div class="input-group">
                         <label for="player-file">Charger la photo du joueur depuis votre PC</label>
                         <input type="file" id="player-file" accept="image/*">
+                        <p style="font-size:0.75rem;color:#aaa;margin:4px 0 0 0;">L'image par défaut (logo) sera utilisée si aucun fichier n'est sélectionné.</p>
                     </div>
                     <div class="input-group">
                         <label>Statistiques du joueur</label>
@@ -181,6 +218,7 @@
                             <label for="new-pr-date">Date du relevé</label>
                             <input type="date" id="new-pr-date">
                         </div>
+                        <p style="font-size:0.72rem;color:#666;margin:8px 0 0 0;">Laisse vide pour ne pas modifier l'historique PR.</p>
                     </div>
 
                     <button type="submit" class="form-btn" id="add-player-btn">Enregistrer le joueur</button>
@@ -233,6 +271,7 @@
         let cacheJoueurs = {};
         let base64ImageString = "";
 
+        // ── HELPERS PR ──────────────────────────────────────────────
         function calculerEvolution(historique) {
             if (!historique || historique.length < 2) return null;
             const dernier = historique[historique.length - 1].value;
@@ -285,6 +324,7 @@
                 </div>`;
         }
 
+        // ── LECTURE FICHIER IMAGE ────────────────────────────────────
         playerFileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
@@ -294,16 +334,22 @@
             }
         });
 
-        const qRoster = query(collection(db, "roster"), orderBy("createdAt", "asc"));
-        onSnapshot(qRoster, (snapshot) => {
-            mainGrid.innerHTML = ""; cdfGrid.innerHTML = ""; academyGrid.innerHTML = ""; popupsContainer.innerHTML = "";
+        // ── ÉCOUTE FIRESTORE ─────────────────────────────────────────
+        const q = query(collection(db, "roster"), orderBy("createdAt", "asc"));
+        onSnapshot(q, (snapshot) => {
+            mainGrid.innerHTML = "";
+            cdfGrid.innerHTML = "";
+            academyGrid.innerHTML = "";
+            popupsContainer.innerHTML = "";
             cacheJoueurs = {};
+
             let mainCount = 0, cdfCount = 0, acadCount = 0;
 
             snapshot.forEach((docSnap) => {
                 const player = docSnap.data();
                 const id = docSnap.id;
                 cacheJoueurs[id] = player;
+
                 const imgSrc = (player.image && player.image !== "#") ? player.image : "logo.png";
                 const historique = player.prHistory || [];
 
@@ -331,9 +377,9 @@
                     document.body.style.overflow = 'hidden';
                 });
 
-                if (player.team === "main") { mainGrid.appendChild(cardContainer); mainCount++; }
-                else if (player.team === "cdf") { cdfGrid.appendChild(cardContainer); cdfCount++; }
-                else { academyGrid.appendChild(cardContainer); acadCount++; }
+                if (player.team === "main")        { mainGrid.appendChild(cardContainer); mainCount++; }
+                else if (player.team === "cdf")    { cdfGrid.appendChild(cardContainer); cdfCount++; }
+                else                               { academyGrid.appendChild(cardContainer); acadCount++; }
 
                 const popupOverlay = document.createElement('div');
                 popupOverlay.className = "popup-overlay";
@@ -360,8 +406,16 @@
                         </div>
                     </div>`;
 
-                popupOverlay.querySelector('.popup-close').onclick = () => { popupOverlay.classList.remove('active'); document.body.style.overflow = ''; };
-                popupOverlay.onclick = (e) => { if (e.target === popupOverlay) { popupOverlay.classList.remove('active'); document.body.style.overflow = ''; } };
+                popupOverlay.querySelector('.popup-close').onclick = () => {
+                    popupOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                };
+                popupOverlay.onclick = (e) => {
+                    if (e.target === popupOverlay) {
+                        popupOverlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                };
                 popupsContainer.appendChild(popupOverlay);
             });
 
@@ -372,7 +426,7 @@
             document.querySelectorAll('.inline-delete-btn').forEach(btn => {
                 btn.onclick = async (e) => {
                     e.stopPropagation();
-                    if (confirm("Voulez-vous vraiment retirer ce joueur ?")) {
+                    if (confirm("Voulez-vous vraiment retirer ce joueur du roster ABYSZ ?")) {
                         await deleteDoc(doc(db, "roster", e.target.getAttribute('data-id')));
                     }
                 };
@@ -387,6 +441,7 @@
 
                     editingPlayerId = id;
                     base64ImageString = player.image || "#";
+
                     document.getElementById('player-team').value = player.team;
                     document.getElementById('player-pseudo').value = player.pseudo;
                     document.getElementById('player-role').value = player.role;
@@ -398,24 +453,30 @@
                     document.getElementById('link-twitch').value = player.twitch;
                     document.getElementById('link-twitter').value = player.twitter;
                     document.getElementById('link-tracker').value = player.tracker;
+
                     document.getElementById('new-pr-value').value = "";
                     document.getElementById('new-pr-date').value = new Date().toISOString().split('T')[0];
+
                     prAddZone.classList.remove('hidden');
+
                     panelTitle.textContent = "Modifier : " + player.pseudo;
-                    addPlayerBtn.textContent = "Mettre à jour";
+                    addPlayerBtn.textContent = "Mettre à jour le joueur";
                     modal.classList.add('active');
                 };
             });
         });
 
+        // ── AUTH ─────────────────────────────────────────────────────
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
-                loginStep.classList.add('hidden'); panelStep.classList.remove('hidden');
+                loginStep.classList.add('hidden');
+                panelStep.classList.remove('hidden');
                 userDisplayEmail.textContent = user.email;
                 document.querySelectorAll('.admin-controls').forEach(c => c.classList.remove('hidden'));
             } else {
-                loginStep.classList.remove('hidden'); panelStep.classList.add('hidden');
+                loginStep.classList.remove('hidden');
+                panelStep.classList.add('hidden');
                 userDisplayEmail.textContent = '';
                 document.querySelectorAll('.admin-controls').forEach(c => c.classList.add('hidden'));
             }
@@ -424,68 +485,85 @@
         loginForm.addEventListener('submit', async () => {
             loginError.classList.add('hidden');
             try {
-                await signInWithEmailAndPassword(auth, document.getElementById('admin-email').value.trim(), document.getElementById('admin-password').value);
-            } catch { loginError.textContent = "Identifiants incorrects."; loginError.classList.remove('hidden'); }
+                await signInWithEmailAndPassword(
+                    auth,
+                    document.getElementById('admin-email').value.trim(),
+                    document.getElementById('admin-password').value
+                );
+            } catch {
+                loginError.textContent = "Identifiants incorrects.";
+                loginError.classList.remove('hidden');
+            }
         });
 
         logoutBtn.onclick = () => { signOut(auth); modal.classList.remove('active'); };
 
+        // ── ENREGISTREMENT ───────────────────────────────────────────
         playerForm.addEventListener('submit', async () => {
             const dataJoueur = {
-                team: document.getElementById('player-team').value,
-                pseudo: document.getElementById('player-pseudo').value.trim(),
-                role: document.getElementById('player-role').value.trim(),
-                image: base64ImageString || "#",
-                earnings: document.getElementById('stat-earnings').value.trim(),
-                bestPlacement: document.getElementById('stat-best').value.trim(),
-                wins: document.getElementById('stat-wins').value.trim(),
-                bio: document.getElementById('player-bio').value.trim(),
-                twitch: document.getElementById('link-twitch').value.trim(),
-                twitter: document.getElementById('link-twitter').value.trim(),
-                tracker: document.getElementById('link-tracker').value.trim(),
+                team:           document.getElementById('player-team').value,
+                pseudo:         document.getElementById('player-pseudo').value.trim(),
+                role:           document.getElementById('player-role').value.trim(),
+                image:          base64ImageString || "#",
+                earnings:       document.getElementById('stat-earnings').value.trim(),
+                bestPlacement:  document.getElementById('stat-best').value.trim(),
+                wins:           document.getElementById('stat-wins').value.trim(),
+                bio:            document.getElementById('player-bio').value.trim(),
+                twitch:         document.getElementById('link-twitch').value.trim(),
+                twitter:        document.getElementById('link-twitter').value.trim(),
+                tracker:        document.getElementById('link-tracker').value.trim(),
             };
 
             try {
                 if (editingPlayerId) {
                     const newPrVal = document.getElementById('new-pr-value').value.trim();
                     const newPrDate = document.getElementById('new-pr-date').value.trim();
+
                     if (newPrVal !== "" && !isNaN(parseInt(newPrVal))) {
                         const ancienHistorique = cacheJoueurs[editingPlayerId].prHistory || [];
-                        dataJoueur.prHistory = [...ancienHistorique, { value: parseInt(newPrVal), date: newPrDate || new Date().toLocaleDateString('fr-FR') }];
-                    } else { dataJoueur.prHistory = cacheJoueurs[editingPlayerId].prHistory || []; }
+                        const nouvelleEntree = {
+                            value: parseInt(newPrVal),
+                            date: newPrDate || new Date().toLocaleDateString('fr-FR')
+                        };
+                        dataJoueur.prHistory = [...ancienHistorique, nouvelleEntree];
+                    } else {
+                        dataJoueur.prHistory = cacheJoueurs[editingPlayerId].prHistory || [];
+                    }
+
                     await updateDoc(doc(db, "roster", editingPlayerId), dataJoueur);
+                    alert("Joueur mis à jour avec succès !");
                 } else {
-                    dataJoueur.prHistory = []; dataJoueur.createdAt = new Date();
+                    dataJoueur.prHistory = [];
+                    dataJoueur.createdAt = new Date();
                     await addDoc(collection(db, "roster"), dataJoueur);
+                    alert("Joueur ajouté avec succès !");
                 }
-                reinitialiserFormulaire(); modal.classList.remove('active');
-            } catch (error) { alert("Erreur : " + error.message); }
+
+                reinitialiserFormulaire();
+                modal.classList.remove('active');
+            } catch (error) {
+                alert("Une erreur est survenue : " + error.message);
+            }
         });
 
         function reinitialiserFormulaire() {
-            editingPlayerId = null; base64ImageString = ""; playerForm.reset(); playerFileInput.value = "";
-            panelTitle.textContent = "Ajouter un joueur"; addPlayerBtn.textContent = "Enregistrer le joueur";
-            document.getElementById('link-twitch').value = "#"; document.getElementById('link-twitter').value = "#"; document.getElementById('link-tracker').value = "#";
+            editingPlayerId = null;
+            base64ImageString = "";
+            playerForm.reset();
+            playerFileInput.value = "";
+            panelTitle.textContent = "Ajouter un joueur";
+            addPlayerBtn.textContent = "Enregistrer le joueur";
+            document.getElementById('link-twitch').value = "#";
+            document.getElementById('link-twitter').value = "#";
+            document.getElementById('link-tracker').value = "#";
+            document.getElementById('new-pr-value').value = "";
+            document.getElementById('new-pr-date').value = "";
             prAddZone.classList.add('hidden');
         }
 
         adminGateBtn.onclick = () => { reinitialiserFormulaire(); modal.classList.add('active'); };
         closeModalBtn.onclick = () => modal.classList.remove('active');
         window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
-
-        // ── TRACKER DE STATISTIQUES ROSTER ──
-        async function trackRosterPage() {
-            const support = window.innerWidth < 768 ? "Mobile" : "Ordinateur";
-            try {
-                await addDoc(collection(db, "analytics"), {
-                    date: new Date().toISOString().split('T')[0],
-                    page: "roster.html",
-                    device: support,
-                    timestamp: new Date()
-                });
-            } catch (e) { console.error("Analytics Error:", e); }
-        }
-        trackRosterPage();
     </script>
 </body>
 </html>

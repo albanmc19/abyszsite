@@ -327,12 +327,13 @@
                 `;
                 targetGrid.appendChild(card);
 
-                // Correction de la récupération de la clé prHistory
+                // Récupération sécurisée du tableau prHistory
                 const prHistory = p.prHistory || [];
                 let prTableRows = "";
                 let evolutionBadge = `<div class="pr-evolution-badge neutral">▬ Stable</div>`;
 
                 if(prHistory.length > 0) {
+                    // Trier du plus récent au plus ancien
                     const sortedPr = [...prHistory].sort((a,b) => new Date(b.date) - new Date(a.date));
                     
                     if(sortedPr.length >= 2) {
@@ -357,14 +358,15 @@
                             else if(currentDiff < 0) { deltaStr = `${currentDiff}`; deltaClass = "neg"; }
                         }
                         
-                        // Sécurisation de l'affichage de la date si elle est brute ou mal formée
                         let displayDate = "Date inconnue";
                         if(entry.date) {
-                            const d = new Date(entry.date);
-                            if(!isNaN(d.getTime())) {
-                                displayDate = d.toLocaleDateString('fr-FR');
+                            // Nettoyage de la date pour éviter le décalage de fuseau horaire
+                            const dateParts = entry.date.split('-');
+                            if(dateParts.length === 3) {
+                                displayDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
                             } else {
-                                displayDate = entry.date;
+                                const d = new Date(entry.date);
+                                if(!isNaN(d.getTime())) displayDate = d.toLocaleDateString('fr-FR');
                             }
                         }
 
@@ -468,20 +470,21 @@
             });
         });
 
-        // REFAIT A NEUF : Gestion de la soumission sans rechargement de page
+        // FIX TOTAL DE L'ENREGISTREMENT ET MODIFICATION
         playerForm.addEventListener('submit', async (e) => {
             e.preventDefault(); 
 
-            const pseudo = document.getElementById('player-pseudo').value.trim();
-            const role = document.getElementById('player-role').value.trim();
-            const team = document.getElementById('player-team').value;
-            const earnings = document.getElementById('stat-earnings').value.trim();
-            const bestPlacement = document.getElementById('stat-best').value.trim();
-            const wins = document.getElementById('stat-wins').value.trim();
-            const bio = document.getElementById('player-bio').value.trim();
-            const twitch = document.getElementById('link-twitch').value.trim();
-            const twitter = document.getElementById('link-twitter').value.trim();
-            const tracker = document.getElementById('link-tracker').value.trim();
+            // Sauvegarde immédiate des éléments saisis par l'utilisateur
+            const inputPseudo = document.getElementById('player-pseudo').value.trim();
+            const inputRole = document.getElementById('player-role').value.trim();
+            const inputTeam = document.getElementById('player-team').value;
+            const inputEarnings = document.getElementById('stat-earnings').value.trim();
+            const inputBestPlacement = document.getElementById('stat-best').value.trim();
+            const inputWins = document.getElementById('stat-wins').value.trim();
+            const inputBio = document.getElementById('player-bio').value.trim();
+            const inputTwitch = document.getElementById('link-twitch').value.trim();
+            const inputTwitter = document.getElementById('link-twitter').value.trim();
+            const inputTracker = document.getElementById('link-tracker').value.trim();
 
             const newPrVal = document.getElementById('new-pr-value').value;
             const newPrDate = document.getElementById('new-pr-date').value;
@@ -490,12 +493,14 @@
 
             try {
                 if (editingPlayerId) {
+                    // MODE UNIQUE : MODIFICATION
                     const docRef = fsDoc(db, "roster", editingPlayerId);
                     const currentPlayerData = playersDataCache[editingPlayerId];
                     
-                    // On force l'utilisation stricte de la même clé prHistory
+                    // On garde le tableau existant intact
                     let updatedPrHistory = currentPlayerData.prHistory || [];
 
+                    // Si l'admin a écrit une nouvelle valeur et choisi une date
                     if(newPrVal && newPrDate) {
                         updatedPrHistory.push({
                             date: newPrDate,
@@ -503,31 +508,56 @@
                         });
                     }
 
+                    // Envoi complet des données nettoyées à Firebase
                     await fsUpdate(docRef, {
-                        team, pseudo, role, image: finalImage, earnings, bestPlacement, wins, bio, twitch, twitter, tracker,
+                        team: inputTeam,
+                        pseudo: inputPseudo,
+                        role: inputRole,
+                        image: finalImage,
+                        earnings: inputEarnings,
+                        bestPlacement: inputBestPlacement,
+                        wins: inputWins,
+                        bio: inputBio,
+                        twitch: inputTwitch,
+                        twitter: inputTwitter,
+                        tracker: inputTracker,
                         prHistory: updatedPrHistory
                     });
+                    
                     alert("Joueur modifié avec succès !");
                 } else {
+                    // MODE UNIQUE : AJOUT NOUVEAU
                     let initialPrHistory = [];
                     if(newPrVal && newPrDate) {
                         initialPrHistory.push({ date: newPrDate, value: parseInt(newPrVal) });
                     }
 
                     await addDoc(fsCol(db, "roster"), {
-                        team, pseudo, role, image: finalImage, earnings, bestPlacement, wins, bio, twitch, twitter, tracker,
+                        team: inputTeam,
+                        pseudo: inputPseudo,
+                        role: inputRole,
+                        image: finalImage,
+                        earnings: inputEarnings,
+                        bestPlacement: inputBestPlacement,
+                        wins: inputWins,
+                        bio: inputBio,
+                        twitch: inputTwitch,
+                        twitter: inputTwitter,
+                        tracker: inputTracker,
                         prHistory: initialPrHistory
                     });
                     alert("Nouveau joueur ajouté avec succès !");
                 }
 
+                // Réinitialisation propre après l'envoi réussi
                 modal.classList.remove('active');
                 playerForm.reset();
                 base64ImageString = "";
                 fileStatus.textContent = "";
+                editingPlayerId = null;
             } catch(err) {
-                console.error(err);
-                alert("Erreur lors de l'enregistrement.");
+                console.error("Erreur Firebase : ", err);
+                alert("Erreur lors de l'enregistrement. Vérifie ta console.");
             }
         });
 

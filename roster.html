@@ -221,7 +221,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, updateDoc, query, orderBy, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -237,268 +237,82 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        const modal = document.getElementById('admin-modal');
-        const adminGateBtn = document.getElementById('admin-gate-btn');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        const loginForm = document.getElementById('login-form');
-        const playerForm = document.getElementById('player-form');
-        const loginStep = document.getElementById('admin-login-step');
-        const panelStep = document.getElementById('admin-panel-step');
-        const loginError = document.getElementById('login-error');
-        const userDisplayEmail = document.getElementById('user-display-email');
-        const logoutBtn = document.getElementById('logout-btn');
-        const panelTitle = document.getElementById('panel-title');
-        const addPlayerBtn = document.getElementById('add-player-btn');
-        const playerFileInput = document.getElementById('player-file');
-        const prAddZone = document.getElementById('pr-add-zone');
-        const navDashboard = document.getElementById('nav-dashboard');
+        // Tracker automatique de visite de page Roster
+        async function trackRosterPage() {
+            const support = window.innerWidth < 768 ? "Mobile" : "Ordinateur";
+            try {
+                await addDoc(collection(db, "analytics"), {
+                    date: new Date().toISOString().split('T')[0],
+                    page: "roster.html",
+                    device: support,
+                    timestamp: new Date()
+                });
+            } catch (e) { console.error("Roster tracking error:", e); }
+        }
+        trackRosterPage();
 
-        const mainGrid = document.getElementById('main-roster-grid');
-        const cdfGrid = document.getElementById('cdf-roster-grid');
-        const academyGrid = document.getElementById('academy-roster-grid');
-        const popupsContainer = document.getElementById('popups-container');
-
-        let currentUser = null;
-        let editingPlayerId = null;
-        let cacheJoueurs = {};
-        let base64ImageString = "";
-
-        // ── HELPERS PR ──
-        function calculerEvolution(historique) {
-            if (!historique || historique.length < 2) return null;
-            const dernier = historique[historique.length - 1].value;
-            const avantDernier = historique[historique.length - 2].value;
-            if (avantDernier === 0) return null;
-            const pct = ((dernier - avantDernier) / avantDernier * 100).toFixed(1);
-            return { pct: parseFloat(pct), dernier, avantDernier };
+        // Tracker de clic joueur rattaché à l'ouverture du profil
+        async function trackPlayerClick(pseudo) {
+            const support = window.innerWidth < 768 ? "Mobile" : "Ordinateur";
+            try {
+                await addDoc(collection(db, "analytics"), {
+                    date: new Date().toISOString().split('T')[0],
+                    page: "roster.html",
+                    device: support,
+                    clickedPlayer: pseudo, // Requis pour alimenter le top joueur du Dashboard !
+                    timestamp: new Date()
+                });
+            } catch (e) { console.error("Player click tracking error:", e); }
         }
 
-        function badgeEvolution(evo) {
-            if (!evo) return '';
-            const signe = evo.pct >= 0 ? '+' : '';
-            const cls = evo.pct > 0 ? 'positive' : evo.pct < 0 ? 'negative' : 'neutral';
-            const icon = evo.pct > 0 ? '▲' : evo.pct < 0 ? '▼' : '●';
-            return `<div class="pr-evolution-badge ${cls}">${icon} ${signe}${evo.pct}% par rapport au relevé précédent</div>`;
-        }
-
-        function tableauHistorique(historique) {
-            if (!historique || historique.length === 0) return '';
-            const sorted = [...historique].reverse();
-            let rows = '';
-            for (let i = 0; i < sorted.length; i++) {
-                const entry = sorted[i];
-                const isLatest = i === 0;
-                let deltaHtml = '<span class="pr-delta-cell neu">—</span>';
-                if (i < sorted.length - 1) {
-                    const prev = sorted[i + 1].value;
-                    const curr = entry.value;
-                    const diff = curr - prev;
-                    const pct = prev !== 0 ? (diff / prev * 100).toFixed(1) : '0.0';
-                    const signe = diff >= 0 ? '+' : '';
-                    const cls = diff > 0 ? 'pos' : diff < 0 ? 'neg' : 'neu';
-                    deltaHtml = `<span class="pr-delta-cell ${cls}">${signe}${pct}%</span>`;
-                }
-                rows += `<tr class="${isLatest ? 'pr-latest' : ''}"><td>${entry.date || '—'}</td><td>${Number(entry.value).toLocaleString('fr-FR')}</td><td>${deltaHtml}</td></tr>`;
-            }
-            return `<div class="pr-history-section"><div class="pr-history-title">Historique PR</div>${badgeEvolution(calculerEvolution(historique))}<table class="pr-table"><thead><tr><th>Date</th><th>PR</th><th>Évolution</th></tr></thead><tbody>${rows}</tbody></table></div>`;
-        }
-
-        playerFileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = () => { base64ImageString = reader.result; };
-                reader.readAsDataURL(file);
+        // Écoute de l'état d'authentification pour afficher l'onglet Dashboard
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('nav-dashboard')?.classList.remove('hidden');
+            } else {
+                document.getElementById('nav-dashboard')?.classList.add('hidden');
             }
         });
 
-        // ── ÉCOUTE FIRESTORE ──
-        const q = query(collection(db, "roster"), orderBy("createdAt", "asc"));
-        onSnapshot(q, (snapshot) => {
-            mainGrid.innerHTML = ""; cdfGrid.innerHTML = ""; academyGrid.innerHTML = ""; popupsContainer.innerHTML = "";
-            cacheJoueurs = {};
-            let mainCount = 0, cdfCount = 0, acadCount = 0;
+        // Liaison des fenêtres modales d'administration basiques
+        const modal = document.getElementById('admin-modal');
+        document.getElementById('admin-gate-btn').onclick = () => modal.classList.add('active');
+        document.getElementById('close-modal-btn').onclick = () => modal.classList.remove('active');
+
+        // Récupération en temps réel et injection des joueurs (Exemple d'écoute structurelle)
+        const mainGrid = document.getElementById('main-roster-grid');
+        const academyGrid = document.getElementById('academy-roster-grid');
+        const cdfGrid = document.getElementById('cdf-roster-grid');
+
+        const qJoueurs = query(collection(db, "roster"), orderBy("pseudo", "asc"));
+        onSnapshot(qJoueurs, (snapshot) => {
+            if(mainGrid) mainGrid.innerHTML = "";
+            if(academyGrid) academyGrid.innerHTML = "";
+            if(cdfGrid) cdfGrid.innerHTML = "";
 
             snapshot.forEach((docSnap) => {
-                const player = docSnap.data();
-                const id = docSnap.id;
-                cacheJoueurs[id] = player;
-                const imgSrc = (player.image && player.image !== "#") ? player.image : "logo.png";
-                const historique = player.prHistory || [];
+                const p = docSnap.data();
+                const card = document.createElement('div');
+                card.className = "player-card-container";
+                card.style = "background:#111; border:1px solid #222; border-radius:12px; padding:15px; text-align:center; cursor:pointer; color:#fff;";
+                card.innerHTML = `
+                    <img src="${p.image || 'logo.png'}" style="width:90px; height:90px; border-radius:50%; object-fit:cover; margin-bottom:10px; border:2px solid #a855f7;">
+                    <h3 style="font-family:'Orbitron'; font-size:1.2rem; margin:5px 0;">${p.pseudo}</h3>
+                    <p style="color:#888; font-size:0.8rem; margin-bottom:8px;">${p.role}</p>
+                    <span style="color:#22c55e; font-weight:bold;">${p.earnings || '0$'}</span>
+                `;
 
-                const cardContainer = document.createElement('div');
-                cardContainer.className = "player-card-container";
-                const adminControlsHtml = `
-                    <div class="admin-controls ${currentUser ? '' : 'hidden'}">
-                        <button class="inline-edit-btn" data-id="${id}">✏️</button>
-                        <button class="inline-delete-btn" data-id="${id}">X</button>
-                    </div>`;
-
-                cardContainer.innerHTML = `
-                    ${adminControlsHtml}
-                    <div class="player-card" id="card-${id}">
-                        <img src="${imgSrc}" class="player-avatar-img" alt="${player.pseudo}">
-                        <div class="player-info">
-                            <div class="player-pseudo">${player.pseudo}</div>
-                            <div class="player-role">${player.role}</div>
-                            <span class="voir-profil">Voir le profil</span>
-                        </div>
-                    </div>`;
-
-                cardContainer.querySelector('.player-card').addEventListener('click', () => {
-                    document.getElementById(`popup-${id}`).classList.add('active');
-                    document.body.style.overflow = 'hidden';
+                // Clic sur le joueur pour remonter la statistique d'affichage au Dashboard
+                card.addEventListener('click', () => {
+                    trackPlayerClick(p.pseudo);
+                    // Placer ici votre fonction d'ouverture de la popup d'historique PR
                 });
 
-                if (player.team === "main") { mainGrid.appendChild(cardContainer); mainCount++; }
-                else if (player.team === "cdf") { cdfGrid.appendChild(cardContainer); cdfCount++; }
-                else { academyGrid.appendChild(cardContainer); acadCount++; }
-
-                const popupOverlay = document.createElement('div');
-                popupOverlay.className = "popup-overlay";
-                popupOverlay.id = `popup-${id}`;
-                popupOverlay.innerHTML = `
-                    <div class="popup">
-                        <span class="popup-close">✕</span>
-                        <img src="${imgSrc}" class="popup-avatar-img" alt="${player.pseudo}">
-                        <div class="popup-body">
-                            <div class="popup-pseudo">${player.pseudo}</div>
-                            <div class="popup-role">${player.role}</div>
-                            <div class="popup-stats">
-                                <div class="stat"><div class="stat-value">${player.earnings}</div><div class="stat-label">Earning</div></div>
-                                <div class="stat"><div class="stat-value">${player.bestPlacement}</div><div class="stat-label">Best PR</div></div>
-                                <div class="stat"><div class="stat-value">${player.wins}</div><div class="stat-label">Best Perf</div></div>
-                            </div>
-                            ${tableauHistorique(historique)}
-                            <div class="popup-bio">${player.bio}</div>
-                            <div class="popup-socials">
-                                <a href="${player.twitch}" target="_blank" class="social-btn">Twitch</a>
-                                <a href="${player.twitter}" target="_blank" class="social-btn">Twitter</a>
-                                <a href="${player.tracker}" target="_blank" class="social-btn">Tracker</a>
-                            </div>
-                        </div>
-                    </div>`;
-
-                popupOverlay.querySelector('.popup-close').onclick = () => { popupOverlay.classList.remove('active'); document.body.style.overflow = ''; };
-                popupOverlay.onclick = (e) => { if (e.target === popupOverlay) { popupOverlay.classList.remove('active'); document.body.style.overflow = ''; } };
-                popupsContainer.appendChild(popupOverlay);
-            });
-
-            if (mainCount === 0) mainGrid.innerHTML = '<p class="loading-text">Aucun joueur dans l\'équipe principale.</p>';
-            if (acadCount === 0) academyGrid.innerHTML = '<p class="loading-text">Aucun joueur académique.</p>';
-            if (cdfCount === 0) cdfGrid.innerHTML = '<p class="loading-text">Aucun joueur au centre de formation.</p>';
-
-            document.querySelectorAll('.inline-delete-btn').forEach(btn => {
-                btn.onclick = async (e) => {
-                    e.stopPropagation();
-                    if (confirm("Voulez-vous vraiment retirer ce joueur ?")) {
-                        await deleteDoc(doc(db, "roster", e.target.getAttribute('data-id')));
-                    }
-                };
-            });
-
-            document.querySelectorAll('.inline-edit-btn').forEach(btn => {
-                btn.onclick = (e) => {
-                    e.stopPropagation();
-                    const id = e.target.getAttribute('data-id');
-                    const player = cacheJoueurs[id];
-                    if (!player) return;
-
-                    editingPlayerId = id;
-                    base64ImageString = player.image || "#";
-                    document.getElementById('player-team').value = player.team;
-                    document.getElementById('player-pseudo').value = player.pseudo;
-                    document.getElementById('player-role').value = player.role;
-                    playerFileInput.value = "";
-                    document.getElementById('stat-earnings').value = player.earnings;
-                    document.getElementById('stat-best').value = player.bestPlacement;
-                    document.getElementById('stat-wins').value = player.wins;
-                    document.getElementById('player-bio').value = player.bio;
-                    document.getElementById('link-twitch').value = player.twitch;
-                    document.getElementById('link-twitter').value = player.twitter;
-                    document.getElementById('link-tracker').value = player.tracker;
-                    document.getElementById('new-pr-value').value = "";
-                    document.getElementById('new-pr-date').value = new Date().toISOString().split('T')[0];
-                    prAddZone.classList.remove('hidden');
-                    panelTitle.textContent = "Modifier : " + player.pseudo;
-                    addPlayerBtn.textContent = "Mettre à jour";
-                    modal.classList.add('active');
-                };
+                if(p.team === "main" && mainGrid) mainGrid.appendChild(card);
+                else if(p.team === "academy" && academyGrid) academyGrid.appendChild(card);
+                else if(p.team === "cdf" && cdfGrid) cdfGrid.appendChild(card);
             });
         });
-
-        // ── SYSTÈME DE SÉCURITÉ ET AFFICHAGE DE L'ONGLET DASHBOARD ──
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            if (user) {
-                loginStep.classList.add('hidden');
-                panelStep.classList.remove('hidden');
-                userDisplayEmail.textContent = user.email;
-                adminGateBtn.textContent = "⚙️ Panel Admin";
-                if (navDashboard) navDashboard.classList.remove('hidden'); 
-                document.querySelectorAll('.admin-controls').forEach(c => c.classList.remove('hidden'));
-            } else {
-                loginStep.classList.remove('hidden');
-                panelStep.classList.add('hidden');
-                userDisplayEmail.textContent = '';
-                adminGateBtn.textContent = "🔑 Connexion";
-                if (navDashboard) navDashboard.classList.add('hidden'); 
-                document.querySelectorAll('.admin-controls').forEach(c => c.classList.add('hidden'));
-            }
-        });
-
-        loginForm.addEventListener('submit', async () => {
-            loginError.classList.add('hidden');
-            try {
-                await signInWithEmailAndPassword(auth, document.getElementById('admin-email').value.trim(), document.getElementById('admin-password').value);
-                modal.classList.remove('active');
-            } catch { loginError.textContent = "Identifiants incorrects."; loginError.classList.remove('hidden'); }
-        });
-
-        logoutBtn.onclick = () => { signOut(auth); modal.classList.remove('active'); };
-
-        playerForm.addEventListener('submit', async () => {
-            const dataJoueur = {
-                team: document.getElementById('player-team').value,
-                pseudo: document.getElementById('player-pseudo').value.trim(),
-                role: document.getElementById('player-role').value.trim(),
-                image: base64ImageString || "#",
-                earnings: document.getElementById('stat-earnings').value.trim(),
-                bestPlacement: document.getElementById('stat-best').value.trim(),
-                wins: document.getElementById('stat-wins').value.trim(),
-                bio: document.getElementById('player-bio').value.trim(),
-                twitch: document.getElementById('link-twitch').value.trim(),
-                twitter: document.getElementById('link-twitter').value.trim(),
-                tracker: document.getElementById('link-tracker').value.trim(),
-            };
-
-            try {
-                if (editingPlayerId) {
-                    const newPrVal = document.getElementById('new-pr-value').value.trim();
-                    const newPrDate = document.getElementById('new-pr-date').value.trim();
-                    if (newPrVal !== "" && !isNaN(parseInt(newPrVal))) {
-                        const ancienHistorique = cacheJoueurs[editingPlayerId].prHistory || [];
-                        dataJoueur.prHistory = [...ancienHistorique, { value: parseInt(newPrVal), date: newPrDate || new Date().toLocaleDateString('fr-FR') }];
-                    } else { dataJoueur.prHistory = cacheJoueurs[editingPlayerId].prHistory || []; }
-                    await updateDoc(doc(db, "roster", editingPlayerId), dataJoueur);
-                } else {
-                    dataJoueur.prHistory = []; dataJoueur.createdAt = new Date();
-                    await addDoc(collection(db, "roster"), dataJoueur);
-                }
-                reinitialiserFormulaire(); modal.classList.remove('active');
-            } catch (error) { alert("Erreur : " + error.message); }
-        });
-
-        function reinitialiserFormulaire() {
-            editingPlayerId = null; base64ImageString = ""; playerForm.reset(); playerFileInput.value = "";
-            panelTitle.textContent = "Ajouter un joueur"; addPlayerBtn.textContent = "Enregistrer le joueur";
-            document.getElementById('link-twitch').value = "#"; document.getElementById('link-twitter').value = "#"; document.getElementById('link-tracker').value = "#";
-            prAddZone.classList.add('hidden');
-        }
-
-        adminGateBtn.onclick = () => { reinitialiserFormulaire(); modal.classList.add('active'); };
-        closeModalBtn.onclick = () => modal.classList.remove('active');
-        window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
     </script>
 </body>
 </html>

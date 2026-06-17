@@ -8,7 +8,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        .dashboard-container { max-width: 1200px; margin: 120px auto 40px auto; padding: 0 20px; }
+        /* CORRECTIF BUG D'AFFICHAGE : Augmentation de la marge haute pour éviter le chevauchement avec le nav */
+        .dashboard-container { 
+            max-width: 1200px; 
+            margin: 180px auto 40px auto; 
+            padding: 0 20px; 
+            position: relative;
+            z-index: 1;
+        }
         .dash-header { display: flex; justify-content: space-between; align-items: center; background: #141414; padding: 20px 30px; border-radius: 16px; border: 1px solid #2a2a2a; margin-bottom: 25px; }
         .dash-header h1 { font-family: 'Orbitron'; color: white; margin: 0; font-size: 1.8rem; }
         .dash-tabs { display: flex; gap: 10px; margin-bottom: 30px; border-bottom: 1px solid #2a2a2a; padding-bottom: 10px; }
@@ -18,7 +25,7 @@
         .dash-panel.active { display: block; }
         .dash-grid { display: grid; grid-template-columns: 1fr; gap: 30px; }
         .dash-card { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; padding: 30px; }
-        .dash-card h2 { font-family: 'Orbitron'; color: #a855f7; margin-top: 0; margin-bottom: 25px; border-bottom: 1px solid #2a2a2a; padding-bottom: 10px; }
+        .dash-card h2 { font-family: 'Orbitron'; color: #a855f7; margin-top: 0; margin-bottom: 25px; border-bottom: 1px solid #2a2a2a; padding-bottom: 10px; line-height: 1.4; }
         .input-group { margin-bottom: 15px; }
         .input-group label { display: block; margin-bottom: 6px; color: #aaa; font-size: 0.85rem; font-family: 'Orbitron'; }
         .input-group input, .input-group textarea, .input-group select { width: 100%; padding: 12px; background: #0a0a0a; border: 1px solid #2a2a2a; color: white; border-radius: 8px; box-sizing: border-box; }
@@ -32,14 +39,14 @@
         .guard-screen { position: fixed; inset: 0; background: #0a0a0a; z-index: 99999; display: flex; justify-content: center; align-items: center; color: white; font-family: 'Orbitron'; }
         .hidden { display: none !important; }
         .filter-zone { margin-bottom: 15px; display: flex; justify-content: flex-end; }
-        .filter-zone select { background: #0a0a0a; border: 1px solid #2a2a2a; color: white; padding: 8px 16px; border-radius: 6px; font-family: 'Orbitron'; font-size: 0.85rem; }
+        .filter-zone select { background: #0a0a0a; border: 1px solid #2a2a2a; color: white; padding: 8px 16px; border-radius: 6px; font-family: 'Orbitron'; font-size: 0.85rem; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="guard-screen" class="guard-screen"><p>VÉRIFICATION DE L'ACCÈS DE L'ABYSZ CRU...</p></div>
 
-    <nav>
+    <nav style="position: fixed; top: 0; width: 100%; z-index: 9999;">
         <div class="logo"><a href="index.html" style="display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit;"><img src="logo.png" alt="Logo ABYSZ"> ABYSZ DASHBOARD</a></div>
         <ul><li><a href="index.html">Voir le Site</a></li><li><a href="roster.html">Roster</a></li></ul>
     </nav>
@@ -62,7 +69,7 @@
                     <h2>📊 Tableau de Bord des Données Récoltées</h2>
                     
                     <div class="stats-summary">
-                        <div class="stat-box"><div class="num" id="stat-total-visites">-</div><div class="label">Visites Totales (Brut)</div></div>
+                        <div class="stat-box"><div class="num" id="stat-total-visites">-</div><div class="label">Visites Filtrées</div></div>
                         <div class="stat-box"><div class="num" id="stat-discord-clicks">-</div><div class="label">Rejections vers Discord</div></div>
                         <div class="stat-box"><div class="num" id="stat-top-joueur" style="font-size:1.3rem; padding-top:8px;">-</div><div class="label">Joueur le plus cliqué</div></div>
                     </div>
@@ -72,6 +79,7 @@
                             <option value="all">Toutes les Pages</option>
                             <option value="index.html">Page Accueil (index.html)</option>
                             <option value="roster.html">Page Équipe (roster.html)</option>
+                            <option value="boutique.html">Page Boutique (boutique.html)</option>
                         </select>
                     </div>
 
@@ -127,20 +135,23 @@
         let globalAnalyticsData = [];
 
         onAuthStateChanged(auth, (user) => {
-            if (!user) window.location.href = "login.html";
-            else { document.getElementById('user-display-email').textContent = `Connecté : ${user.email}`; document.getElementById('guard-screen').classList.add('hidden'); chargerDonnees(); }
+            if (!user) {
+                window.location.href = "roster.html"; // Redirection si pas connecté
+            } else { 
+                document.getElementById('user-display-email').textContent = `Connecté : ${user.email}`; 
+                document.getElementById('guard-screen').classList.add('hidden'); 
+                chargerDonnees(); 
+            }
         });
 
-        document.getElementById('logout-btn').onclick = () => { signOut(auth).then(() => window.location.href = "login.html" ); };
+        document.getElementById('logout-btn').onclick = () => { signOut(auth).then(() => window.location.href = "roster.html" ); };
 
         async function chargerDonnees() {
             try {
-                // 1. Récupération des données de visites
                 const snapshotVisites = await getDocs(collection(db, "analytics"));
                 globalAnalyticsData = [];
                 snapshotVisites.forEach(doc => globalAnalyticsData.push(doc.data()));
 
-                // 2. Récupération des clics Discord & Joueurs
                 const snapshotEvents = await getDocs(collection(db, "events"));
                 let totalDiscord = 0;
                 let clicsJoueurs = {};
@@ -155,20 +166,17 @@
 
                 document.getElementById('stat-discord-clicks').textContent = totalDiscord;
 
-                // Trouver le joueur le plus cliqué
                 let topJoueurName = "Aucun clic"; let maxClics = 0;
                 for (const [name, count] of Object.entries(clicsJoueurs)) {
                     if(count > maxClics) { maxClics = count; topJoueurName = `${name} (${count} 👀)`; }
                 }
                 document.getElementById('stat-top-joueur').textContent = topJoueurName;
 
-                // Générer le graphique initial
                 genererGraphique("all");
 
             } catch (e) { console.error(e); }
         }
 
-        // Déclencheur du filtre par page
         document.getElementById('page-filter-select').addEventListener('change', (e) => {
             genererGraphique(e.target.value);
         });
@@ -177,7 +185,6 @@
             const dataFiltree = globalAnalyticsData.filter(item => pageFiltre === "all" || item.page === pageFiltre);
             document.getElementById('stat-total-visites').textContent = dataFiltree.length;
 
-            // Compresser par jour et par support
             const ordinateursParJour = {}; const mobilesParJour = {};
             const ensembleDates = new Set();
 

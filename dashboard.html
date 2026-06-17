@@ -199,7 +199,7 @@
         const pageFilter = document.getElementById('page-filter');
 
         let myChart = null;
-        let listeDocsAnalytics = []; // Contient toutes les lignes de ta bdd analytics
+        let listeDocsAnalytics = [];
 
         // ── SÉCURITÉ DE L'ACCÈS ADMIN ──
         onAuthStateChanged(auth, (user) => {
@@ -209,10 +209,8 @@
                 chargerDonneesDashboard();
                 initialiserGraphiqueStructure();
                 
-                // On écoute la collection globale complète en temps réel
                 ecouterCollectionAnalytics();
 
-                // Changement de filtre du menu déroulant (TRI EFFECTIF)
                 pageFilter.addEventListener('change', () => {
                     calculerEtCalculerStats(pageFilter.value);
                 });
@@ -222,60 +220,63 @@
             }
         });
 
-        // ── ÉCOUTE ET RECENSEMENT DE CHAQUE DOCUMENT DE LA COLLECTION ──
         function ecouterCollectionAnalytics() {
             onSnapshot(collection(db, "analytics"), (snapshot) => {
                 listeDocsAnalytics = [];
                 snapshot.forEach((docSnap) => {
                     listeDocsAnalytics.push(docSnap.data());
                 });
-                // Une fois chargé, on calcule immédiatement avec le filtre actuel
                 calculerEtCalculerStats(pageFilter.value);
             }, (err) => {
-                console.error("Erreur de chargement de la collection analytics :", err);
+                console.error("Erreur collection analytics :", err);
             });
         }
 
-        // ── CALCUL ET FILTRAGE DYNAMIQUE SELON TA STRUCTURE DE BASES ──
+        // ── FONCTION REFAITE : DETECTION LARGE DES ACTIONS ET DE TA STRUCTURE ──
         function calculerEtCalculerStats(filtrePage) {
             let totalVisites = 0;
             let totalDiscord = 0;
             let clicsJoueurs = {};
 
-            // Initialisation des données pour les jours de la semaine (Graphique)
-            const joursSemaine = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
             const graphPC = [0, 0, 0, 0, 0, 0, 0];
             const graphMobile = [0, 0, 0, 0, 0, 0, 0];
 
-            // Map pour lier les formats de dates ou jours si disponible
-            // Ta BDD stocke "2026-06-17", on va extraire le jour de la semaine
             listeDocsAnalytics.forEach(docData => {
-                // Vérification du filtre par page
-                if (filtrePage !== "all" && docData.page !== filtrePage) {
-                    return; // Saute ce document s'il ne correspond pas à la page filtrée
+                const pageDuDoc = docData.page || "";
+
+                // Filtrage selon le menu déroulant
+                if (filtrePage !== "all" && pageDuDoc !== filtrePage) {
+                    return; 
                 }
 
-                // Compter s'il s'agit d'une visite classique ou d'une action Discord
-                if (docData.page === "discord" || docData.isDiscordClick === true || (docData.type && docData.type.includes("discord"))) {
+                // 1. DETECTION SECURISEE DU CLIC DISCORD (Tous les cas possibles de tes scripts)
+                const estUnClicDiscord = 
+                    pageDuDoc.includes("discord") || 
+                    docData.isDiscordClick === true || 
+                    docData.clickType === "discord" || 
+                    docData.type === "discord" ||
+                    docData.action === "discord";
+
+                if (estUnClicDiscord) {
                     totalDiscord++;
                 } else {
                     totalVisites++;
                 }
 
-                // Compter les clics sur les profils des joueurs (si stocké dans un champ spécifique)
-                if (docData.clickedPlayer) {
-                    clicsJoueurs[docData.clickedPlayer] = (clicsJoueurs[docData.clickedPlayer] || 0) + 1;
+                // 2. DETECTION DU JOUEUR CLIQUE (Multi-clés rétrocompatibles)
+                const nomJoueur = docData.clickedPlayer || docData.playerName || docData.joueur || docData.player;
+                if (nomJoueur) {
+                    clicsJoueurs[nomJoueur] = (clicsJoueurs[nomJoueur] || 0) + 1;
                 }
 
-                // Traitement pour le graphique (Aiguillage PC vs Mobile)
+                // 3. RETOUR GRAPHISME PAR DATE (PC VS MOBILE)
                 if (docData.date) {
                     const dateObj = new Date(docData.date);
-                    // Déterminer le jour (0 = Dimanche, 1 = Lundi...) et réaligner sur notre tableau [Lun...Dim]
                     let indexJour = dateObj.getDay() - 1; 
-                    if (indexJour === -1) indexJour = 6; // Ajustement pour le Dimanche
+                    if (indexJour === -1) indexJour = 6; // Dimanche
 
                     if (indexJour >= 0 && indexJour < 7) {
-                        const appareil = String(docData.device).toLowerCase();
+                        const appareil = String(docData.device || "").toLowerCase();
                         if (appareil.includes("ordinateur") || appareil.includes("desktop") || appareil.includes("pc")) {
                             graphPC[indexJour]++;
                         } else {
@@ -285,11 +286,11 @@
                 }
             });
 
-            // Injection des totaux calculés dans tes 3 blocs d'origine
+            // Injection des compteurs calculés en direct
             siteVisitesNum.textContent = totalVisites;
             discordClicksNum.textContent = totalDiscord;
 
-            // Trouver le joueur le plus cliqué dans l'objet
+            // Calcul du Top Joueur
             let topJoueur = "Aucun clic";
             let maxClics = 0;
             for (const [joueur, clics] of Object.entries(clicsJoueurs)) {
@@ -300,13 +301,12 @@
             }
             topPlayerClickStr.textContent = topJoueur;
 
-            // Rendu du graphique mis à jour avec les calculs cumulés
+            // Actualisation du graphique
             myChart.data.datasets[0].data = graphPC;
             myChart.data.datasets[1].data = graphMobile;
             myChart.update();
         }
 
-        // ── CONFIGURATION RENDU GRAPHISME CHART.JS ──
         function initialiserGraphiqueStructure() {
             const ctx = document.getElementById('analyticsChart').getContext('2d');
             myChart = new Chart(ctx, {
@@ -330,7 +330,6 @@
             });
         }
 
-        // ── TABLEAU ROSTER EN TEMPS RÉEL (FAIT TOUT A L'HEURE, ADAPTÉ RAPIDE) ──
         function chargerDonneesDashboard() {
             const q = query(collection(db, "roster"), orderBy("createdAt", "asc"));
             onSnapshot(q, (snapshot) => {

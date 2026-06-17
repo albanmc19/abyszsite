@@ -20,13 +20,13 @@
         .main-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 2.2rem; font-weight: 700; margin-bottom: 40px; text-shadow: 0 0 10px rgba(168, 85, 247, 0.3); text-align: center; }
         .section-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; margin: 40px 0 20px 0; border-bottom: 1px solid #2a2a2a; padding-bottom: 8px; }
 
-        /* ── BLOCS DE STATS DE VOTRE CAPTURE ── */
+        /* ── BLOCS DE STATS ── */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 25px; }
         .stat-card { background: #0b0b0b; border: 1px solid #1a1a1a; border-radius: 12px; padding: 30px 20px; text-align: center; position: relative; }
         .stat-card .num { font-family: 'Orbitron', sans-serif; font-size: 2.4rem; font-weight: 700; color: #a855f7; margin-bottom: 10px; }
         .stat-card .label { color: #555; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
 
-        /* FILTRE ET CANVASES */
+        /* FILTRE ET GRAPH */
         .filter-container { display: flex; justify-content: flex-end; margin-bottom: 20px; }
         .page-selector { background: #050505; color: #fff; border: 1px solid #222; padding: 10px 20px; border-radius: 8px; font-family: 'Inter', sans-serif; cursor: pointer; font-weight: 600; outline: none; }
         .page-selector option { background: #0a0a0a; }
@@ -108,6 +108,7 @@
 
         <div class="filter-container">
             <select id="page-filter" class="page-selector">
+                <option value="all">Toutes les pages</option>
                 <option value="index.html">Page Accueil (index.html)</option>
                 <option value="roster.html">Page Roster (roster.html)</option>
                 <option value="boutique.html">Page Boutique (boutique.html)</option>
@@ -168,7 +169,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, query, orderBy, onSnapshot, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -198,7 +199,7 @@
         const pageFilter = document.getElementById('page-filter');
 
         let myChart = null;
-        let unsubscribeAnalytics = null;
+        let listeDocsAnalytics = []; // Contient toutes les lignes de ta bdd analytics
 
         // ── SÉCURITÉ DE L'ACCÈS ADMIN ──
         onAuthStateChanged(auth, (user) => {
@@ -208,12 +209,12 @@
                 chargerDonneesDashboard();
                 initialiserGraphiqueStructure();
                 
-                // On charge le tracking par défaut au démarrage
-                gererSelectionPage(pageFilter.value);
+                // On écoute la collection globale complète en temps réel
+                ecouterCollectionAnalytics();
 
-                // Écoute des changements du bouton de tri par page
-                pageFilter.addEventListener('change', (e) => {
-                    gererSelectionPage(e.target.value);
+                // Changement de filtre du menu déroulant (TRI EFFECTIF)
+                pageFilter.addEventListener('change', () => {
+                    calculerEtCalculerStats(pageFilter.value);
                 });
             } else {
                 accessDeniedSec.classList.remove('hidden');
@@ -221,68 +222,91 @@
             }
         });
 
-        // ── FONCTION DE LECTURE DES STATS ET CORRECTION DE L'ID DE DOCUMENT ──
-        function gererSelectionPage(valeurPage) {
-            if (unsubscribeAnalytics) unsubscribeAnalytics();
-
-            // Nettoyage temporaire pendant le chargement
-            siteVisitesNum.textContent = "...";
-            discordClicksNum.textContent = "...";
-            topPlayerClickStr.textContent = "Chargement...";
-
-            // CORRECTION CRUCIALE : Nettoyage de l'identifiant pour correspondre à vos documents Firestore.
-            // Si le menu renvoie "index.html", on cherche le document "index"
-            const docId = valeurPage.replace('.html', '');
-
-            // Écoute en temps réel du document de la page sélectionnée
-            unsubscribeAnalytics = onSnapshot(doc(db, "analytics", docId), (docSnap) => {
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    
-                    // Récupération des compteurs selon vos deux structures historiques possibles
-                    siteVisitesNum.textContent = data.visitesTotales || data.visites || 0;
-                    discordClicksNum.textContent = data.discordClicks || data.discord || 0;
-                    topPlayerClickStr.textContent = data.topPlayer || "Aucun clic";
-                    
-                    // Extraction et rendu de l'historique de votre graphique (Objets par Jours)
-                    if (data.historiqueJours) {
-                        // Tri chronologique si nécessaire ou mapping direct des jours (Lun-Dim)
-                        const labelsJours = Object.keys(data.historiqueJours); // ['Lun', 'Mar', ...]
-                        const pcStats = [];
-                        const mobileStats = [];
-
-                        labelsJours.forEach(jour => {
-                            const statsJour = data.historiqueJours[jour] || {};
-                            pcStats.push(statsJour.desktop || statsJour.pc || 0);
-                            mobileStats.push(statsJour.mobile || 0);
-                        });
-
-                        myChart.data.labels = labelsJours;
-                        myChart.data.datasets[0].data = pcStats;
-                        myChart.data.datasets[1].data = mobileStats;
-                        myChart.update();
-                    } else if (data.pcData && data.mobileData) {
-                        // Secours si stocké sous forme de listes directes
-                        myChart.data.datasets[0].data = data.pcData;
-                        myChart.data.datasets[1].data = data.mobileData;
-                        if (data.labels) myChart.data.labels = data.labels;
-                        myChart.update();
-                    }
-                } else {
-                    // Si pas de données encore enregistrées sur ce document
-                    siteVisitesNum.textContent = "0";
-                    discordClicksNum.textContent = "0";
-                    topPlayerClickStr.textContent = "Aucun clic";
-                    myChart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0];
-                    myChart.data.datasets[1].data = [0, 0, 0, 0, 0, 0, 0];
-                    myChart.update();
-                }
+        // ── ÉCOUTE ET RECENSEMENT DE CHAQUE DOCUMENT DE LA COLLECTION ──
+        function ecouterCollectionAnalytics() {
+            onSnapshot(collection(db, "analytics"), (snapshot) => {
+                listeDocsAnalytics = [];
+                snapshot.forEach((docSnap) => {
+                    listeDocsAnalytics.push(docSnap.data());
+                });
+                // Une fois chargé, on calcule immédiatement avec le filtre actuel
+                calculerEtCalculerStats(pageFilter.value);
             }, (err) => {
-                console.error("Erreur de synchronisation Firestore Analytics : ", err);
+                console.error("Erreur de chargement de la collection analytics :", err);
             });
         }
 
-        // ── MISE EN PLACE DE CHART.JS (CONCORDANCE AVEC VOTRE COMPTE RENDU DESIGN) ──
+        // ── CALCUL ET FILTRAGE DYNAMIQUE SELON TA STRUCTURE DE BASES ──
+        function calculerEtCalculerStats(filtrePage) {
+            let totalVisites = 0;
+            let totalDiscord = 0;
+            let clicsJoueurs = {};
+
+            // Initialisation des données pour les jours de la semaine (Graphique)
+            const joursSemaine = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+            const graphPC = [0, 0, 0, 0, 0, 0, 0];
+            const graphMobile = [0, 0, 0, 0, 0, 0, 0];
+
+            // Map pour lier les formats de dates ou jours si disponible
+            // Ta BDD stocke "2026-06-17", on va extraire le jour de la semaine
+            listeDocsAnalytics.forEach(docData => {
+                // Vérification du filtre par page
+                if (filtrePage !== "all" && docData.page !== filtrePage) {
+                    return; // Saute ce document s'il ne correspond pas à la page filtrée
+                }
+
+                // Compter s'il s'agit d'une visite classique ou d'une action Discord
+                if (docData.page === "discord" || docData.isDiscordClick === true || (docData.type && docData.type.includes("discord"))) {
+                    totalDiscord++;
+                } else {
+                    totalVisites++;
+                }
+
+                // Compter les clics sur les profils des joueurs (si stocké dans un champ spécifique)
+                if (docData.clickedPlayer) {
+                    clicsJoueurs[docData.clickedPlayer] = (clicsJoueurs[docData.clickedPlayer] || 0) + 1;
+                }
+
+                // Traitement pour le graphique (Aiguillage PC vs Mobile)
+                if (docData.date) {
+                    const dateObj = new Date(docData.date);
+                    // Déterminer le jour (0 = Dimanche, 1 = Lundi...) et réaligner sur notre tableau [Lun...Dim]
+                    let indexJour = dateObj.getDay() - 1; 
+                    if (indexJour === -1) indexJour = 6; // Ajustement pour le Dimanche
+
+                    if (indexJour >= 0 && indexJour < 7) {
+                        const appareil = String(docData.device).toLowerCase();
+                        if (appareil.includes("ordinateur") || appareil.includes("desktop") || appareil.includes("pc")) {
+                            graphPC[indexJour]++;
+                        } else {
+                            graphMobile[indexJour]++;
+                        }
+                    }
+                }
+            });
+
+            // Injection des totaux calculés dans tes 3 blocs d'origine
+            siteVisitesNum.textContent = totalVisites;
+            discordClicksNum.textContent = totalDiscord;
+
+            // Trouver le joueur le plus cliqué dans l'objet
+            let topJoueur = "Aucun clic";
+            let maxClics = 0;
+            for (const [joueur, clics] of Object.entries(clicsJoueurs)) {
+                if (clics > maxClics) {
+                    maxClics = clics;
+                    topJoueur = `${joueur} (${clics} 🖱️)`;
+                }
+            }
+            topPlayerClickStr.textContent = topJoueur;
+
+            // Rendu du graphique mis à jour avec les calculs cumulés
+            myChart.data.datasets[0].data = graphPC;
+            myChart.data.datasets[1].data = graphMobile;
+            myChart.update();
+        }
+
+        // ── CONFIGURATION RENDU GRAPHISME CHART.JS ──
         function initialiserGraphiqueStructure() {
             const ctx = document.getElementById('analyticsChart').getContext('2d');
             myChart = new Chart(ctx, {
@@ -306,7 +330,7 @@
             });
         }
 
-        // ── RECOUVREMENT DU TABLEAU ROSTER COMPLET EN TEMPS RÉEL ──
+        // ── TABLEAU ROSTER EN TEMPS RÉEL (FAIT TOUT A L'HEURE, ADAPTÉ RAPIDE) ──
         function chargerDonneesDashboard() {
             const q = query(collection(db, "roster"), orderBy("createdAt", "asc"));
             onSnapshot(q, (snapshot) => {

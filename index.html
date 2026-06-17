@@ -15,10 +15,15 @@
         .social-links a:hover { color: #ffffff; transform: translateY(-2px); }
         .announcements-container { max-width: 1200px; margin: 0 auto; padding: 60px 20px; }
         .announcements-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        
+        /* Titre et petit bouton ajouter alignés */
+        .title-area { display: flex; align-items: center; gap: 15px; }
+        .add-announcement-btn { background: #a855f7; border: none; color: white; width: 32px; height: 32px; border-radius: 50%; font-size: 1.2rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; box-shadow: 0 0 10px rgba(168, 85, 247, 0.3); }
+        .add-announcement-btn:hover { background: #b975ff; transform: scale(1.1); box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
+
         .admin-gate-btn { background: transparent; border: 1px solid #a855f7; color: #a855f7; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-family: 'Orbitron', sans-serif; transition: all 0.3s ease; }
         .admin-gate-btn:hover { background: #a855f7; color: white; box-shadow: 0 0 15px #a855f7; }
         
-        /* Bouton rouge de déconnexion rapide */
         .admin-gate-btn.logged-in { border-color: #ff4444; color: #ff4444; }
         .admin-gate-btn.logged-in:hover { background: #ff4444; color: white; box-shadow: 0 0 15px #ff4444; }
 
@@ -51,7 +56,6 @@
         
         .nav-dashboard-link a { color: #22c55e !important; font-weight: bold; text-decoration: none; }
 
-        /* ── CSS POUR LES ANIMATIONS AU SCROLL ── */
         .reveal {
             opacity: 0;
             transform: translateY(35px);
@@ -96,7 +100,10 @@
 
     <section id="annonces" class="announcements-container reveal">
         <div class="announcements-header">
-            <h2>Annonces Récentes</h2>
+            <div class="title-area">
+                <h2>Annonces Récentes</h2>
+                <button class="add-announcement-btn hidden" id="quick-add-btn" title="Créer une annonce">+</button>
+            </div>
             <button class="admin-gate-btn" id="admin-gate-btn">🔑 Espace Admin</button>
         </div>
         <div id="announcements-feed" class="announcements-feed">
@@ -178,6 +185,7 @@
 
         const modal = document.getElementById('admin-modal');
         const adminGateBtn = document.getElementById('admin-gate-btn');
+        const quickAddBtn = document.getElementById('quick-add-btn');
         const closeModalBtn = document.getElementById('close-modal-btn');
         const loginForm = document.getElementById('login-form');
         const announcementForm = document.getElementById('announcement-form');
@@ -190,7 +198,6 @@
 
         let currentUser = null;
 
-        // ── SCRIPT POUR DÉCLENCHER LES ANIMATIONS AU SCROLL ──
         const scrollObserver = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
                 if (entry.isIntersecting) {
@@ -201,8 +208,6 @@
 
         document.querySelectorAll('.reveal').forEach((el) => scrollObserver.observe(el));
 
-
-        // ── GESTION DES ANNONCES (Correction date) ──
         const q = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
         
         onSnapshot(q, (snapshot) => {
@@ -214,7 +219,6 @@
             snapshot.forEach((docSnap) => {
                 const ann = docSnap.data();
                 
-                // fallback si createdAt est un timestamp de secondes ou des millisecondes numériques
                 let dateRaw;
                 if (ann.createdAt && typeof ann.createdAt.seconds === 'number') {
                     dateRaw = new Date(ann.createdAt.seconds * 1000);
@@ -241,6 +245,7 @@
             });
         });
 
+        // Modification ici : Affiche / Cache le petit bouton '+' selon l'état de connexion
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
@@ -248,6 +253,7 @@
                 panelStep.classList.remove('hidden');
                 userDisplayEmail.textContent = `Admin : ${user.email}`;
                 document.getElementById('nav-dashboard')?.classList.remove('hidden');
+                quickAddBtn.classList.remove('hidden'); // On montre le bouton '+'
                 
                 adminGateBtn.innerHTML = "🔒 Déconnexion";
                 adminGateBtn.classList.add("logged-in");
@@ -256,6 +262,7 @@
                 panelStep.classList.add('hidden');
                 userDisplayEmail.textContent = '';
                 document.getElementById('nav-dashboard')?.classList.add('hidden');
+                quickAddBtn.classList.add('hidden'); // On cache le bouton '+'
                 
                 adminGateBtn.innerHTML = "🔑 Espace Admin";
                 adminGateBtn.classList.remove("logged-in");
@@ -287,7 +294,13 @@
             }
         };
 
-        // Envoi corrigé pour éviter le crash Firebase
+        // Ouvrir directement la création d'annonce au clic sur le '+'
+        quickAddBtn.onclick = () => {
+            if (currentUser) {
+                modal.classList.add('active');
+            }
+        };
+
         announcementForm.addEventListener('submit', async () => {
             const titleInput = document.getElementById("annonce-title");
             const contentInput = document.getElementById("annonce-content");

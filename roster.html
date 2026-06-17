@@ -11,7 +11,6 @@
         .logo-link { display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; }
         .roster-header-container { display:flex; justify-content:space-between; align-items:center; max-width:1200px; margin:0 auto 30px auto; padding:0 20px; }
         
-        /* ── BOUTON DE CONNEXION DANS LE MENU (NAV) ── */
         .admin-gate-btn { 
             background: transparent; 
             border: 1px solid #a855f7; 
@@ -26,7 +25,6 @@
         }
         .admin-gate-btn:hover { background:#a855f7; color:white; box-shadow:0 0 15px #a855f7; }
         
-        /* Style de l'onglet Dashboard quand il devient visible */
         .nav-dashboard-link a {
             color: #22c55e !important;
             font-weight: bold;
@@ -35,11 +33,9 @@
 
         .loading-text { text-align:center; color:#666; font-style:italic; grid-column:1/-1; padding:20px; }
 
-        /* ── IMAGES AJUSTÉES AUTOMATIQUEMENT ── */
         .player-avatar-img { width:100%; height:200px; object-fit:contain; border-bottom:2px solid #a855f7; background:#141414; cursor: pointer; padding: 10px; box-sizing: border-box; }
         .popup-avatar-img { width:100%; max-height:250px; object-fit:contain; border:2px solid #a855f7; border-radius:12px; margin:0 auto 20px auto; display:block; background:#0a0a0a; padding: 10px; box-sizing: border-box; }
 
-        /* ── MODAL & POPUPS ── */
         .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center; padding:20px; }
         .modal-overlay.active { display:flex; }
         .modal-content { background:#141414; border:2px solid #a855f7; border-radius:24px; max-width:500px; width:100%; padding:30px; position:relative; box-shadow:0 0 30px rgba(168,85,247,0.25); box-sizing:border-box; max-height:90vh; overflow-y:auto; }
@@ -56,11 +52,9 @@
         .hidden { display:none !important; }
         .error-message { color:#ff4444; font-size:0.85rem; margin-top:10px; text-align:center; }
 
-        /* Bouton de réinitialisation d'image */
         .reset-img-btn { background:#0a0a0a; border:1px solid #ff4444; color:#ff4444; padding:6px 12px; border-radius:6px; font-size:0.8rem; font-family:'Orbitron',sans-serif; cursor:pointer; margin-top:8px; display:inline-block; transition:all 0.2s; }
         .reset-img-btn:hover { background:#ff4444; color:white; }
 
-        /* ── ADMIN CONTROLS ── */
         .player-card-container { position:relative; }
         .admin-controls { position:absolute; top:10px; right:10px; display:flex; gap:6px; z-index:10; }
         .inline-edit-btn { background:#22c55e; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold; font-family:'Inter',sans-serif; }
@@ -68,7 +62,6 @@
         .inline-delete-btn { background:#ff4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; font-weight:bold; font-family:'Inter',sans-serif; }
         .inline-delete-btn:hover { background:#cc3333; }
 
-        /* ── SECTION PR HISTORIQUE ── */
         .pr-history-section { background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 12px; padding: 16px; margin: 16px 0; }
         .pr-history-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
         .pr-evolution-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: 700; margin-bottom: 14px; }
@@ -266,7 +259,6 @@
         let editingPlayerId = null; 
         let base64ImageString = ""; 
 
-        // Convertir le fichier image local sélectionné en chaîne Base64 textuelle
         playerFileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -285,7 +277,6 @@
             reader.readAsDataURL(file);
         });
 
-        // Action du bouton Réinitialiser l'image
         resetImgBtn.addEventListener('click', () => {
             playerFileInput.value = "";
             base64ImageString = "#"; 
@@ -293,7 +284,6 @@
             fileStatus.style.color = "#ef4444";
         });
 
-        // Récupération en temps réel
         onSnapshot(query(fsCol(db, "roster")), (snapshot) => {
             const grids = {
                 main: document.getElementById("main-roster-grid"),
@@ -337,7 +327,7 @@
                 `;
                 targetGrid.appendChild(card);
 
-                // Construction de la pop-up de détails avec historique PR complexe
+                // Correction de la récupération de la clé prHistory
                 const prHistory = p.prHistory || [];
                 let prTableRows = "";
                 let evolutionBadge = `<div class="pr-evolution-badge neutral">▬ Stable</div>`;
@@ -346,8 +336,8 @@
                     const sortedPr = [...prHistory].sort((a,b) => new Date(b.date) - new Date(a.date));
                     
                     if(sortedPr.length >= 2) {
-                        const latest = parseInt(sortedPr[0].value);
-                        const previous = parseInt(sortedPr[1].value);
+                        const latest = parseInt(sortedPr[0].value) || 0;
+                        const previous = parseInt(sortedPr[1].value) || 0;
                         const diff = latest - previous;
                         if(diff > 0) {
                             evolutionBadge = `<div class="pr-evolution-badge positive">▲ +${diff} PR</div>`;
@@ -360,16 +350,28 @@
                         let deltaStr = "▬";
                         let deltaClass = "neu";
                         if(index < sortedPr.length - 1) {
-                            const currentVal = parseInt(entry.value);
-                            const nextOldestVal = parseInt(sortedPr[index+1].value);
+                            const currentVal = parseInt(entry.value) || 0;
+                            const nextOldestVal = parseInt(sortedPr[index+1].value) || 0;
                             const currentDiff = currentVal - nextOldestVal;
                             if(currentDiff > 0) { deltaStr = `+${currentDiff}`; deltaClass = "pos"; }
                             else if(currentDiff < 0) { deltaStr = `${currentDiff}`; deltaClass = "neg"; }
                         }
+                        
+                        // Sécurisation de l'affichage de la date si elle est brute ou mal formée
+                        let displayDate = "Date inconnue";
+                        if(entry.date) {
+                            const d = new Date(entry.date);
+                            if(!isNaN(d.getTime())) {
+                                displayDate = d.toLocaleDateString('fr-FR');
+                            } else {
+                                displayDate = entry.date;
+                            }
+                        }
+
                         return `
                             <tr class="${index === 0 ? 'pr-latest' : ''}">
-                                <td>${new Date(entry.date).toLocaleDateString('fr-FR')}</td>
-                                <td>${parseInt(entry.value).toLocaleString()}</td>
+                                <td>${displayDate}</td>
+                                <td>${(parseInt(entry.value) || 0).toLocaleString()}</td>
                                 <td class="pr-delta-cell ${deltaClass}">${deltaStr}</td>
                             </tr>
                         `;
@@ -416,7 +418,6 @@
                 popupsContainer.appendChild(popup);
             });
 
-            // Événement Modifier joueur
             document.querySelectorAll('.inline-edit-btn').forEach(btn => {
                 btn.onclick = (e) => {
                     e.stopPropagation();
@@ -457,7 +458,6 @@
                 };
             });
 
-            // Supprimer joueur
             document.querySelectorAll('.inline-delete-btn').forEach(btn => {
                 btn.onclick = async (e) => {
                     e.stopPropagation();
@@ -468,7 +468,7 @@
             });
         });
 
-        // ENREGISTREMENT SÉCURISÉ (Ajout ou Modification)
+        // REFAIT A NEUF : Gestion de la soumission sans rechargement de page
         playerForm.addEventListener('submit', async (e) => {
             e.preventDefault(); 
 
@@ -490,9 +490,10 @@
 
             try {
                 if (editingPlayerId) {
-                    // MODE MODIFICATION
                     const docRef = fsDoc(db, "roster", editingPlayerId);
                     const currentPlayerData = playersDataCache[editingPlayerId];
+                    
+                    // On force l'utilisation stricte de la même clé prHistory
                     let updatedPrHistory = currentPlayerData.prHistory || [];
 
                     if(newPrVal && newPrDate) {
@@ -508,7 +509,6 @@
                     });
                     alert("Joueur modifié avec succès !");
                 } else {
-                    // MODE AJOUT NOUVEAU JOUEUR
                     let initialPrHistory = [];
                     if(newPrVal && newPrDate) {
                         initialPrHistory.push({ date: newPrDate, value: parseInt(newPrVal) });
@@ -531,7 +531,6 @@
             }
         });
 
-        // Gestion de la connexion
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {

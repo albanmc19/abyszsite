@@ -15,18 +15,26 @@
         .dashboard-wrapper { max-width: 1200px; margin: 0 auto 80px auto; padding: 0 20px; }
         .main-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 2.2rem; font-weight: 700; margin-bottom: 40px; text-shadow: 0 0 10px rgba(168, 85, 247, 0.3); text-align: center; }
         .section-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; margin: 40px 0 20px 0; border-bottom: 1px solid #2a2a2a; padding-bottom: 8px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 25px; }
-        .stat-card { background: #0b0b0b; border: 1px solid #1a1a1a; border-radius: 12px; padding: 30px 20px; text-align: center; position: relative; }
-        .stat-card .num { font-family: 'Orbitron', sans-serif; font-size: 2.4rem; font-weight: 700; color: #a855f7; margin-bottom: 10px; }
+        
+        /* Grille adaptative pour passer à 4 ou 5 cartes proprement */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .stat-card { background: #0b0b0b; border: 1px solid #1a1a1a; border-radius: 12px; padding: 25px 15px; text-align: center; position: relative; }
+        .stat-card .num { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; font-weight: 700; color: #a855f7; margin-bottom: 10px; }
         .stat-card .label { color: #555; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        
         .filter-container { display: flex; justify-content: flex-end; margin-bottom: 20px; }
         .page-selector { background: #050505; color: #fff; border: 1px solid #222; padding: 10px 20px; border-radius: 8px; font-family: 'Inter', sans-serif; cursor: pointer; font-weight: 600; outline: none; }
         .page-selector option { background: #0a0a0a; }
-        .chart-container { background: #050505; border: 1px solid #141414; padding: 25px; border-radius: 16px; margin-bottom: 40px; position: relative; }
+        
+        /* Grille pour afficher les graphiques côte à côte sur grand écran */
+        .charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 40px; }
+        .chart-container { background: #050505; border: 1px solid #141414; padding: 25px; border-radius: 16px; position: relative; }
+        
         .roster-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
         .roster-card { background: #141414; border-left: 3px solid #a855f7; padding: 15px 20px; border-radius: 8px; font-family: 'Orbitron', sans-serif; }
         .roster-card .num { font-size: 1.5rem; color: #fff; font-weight: bold; }
         .roster-card .label { color: #666; font-size: 0.75rem; text-transform: uppercase; }
+        
         .db-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .db-header h3 { font-family: 'Orbitron', sans-serif; margin: 0; font-size: 1.3rem; color: #fff; }
         .db-table-wrapper { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; overflow: hidden; }
@@ -35,15 +43,21 @@
         .db-table td { padding: 14px 16px; color: #ccc; border-bottom: 1px solid #1a1a1a; vertical-align: middle; }
         .db-table tr:last-child td { border-bottom: none; }
         .db-table tr:hover td { background: rgba(168, 85, 247, 0.02); }
+        
         .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; font-family: 'Orbitron', sans-serif; }
         .badge.main { background: rgba(168,85,247,0.15); color: #a855f7; border: 1px solid rgba(168,85,247,0.3); }
         .badge.academy { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
         .badge.cdf { background: rgba(234,179,8,0.15); color: #eab308; border: 1px solid rgba(234,179,8,0.3); }
+        
         .db-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid #a855f7; background: #0a0a0a; }
         .player-flex { display: flex; align-items: center; gap: 12px; font-weight: 600; color: #fff; }
         .action-btn { background: #a855f7; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: bold; font-family: 'Inter', sans-serif; transition: background 0.2s; text-decoration: none; }
         .action-btn:hover { background: #b975ff; }
         .hidden { display: none !important; }
+
+        @media (max-width: 900px) {
+            .charts-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -74,11 +88,19 @@
             </div>
             <div class="stat-card">
                 <div id="discord-clicks" class="num">0</div>
-                <div class="label">Redirections vers Discord</div>
+                <div class="label">Clics Discord</div>
             </div>
             <div class="stat-card">
-                <div id="top-player-click" class="num" style="font-size: 1.3rem; line-height: 2.4rem;">Aucun clic</div>
-                <div class="label">Joueur le plus cliqué</div>
+                <div id="boutique-interest" class="num">0</div>
+                <div class="label">Intérêt Boutique</div>
+            </div>
+            <div class="stat-card">
+                <div id="conversion-rate" class="num" style="color: #22c55e;">0%</div>
+                <div class="label">Conversion Discord</div>
+            </div>
+            <div class="stat-card">
+                <div id="top-player-click" class="num" style="font-size: 1.2rem; line-height: 2.4rem;">Aucun clic</div>
+                <div class="label">Joueur Vedette</div>
             </div>
         </div>
 
@@ -91,8 +113,13 @@
             </select>
         </div>
 
-        <div class="chart-container">
-            <canvas id="analyticsChart" style="max-height: 320px; width: 100%;"></canvas>
+        <div class="charts-grid">
+            <div class="chart-container">
+                <canvas id="analyticsChart" style="max-height: 320px; width: 100%;"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="pagesPieChart" style="max-height: 320px; width: 100%;"></canvas>
+            </div>
         </div>
 
         <div class="section-title">👥 Gestion des Effectifs & Roster</div>
@@ -144,12 +171,16 @@
         const countMain = document.getElementById('count-main');
         const countAcademy = document.getElementById('count-academy');
         const countCdf = document.getElementById('count-cdf');
+        
         const siteVisitesNum = document.getElementById('site-visites');
         const discordClicksNum = document.getElementById('discord-clicks');
+        const boutiqueInterestNum = document.getElementById('boutique-interest');
+        const conversionRateNum = document.getElementById('conversion-rate');
         const topPlayerClickStr = document.getElementById('top-player-click');
         const pageFilter = document.getElementById('page-filter');
 
         let myChart = null;
+        let pieChart = null;
         let listeDocsAnalytics = [];
 
         onAuthStateChanged(auth, (user) => {
@@ -157,7 +188,7 @@
                 accessDeniedSec.classList.add('hidden');
                 dashboardContentSec.classList.remove('hidden');
                 chargerDonneesDashboard();
-                initialiserGraphiqueStructure();
+                initialiserGraphiques();
                 ecouterCollectionAnalytics();
                 pageFilter.addEventListener('change', () => calculerEtAfficherStats(pageFilter.value));
             } else {
@@ -179,24 +210,35 @@
         function calculerEtAfficherStats(filtrePage) {
             let totalVisites = 0;
             let totalDiscord = 0;
+            let totalBoutique = 0;
             let clicsJoueurs = {};
+
+            // Compteurs globaux pour le Pie Chart (toujours calculés sur l'ensemble)
+            let pagesDist = { index: 0, roster: 0, boutique: 0 };
 
             const graphPC = [0, 0, 0, 0, 0, 0, 0];
             const graphMobile = [0, 0, 0, 0, 0, 0, 0];
 
-            listeDocsAnalytics.forEach((docData, index) => {
+            listeDocsAnalytics.forEach((docData) => {
                 const pageDuDoc = docData.page || "";
                 
+                // Comptabilisation pour la répartition globale des pages
+                if (pageDuDoc.includes("index")) pagesDist.index++;
+                else if (pageDuDoc.includes("roster")) pagesDist.roster++;
+                else if (pageDuDoc.includes("boutique")) pagesDist.boutique++;
+
                 let estDiscord = false;
                 Object.values(docData).forEach(val => {
                     if(typeof val === 'string' && val.toLowerCase().includes('discord')) estDiscord = true;
                 });
                 if(docData.isDiscordClick === true || docData.clickType === "discord") estDiscord = true;
 
+                // Tri et filtres
                 if (estDiscord) {
                     totalDiscord++;
                     if (filtrePage !== "all") return;
                 } else {
+                    if (pageDuDoc.includes("boutique")) totalBoutique++;
                     if (filtrePage !== "all" && pageDuDoc !== filtrePage) return;
                     totalVisites++;
                 }
@@ -206,9 +248,8 @@
                     clicsJoueurs[nomJoueur] = (clicsJoueurs[nomJoueur] || 0) + 1;
                 }
 
-                // FIX DU GRAPH : Traitement local de la date pour éviter le décalage UTC d'un jour
+                // Construction des graphiques de temps
                 if (docData.date) {
-                    // On force des slashs à la place des tirets (YYYY/MM/DD) pour que JS l'interprète sur l'heure locale
                     const dateClean = String(docData.date).replace(/-/g, "/");
                     const dateObj = new Date(dateClean);
                     
@@ -226,9 +267,20 @@
                 }
             });
 
+            // Affichage des compteurs
             siteVisitesNum.textContent = totalVisites;
             discordClicksNum.textContent = totalDiscord;
+            boutiqueInterestNum.textContent = totalBoutique;
 
+            // Calcul du taux de conversion Discord (Clics / Visites totales * 100)
+            if (totalVisites > 0) {
+                const taux = ((totalDiscord / totalVisites) * 100).toFixed(1);
+                conversionRateNum.textContent = `${taux}%`;
+            } else {
+                conversionRateNum.textContent = "0%";
+            }
+
+            // Top Joueur
             let topJoueur = "Aucun clic";
             let maxClics = 0;
             for (const [joueur, clics] of Object.entries(clicsJoueurs)) {
@@ -239,28 +291,58 @@
             }
             topPlayerClickStr.textContent = topJoueur;
 
+            // Mise à jour des lignes de tendance
             if(myChart) {
                 myChart.data.datasets[0].data = graphPC;
                 myChart.data.datasets[1].data = graphMobile;
                 myChart.update();
             }
+
+            // Mise à jour du Camembert des pages
+            if(pieChart) {
+                pieChart.data.datasets[0].data = [pagesDist.index, pagesDist.roster, pagesDist.boutique];
+                pieChart.update();
+            }
         }
 
-        function initialiserGraphiqueStructure() {
-            const ctx = document.getElementById('analyticsChart').getContext('2d');
-            myChart = new Chart(ctx, {
+        function initialiserGraphiques() {
+            // 1. Graphique Temporel (Lignes)
+            const ctxLine = document.getElementById('analyticsChart').getContext('2d');
+            myChart = new Chart(ctxLine, {
                 type: 'line',
                 data: {
                     labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
                     datasets: [
-                        { label: 'Ordinateur (PC)', data: [0, 0, 0, 0, 0, 0, 0], borderColor: '#a855f7', backgroundColor: 'transparent', tension: 0.2, pointBackgroundColor: '#a855f7' },
-                        { label: 'Mobile / Smartphone', data: [0, 0, 0, 0, 0, 0, 0], borderColor: '#00bfff', backgroundColor: 'transparent', tension: 0.2, pointBackgroundColor: '#00bfff' }
+                        { label: 'PC', data: [0, 0, 0, 0, 0, 0, 0], borderColor: '#a855f7', backgroundColor: 'transparent', tension: 0.2, pointBackgroundColor: '#a855f7' },
+                        { label: 'Mobile', data: [0, 0, 0, 0, 0, 0, 0], borderColor: '#00bfff', backgroundColor: 'transparent', tension: 0.2, pointBackgroundColor: '#00bfff' }
                     ]
                 },
                 options: { 
                     responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { labels: { color: '#fff' } } }, 
                     scales: { y: { grid: { color: '#111' }, ticks: { color: '#666' } }, x: { grid: { color: '#111' }, ticks: { color: '#666' } } } 
+                }
+            });
+
+            // 2. Nouveau Graphique en Camembert (Pages les plus visitées)
+            const ctxPie = document.getElementById('pagesPieChart').getContext('2d');
+            pieChart = new Chart(ctxPie, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Accueil', 'Roster', 'Boutique'],
+                    datasets: [{
+                        data: [0, 0, 0],
+                        backgroundColor: ['#a855f7', '#22c55e', '#eab308'],
+                        borderWidth: 1,
+                        borderColor: '#050505'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#fff', font: { family: 'Orbitron' } } }
+                    }
                 }
             });
         }

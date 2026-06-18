@@ -269,6 +269,28 @@
                     
                     <button type="submit" class="form-btn" id="publish-btn">Publier l'annonce</button>
                 </form>
+
+                <div style="margin-top: 30px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
+                    <h3>📁 Déposer un fichier pour un joueur</h3>
+                    <form id="upload-file-form" onsubmit="return false;">
+                        <div class="input-group">
+                            <label for="select-player">Sélectionner le joueur</label>
+                            <select id="select-player" required>
+                                <option value="">Chargement des joueurs...</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="file-name">Nom du document (Ex: Livret d'accueil)</label>
+                            <input type="text" id="file-name" placeholder="Nom pour le joueur" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="file-input">Choisir le fichier</label>
+                            <input type="file" id="file-input" required>
+                        </div>
+                        <button type="submit" class="form-btn" id="upload-btn">Envoyer le fichier au joueur</button>
+                    </form>
+                    <p id="upload-status" style="font-size: 0.9rem; text-align: center; margin-top: 10px; font-family: 'Inter', sans-serif;"></p>
+                </div>
             </div>
         </div>
     </div>
@@ -276,7 +298,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, getDoc, getDocs, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -293,6 +316,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const storage = getStorage(app);
 
         const modal = document.getElementById('admin-modal');
         const adminGateBtn = document.getElementById('admin-gate-btn');
@@ -309,7 +333,7 @@
         const navEspaceJoueur = document.getElementById('nav-espace-joueur');
 
         let currentUser = null;
-        let isUserAdmin = false; // Flag pour suivre si l'utilisateur connecté est admin
+        let isUserAdmin = false; 
 
         const scrollObserver = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
@@ -366,7 +390,6 @@
                 let imgHtml = ann.imageUrl ? `<img src="${ann.imageUrl}" class="announcement-img" alt="Illustration">` : '';
                 let actionBtnHtml = (ann.btnText && ann.btnLink) ? `<a href="${ann.btnLink}" target="_blank" class="announcement-action-btn">${ann.btnText} →</a>` : '';
                 
-                // SÉCURITÉ : Bouton supprimer visible uniquement si l'utilisateur connecté est ADMIN
                 const deleteButtonHtml = (currentUser && isUserAdmin) ? `<button class="delete-btn" data-id="${docSnap.id}">Supprimer</button>` : "";
                 
                 card.innerHTML = `
@@ -384,20 +407,38 @@
             setupDeleteButtons();
         });
 
-        // GESTION ET CLASSIFICATION DES ROLES (Joueur vs Admin)
+        // Charger dynamiquement la liste déroulante des joueurs pour l'admin
+        async function loadPlayersDropdown() {
+            const playerSelect = document.getElementById('select-player');
+            if (!playerSelect) return;
+            playerSelect.innerHTML = '<option value="">-- Choisir un joueur --</option>';
+            try {
+                const querySnapshot = await getDocs(collection(db, "players"));
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    if (data.role !== 'admin') {
+                        const option = document.createElement('option');
+                        option.value = docSnap.id; 
+                        option.textContent = data.name || data.email || docSnap.id;
+                        playerSelect.appendChild(option);
+                    }
+                });
+            } catch (err) {
+                console.error("Erreur chargement joueurs dropdown:", err);
+            }
+        }
+
+        // ÉCOUTE DES ÉTATS DE CONNEXION (Rôles Joueur / Admin)
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
             if (user) {
-                // Tout utilisateur connecté a accès à son onglet "Mon Espace"
                 navEspaceJoueur.classList.remove('hidden');
 
-                // On va chercher ses permissions dans la collection 'players'
                 const userDocRef = doc(db, "players", user.uid);
                 const userDocSnap = await getDoc(userDocRef);
                 
                 if (userDocSnap.exists() && userDocSnap.data().role === "admin") {
                     isUserAdmin = true;
-                    // L'utilisateur est admin -> On affiche les privilèges admins
                     loginStep.classList.add('hidden');
                     panelStep.classList.remove('hidden');
                     userDisplayEmail.textContent = `Admin : ${user.email}`;
@@ -405,21 +446,21 @@
                     quickAddBtn.classList.remove('hidden');
                     adminGateBtn.innerHTML = "🔒 Panel Admin";
                     adminGateBtn.classList.add("logged-in");
+                    
+                    // L'utilisateur connecté est admin, on charge ses outils
+                    loadPlayersDropdown();
                 } else {
                     isUserAdmin = false;
-                    // L'utilisateur est un joueur -> On bloque/masque tous les outils d'administration
                     loginStep.classList.add('hidden');
-                    panelStep.classList.add('hidden'); // Reste caché
+                    panelStep.classList.add('hidden'); 
                     document.getElementById('nav-dashboard')?.classList.add('hidden');
                     quickAddBtn.classList.add('hidden');
                     
-                    // Transformation du bouton Espace Admin en bouton de déconnexion pour le joueur
                     adminGateBtn.innerHTML = "🚪 Déconnexion";
                     adminGateBtn.classList.add("logged-in");
                 }
             } else {
                 isUserAdmin = false;
-                // Personne n'est connecté -> On nettoie tout l'affichage
                 navEspaceJoueur.classList.add('hidden');
                 loginStep.classList.remove('hidden');
                 panelStep.classList.add('hidden');
@@ -429,10 +470,6 @@
                 adminGateBtn.innerHTML = "🔑 Connexion";
                 adminGateBtn.classList.remove("logged-in");
             }
-            
-            // Forcer le rafraîchissement des boutons de suppression sur le flux d'annonces
-            const event = new CustomEvent('authChanged');
-            window.dispatchEvent(event);
         });
 
         loginForm.addEventListener('submit', async () => {
@@ -448,14 +485,11 @@
             }
         });
 
-        // Modification du comportement du bouton de connexion principal s'il est déjà connecté
         adminGateBtn.onclick = () => { 
             if (currentUser) {
                 if (!isUserAdmin) {
-                    // Si c'est un simple joueur, ce bouton sert à le déconnecter proprement
                     signOut(auth);
                 } else {
-                    // Si c'est un admin, on lui ouvre le modal d'écriture
                     modal.classList.add('active');
                 }
             } else {
@@ -468,7 +502,7 @@
         quickAddBtn.onclick = () => { if (currentUser && isUserAdmin) modal.classList.add('active'); };
 
         announcementForm.addEventListener('submit', async () => {
-            if (!isUserAdmin) return alert("Action non autorisée."); // Double sécurité front
+            if (!isUserAdmin) return alert("Action non autorisée."); 
             
             const titleInput = document.getElementById("annonce-title");
             const contentInput = document.getElementById("annonce-content");
@@ -519,11 +553,49 @@
             } catch (error) { alert("Erreur lors de la publication : " + error.message); }
         });
 
-        async function trackIndexPage() {
-            const support = window.innerWidth < 768 ? "Mobile" : "Ordinateur";
-            try { await addDoc(collection(db, "analytics"), { date: new Date().toISOString().split('T')[0], page: "index.html", device: support, timestamp: Date.now() }); } catch (e) { console.error(e); }
-        }
-        trackIndexPage();
+        // LOGIQUE D'ENVOI DE FICHIER SUR L'ESPACE JOUEUR
+        const uploadForm = document.getElementById('upload-file-form');
+        uploadForm.addEventListener('submit', async () => {
+            if (!isUserAdmin) return alert("Action interdite.");
+
+            const playerUid = document.getElementById('select-player').value;
+            const customName = document.getElementById('file-name').value.trim();
+            const fileInput = document.getElementById('file-input');
+            const statusText = document.getElementById('upload-status');
+            
+            if (!playerUid || fileInput.files.length === 0) return;
+            
+            const file = fileInput.files[0];
+            statusText.style.color = "#a855f7";
+            statusText.textContent = "Téléversement du fichier en cours...";
+
+            try {
+                // Upload sur Firebase Storage (Dossier unique /players/[UID]/)
+                const storageRef = ref(storage, `players/${playerUid}/${Date.now()}_${file.name}`);
+                const snapshot = await uploadBytes(storageRef, file);
+                
+                // Récupération de l'URL brute sécurisée
+                const downloadUrl = await getDownloadURL(snapshot.ref);
+                
+                // Insertion des métadonnées dans la base Firestore du joueur
+                const playerDocRef = doc(db, "players", playerUid);
+                await updateDoc(playerDocRef, {
+                    files: arrayUnion({
+                        name: customName,
+                        url: downloadUrl,
+                        uploadedAt: Date.now()
+                    })
+                });
+
+                statusText.style.color = "#10b981";
+                statusText.textContent = "Fichier envoyé avec succès au joueur !";
+                uploadForm.reset();
+            } catch (error) {
+                console.error(error);
+                statusText.style.color = "#ff4444";
+                statusText.textContent = "Erreur d'envoi : " + error.message;
+            }
+        });
     </script>
 </body>
 </html>

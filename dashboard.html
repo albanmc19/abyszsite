@@ -146,7 +146,7 @@
             <p id="search-error" class="error-message hidden"></p>
 
             <div id="player-edit-form-container" class="hidden" style="border-top: 1px solid #222; padding-top: 25px;">
-                <form id="dashboard-player-modify-form" onsubmit="return false;">
+                <form id="dashboard-player-modify-form">
                     <div class="form-grid">
                         <div class="input-group">
                             <label>Pseudo Global</label>
@@ -174,7 +174,7 @@
                     </div>
 
                     <div class="input-group">
-                        <label style="color: #22c55e;">Lien du document / Stratégie (PDF, Image, Drive...)</label>
+                        <label style="color: #22c55e;">Option B : Lien URL direct alternatif</label>
                         <input type="text" id="player-doc-input" placeholder="https://drive.google.com/file/... ou lien de téléchargement direct">
                     </div>
 
@@ -351,10 +351,12 @@
                 } catch (err) { console.error(err); }
             };
 
-            dashboardPlayerModifyForm.onsubmit = async () => {
+            dashboardPlayerModifyForm.onsubmit = async (e) => {
+                if (e) e.preventDefault(); 
+                
                 saveSuccess.classList.add('hidden');
                 const emailRecherche = searchPlayerEmail.value.trim().toLowerCase();
-                if (!emailRecherche || !activeTargetUid) return;
+                if (!emailRecherche) return false;
 
                 const btnSave = document.getElementById('btn-save-player');
                 btnSave.disabled = true;
@@ -365,9 +367,8 @@
                     const snapshot = await getDocs(q);
 
                     if (!snapshot.empty) {
-                        const playerDocRef = doc(db, "players", snapshot.docs[0].id);
-
-                        // Récupération directe et obligatoire de la chaîne textuelle du champ Option B
+                        const trueDocId = snapshot.docs[0].id;
+                        const playerDocRef = doc(db, "players", trueDocId);
                         const inputLienDoc = document.getElementById('player-doc-input').value.trim();
 
                         const dataMiseAJour = {
@@ -383,7 +384,7 @@
                         await setDoc(playerDocRef, dataMiseAJour, { merge: true });
                         saveSuccess.classList.remove('hidden');
                     } else {
-                        alert("Erreur : Le document du joueur n'a pas pu être identifié.");
+                        alert("Erreur : Impossible de localiser le compte de ce joueur dans Firestore.");
                     }
                 } catch (error) {
                     console.error("Erreur de sauvegarde :", error);
@@ -392,6 +393,7 @@
                     btnSave.disabled = false;
                     btnSave.textContent = "Enregistrer les modifications";
                 }
+                return false;
             };
         }
     </script>

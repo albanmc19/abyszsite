@@ -426,7 +426,7 @@
         }
 
         /* ─────────────────────────────────────────────────────────────
-           LOGIQUE RECTIFIÉE DE RECHERCHE ET MISE À JOUR SYNCHRONISÉE
+           LOGIQUE DE RECHERCHE ET MISE À JOUR SYNCHRONISÉE PAR EMAIL
            ───────────────────────────────────────────────────────────── */
         function setupPlayerEditing() {
             btnSearchPlayer.onclick = async () => {
@@ -442,13 +442,13 @@
                 }
 
                 try {
-                    // Recherche par l'e-mail dans la collection "players"
+                    // Recherche par l'e-mail forcé en minuscules dans la collection "players"
                     const q = query(collection(db, "players"), where("email", "==", emailRecherche));
                     const snapshot = await getDocs(q);
 
                     if (!snapshot.empty) {
                         const targetDoc = snapshot.docs[0];
-                        activeTargetUid = targetDoc.id; // Récupère le véritable UID de connexion du joueur
+                        activeTargetUid = targetDoc.id; // Stockage de l'UID (nom du document)
                         activeTargetEmail = emailRecherche;
 
                         const data = targetDoc.data();
@@ -488,7 +488,7 @@
                 };
 
                 try {
-                    // ÉCRITURE CRITIQUE : Écrit exactement sur l'identifiant (UID) lu par espace-joueur.html
+                    // Force l'écriture exacte sur l'identifiant (UID) lu en temps réel par espace-joueur.html
                     const docPlayerRef = doc(db, "players", activeTargetUid);
                     await setDoc(docPlayerRef, dataMiseAJour, { merge: true });
                     

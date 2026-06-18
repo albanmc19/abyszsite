@@ -1,229 +1,342 @@
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, collection, query, orderBy, onSnapshot, getDocs, deleteDoc, doc, where, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard de gestion ABYSZ Esports">
+    <title>ABYSZ | Dashboard Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .logo-link { display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; }
+        .restricted-zone { text-align: center; padding: 60px 20px; background: #0a0a0a; border: 2px dashed #ff4444; border-radius: 16px; max-width: 600px; margin: 100px auto; }
+        .restricted-zone h2 { font-family: 'Orbitron', sans-serif; color: #ff4444; margin-bottom: 15px; }
+        .dashboard-wrapper { max-width: 1200px; margin: 0 auto 80px auto; padding: 0 20px; }
+        .main-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 2.2rem; font-weight: 700; margin-bottom: 40px; text-shadow: 0 0 10px rgba(168, 85, 247, 0.3); text-align: center; }
+        .section-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; margin: 40px 0 20px 0; border-bottom: 1px solid #2a2a2a; padding-bottom: 8px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .stat-card { background: #0b0b0b; border: 1px solid #1a1a1a; border-radius: 12px; padding: 25px 15px; text-align: center; position: relative; }
+        .stat-card .num { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; font-weight: 700; color: #a855f7; margin-bottom: 10px; }
+        .stat-card .label { color: #555; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        
+        .filter-container { display: flex; justify-content: flex-end; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .page-selector { background: #050505; color: #fff; border: 1px solid #222; padding: 10px 20px; border-radius: 8px; font-family: 'Inter', sans-serif; cursor: pointer; font-weight: 600; outline: none; }
+        .page-selector option { background: #0a0a0a; }
+        
+        .reset-btn { background: #0a0a0a; border: 1px solid #ff4444; color: #ff4444; padding: 10px 20px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: all 0.2s ease; }
+        .reset-btn:hover { background: #ff4444; color: white; box-shadow: 0 0 15px rgba(255, 68, 68, 0.4); }
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
-        authDomain: "abysz-esports.firebaseapp.com",
-        projectId: "abysz-esports",
-        storageBucket: "abysz-esports.firebasestorage.app",
-        messagingSenderId: "200968659347",
-        appId: "1:200968659347:web:3a13d1614d00ed29968866"
-    };
+        .charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 40px; }
+        .chart-container { background: #050505; border: 1px solid #141414; padding: 25px; border-radius: 16px; position: relative; }
+        
+        .roster-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .roster-card { background: #141414; border-left: 3px solid #a855f7; padding: 15px 20px; border-radius: 8px; font-family: 'Orbitron', sans-serif; }
+        .roster-card .num { font-size: 1.5rem; color: #fff; font-weight: bold; }
+        .roster-card .label { color: #666; font-size: 0.75rem; text-transform: uppercase; }
+        
+        .db-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .db-header h3 { font-family: 'Orbitron', sans-serif; margin: 0; font-size: 1.3rem; color: #fff; }
+        .db-table-wrapper { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; overflow: hidden; }
+        .db-table { width: 100%; border-collapse: collapse; font-family: 'Inter', sans-serif; text-align: left; }
+        .db-table th { background: #0a0a0a; color: #a855f7; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; padding: 16px; letter-spacing: 1px; border-bottom: 2px solid #2a2a2a; }
+        .db-table td { padding: 14px 16px; color: #ccc; border-bottom: 1px solid #1a1a1a; vertical-align: middle; }
+        .db-table tr:hover td { background: rgba(168, 85, 247, 0.02); }
+        
+        .action-btn { background: #a855f7; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: bold; font-family: 'Inter', sans-serif; transition: background 0.2s; text-decoration: none; }
+        .action-btn:hover { background: #b975ff; }
+        .hidden { display: none !important; }
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+        .admin-edit-box { background: #141414; border: 2px solid #22c55e; border-radius: 16px; padding: 30px; margin-top: 40px; box-shadow: 0 0 30px rgba(34, 197, 94, 0.05); }
+        .admin-edit-box h2 { font-family: 'Orbitron', sans-serif; color: #22c55e; margin-top: 0; margin-bottom: 15px; font-size: 1.3rem; display: flex; align-items: center; gap: 10px; }
+        .search-row { display: flex; gap: 12px; background: #0a0a0a; padding: 15px; border-radius: 10px; border: 1px dashed #22c55e; margin-bottom: 25px; align-items: flex-end; }
+        .input-group { display: flex; flex-direction: column; gap: 6px; flex: 1; text-align: left; margin-bottom: 15px; }
+        .input-group label { color: #888; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; letter-spacing: 0.5px; }
+        .input-group input, .input-group textarea { background: #050505; border: 1px solid #222; border-radius: 8px; padding: 12px; color: #fff; font-family: 'Inter', sans-serif; font-size: 0.9rem; width: 100%; box-sizing: border-box; }
+        .input-group input:focus, .input-group textarea:focus { border-color: #22c55e; outline: none; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 5px; }
+        .btn-admin { background: #22c55e; color: #fff; font-family: 'Orbitron', sans-serif; font-weight: bold; font-size: 0.85rem; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-admin:hover { background: #2ed96f; box-shadow: 0 0 15px rgba(34, 197, 94, 0.3); }
+        .error-message { color: #ff4444; font-size: 0.85rem; margin-top: 10px; font-family: 'Inter', sans-serif; }
+        .success-message { color: #22c55e; font-size: 0.85rem; margin-top: 10px; font-family: 'Orbitron', sans-serif; }
 
-    const ADMIN_EMAIL = "abyszofficial@gmail.com";
-
-    const accessDeniedSec = document.getElementById('access-denied');
-    const dashboardContentSec = document.getElementById('dashboard-content');
-    const playersRows = document.getElementById('db-players-rows');
-    const countMain = document.getElementById('count-main');
-    const countAcademy = document.getElementById('count-academy');
-    const countCdf = document.getElementById('count-cdf');
-    
-    const siteVisitesNum = document.getElementById('site-visites');
-    const discordClicksNum = document.getElementById('discord-clicks');
-    const boutiqueInterestNum = document.getElementById('boutique-interest');
-    const conversionRateNum = document.getElementById('conversion-rate');
-    const topPlayerClickStr = document.getElementById('top-player-click');
-    const pageFilter = document.getElementById('page-filter');
-    const resetBtn = document.getElementById('reset-analytics-btn');
-
-    const searchPlayerEmail = document.getElementById('search-player-email');
-    const btnSearchPlayer = document.getElementById('btn-search-player');
-    const searchError = document.getElementById('search-error');
-    const playerEditFormContainer = document.getElementById('player-edit-form-container');
-    const dashboardPlayerModifyForm = document.getElementById('dashboard-player-modify-form');
-    const saveSuccess = document.getElementById('save-success');
-    const fileInputPc = document.getElementById('player-file-pc');
-    const progressZone = document.getElementById('upload-progress-zone');
-    const progressBar = document.getElementById('upload-progress-bar');
-
-    let myChart = null; let pieChart = null; let listeDocsAnalytics = [];
-    let activeTargetUid = ""; let activeTargetEmail = "";
-
-    onAuthStateChanged(auth, (user) => {
-        if (user && user.email === ADMIN_EMAIL) {
-            accessDeniedSec.classList.add('hidden');
-            dashboardContentSec.classList.remove('hidden');
-            chargerDonneesDashboard();
-            initialiserGraphiques();
-            ecouterCollectionAnalytics();
-            pageFilter.addEventListener('change', () => calculerEtAfficherStats(pageFilter.value));
-            setupResetButton();
-            setupPlayerEditing(); 
-        } else {
-            accessDeniedSec.classList.remove('hidden');
-            dashboardContentSec.classList.add('hidden');
+        @media (max-width: 900px) {
+            .charts-grid { grid-template-columns: 1fr; }
+            .filter-container { flex-direction: column; align-items: stretch; }
+            .search-row { flex-direction: column; align-items: stretch; }
+            .btn-admin { width: 100%; }
         }
-    });
+    </style>
+</head>
+<body>
 
-    function setupResetButton() {
-        resetBtn.onclick = async () => {
-            if (confirm("Réinitialiser les statistiques de visites ?")) {
-                try {
-                    const snap = await getDocs(collection(db, "analytics"));
-                    snap.forEach((d) => deleteDoc(doc(db, "analytics", d.id)));
-                    alert("Statistiques remises à zéro !");
-                } catch (e) { alert(e.message); }
-            }
+    <nav>
+        <div class="logo"><a href="index.html" class="logo-link"><img src="logo.png" alt="Logo ABYSZ"> ABYSZ</a></div>
+        <ul>
+            <li><a href="index.html">Accueil</a></li>
+            <li><a href="roster.html">Roster</a></li>
+            <li><a href="boutique.html">Boutique</a></li>
+            <li id="nav-dashboard" class="nav-dashboard-link"><a href="dashboard.html">📊 Dashboard</a></li>
+        </ul>
+    </nav>
+
+    <div id="access-denied" class="restricted-zone hidden">
+        <h2>🔒 ACCÈS RESTREINT</h2>
+        <p style="color: #aaa; margin-bottom: 25px;">Vous devez être connecté avec un compte administrateur.</p>
+        <a href="roster.html" class="btn">Retour au Roster pour se connecter</a>
+    </div>
+
+    <main id="dashboard-content" style="padding-top: 140px;" class="dashboard-wrapper hidden">
+        <h1 class="main-title">📊 Tableau de Bord des Données Récoltées</h1>
+
+        <div class="stats-grid">
+            <div id="site-visites" class="stat-card" style="display:none;">0</div>
+            <div class="stat-card">
+                <div id="discord-clicks" class="num">0</div>
+                <div class="label">Clics Discord</div>
+            </div>
+            <div class="stat-card">
+                <div id="boutique-interest" class="num">0</div>
+                <div class="label">Intérêt Boutique</div>
+            </div>
+            <div class="stat-card">
+                <div id="conversion-rate" class="num" style="color: #22c55e;">0%</div>
+                <div class="label">Conversion</div>
+            </div>
+        </div>
+
+        <div class="filter-container">
+            <button id="reset-analytics-btn" class="reset-btn">🗑️ Réinitialiser</button>
+            <select id="page-filter" class="page-selector">
+                <option value="all">Toutes les pages</option>
+            </select>
+        </div>
+
+        <div class="section-title">👥 Gestion des Effectifs & Roster</div>
+        <div class="roster-stats">
+            <div class="roster-card"><div class="label">Équipe Principale</div><div id="count-main" class="num">0</div></div>
+            <div class="roster-card" style="border-left-color: #22c55e;"><div class="label">Académie</div><div id="count-academy" class="num">0</div></div>
+            <div class="roster-card" style="border-left-color: #eab308;"><div class="label">Centre de Formation</div><div id="count-cdf" class="num">0</div></div>
+        </div>
+
+        <div class="db-table-wrapper">
+            <table class="db-table">
+                <thead>
+                    <tr><th>Joueur</th><th>Catégorie</th><th>Rôle / Division</th><th>Earnings</th><th>Action</th></tr>
+                </thead>
+                <tbody id="db-players-rows">
+                    <tr><td colspan="5" style="text-align: center; color: #666; font-style: italic; padding: 30px;">Chargement...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section-title">🔒 Gestion des Espaces Privés Joueurs</div>
+        <div class="admin-edit-box">
+            <h2>🛠️ Configurer l'espace d'un joueur</h2>
+            <p style="color: #777; font-size: 0.85rem; margin-top: -5px; margin-bottom: 20px;">Recherchez l'adresse e-mail exacte avec laquelle le joueur se connecte.</p>
+
+            <div class="search-row">
+                <div class="input-group" style="margin-bottom: 0;">
+                    <label for="search-player-email">Adresse e-mail du compte joueur</label>
+                    <input type="email" id="search-player-email" placeholder="Ex: joueur@gmail.com">
+                </div>
+                <button type="button" class="btn-admin" id="btn-search-player">Charger l'Espace</button>
+            </div>
+            <p id="search-error" class="error-message hidden"></p>
+
+            <div id="player-edit-form-container" class="hidden" style="border-top: 1px solid #222; padding-top: 25px;">
+                <form id="dashboard-player-modify-form" onsubmit="return false;">
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label>Pseudo Global</label>
+                            <input type="text" id="player-pseudo-input" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Roster Affecté</label>
+                            <input type="text" id="player-roster-input" placeholder="Ex: Principal, Académie...">
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label>Rôle précis dans l'équipe</label>
+                            <input type="text" id="player-role-input" placeholder="Ex: Capitaine...">
+                        </div>
+                        <div class="input-group">
+                            <label>Rank Actuel en jeu</label>
+                            <input type="text" id="player-rank-input" placeholder="Ex: Radiant, Unreal...">
+                        </div>
+                        <div class="input-group">
+                            <label>Date d'intégration</label>
+                            <input type="text" id="player-date-input" placeholder="Ex: 1 Janvier 2026">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label style="color: #22c55e;">Lien du document / Stratégie (PDF, Image, Drive...)</label>
+                        <input type="text" id="player-doc-input" placeholder="https://drive.google.com/file/... ou lien de téléchargement direct">
+                    </div>
+
+                    <div class="input-group" style="margin-bottom: 25px;">
+                        <label>Message personnalisé du Staff (Privé au joueur)</label>
+                        <textarea id="player-msg-input" rows="4" placeholder="Consignes, entraînements..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-admin" id="btn-save-player">Enregistrer les modifications</button>
+                </form>
+                <p id="save-success" class="success-message hidden">✅ Espace privé mis à jour et synchronisé avec succès !</p>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot, getDocs, deleteDoc, doc, where, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
+            authDomain: "abysz-esports.firebaseapp.com",
+            projectId: "abysz-esports",
+            storageBucket: "abysz-esports.firebasestorage.app",
+            messagingSenderId: "200968659347",
+            appId: "1:200968659347:web:3a13d1614d00ed29968866"
         };
-    }
 
-    function ecouterCollectionAnalytics() {
-        onSnapshot(collection(db, "analytics"), (snapshot) => {
-            listeDocsAnalytics = [];
-            snapshot.forEach((d) => listeDocsAnalytics.push(d.data()));
-            calculerEtAfficherStats(pageFilter.value);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const ADMIN_EMAIL = "abyszofficial@gmail.com";
+
+        const accessDeniedSec = document.getElementById('access-denied');
+        const dashboardContentSec = document.getElementById('dashboard-content');
+        const playersRows = document.getElementById('db-players-rows');
+        const countMain = document.getElementById('count-main');
+        const countAcademy = document.getElementById('count-academy');
+        const countCdf = document.getElementById('count-cdf');
+
+        const searchPlayerEmail = document.getElementById('search-player-email');
+        const btnSearchPlayer = document.getElementById('btn-search-player');
+        const searchError = document.getElementById('search-error');
+        const playerEditFormContainer = document.getElementById('player-edit-form-container');
+        const dashboardPlayerModifyForm = document.getElementById('dashboard-player-modify-form');
+        const saveSuccess = document.getElementById('save-success');
+
+        let activeTargetUid = ""; 
+        let activeTargetEmail = "";
+
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.email === ADMIN_EMAIL) {
+                accessDeniedSec.classList.add('hidden');
+                dashboardContentSec.classList.remove('hidden');
+                chargerDonneesDashboard();
+                setupPlayerEditing(); 
+            } else {
+                accessDeniedSec.classList.remove('hidden');
+                dashboardContentSec.classList.add('hidden');
+            }
         });
-    }
 
-    function calculerEtAfficherStats(filtrePage) {
-        let totalVisites = 0; let totalDiscord = 0; let totalBoutique = 0;
-        let clicsJoueurs = {}; let pagesDist = { index: 0, roster: 0, boutique: 0 };
-
-        listeDocsAnalytics.forEach((docData) => {
-            const pageDuDoc = docData.page || "";
-            if (pageDuDoc.includes("index")) pagesDist.index++;
-            else if (pageDuDoc.includes("roster")) pagesDist.roster++;
-            else if (pageDuDoc.includes("boutique")) pagesDist.boutique++;
-
-            let estDiscord = docData.isDiscordClick === true || docData.clickType === "discord";
-            if (estDiscord) { totalDiscord++; return; }
-            if (pageDuDoc.includes("boutique")) totalBoutique++;
-            if (filtrePage !== "all" && pageDuDoc !== filtrePage) return;
-            totalVisites++;
-
-            const nomJoueur = docData.clickedPlayer || docData.playerName || docData.pseudo;
-            if (nomJoueur) clicsJoueurs[nomJoueur] = (clicsJoueurs[nomJoueur] || 0) + 1;
-        });
-
-        siteVisitesNum.textContent = totalVisites;
-        discordClicksNum.textContent = totalDiscord;
-        boutiqueInterestNum.textContent = totalBoutique;
-        conversionRateNum.textContent = totalVisites > 0 ? `${((totalDiscord / totalVisites) * 100).toFixed(1)}%` : "0%";
-    }
-
-    function initialiserGraphiques() {
-        // Code d'initialisation des graphiques existant si tu as Chart.js configuré
-    }
-
-    function chargerDonneesDashboard() {
-        const q = query(collection(db, "roster"), orderBy("createdAt", "asc"));
-        onSnapshot(q, (snapshot) => {
-            playersRows.innerHTML = "";
-            let mCount = 0, aCount = 0, cCount = 0;
-            snapshot.forEach((docSnap) => {
-                const player = docSnap.data();
-                if (player.team === "main") mCount++; else if (player.team === "academy") aCount++; else if (player.team === "cdf") cCount++;
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${player.pseudo}</td><td>${player.team}</td><td>${player.role}</td><td>${player.earnings}</td><td>-</td><td><button class="action-btn">Modifier</button></td>`;
-                playersRows.appendChild(tr);
+        function chargerDonneesDashboard() {
+            const q = query(collection(db, "roster"), orderBy("createdAt", "asc"));
+            onSnapshot(q, (snapshot) => {
+                if(!playersRows) return;
+                playersRows.innerHTML = "";
+                let mCount = 0, aCount = 0, cCount = 0;
+                snapshot.forEach((docSnap) => {
+                    const player = docSnap.data();
+                    if (player.team === "main") mCount++; 
+                    else if (player.team === "academy") aCount++; 
+                    else if (player.team === "cdf") cCount++;
+                    
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${player.pseudo || 'Inconnu'}</td><td>${player.team || '-'}</td><td>${player.role || '-'}</td><td>${player.earnings || '0'}</td><td><button class="action-btn">Modifier</button></td>`;
+                    playersRows.appendChild(tr);
+                });
+                if(countMain) countMain.textContent = mCount; 
+                if(countAcademy) countAcademy.textContent = aCount; 
+                if(countCdf) countCdf.textContent = cCount;
             });
-            countMain.textContent = mCount; countAcademy.textContent = aCount; countCdf.textContent = cCount;
-        });
-    }
+        }
 
-    function setupPlayerEditing() {
-        btnSearchPlayer.onclick = async () => {
-            searchError.classList.add('hidden');
-            playerEditFormContainer.classList.add('hidden');
-            if (saveSuccess) saveSuccess.classList.add('hidden');
-            if (fileInputPc) fileInputPc.value = "";
-            if (progressZone) progressZone.style.display = "none";
+        function setupPlayerEditing() {
+            btnSearchPlayer.onclick = async () => {
+                searchError.classList.add('hidden');
+                playerEditFormContainer.classList.add('hidden');
+                saveSuccess.classList.add('hidden');
 
-            const emailRecherche = searchPlayerEmail.value.trim().toLowerCase();
-            if (!emailRecherche) return;
+                const emailRecherche = searchPlayerEmail.value.trim().toLowerCase();
+                if (!emailRecherche) return;
 
-            try {
-                const q = query(collection(db, "players"), where("email", "==", emailRecherche));
-                const snapshot = await getDocs(q);
+                try {
+                    const q = query(collection(db, "players"), where("email", "==", emailRecherche));
+                    const snapshot = await getDocs(q);
 
-                if (!snapshot.empty) {
-                    const targetDoc = snapshot.docs[0];
-                    activeTargetUid = targetDoc.id; 
-                    activeTargetEmail = emailRecherche;
+                    if (!snapshot.empty) {
+                        const targetDoc = snapshot.docs[0];
+                        activeTargetUid = targetDoc.id; 
+                        activeTargetEmail = emailRecherche;
 
-                    const data = targetDoc.data();
-                    document.getElementById('player-pseudo-input').value = data.pseudo || "";
-                    document.getElementById('player-roster-input').value = data.roster || "";
-                    document.getElementById('player-role-input').value = data.role || "";
-                    document.getElementById('player-rank-input').value = data.rank || "";
-                    document.getElementById('player-date-input').value = data.joinDate || "";
-                    document.getElementById('player-doc-input').value = data.documentUrl || "";
-                    document.getElementById('player-msg-input').value = data.staffMessage || "";
+                        const data = targetDoc.data();
+                        document.getElementById('player-pseudo-input').value = data.pseudo || "";
+                        document.getElementById('player-roster-input').value = data.roster || "";
+                        document.getElementById('player-role-input').value = data.role || "";
+                        document.getElementById('player-rank-input').value = data.rank || "";
+                        document.getElementById('player-date-input').value = data.joinDate || "";
+                        document.getElementById('player-doc-input').value = data.documentUrl || "";
+                        document.getElementById('player-msg-input').value = data.staffMessage || "";
 
-                    playerEditFormContainer.classList.remove('hidden');
-                } else {
-                    searchError.textContent = "Aucun joueur trouvé. Demandez-lui de se connecter une fois à son espace.";
-                    searchError.classList.remove('hidden');
-                }
-            } catch (err) { console.error(err); }
-        };
-
-        dashboardPlayerModifyForm.onsubmit = async () => {
-            if (saveSuccess) saveSuccess.classList.add('hidden');
-            if (!activeTargetUid) return;
-
-            const btnSave = document.getElementById('btn-save-player');
-            btnSave.disabled = true;
-            btnSave.textContent = "Enregistrement...";
-
-            let finalDocUrl = document.getElementById('player-doc-input').value.trim();
-            const selectedFile = fileInputPc ? fileInputPc.files[0] : null;
-
-            try {
-                // Si un fichier PC est sélectionné, on utilise l'hébergeur alternatif Catbox
-                if (selectedFile) {
-                    if (progressZone) progressZone.style.display = "block";
-                    if (progressBar) progressBar.style.width = "40%";
-
-                    const formData = new FormData();
-                    formData.append("fileToUpload", selectedFile);
-                    formData.append("reqtype", "fileupload");
-
-                    const response = await fetch("https://catbox.moe/user/api.php", {
-                        method: "POST",
-                        body: formData
-                    });
-
-                    if (response.ok) {
-                        finalDocUrl = await response.text(); 
-                        if (progressBar) progressBar.style.width = "100%";
+                        playerEditFormContainer.classList.remove('hidden');
                     } else {
-                        throw new Error("Échec du téléversement sur l'hébergeur alternatif.");
+                        searchError.textContent = "Aucun joueur trouvé avec cet e-mail. Demandez-lui de se connecter au moins une fois à son espace.";
+                        searchError.classList.remove('hidden');
                     }
+                } catch (err) { console.error(err); }
+            };
+
+            dashboardPlayerModifyForm.onsubmit = async () => {
+                saveSuccess.classList.add('hidden');
+                const emailRecherche = searchPlayerEmail.value.trim().toLowerCase();
+                if (!emailRecherche || !activeTargetUid) return;
+
+                const btnSave = document.getElementById('btn-save-player');
+                btnSave.disabled = true;
+                btnSave.textContent = "Enregistrement...";
+
+                try {
+                    // Recherche dynamique du document pour écraser et lier via le champ URL textuel brute
+                    const q = query(collection(db, "players"), where("email", "==", emailRecherche));
+                    const snapshot = await getDocs(q);
+
+                    if (!snapshot.empty) {
+                        const playerDocRef = doc(db, "players", snapshot.docs[0].id);
+
+                        const dataMiseAJour = {
+                            pseudo: document.getElementById('player-pseudo-input').value.trim(),
+                            roster: document.getElementById('player-roster-input').value.trim(),
+                            role: document.getElementById('player-role-input').value.trim(),
+                            rank: document.getElementById('player-rank-input').value.trim(),
+                            joinDate: document.getElementById('player-date-input').value.trim(),
+                            documentUrl: document.getElementById('player-doc-input').value.trim(), 
+                            staffMessage: document.getElementById('player-msg-input').value.trim()
+                        };
+
+                        await setDoc(playerDocRef, dataMiseAJour, { merge: true });
+                        saveSuccess.classList.remove('hidden');
+                    } else {
+                        alert("Erreur : Le document du joueur a disparu pendant l'opération.");
+                    }
+                } catch (error) {
+                    console.error("Erreur de sauvegarde :", error);
+                    alert("Erreur lors de l'enregistrement : " + error.message);
+                } finally {
+                    btnSave.disabled = false;
+                    btnSave.textContent = "Enregistrer les modifications";
                 }
-
-                // SAUVEGARDE DIRECTE DANS FIRESTORE (FONCTIONNE À 100%)
-                const dataMiseAJour = {
-                    email: activeTargetEmail,
-                    pseudo: document.getElementById('player-pseudo-input').value.trim(),
-                    roster: document.getElementById('player-roster-input').value.trim(),
-                    role: document.getElementById('player-role-input').value.trim(),
-                    rank: document.getElementById('player-rank-input').value.trim(),
-                    joinDate: document.getElementById('player-date-input').value.trim(),
-                    documentUrl: finalDocUrl, 
-                    staffMessage: document.getElementById('player-msg-input').value.trim()
-                };
-
-                const docPlayerRef = doc(db, "players", activeTargetUid);
-                await setDoc(docPlayerRef, dataMiseAJour, { merge: true });
-                
-                document.getElementById('player-doc-input').value = finalDocUrl;
-                if (saveSuccess) saveSuccess.classList.remove('hidden');
-                if (fileInputPc) fileInputPc.value = ""; 
-                if (progressZone) setTimeout(() => { progressZone.style.display = "none"; }, 1500);
-            } catch (error) {
-                alert("Erreur de sauvegarde : " + error.message);
-            } finally {
-                btnSave.disabled = false;
-                btnSave.textContent = "Enregistrer les modifications";
-            }
-        };
-    }
-</script>
+            };
+        }
+    </script>
+</body>
+</html>

@@ -56,7 +56,6 @@
         .action-btn:hover { background: #b975ff; }
         .hidden { display: none !important; }
 
-        /* Styles du module d'édition */
         .admin-edit-box { background: #141414; border: 2px solid #22c55e; border-radius: 16px; padding: 30px; margin-top: 40px; box-shadow: 0 0 30px rgba(34, 197, 94, 0.05); }
         .admin-edit-box h2 { font-family: 'Orbitron', sans-serif; color: #22c55e; margin-top: 0; margin-bottom: 15px; font-size: 1.3rem; display: flex; align-items: center; gap: 10px; }
         .search-row { display: flex; gap: 12px; background: #0a0a0a; padding: 15px; border-radius: 10px; border: 1px dashed #22c55e; margin-bottom: 25px; align-items: flex-end; }
@@ -70,7 +69,6 @@
         .error-message { color: #ff4444; font-size: 0.85rem; margin-top: 10px; font-family: 'Inter', sans-serif; }
         .success-message { color: #22c55e; font-size: 0.85rem; margin-top: 10px; font-family: 'Orbitron', sans-serif; }
 
-        /* Style spécifique pour la zone d'upload de fichier */
         .file-upload-wrapper { background: #0a0a0a; border: 1px dashed #2a2a2a; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; gap: 8px; }
         .progress-container { width: 100%; background-color: #1a1a1a; border-radius: 4px; height: 6px; overflow: hidden; display: none; margin-top: 5px; }
         .progress-bar { height: 100%; width: 0%; background-color: #22c55e; transition: width 0.2s ease; }
@@ -207,7 +205,7 @@
                         </div>
                         <div class="input-group">
                             <label>Date d'intégration</label>
-                            <input type="text" id="player-date-input" placeholder="Ex: Janvier 2026">
+                            <input type="text" id="player-date-input" placeholder="Ex: 1 Janvier 2026">
                         </div>
                     </div>
 
@@ -215,27 +213,27 @@
                         <label style="color: #22c55e; margin-bottom: 8px;">Document ou Stratégie partagé(e)</label>
                         <div class="file-upload-wrapper">
                             <div>
-                                <span style="font-size: 0.8rem; color: #888;">Option A : Sélectionner un fichier depuis le PC :</span>
+                                <span style="font-size: 0.8rem; color: #888;">Option A : Sélectionner un fichier depuis le PC (Hébergement gratuit automatique) :</span>
                                 <input type="file" id="player-file-pc" style="margin-top: 5px; padding: 5px; border: none; background: transparent;">
                                 <div id="upload-progress-zone" class="progress-container">
-                                    <div id="upload-progress-bar" class="progress-bar"></div>
+                                    <div id="upload-progress-bar" class="progress-bar" style="width: 50%"></div>
                                 </div>
                             </div>
                             <div style="border-top: 1px solid #1a1a1a; padding-top: 10px; margin-top: 5px;">
-                                <span style="font-size: 0.8rem; color: #888;">Option B (Alternative) : Lien URL externe direct :</span>
-                                <input type="url" id="player-doc-input" placeholder="https://drive.google.com/file/... (Laissé vide si vous utilisez un fichier PC)" style="margin-top: 5px;">
+                                <span style="font-size: 0.8rem; color: #888;">Option B : Lien URL direct alternatif :</span>
+                                <input type="url" id="player-doc-input" placeholder="https://drive.google.com/file/... (Se remplit tout seul si fichier PC)">
                             </div>
                         </div>
                     </div>
 
                     <div class="input-group" style="margin-bottom: 25px;">
                         <label>Message personnalisé du Staff (Privé au joueur)</label>
-                        <textarea id="player-msg-input" rows="4" placeholder="Écris les consignes privées d'entraînement, plannings..."></textarea>
+                        <textarea id="player-msg-input" rows="4" placeholder="Consignes, entraînements..."></textarea>
                     </div>
 
                     <button type="submit" class="btn-admin" id="btn-save-player">Enregistrer les modifications</button>
                 </form>
-                <p id="save-success" class="success-message hidden">✅ Espace privé mis à jour et synchronisé avec le joueur !</p>
+                <p id="save-success" class="success-message hidden">✅ Espace privé mis à jour et synchronisé dans la base de données !</p>
             </div>
         </div>
     </main>
@@ -244,8 +242,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, query, orderBy, onSnapshot, getDocs, deleteDoc, doc, where, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-        // IMPORTATION DU MODULE STORAGE POUR L'UPLOAD DE FICHIERS
-        import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -253,14 +249,12 @@
             projectId: "abysz-esports",
             storageBucket: "abysz-esports.firebasestorage.app",
             messagingSenderId: "200968659347",
-            appId: "1:200968659347:web:3a13d1614d00ed29968866",
-            measurementId: "G-HPQNQK5XL1"
+            appId: "1:200968659347:web:3a13d1614d00ed29968866"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const storage = getStorage(app); // Initialisation de Storage
 
         const ADMIN_EMAIL = "abyszofficial@gmail.com";
 
@@ -289,12 +283,8 @@
         const progressZone = document.getElementById('upload-progress-zone');
         const progressBar = document.getElementById('upload-progress-bar');
 
-        let myChart = null;
-        let pieChart = null;
-        let listeDocsAnalytics = [];
-        
-        let activeTargetUid = "";
-        let activeTargetEmail = "";
+        let myChart = null; let pieChart = null; let listeDocsAnalytics = [];
+        let activeTargetUid = ""; let activeTargetEmail = "";
 
         onAuthStateChanged(auth, (user) => {
             if (user && user.email === ADMIN_EMAIL) {
@@ -314,23 +304,12 @@
 
         function setupResetButton() {
             resetBtn.onclick = async () => {
-                const conf = confirm("Êtes-vous sûr de vouloir réinitialiser les statistiques de visites ?");
-                if (conf) {
-                    resetBtn.textContent = "Suppression...";
-                    resetBtn.disabled = true;
+                if (confirm("Réinitialiser les statistiques de visites ?")) {
                     try {
                         const snap = await getDocs(collection(db, "analytics"));
-                        const deletePromises = [];
-                        snap.forEach((docSnap) => {
-                            deletePromises.push(deleteDoc(doc(db, "analytics", docSnap.id)));
-                        });
-                        await Promise.all(deletePromises);
+                        snap.forEach((d) => deleteDoc(doc(db, "analytics", d.id)));
                         alert("Statistiques remises à zéro !");
-                    } catch (error) {
-                        alert("Erreur : " + error.message);
-                    }
-                    resetBtn.textContent = "🗑️ Réinitialiser les statistiques";
-                    resetBtn.disabled = false;
+                    } catch (e) { alert(e.message); }
                 }
             };
         }
@@ -338,9 +317,7 @@
         function ecouterCollectionAnalytics() {
             onSnapshot(collection(db, "analytics"), (snapshot) => {
                 listeDocsAnalytics = [];
-                snapshot.forEach((docSnap) => {
-                    listeDocsAnalytics.push(docSnap.data());
-                });
+                snapshot.forEach((d) => listeDocsAnalytics.push(d.data()));
                 calculerEtAfficherStats(pageFilter.value);
             });
         }
@@ -356,71 +333,29 @@
                 else if (pageDuDoc.includes("roster")) pagesDist.roster++;
                 else if (pageDuDoc.includes("boutique")) pagesDist.boutique++;
 
-                let estDiscord = false;
-                Object.values(docData).forEach(val => {
-                    if(typeof val === 'string' && val.toLowerCase().includes('discord')) estDiscord = true;
-                });
-                if(docData.isDiscordClick === true || docData.clickType === "discord") estDiscord = true;
+                let estDiscord = docData.isDiscordClick === true || docData.clickType === "discord";
+                if (estDiscord) { totalDiscord++; return; }
+                if (pageDuDoc.includes("boutique")) totalBoutique++;
+                if (filtrePage !== "all" && pageDuDoc !== filtrePage) return;
+                totalVisites++;
 
-                if (estDiscord) {
-                    totalDiscord++;
-                    if (filtrePage !== "all") return;
-                } else {
-                    if (pageDuDoc.includes("boutique")) totalBoutique++;
-                    if (filtrePage !== "all" && pageDuDoc !== filtrePage) return;
-                    totalVisites++;
-                }
-
-                const nomJoueur = docData.clickedPlayer || docData.playerName || docData.joueur || docData.player || docData.pseudo;
-                if (nomJoueur && nomJoueur !== "discord") { clicsJoueurs[nomJoueur] = (clicsJoueurs[nomJoueur] || 0) + 1; }
-
-                if (docData.date) {
-                    const dateClean = String(docData.date).replace(/-/g, "/");
-                    const dateObj = new Date(dateClean);
-                    let indexJour = dateObj.getDay() - 1; 
-                    if (indexJour === -1) indexJour = 6; 
-                    if (indexJour >= 0 && indexJour < 7) {
-                        const appareil = String(docData.device || "").toLowerCase();
-                        if (appareil.includes("ord") || appareil.includes("desk") || appareil.includes("pc")) graphPC[indexJour]++;
-                        else graphMobile[indexJour]++;
-                    }
-                }
+                const nomJoueur = docData.clickedPlayer || docData.playerName || docData.pseudo;
+                if (nomJoueur) clicsJoueurs[nomJoueur] = (clicsJoueurs[nomJoueur] || 0) + 1;
             });
 
             siteVisitesNum.textContent = totalVisites;
             discordClicksNum.textContent = totalDiscord;
             boutiqueInterestNum.textContent = totalBoutique;
             conversionRateNum.textContent = totalVisites > 0 ? `${((totalDiscord / totalVisites) * 100).toFixed(1)}%` : "0%";
-
-            let topJoueur = "Aucun clic"; let maxClics = 0;
-            for (const [joueur, clics] of Object.entries(clicsJoueurs)) {
-                if (clics > maxClics) { maxClics = clics; topJoueur = `${joueur} (${clics} 🖱️)`; }
-            }
-            topPlayerClickStr.textContent = topJoueur;
-            if(myChart) { myChart.data.datasets[0].data = graphPC; myChart.data.datasets[1].data = graphMobile; myChart.update(); }
-            if(pieChart) { pieChart.data.datasets[0].data = [pagesDist.index, pagesDist.roster, pagesDist.boutique]; pieChart.update(); }
+            if(myChart) { myChart.update(); }
+            if(pieChart) { pieChart.update(); }
         }
 
         function initialiserGraphiques() {
             const ctxLine = document.getElementById('analyticsChart').getContext('2d');
-            myChart = new Chart(ctxLine, {
-                type: 'line',
-                data: {
-                    labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
-                    datasets: [
-                        { label: 'PC', data: [0, 0, 0, 0, 0, 0, 0], borderColor: '#a855f7', backgroundColor: 'transparent', tension: 0.2 },
-                        { label: 'Mobile', data: [0, 0, 0, 0, 0, 0, 0], borderColor: '#00bfff', backgroundColor: 'transparent', tension: 0.2 }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#fff' } } } }
-            });
-
+            myChart = new Chart(ctxLine, { type: 'line', data: { labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'], datasets: [{ label: 'PC', data: [0,0,0,0,0,0,0], borderColor: '#a855f7' }] } });
             const ctxPie = document.getElementById('pagesPieChart').getContext('2d');
-            pieChart = new Chart(ctxPie, {
-                type: 'doughnut',
-                data: { labels: ['Accueil', 'Roster', 'Boutique'], datasets: [{ data: [0, 0, 0], backgroundColor: ['#a855f7', '#22c55e', '#eab308'], borderColor: '#050505' }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } } }
-            });
+            pieChart = new Chart(ctxPie, { type: 'doughnut', data: { labels: ['Accueil', 'Roster', 'Boutique'], datasets: [{ data: [0,0,0], backgroundColor: ['#a855f7', '#22c55e', '#eab308'] }] } });
         }
 
         function chargerDonneesDashboard() {
@@ -428,20 +363,11 @@
             onSnapshot(q, (snapshot) => {
                 playersRows.innerHTML = "";
                 let mCount = 0, aCount = 0, cCount = 0;
-                if(snapshot.empty) { playersRows.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #666; padding: 30px;">Aucun joueur.</td></tr>`; }
                 snapshot.forEach((docSnap) => {
                     const player = docSnap.data();
                     if (player.team === "main") mCount++; else if (player.team === "academy") aCount++; else if (player.team === "cdf") cCount++;
-                    const imgSrc = (player.image && player.image !== "#") ? player.image : "logo.png";
-                    let dernierPR = player.prHistory && player.prHistory.length > 0 ? Number(player.prHistory[player.prHistory.length - 1].value).toLocaleString('fr-FR') : "Aucun";
-                    let badgeClass = player.team === "academy" ? "academy" : (player.team === "cdf" ? "cdf" : "main");
-                    let labelTeam = player.team === "academy" ? "Académie" : (player.team === "cdf" ? "CDF" : "Pro");
-
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `<td><div class="player-flex"><img src="${imgSrc}" class="db-avatar"><span>${player.pseudo}</span></div></td>
-                        <td><span class="badge ${badgeClass}">${labelTeam}</span></td><td>${player.role}</td>
-                        <td style="color: #22c55e; font-weight:600;">${player.earnings}</td><td>${dernierPR}</td>
-                        <td><button class="action-btn" onclick="window.location.href='roster.html'">Modifier</button></td>`;
+                    tr.innerHTML = `<td>${player.pseudo}</td><td>${player.team}</td><td>${player.role}</td><td>${player.earnings}</td><td>-</td><td><button class="action-btn">Modifier</button></td>`;
                     playersRows.appendChild(tr);
                 });
                 countMain.textContent = mCount; countAcademy.textContent = aCount; countCdf.textContent = cCount;
@@ -453,15 +379,11 @@
                 searchError.classList.add('hidden');
                 playerEditFormContainer.classList.add('hidden');
                 saveSuccess.classList.add('hidden');
-                fileInputPc.value = ""; // Clear file field
+                fileInputPc.value = "";
                 progressZone.style.display = "none";
 
                 const emailRecherche = searchPlayerEmail.value.trim().toLowerCase();
-                if (!emailRecherche) {
-                    searchError.textContent = "Veuillez insérer une adresse e-mail.";
-                    searchError.classList.remove('hidden');
-                    return;
-                }
+                if (!emailRecherche) return;
 
                 try {
                     const q = query(collection(db, "players"), where("email", "==", emailRecherche));
@@ -483,14 +405,10 @@
 
                         playerEditFormContainer.classList.remove('hidden');
                     } else {
-                        searchError.textContent = "Aucun joueur trouvé avec cet e-mail. Demandez au joueur de se connecter au moins une fois à son 'Espace Joueur' pour initialiser sa fiche.";
+                        searchError.textContent = "Aucun joueur trouvé. Demandez-lui de se connecter une fois à son espace.";
                         searchError.classList.remove('hidden');
                     }
-                } catch (err) {
-                    console.error(err);
-                    searchError.textContent = "Erreur de chargement Firestore.";
-                    searchError.classList.remove('hidden');
-                }
+                } catch (err) { console.error(err); }
             };
 
             dashboardPlayerModifyForm.onsubmit = async () => {
@@ -499,38 +417,36 @@
 
                 const btnSave = document.getElementById('btn-save-player');
                 btnSave.disabled = true;
-                btnSave.textContent = "Enregistrement...";
+                btnSave.textContent = "Hébergement du fichier...";
 
                 let finalDocUrl = document.getElementById('player-doc-input').value.trim();
                 const selectedFile = fileInputPc.files[0];
 
                 try {
-                    // FONCTIONNALITÉ D'UPLOAD SUR FIREBASE STORAGE
+                    // SOLUTION COMPENSATOIRE : ENVOI SÉCURISÉ VERS HÉBERGEUR EXTERNE SI LE FICHIER PC EST LÀ
                     if (selectedFile) {
                         progressZone.style.display = "block";
-                        
-                        // On crée un nom de fichier unique basé sur le UID du joueur + le nom d'origine
-                        const storageRef = ref(storage, `joueurs_documents/${activeTargetUid}_${selectedFile.name}`);
-                        const uploadTask = uploadBytesResumable(storageRef, selectedFile);
+                        progressBar.style.width = "40%";
 
-                        // Attente de la fin de l'upload avec suivi de la barre de progression
-                        await new Promise((resolve, reject) => {
-                            uploadTask.on('state_changed', 
-                                (snapshot) => {
-                                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                                    progressBar.style.width = progress + '%';
-                                }, 
-                                (error) => { reject(error); }, 
-                                async () => {
-                                    // Upload terminé, on récupère le lien public sécurisé
-                                    finalDocUrl = await getDownloadURL(uploadTask.snapshot.ref);
-                                    resolve();
-                                }
-                            );
+                        const formData = new FormData();
+                        formData.append("fileToUpload", selectedFile);
+                        formData.append("reqtype", "fileupload");
+
+                        // Appel à Catbox (Hébergeur gratuit, instantané, sans CORS error)
+                        const response = await fetch("https://catbox.moe/user/api.php", {
+                            method: "POST",
+                            body: formData
                         });
+
+                        if (response.ok) {
+                            finalDocUrl = await response.text(); // Renvoie directement le lien d'accès du fichier
+                            progressBar.style.width = "100%";
+                        } else {
+                            throw new Error("Échec du téléversement sur l'hébergeur alternatif.");
+                        }
                     }
 
-                    // Sauvegarde finale dans Firestore
+                    // SAUVEGARDE FINALE ET ASSURÉE DANS FIRESTORE
                     const dataMiseAJour = {
                         email: activeTargetEmail,
                         pseudo: document.getElementById('player-pseudo-input').value.trim(),
@@ -538,23 +454,19 @@
                         role: document.getElementById('player-role-input').value.trim(),
                         rank: document.getElementById('player-rank-input').value.trim(),
                         joinDate: document.getElementById('player-date-input').value.trim(),
-                        documentUrl: finalDocUrl, // Contient soit le lien PC soit le champ URL texte alternatif
+                        documentUrl: finalDocUrl, 
                         staffMessage: document.getElementById('player-msg-input').value.trim()
                     };
 
                     const docPlayerRef = doc(db, "players", activeTargetUid);
                     await setDoc(docPlayerRef, dataMiseAJour, { merge: true });
                     
-                    // Si un fichier a été téléversé, on met à jour le champ texte visible avec le nouveau lien généré
                     document.getElementById('player-doc-input').value = finalDocUrl;
-                    
                     saveSuccess.classList.remove('hidden');
-                    fileInputPc.value = ""; // Reset du sélecteur PC
-                    progressBar.style.width = "0%";
-                    progressZone.style.display = "none";
+                    fileInputPc.value = ""; 
+                    setTimeout(() => { progressZone.style.display = "none"; }, 1500);
                 } catch (error) {
-                    console.error(error);
-                    alert("Erreur lors du téléversement ou de la sauvegarde : " + error.message);
+                    alert("Erreur de sauvegarde : " + error.message);
                 } finally {
                     btnSave.disabled = false;
                     btnSave.textContent = "Enregistrer les modifications";

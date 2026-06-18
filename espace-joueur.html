@@ -8,29 +8,21 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        html { scroll-behavior: smooth; scrollbar-gutter: stable; }
         body { background: #0a0a0a; color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
-        
         .container { max-width: 800px; margin: 60px auto; padding: 0 20px; text-align: center; }
         .card { background: #141414; border: 2px solid #a855f7; border-radius: 20px; padding: 40px 30px; box-shadow: 0 0 30px rgba(168, 85, 247, 0.15); margin-bottom: 30px; }
         h2, h3, h4 { font-family: 'Orbitron', sans-serif; color: white; }
-        
         .input-group { margin-bottom: 20px; text-align: left; }
         .input-group label { display: block; margin-bottom: 8px; color: #a855f7; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; }
-        .input-group input { width: 100%; padding: 12px; background: #0a0a0a; border: 1px solid #2a2a2a; color: white; border-radius: 8px; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        .input-group input:focus { border-color: #a855f7; outline: none; }
-        
-        .btn { background: #a855f7; color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: bold; font-family: 'Orbitron', sans-serif; cursor: pointer; transition: all 0.2s; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; text-decoration: none; display: block; text-align: center; }
+        .input-group input { width: 100%; padding: 12px; background: #0a0a0a; border: 1px solid #2a2a2a; color: white; border-radius: 8px; box-sizing: border-box; }
+        .btn { background: #a855f7; color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: bold; font-family: 'Orbitron', sans-serif; cursor: pointer; text-transform: uppercase; font-size: 0.85rem; text-decoration: none; display: block; text-align: center; }
         .btn:hover { background: #b975ff; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
-        
         .btn-download { background: #22c55e; margin-top: 15px; }
         .btn-download:hover { background: #2ed96f; box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); }
-
         .hidden { display: none !important; }
         .error-message { color: #ff4444; margin-top: 15px; font-size: 0.9rem; }
-        
         .profile-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #2a2a2a; padding-bottom: 20px; margin-bottom: 20px; }
-        .logout-link { color: #ff4444; background: none; border: none; cursor: pointer; font-family: 'Orbitron', sans-serif; font-weight: bold; font-size: 0.9rem; }
+        .logout-link { color: #ff4444; background: none; border: none; cursor: pointer; font-family: 'Orbitron', sans-serif; font-weight: bold; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
         .stat-box { background: #1a1a1a; padding: 20px; border-radius: 12px; border-left: 4px solid #a855f7; text-align: left; }
         .stat-box span { display: block; font-size: 0.8rem; color: #777; font-family: 'Orbitron', sans-serif; }
@@ -42,12 +34,10 @@
     <div class="container">
         <div id="auth-zone" class="card">
             <h2>Connexion Joueur</h2>
-            <p style="color: #777; margin-bottom: 30px;">Accède à tes statistiques et ton espace d'entraînement Abysz.</p>
-            
             <form id="player-login-form" onsubmit="return false;">
                 <div class="input-group">
                     <label for="player-email">Adresse E-mail</label>
-                    <input type="email" id="player-email" placeholder="joueur@abysz.com" required>
+                    <input type="email" id="player-email" placeholder="joueur@gmail.com" required>
                 </div>
                 <div class="input-group">
                     <label for="player-password">Mot de passe</label>
@@ -85,8 +75,8 @@
             
             <div id="document-zone" class="hidden" style="margin-top: 30px; background: #0c1a10; padding: 20px; border-radius: 12px; text-align: left; border: 1px solid #22c55e;">
                 <h4 style="margin: 0 0 5px 0; font-family: 'Orbitron', sans-serif; color: #22c55e;">📄 Document partagé par le Staff</h4>
-                <p style="margin: 0 0 15px 0; font-size: 0.85rem; color: #aaa;">Un document officiel (Stratégie, planning ou livret) est disponible au téléchargement.</p>
-                <a id="player-download-link" href="#" target="_blank" class="btn btn-download">Consulter / Télécharger le document</a>
+                <p style="margin: 0 0 15px 0; font-size: 0.85rem; color: #aaa;">Une stratégie ou un document d'équipe vient d'être mis à ta disposition.</p>
+                <a id="player-download-link" href="#" target="_blank" class="btn btn-download">Consulter / Télécharger le fichier</a>
             </div>
 
             <div style="margin-top: 30px; background: #0a0a0a; padding: 20px; border-radius: 12px; text-align: left; border: 1px dashed #a855f7;">
@@ -99,7 +89,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, query, where, onSnapshot, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -114,7 +104,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // CONFIGURATION SÉCURITÉ ADMIN
         const ADMIN_EMAIL = "abyszofficial@gmail.com";
 
         const authZone = document.getElementById('auth-zone');
@@ -130,32 +119,27 @@
             if (user) {
                 const emailMinuscule = user.email.toLowerCase().trim();
 
-                // 1. REDIRECTION AUTOMATIQUE SI C'EST L'ADMIN
                 if (emailMinuscule === ADMIN_EMAIL) {
                     window.location.href = "dashboard.html";
-                    return; // Stoppe l'exécution du reste du script
+                    return;
                 }
 
-                // 2. LOGIQUE NORMALE POUR LES JOUEURS
                 authZone.classList.add('hidden');
                 profileZone.classList.remove('hidden');
                 
-                const docRef = doc(db, "players", user.uid);
-                const docSnap = await getDoc(docRef);
-                if (!docSnap.exists() || !docSnap.data().email || docSnap.data().email !== emailMinuscule) {
-                    await setDoc(docRef, { email: emailMinuscule }, { merge: true });
-                }
-
-                unsubscribeProfile = onSnapshot(docRef, (snapshot) => {
-                    if (snapshot.exists()) {
-                        const data = snapshot.data();
+                // Recherche par e-mail direct pour s'aligner parfaitement avec le Dashboard
+                const q = query(collection(db, "players"), where("email", "==", emailMinuscule));
+                
+                unsubscribeProfile = onSnapshot(q, (snapshot) => {
+                    if (!snapshot.empty) {
+                        const data = snapshot.docs[0].data();
                         
-                        document.getElementById('player-pseudo').textContent = data.pseudo || "Joueur Abysz";
+                        document.getElementById('player-pseudo').textContent = data.pseudo || "Joueur TEST";
                         document.getElementById('player-role').textContent = `Roster : ${data.roster || 'Non assigné'}`;
                         document.getElementById('stat-role').textContent = data.role || "Membre";
                         document.getElementById('stat-rank').textContent = data.rank || "Non Classé";
                         document.getElementById('stat-date').textContent = data.joinDate || "-";
-                        document.getElementById('player-staff-message').textContent = data.staffMessage || "Bienvenue dans ton espace privé.";
+                        document.getElementById('player-staff-message').textContent = data.staffMessage || "Bienvenue.";
                         
                         if (data.documentUrl && data.documentUrl.trim() !== "") {
                             playerDownloadLink.href = data.documentUrl;
@@ -163,20 +147,19 @@
                         } else {
                             documentZone.classList.add('hidden');
                         }
+                    } else {
+                        // Création automatique si premier compte
+                        setDoc(doc(db, "players", user.uid), { email: emailMinuscule }, { merge: true });
                     }
                 });
 
             } else {
-                if (unsubscribeProfile) {
-                    unsubscribeProfile();
-                    unsubscribeProfile = null;
-                }
+                if (unsubscribeProfile) unsubscribeProfile();
                 authZone.classList.remove('hidden');
                 profileZone.classList.add('hidden');
             }
         });
 
-        // Formulaire de connexion
         loginForm.addEventListener('submit', async () => {
             authError.classList.add('hidden');
             const email = document.getElementById('player-email').value.trim();
@@ -189,10 +172,7 @@
             }
         });
 
-        // Déconnexion
-        document.getElementById('player-logout-btn').onclick = () => {
-            signOut(auth);
-        };
+        document.getElementById('player-logout-btn').onclick = () => { signOut(auth); };
     </script>
 </body>
 </html>

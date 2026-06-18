@@ -80,7 +80,7 @@
         .hidden { display: none !important; }
 
         /* ── GRAPHIQUE CONTENEUR ── */
-        .chart-container { background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 10px; margin: 15px 0; max-height: 160px; }
+        .chart-container { background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 10px; margin: 15px 0; height: 160px; }
 
         /* ── HISTORIQUE PR ── */
         .pr-history-section { background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 12px; padding: 16px; margin: 16px 0; }
@@ -146,7 +146,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, deleteDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -166,7 +166,6 @@
         let estAdmin = false;
 
         document.addEventListener("DOMContentLoaded", () => {
-            // Suivi en temps réel de l'état de connexion de l'utilisateur
             onAuthStateChanged(auth, (user) => {
                 const addBtn = document.getElementById("add-player-btn");
                 const loginBtn = document.getElementById("login-btn");
@@ -185,7 +184,6 @@
                 }
             });
 
-            // Action du bouton de déconnexion
             const logoutBtn = document.getElementById("logout-btn");
             if (logoutBtn) {
                 logoutBtn.addEventListener("click", () => {
@@ -197,7 +195,6 @@
                 });
             }
 
-            // Action du bouton de connexion (Ouvre le modal de login)
             const loginBtn = document.getElementById("login-btn");
             if (loginBtn) {
                 loginBtn.addEventListener("click", openLoginPopup);
@@ -207,7 +204,6 @@
             setupAddPlayerButton();
         });
 
-        // ── POPUP COMPACT DE CONNEXION DIRECTE ──
         function openLoginPopup() {
             const container = document.getElementById("popups-container");
             if (!container) return;
@@ -302,12 +298,33 @@
                     </div>
                 `;
 
-                card.querySelector(".player-card").addEventListener("mouseenter", function() { this.style.transform = "translateY(-5px)"; });
-                card.querySelector(".player-card").addEventListener("mouseleave", function() { this.style.transform = "translateY(0)"; });
-                card.querySelector(".player-card").addEventListener("click", () => openPlayerPopup(player));
+                const internalCard = card.querySelector(".player-card");
+                internalCard.addEventListener("mouseenter", function() { this.style.transform = "translateY(-5px)"; });
+                internalCard.addEventListener("mouseleave", function() { this.style.transform = "translateY(0)"; });
+                internalCard.addEventListener("click", () => openPlayerPopup(player));
 
                 grid.appendChild(card);
             });
+        }
+
+        function setupAddPlayerButton() {
+            const addBtn = document.getElementById("add-player-btn");
+            if (addBtn) {
+                addBtn.addEventListener("click", () => {
+                    openPlayerPopup({
+                        pseudo: "",
+                        team: "main",
+                        role: "",
+                        earnings: "",
+                        image: "logo.png",
+                        prHistory: [],
+                        twitter: "",
+                        twitch: "",
+                        youtube: "",
+                        tiktok: ""
+                    }, true);
+                });
+            }
         }
 
         function openPlayerPopup(player, startInEditMode = false) {
@@ -458,40 +475,9 @@
             const closePopup = () => { popupOverlay.classList.remove("active"); setTimeout(() => popupOverlay.remove(), 200); };
             popupOverlay.querySelector(".popup-close").addEventListener("click", closePopup);
 
-            // ── EDITEUR PR EN DIRECT ──
-            const rafraichirListeEditeurPR = () => {
-                const box = document.getElementById(`edit-pr-list-${playerId}`);
-                if (!box) return;
-                if (localPrHistory.length === 0) {
-                    box.innerHTML = `<p style="color:#555; font-size:0.8rem; margin:5px 0; text-align:center;">Aucun historique.</p>`;
-                    return;
-                }
-                let html = "";
-                localPrHistory.forEach((item, index) => {
-                    html += `
-                        <div style="display:flex; justify-content:space-between; align-items:center; background:#111; padding:4px 8px; margin-bottom:4px; border-radius:4px; font-size:0.8rem; color:#ccc;">
-                            <span><b>${item.date}</b> - ${item.label || item.event || 'Tournoi'} (${item.value} PR)</span>
-                            <span class="btn-del-pr-row" data-index="${index}" style="color:#ff4444; cursor:pointer; font-weight:bold; padding:0 4px;">×</span>
-                        </div>
-                    `;
-                });
-                box.innerHTML = html;
-
-                box.querySelectorAll(".btn-del-pr-row").forEach(btn => {
-                    btn.addEventListener("click", (e) => {
-                        const idx = parseInt(e.target.getAttribute("data-index"));
-                        localPrHistory.splice(idx, 1);
-                        rafraichirListeEditeurPR();
-                    });
-                });
-            };
-
-            // ── CONSTRUIRE LE TABLEAU ET LE GRAPHIQUE PUBLIC ──
-            if (!isNewPlayer) {
-                const canvasElement = document.getElementById(`canvas-${playerId}`);
-                const chartBox = document.getElementById(`chart-box-${playerId}`);
-                const tableContainer = document.getElementById(`pr-table-container-${playerId}`);
-                
+            // ── GENERATION DU TABLEAU PUBLIC PR ──
+            const tableContainer = document.getElementById(`pr-table-container-${playerId}`);
+            if (tableContainer) {
                 if (localPrHistory.length > 0) {
                     let tableRows = "";
                     localPrHistory.forEach((row) => {
@@ -512,30 +498,34 @@
                                     <th>PR TOTAL</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                ${tableRows}
-                            </tbody>
+                            <tbody>${tableRows}</tbody>
                         </table>
                     `;
                 } else {
                     tableContainer.innerHTML = `<div style="text-align:center; color:#666; font-size:0.85rem; padding:10px;">Aucun historique de PR.</div>`;
                 }
+            }
 
-                if (localPrHistory.length >= 2) {
-                    const labels = localPrHistory.map(item => item.date || "");
-                    const dataValues = localPrHistory.map(item => Number(item.value) || 0);
-
+            // ── GENERATION DU GRAPHIQUE CHART.JS ──
+            const canvasElement = document.getElementById(`canvas-${playerId}`);
+            const chartBox = document.getElementById(`chart-box-${playerId}`);
+            if (canvasElement && chartBox) {
+                if (localPrHistory.length >= 1) {
+                    const labels = localPrHistory.map(item => item.date);
+                    const dataValues = localPrHistory.map(item => Number(item.value));
+                    
                     new Chart(canvasElement, {
                         type: 'line',
                         data: {
                             labels: labels,
                             datasets: [{
+                                label: 'Points PR',
                                 data: dataValues,
                                 borderColor: '#a855f7',
                                 backgroundColor: 'rgba(168, 85, 247, 0.1)',
                                 borderWidth: 2,
-                                tension: 0.3,
-                                fill: true
+                                fill: true,
+                                tension: 0.3
                             }]
                         },
                         options: {
@@ -549,120 +539,175 @@
                         }
                     });
                 } else {
-                    if (chartBox) chartBox.style.display = "none";
+                    chartBox.classList.add("hidden");
                 }
             }
 
+            // ── ACTIONS MODE EDITION (POUR LES ADMINS) ──
             if (estAdmin) {
-                rafraichirListeEditeurPR();
-
-                document.getElementById(`btn-add-pr-row-${playerId}`).addEventListener("click", () => {
-                    const inpDate = document.getElementById(`new-pr-date-${playerId}`);
-                    const inpLabel = document.getElementById(`new-pr-label-${playerId}`);
-                    const inpValue = document.getElementById(`new-pr-value-${playerId}`);
-
-                    if (!inpDate.value || !inpLabel.value || !inpValue.value) {
-                        alert("Remplis tous les champs (Date, Événement, Valeur).");
+                const rafraichirListeEditeurPR = () => {
+                    const box = document.getElementById(`edit-pr-list-${playerId}`);
+                    if (!box) return;
+                    if (localPrHistory.length === 0) {
+                        box.innerHTML = `<p style="color:#555; font-size:0.8rem; margin:5px 0; text-align:center;">Aucun historique.</p>`;
                         return;
                     }
-
-                    localPrHistory.push({
-                        date: inpDate.value,
-                        label: inpLabel.value,
-                        event: inpLabel.value,
-                        value: Number(inpValue.value)
+                    let html = "";
+                    localPrHistory.forEach((item, index) => {
+                        html += `
+                            <div style="display:flex; justify-content:space-between; align-items:center; background:#111; padding:4px 8px; margin-bottom:4px; border-radius:4px; font-size:0.8rem; color:#ccc;">
+                                <span><b>${item.date}</b> - ${item.label || item.event || 'Tournoi'} (${item.value} PR)</span>
+                                <span class="btn-del-pr-row" data-index="${index}" style="color:#ff4444; cursor:pointer; font-weight:bold; padding:0 4px;">×</span>
+                            </div>
+                        `;
                     });
+                    box.innerHTML = html;
 
-                    inpDate.value = "";
-                    inpLabel.value = "";
-                    inpValue.value = "";
-                    rafraichirListeEditeurPR();
-                });
+                    box.querySelectorAll(".btn-del-pr-row").forEach(btn => {
+                        btn.addEventListener("click", (e) => {
+                            const idx = parseInt(e.target.getAttribute("data-index"));
+                            localPrHistory.splice(idx, 1);
+                            rafraichirListeEditeurPR();
+                        });
+                    });
+                };
 
-                const fileInput = document.getElementById(`file-input-${playerId}`);
-                const clearImgBtn = document.getElementById(`btn-clear-img-${playerId}`);
-                const previewImg = document.getElementById(`edit-preview-${playerId}`);
+                rafraichirListeEditeurPR();
 
-                fileInput.addEventListener("change", (e) => {
-                    const fichier = e.target.files[0];
-                    if (fichier) {
-                        if (fichier.size > 1500000) {
-                            alert("Image trop lourde (Max 1.5 Mo)");
-                            return;
-                        }
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                            imageBase64String = reader.result;
-                            if (previewImg) previewImg.src = imageBase64String;
-                        };
-                        reader.readAsDataURL(fichier);
-                    }
-                });
-
-                clearImgBtn.addEventListener("click", () => {
-                    imageBase64String = "logo.png";
-                    if (previewImg) previewImg.src = "logo.png";
-                    fileInput.value = "";
-                });
-
-                if (!isNewPlayer) {
-                    popupOverlay.querySelector(`#btn-to-edit-${playerId}`).addEventListener("click", () => {
+                // Basculer vers l'édition
+                const toEditBtn = document.getElementById(`btn-to-edit-${playerId}`);
+                if (toEditBtn) {
+                    toEditBtn.addEventListener("click", () => {
                         viewModeDiv.classList.add("hidden");
                         editModeDiv.classList.remove("hidden");
-                        rafraichirListeEditeurPR();
                     });
-                    popupOverlay.querySelector(`#btn-cancel-${playerId}`).addEventListener("click", () => {
-                        editModeDiv.classList.add("hidden");
-                        viewModeDiv.classList.remove("hidden");
-                    });
-                } else {
-                    popupOverlay.querySelector(`#btn-cancel-${playerId}`).addEventListener("click", closePopup);
                 }
 
-                popupOverlay.querySelector(`#form-${playerId}`).addEventListener("submit", async () => {
-                    const pseudo = document.getElementById(`input-pseudo-${playerId}`).value;
-                    const team = document.getElementById(`input-team-${playerId}`).value;
-                    const role = document.getElementById(`input-role-${playerId}`).value;
-                    const earnings = document.getElementById(`input-earnings-${playerId}`).value || "0 €";
-
-                    const twitter = document.getElementById(`input-twitter-${playerId}`).value.trim();
-                    const twitch = document.getElementById(`input-twitch-${playerId}`).value.trim();
-                    const youtube = document.getElementById(`input-youtube-${playerId}`).value.trim();
-                    const tiktok = document.getElementById(`input-tiktok-${playerId}`).value.trim();
-
-                    const existingPlayer = localPlayersList.find(p => p.id === playerId);
-                    const createdAt = existingPlayer ? (existingPlayer.createdAt || Date.now()) : Date.now();
-
-                    try {
-                        await setDoc(doc(db, "roster", playerId), {
-                            pseudo, team, role, earnings, createdAt,
-                            image: imageBase64String,
-                            prHistory: localPrHistory,
-                            twitter, twitch, youtube, tiktok
-                        });
-                        closePopup();
-                    } catch (err) {
-                        alert("Erreur lors de la sauvegarde.");
-                    }
-                });
-
-                if (!isNewPlayer) {
-                    popupOverlay.querySelector(`#btn-delete-${playerId}`).addEventListener("click", async () => {
-                        if (confirm(`Supprimer définitivement ${player.pseudo} ?`)) {
-                            await deleteDoc(doc(db, "roster", playerId));
+                // Annuler
+                const cancelBtn = document.getElementById(`btn-cancel-${playerId}`);
+                if (cancelBtn) {
+                    cancelBtn.addEventListener("click", () => {
+                        if (isNewPlayer) {
                             closePopup();
+                        } else {
+                            editModeDiv.classList.add("hidden");
+                            viewModeDiv.classList.remove("hidden");
                         }
                     });
                 }
-            }
-        }
 
-        function setupAddPlayerButton() {
-            const addBtn = document.getElementById("add-player-btn");
-            if (addBtn) {
-                addBtn.addEventListener("click", () => {
-                    if (estAdmin) openPlayerPopup({}, true);
-                });
+                // Insertion rapide d'une ligne PR
+                const addPrRowBtn = document.getElementById(`btn-add-pr-row-${playerId}`);
+                if (addPrRowBtn) {
+                    addPrRowBtn.addEventListener("click", () => {
+                        const dInput = document.getElementById(`new-pr-date-${playerId}`);
+                        const lInput = document.getElementById(`new-pr-label-${playerId}`);
+                        const vInput = document.getElementById(`new-pr-value-${playerId}`);
+                        
+                        if (!dInput.value.trim() || !vInput.value.trim()) {
+                            alert("Veuillez remplir au moins la date et la valeur du PR.");
+                            return;
+                        }
+
+                        localPrHistory.push({
+                            date: dInput.value.trim(),
+                            label: lInput.value.trim() || "Tournoi",
+                            value: Number(vInput.value)
+                        });
+
+                        // Tri par date croissant automatiquement
+                        localPrHistory.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                        dInput.value = "";
+                        lInput.value = "";
+                        vInput.value = "";
+                        rafraichirListeEditeurPR();
+                    });
+                }
+
+                // Gestion de l'image (Upload local transformé en Base64)
+                const fileInput = document.getElementById(`file-input-${playerId}`);
+                if (fileInput) {
+                    fileInput.addEventListener("change", (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = function(event) {
+                                imageBase64String = event.target.result;
+                                document.getElementById(`edit-preview-${playerId}`).src = imageBase64String;
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                }
+
+                // Réinitialiser au logo par défaut
+                const clearImgBtn = document.getElementById(`btn-clear-img-${playerId}`);
+                if (clearImgBtn) {
+                    clearImgBtn.addEventListener("click", () => {
+                        imageBase64String = "logo.png";
+                        document.getElementById(`edit-preview-${playerId}`).src = "logo.png";
+                    });
+                }
+
+                // Soumission du formulaire & sauvegarde Firestore
+                const form = document.getElementById(`form-${playerId}`);
+                if (form) {
+                    form.addEventListener("submit", async () => {
+                        const pseudoValue = document.getElementById(`input-pseudo-${playerId}`).value.trim();
+                        const teamValue = document.getElementById(`input-team-${playerId}`).value;
+                        const roleValue = document.getElementById(`input-role-${playerId}`).value.trim();
+                        const earningsValue = document.getElementById(`input-earnings-${playerId}`).value.trim();
+                        
+                        const twitterVal = document.getElementById(`input-twitter-${playerId}`).value.trim();
+                        const twitchVal = document.getElementById(`input-twitch-${playerId}`).value.trim();
+                        const youtubeVal = document.getElementById(`input-youtube-${playerId}`).value.trim();
+                        const tiktokVal = document.getElementById(`input-tiktok-${playerId}`).value.trim();
+
+                        const pData = {
+                            pseudo: pseudoValue,
+                            team: teamValue,
+                            role: roleValue,
+                            earnings: earningsValue,
+                            image: imageBase64String,
+                            prHistory: localPrHistory,
+                            twitter: twitterVal,
+                            twitch: twitchVal,
+                            youtube: youtubeVal,
+                            tiktok: tiktokVal
+                        };
+
+                        if (isNewPlayer) {
+                            pData.createdAt = serverTimestamp();
+                        }
+
+                        try {
+                            await setDoc(doc(db, "roster", playerId), pData, { merge: true });
+                            alert("Profil joueur enregistré avec succès !");
+                            closePopup();
+                        } catch (err) {
+                            console.error("Erreur de sauvegarde Firestore :", err);
+                            alert("Une erreur est survenue lors de l'enregistrement.");
+                        }
+                    });
+                }
+
+                // Suppression d'un joueur
+                const deleteBtn = document.getElementById(`btn-delete-${playerId}`);
+                if (deleteBtn) {
+                    deleteBtn.addEventListener("click", async () => {
+                        if (confirm(`Êtes-vous sûr de vouloir supprimer définitivement le joueur ${player.pseudo || ''} ?`)) {
+                            try {
+                                await deleteDoc(doc(db, "roster", playerId));
+                                alert("Joueur supprimé du roster.");
+                                closePopup();
+                            } catch (err) {
+                                console.error(err);
+                                alert("Erreur lors de la suppression.");
+                            }
+                        }
+                    });
+                }
             }
         }
     </script>

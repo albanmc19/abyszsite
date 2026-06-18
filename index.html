@@ -12,7 +12,55 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* ── ZONE DES ANNONCES & MODAL (SANS TOUCHER AU RESTE) ── */
+        /* ── DYNAMISME & FLUIDITÉ GÉNÉRALE ── */
+        html {
+            scroll-behavior: smooth; /* Permet un défilement fluide lors des clics sur le menu */
+        }
+
+        /* Effet d'apparition au défilement (Scroll Reveal) */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .reveal-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Dynamisme des liens du menu */
+        nav ul li a {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: #a855f7;
+            transition: width 0.3s ease;
+        }
+        nav ul li a:hover {
+            color: #a855f7;
+        }
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+
+        /* Effet d'accentuation sur les boutons principaux */
+        .btn {
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+        }
+
+        /* ── ZONE DES ANNONCES & MODAL ── */
         .announcements-container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
         .announcements-header { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 30px; }
         
@@ -26,8 +74,10 @@
         .admin-gate-btn.logged-in:hover { background: #ff4444; color: white; box-shadow: 0 0 15px #ff4444; }
 
         .announcements-feed { display: flex; flex-direction: column; gap: 25px; text-align: left; }
-        .announcement-card { background: #1a1a1a; border-left: 4px solid #a855f7; padding: 25px; border-radius: 0 16px 16px 0; position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 14px; }
+        .announcement-card { background: #1a1a1a; border-left: 4px solid #a855f7; padding: 25px; border-radius: 0 16px 16px 0; position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 14px; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .announcement-card:hover { transform: translateX(5px); box-shadow: 0 6px 25px rgba(168, 85, 247, 0.15); }
         .announcement-card.priority-urgent { border-left-color: #ff4444; background: linear-gradient(90deg, rgba(255,68,68,0.03) 0%, #1a1a1a 100%); }
+        .announcement-card.priority-urgent:hover { box-shadow: 0 6px 25px rgba(255, 68, 68, 0.15); }
         
         .announcement-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-right: 100px; }
         .badge { font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: bold; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -51,9 +101,10 @@
         .delete-btn { position: absolute; top: 20px; right: 20px; background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: background 0.2s; z-index: 10; }
         .delete-btn:hover { background: #cc3333; }
         
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 15px; }
-        .modal-overlay.active { display: flex; }
-        .modal-content { background: #141414; border: 2px solid #a855f7; border-radius: 20px; max-width: 550px; width: 100%; padding: 30px 25px; position: relative; box-shadow: 0 0 30px rgba(168, 85, 247, 0.25); box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 15px; opacity: 0; transition: opacity 0.3s ease; }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content { background: #141414; border: 2px solid #a855f7; border-radius: 20px; max-width: 550px; width: 100%; padding: 30px 25px; position: relative; box-shadow: 0 0 30px rgba(168, 85, 247, 0.25); box-sizing: border-box; max-height: 90vh; overflow-y: auto; transform: scale(0.9); transition: transform 0.3s ease; }
+        .modal-overlay.active .modal-content { transform: scale(1); }
         .modal-content::-webkit-scrollbar { width: 6px; }
         .modal-content::-webkit-scrollbar-track { background: #0a0a0a; }
         .modal-content::-webkit-scrollbar-thumb { background: #a855f7; border-radius: 10px; }
@@ -131,7 +182,7 @@
         </div>
     </section>
 
-    <section id="rejoindre-commu" class="reveal">
+    <section id="rejoindre-commu" class="reveal" style="padding: 60px 20px; text-align: center;">
         <h2>REJOINDRE LA COMMUNAUTÉ</h2>
         <p class="subtitle">Entre dans l'univers Abysz, échange avec les joueurs et suis nos événements en direct !</p>
         <a href="https://discord.gg/KeSPkvjBVy" target="_blank" class="btn" id="discord-btn">Rejoindre le Discord</a>
@@ -265,7 +316,6 @@
 
         document.querySelectorAll('.reveal').forEach((el) => scrollObserver.observe(el));
 
-        // ACTION DE FERMETURE DU MODAL (La croix + clic à l'extérieur)
         closeModalBtn.onclick = () => { modal.classList.remove('active'); };
         window.onclick = (e) => { if (e.target === modal) { modal.classList.remove('active'); } };
 

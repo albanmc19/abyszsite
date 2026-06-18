@@ -101,12 +101,12 @@
                 ABYSZ
             </a>
         </div>
-        <ul>
+        <ul id="nav-links-list">
             <li><a href="index.html">Accueil</a></li>
             <li><a href="roster.html">Roster</a></li>
             <li><a href="boutique.html">Boutique</a></li>
             <li><a href="dashboard.html">📊 Dashboard</a></li>
-        </ul>
+            </ul>
     </nav>
 
     <section style="padding-top: 160px; padding-bottom: 80px;">
@@ -166,7 +166,6 @@
         let localPlayersList = [];
         let estAdmin = false;
 
-        // COMPTE UNIQUE ADMIN MIS À JOUR
         const ADMIN_EMAIL = "abyszofficial@gmail.com";
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -175,22 +174,32 @@
                 const loginBtn = document.getElementById("login-btn");
                 const logoutBtn = document.getElementById("logout-btn");
                 const welcomeMsg = document.getElementById("user-welcome-msg");
+                const navLinks = document.getElementById("nav-links-list");
                 
+                // On nettoie d'abord l'ancien bouton espace joueur s'il existe
+                const oldSpaceLink = document.getElementById("nav-player-space");
+                if (oldSpaceLink) oldSpaceLink.remove();
+
                 if (user) {
                     if (user.email === ADMIN_EMAIL) {
-                        // L'ADMINISTRATEUR RESTE ICI
                         estAdmin = true;
                         if (addBtn) addBtn.classList.remove("hidden");
                         if (welcomeMsg) welcomeMsg.innerText = "Espace Administrateur";
-                        if (logoutBtn) logoutBtn.classList.remove("hidden");
-                        if (loginBtn) loginBtn.classList.add("hidden");
                     } else {
-                        // TOUT AUTRE COMPTE EST REDIRIGÉ
                         estAdmin = false;
                         if (addBtn) addBtn.classList.add("hidden");
-                        window.location.href = "espace-joueur.html";
-                        return;
+                        if (welcomeMsg) welcomeMsg.innerText = "Espace Joueur";
+                        
+                        // ON RESTE SUR LA PAGE MAIS ON AJOUTE UN BOUTON DANS LA NAV POUR ALLER À SON ESPACE
+                        if (navLinks) {
+                            const li = document.createElement("li");
+                            li.id = "nav-player-space";
+                            li.innerHTML = `<a href="espace-joueur.html" style="color:#22c55e; font-weight:bold;">👤 Mon Espace</a>`;
+                            navLinks.appendChild(li);
+                        }
                     }
+                    if (logoutBtn) logoutBtn.classList.remove("hidden");
+                    if (loginBtn) loginBtn.classList.add("hidden");
                 } else {
                     estAdmin = false;
                     if (addBtn) addBtn.classList.add("hidden");
@@ -470,7 +479,6 @@
             const closePopup = () => { popupOverlay.classList.remove("active"); setTimeout(() => popupOverlay.remove(), 200); };
             popupOverlay.querySelector(".popup-close").addEventListener("click", closePopup);
 
-            // Remplissage du tableau PR en mode Vue
             const updatePrTable = () => {
                 const tableContainer = document.getElementById(`pr-table-container-${playerId}`);
                 if (!tableContainer) return;
@@ -488,7 +496,6 @@
             };
             updatePrTable();
 
-            // Rendu graphique Chart.js
             let prChart = null;
             const buildChart = () => {
                 const ctx = document.getElementById(`canvas-${playerId}`);
@@ -527,7 +534,6 @@
 
             if (!estAdmin) return;
 
-            // Logique de modification de l'historique PR en mode édition
             const renderEditPrList = () => {
                 const editPrBox = document.getElementById(`edit-pr-list-${playerId}`);
                 if (!editPrBox) return;
@@ -552,7 +558,6 @@
             };
             renderEditPrList();
 
-            // Ajouter un point PR
             document.getElementById(`btn-add-pr-row-${playerId}`).addEventListener("click", () => {
                 const dateIn = document.getElementById(`new-pr-date-${playerId}`).value.trim();
                 const labelIn = document.getElementById(`new-pr-label-${playerId}`).value.trim();
@@ -569,7 +574,6 @@
                 renderEditPrList();
             });
 
-            // Conversion Image Base64
             document.getElementById(`file-input-${playerId}`).addEventListener("change", (e) => {
                 const file = e.target.files[0];
                 if (file) {
@@ -582,13 +586,11 @@
                 }
             });
 
-            // Supprimer la photo
             document.getElementById(`btn-clear-img-${playerId}`).addEventListener("click", () => {
                 imageBase64String = "logo.png";
                 document.getElementById(`edit-preview-${playerId}`).src = "logo.png";
             });
 
-            // Toggle des écrans Vue/Édition
             const viewMode = document.getElementById(`view-mode-${playerId}`);
             const editMode = document.getElementById(`edit-mode-${playerId}`);
 
@@ -605,7 +607,6 @@
                 }
             });
 
-            // Formulaire de sauvegarde globale (Firebase)
             document.getElementById(`form-${playerId}`).addEventListener("submit", async () => {
                 const pseudo = document.getElementById(`input-pseudo-${playerId}`).value.trim();
                 const team = document.getElementById(`input-team-${playerId}`).value;
@@ -636,17 +637,16 @@
                 }
             });
 
-            // Suppression du joueur
             if (!isNewPlayer) {
                 document.getElementById(`btn-delete-${playerId}`).addEventListener("click", async () => {
-                    if (confirm(`Voulez-vous vraiment retirer ${player.pseudo || 'ce joueur'} du roster ?`)) {
+                    if (confirm(`Voulez-vous vraiment retirer ${player.pseudo || 'ce joueur'} ?`)) {
                         try {
                             await deleteDoc(doc(db, "roster", playerId));
                             alert("Joueur supprimé.");
                             closePopup();
                         } catch (err) {
                             console.error(err);
-                            alert("Erreur lors de la suppression.");
+                            alert("Erreur.");
                         }
                     }
                 });

@@ -60,15 +60,20 @@
         .admin-edit-box { background: #141414; border: 2px solid #22c55e; border-radius: 16px; padding: 30px; margin-top: 40px; box-shadow: 0 0 30px rgba(34, 197, 94, 0.05); }
         .admin-edit-box h2 { font-family: 'Orbitron', sans-serif; color: #22c55e; margin-top: 0; margin-bottom: 15px; font-size: 1.3rem; display: flex; align-items: center; gap: 10px; }
         .search-row { display: flex; gap: 12px; background: #0a0a0a; padding: 15px; border-radius: 10px; border: 1px dashed #22c55e; margin-bottom: 25px; align-items: flex-end; }
-        .input-group { display: flex; flex-direction: column; gap: 6px; flex: 1; text-align: left; }
+        .input-group { display: flex; flex-direction: column; gap: 6px; flex: 1; text-align: left; margin-bottom: 15px; }
         .input-group label { color: #888; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; letter-spacing: 0.5px; }
         .input-group input, .input-group textarea { background: #050505; border: 1px solid #222; border-radius: 8px; padding: 12px; color: #fff; font-family: 'Inter', sans-serif; font-size: 0.9rem; width: 100%; box-sizing: border-box; }
         .input-group input:focus, .input-group textarea:focus { border-color: #22c55e; outline: none; }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 5px; }
         .btn-admin { background: #22c55e; color: #fff; font-family: 'Orbitron', sans-serif; font-weight: bold; font-size: 0.85rem; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px; }
         .btn-admin:hover { background: #2ed96f; box-shadow: 0 0 15px rgba(34, 197, 94, 0.3); }
         .error-message { color: #ff4444; font-size: 0.85rem; margin-top: 10px; font-family: 'Inter', sans-serif; }
         .success-message { color: #22c55e; font-size: 0.85rem; margin-top: 10px; font-family: 'Orbitron', sans-serif; }
+
+        /* Style spécifique pour la zone d'upload de fichier */
+        .file-upload-wrapper { background: #0a0a0a; border: 1px dashed #2a2a2a; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; gap: 8px; }
+        .progress-container { width: 100%; background-color: #1a1a1a; border-radius: 4px; height: 6px; overflow: hidden; display: none; margin-top: 5px; }
+        .progress-bar { height: 100%; width: 0%; background-color: #22c55e; transition: width 0.2s ease; }
 
         @media (max-width: 900px) {
             .charts-grid { grid-template-columns: 1fr; }
@@ -170,7 +175,7 @@
             <p style="color: #777; font-size: 0.85rem; margin-top: -5px; margin-bottom: 20px;">Recherchez l'adresse e-mail exacte avec laquelle le joueur se connecte.</p>
 
             <div class="search-row">
-                <div class="input-group">
+                <div class="input-group" style="margin-bottom: 0;">
                     <label for="search-player-email">Adresse e-mail du compte joueur</label>
                     <input type="email" id="search-player-email" placeholder="Ex: joueur@gmail.com">
                 </div>
@@ -206,9 +211,21 @@
                         </div>
                     </div>
 
-                    <div class="input-group" style="margin-bottom: 20px;">
-                        <label style="color: #22c55e;">Lien du document / Stratégie (PDF, Image, Drive...)</label>
-                        <input type="url" id="player-doc-input" placeholder="https://drive.google.com/file/... ou lien de téléchargement direct">
+                    <div class="input-group">
+                        <label style="color: #22c55e; margin-bottom: 8px;">Document ou Stratégie partagé(e)</label>
+                        <div class="file-upload-wrapper">
+                            <div>
+                                <span style="font-size: 0.8rem; color: #888;">Option A : Sélectionner un fichier depuis le PC :</span>
+                                <input type="file" id="player-file-pc" style="margin-top: 5px; padding: 5px; border: none; background: transparent;">
+                                <div id="upload-progress-zone" class="progress-container">
+                                    <div id="upload-progress-bar" class="progress-bar"></div>
+                                </div>
+                            </div>
+                            <div style="border-top: 1px solid #1a1a1a; padding-top: 10px; margin-top: 5px;">
+                                <span style="font-size: 0.8rem; color: #888;">Option B (Alternative) : Lien URL externe direct :</span>
+                                <input type="url" id="player-doc-input" placeholder="https://drive.google.com/file/... (Laissé vide si vous utilisez un fichier PC)" style="margin-top: 5px;">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="input-group" style="margin-bottom: 25px;">
@@ -227,6 +244,8 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, query, orderBy, onSnapshot, getDocs, deleteDoc, doc, where, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        // IMPORTATION DU MODULE STORAGE POUR L'UPLOAD DE FICHIERS
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -241,6 +260,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const storage = getStorage(app); // Initialisation de Storage
 
         const ADMIN_EMAIL = "abyszofficial@gmail.com";
 
@@ -265,6 +285,9 @@
         const playerEditFormContainer = document.getElementById('player-edit-form-container');
         const dashboardPlayerModifyForm = document.getElementById('dashboard-player-modify-form');
         const saveSuccess = document.getElementById('save-success');
+        const fileInputPc = document.getElementById('player-file-pc');
+        const progressZone = document.getElementById('upload-progress-zone');
+        const progressBar = document.getElementById('upload-progress-bar');
 
         let myChart = null;
         let pieChart = null;
@@ -425,14 +448,13 @@
             });
         }
 
-        /* ─────────────────────────────────────────────────────────────
-           LOGIQUE DE RECHERCHE ET MISE À JOUR SYNCHRONISÉE PAR EMAIL
-           ───────────────────────────────────────────────────────────── */
         function setupPlayerEditing() {
             btnSearchPlayer.onclick = async () => {
                 searchError.classList.add('hidden');
                 playerEditFormContainer.classList.add('hidden');
                 saveSuccess.classList.add('hidden');
+                fileInputPc.value = ""; // Clear file field
+                progressZone.style.display = "none";
 
                 const emailRecherche = searchPlayerEmail.value.trim().toLowerCase();
                 if (!emailRecherche) {
@@ -442,13 +464,12 @@
                 }
 
                 try {
-                    // Recherche par l'e-mail forcé en minuscules dans la collection "players"
                     const q = query(collection(db, "players"), where("email", "==", emailRecherche));
                     const snapshot = await getDocs(q);
 
                     if (!snapshot.empty) {
                         const targetDoc = snapshot.docs[0];
-                        activeTargetUid = targetDoc.id; // Stockage de l'UID (nom du document)
+                        activeTargetUid = targetDoc.id; 
                         activeTargetEmail = emailRecherche;
 
                         const data = targetDoc.data();
@@ -476,26 +497,67 @@
                 saveSuccess.classList.add('hidden');
                 if(!activeTargetUid) return;
 
-                const dataMiseAJour = {
-                    email: activeTargetEmail,
-                    pseudo: document.getElementById('player-pseudo-input').value.trim(),
-                    roster: document.getElementById('player-roster-input').value.trim(),
-                    role: document.getElementById('player-role-input').value.trim(),
-                    rank: document.getElementById('player-rank-input').value.trim(),
-                    joinDate: document.getElementById('player-date-input').value.trim(),
-                    documentUrl: document.getElementById('player-doc-input').value.trim(),
-                    staffMessage: document.getElementById('player-msg-input').value.trim()
-                };
+                const btnSave = document.getElementById('btn-save-player');
+                btnSave.disabled = true;
+                btnSave.textContent = "Enregistrement...";
+
+                let finalDocUrl = document.getElementById('player-doc-input').value.trim();
+                const selectedFile = fileInputPc.files[0];
 
                 try {
-                    // Force l'écriture exacte sur l'identifiant (UID) lu en temps réel par espace-joueur.html
+                    // FONCTIONNALITÉ D'UPLOAD SUR FIREBASE STORAGE
+                    if (selectedFile) {
+                        progressZone.style.display = "block";
+                        
+                        // On crée un nom de fichier unique basé sur le UID du joueur + le nom d'origine
+                        const storageRef = ref(storage, `joueurs_documents/${activeTargetUid}_${selectedFile.name}`);
+                        const uploadTask = uploadBytesResumable(storageRef, selectedFile);
+
+                        // Attente de la fin de l'upload avec suivi de la barre de progression
+                        await new Promise((resolve, reject) => {
+                            uploadTask.on('state_changed', 
+                                (snapshot) => {
+                                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                                    progressBar.style.width = progress + '%';
+                                }, 
+                                (error) => { reject(error); }, 
+                                async () => {
+                                    // Upload terminé, on récupère le lien public sécurisé
+                                    finalDocUrl = await getDownloadURL(uploadTask.snapshot.ref);
+                                    resolve();
+                                }
+                            );
+                        });
+                    }
+
+                    // Sauvegarde finale dans Firestore
+                    const dataMiseAJour = {
+                        email: activeTargetEmail,
+                        pseudo: document.getElementById('player-pseudo-input').value.trim(),
+                        roster: document.getElementById('player-roster-input').value.trim(),
+                        role: document.getElementById('player-role-input').value.trim(),
+                        rank: document.getElementById('player-rank-input').value.trim(),
+                        joinDate: document.getElementById('player-date-input').value.trim(),
+                        documentUrl: finalDocUrl, // Contient soit le lien PC soit le champ URL texte alternatif
+                        staffMessage: document.getElementById('player-msg-input').value.trim()
+                    };
+
                     const docPlayerRef = doc(db, "players", activeTargetUid);
                     await setDoc(docPlayerRef, dataMiseAJour, { merge: true });
                     
+                    // Si un fichier a été téléversé, on met à jour le champ texte visible avec le nouveau lien généré
+                    document.getElementById('player-doc-input').value = finalDocUrl;
+                    
                     saveSuccess.classList.remove('hidden');
+                    fileInputPc.value = ""; // Reset du sélecteur PC
+                    progressBar.style.width = "0%";
+                    progressZone.style.display = "none";
                 } catch (error) {
                     console.error(error);
-                    alert("Erreur lors de la sauvegarde.");
+                    alert("Erreur lors du téléversement ou de la sauvegarde : " + error.message);
+                } finally {
+                    btnSave.disabled = false;
+                    btnSave.textContent = "Enregistrer les modifications";
                 }
             };
         }

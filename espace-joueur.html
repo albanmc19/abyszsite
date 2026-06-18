@@ -24,9 +24,6 @@
         .btn { background: #a855f7; color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: bold; font-family: 'Orbitron', sans-serif; cursor: pointer; transition: all 0.2s; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; }
         .btn:hover { background: #b975ff; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
         
-        .btn-secondary { background: #222; border: 1px solid #a855f7; margin-bottom: 15px; }
-        .btn-secondary:hover { background: #a855f7; }
-
         .hidden { display: none !important; }
         .error-message { color: #ff4444; margin-top: 15px; font-size: 0.9rem; }
         .success-message { color: #22c55e; margin-top: 15px; font-size: 0.9rem; font-family: 'Orbitron', sans-serif; }
@@ -98,12 +95,12 @@
 
         <div id="admin-zone" class="card admin-card hidden">
             <h2>🛠️ Gestion des Espaces Joueurs</h2>
-            <p style="color: #aaa; margin-bottom: 25px;">En tant qu'administrateur, tu peux modifier l'espace privé de n'importe quel joueur à partir de son UID Firebase.</p>
+            <p style="color: #aaa; margin-bottom: 25px;">En tant qu'administrateur, tu peux modifier l'espace privé d'un joueur directement avec son adresse e-mail de connexion.</p>
 
             <div class="input-group" style="border-bottom: 1px solid #22c55e; padding-bottom: 20px;">
-                <label style="color: #22c55e;">1. Rechercher le joueur par son UID</label>
+                <label style="color: #22c55e;">1. Rechercher le joueur par son E-mail</label>
                 <div style="display: flex; gap: 10px; margin-top: 5px;">
-                    <input type="text" id="admin-search-uid" placeholder="Coller l'UID Firebase du joueur ici...">
+                    <input type="email" id="admin-search-email" placeholder="Ex: joueur@gmail.com">
                     <button type="button" class="btn" id="btn-admin-search" style="width: auto; background: #22c55e; white-space: nowrap;">Charger</button>
                 </div>
                 <p id="admin-search-error" class="error-message hidden"></p>
@@ -153,7 +150,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -170,22 +167,21 @@
 
         const ADMIN_EMAIL = "abyszofficial@gmail.com";
 
-        // Éléments DOM principaux
         const authZone = document.getElementById('auth-zone');
         const profileZone = document.getElementById('profile-zone');
         const loginForm = document.getElementById('player-login-form');
         const authError = document.getElementById('auth-error');
         const adminZone = document.getElementById('admin-zone');
 
-        // Éléments DOM sous-partie Administration
-        const adminSearchUid = document.getElementById('admin-search-uid');
+        const adminSearchEmail = document.getElementById('admin-search-email');
         const btnAdminSearch = document.getElementById('btn-admin-search');
         const adminSearchError = document.getElementById('admin-search-error');
         const adminEditFormContainer = document.getElementById('admin-edit-form-container');
         const adminModifyForm = document.getElementById('admin-modify-player-form');
         const adminSuccessMsg = document.getElementById('admin-success-msg');
 
-        let currentTargetUid = ""; // Garde en mémoire l'UID du joueur édité
+        let currentTargetUid = ""; 
+        let currentTargetEmail = "";
 
         // Écouteur d'état de connexion
         onAuthStateChanged(auth, async (user) => {
@@ -193,14 +189,12 @@
                 authZone.classList.add('hidden');
                 profileZone.classList.remove('hidden');
                 
-                // Vérification si le compte connecté est l'administrateur suprême
                 if (user.email === ADMIN_EMAIL) {
                     adminZone.classList.remove('hidden');
                 } else {
                     adminZone.classList.add('hidden');
                 }
                 
-                // Récupération des données du compte actuel
                 const docRef = doc(db, "players", user.uid);
                 const docSnap = await getDoc(docRef);
 
@@ -246,59 +240,71 @@
         };
 
         /* ─────────────────────────────────────────────────────────────
-           LOGIQUE DE MODIFICATION ADMIN DE L'ESPACE JOUEUR
+           LOGIQUE DE RECHERCHE ET MODIFICATION PAR ADRESSE EMAIL
            ───────────────────────────────────────────────────────────── */
 
-        // Charger un joueur cible depuis son UID
         btnAdminSearch.addEventListener('click', async () => {
             adminSearchError.classList.add('hidden');
             adminEditFormContainer.classList.add('hidden');
             adminSuccessMsg.classList.add('hidden');
             
-            currentTargetUid = adminSearchUid.value.trim();
-            if (!currentTargetUid) {
-                adminSearchError.textContent = "Veuillez insérer un UID Firebase valide.";
+            const emailRecherche = adminSearchEmail.value.trim().toLowerCase();
+            if (!emailRecherche) {
+                adminSearchError.textContent = "Veuillez insérer une adresse e-mail valide.";
                 adminSearchError.classList.remove('hidden');
                 return;
             }
 
             try {
-                const targetDocRef = doc(db, "players", currentTargetUid);
-                const targetSnap = await getDoc(targetDocRef);
+                // Recherche dans la collection "players" le document possédant le bon champ email
+                const q = query(collection(db, "players"), where("email", "==", emailRecherche));
+                const querySnapshot = await getDocs(q);
 
-                if (targetSnap.exists()) {
-                    const tData = targetSnap.data();
+                if (!querySnapshot.empty) {
+                    // Si on trouve le document lié à cet e-mail
+                    const targetDoc = querySnapshot.docs[0];
+                    currentTargetUid = targetDoc.id; // L'ID du document est l'UID Firebase du joueur
+                    currentTargetEmail = emailRecherche;
+
+                    const tData = targetDoc.data();
                     document.getElementById('edit-pseudo').value = tData.pseudo || "";
                     document.getElementById('edit-roster').value = tData.roster || "";
                     document.getElementById('edit-role').value = tData.role || "";
                     document.getElementById('edit-rank').value = tData.rank || "";
                     document.getElementById('edit-join-date').value = tData.joinDate || "";
                     document.getElementById('edit-staff-message').value = tData.staffMessage || "";
-                } else {
-                    // Si aucune donnée n'existe encore pour cet UID, on prépare des champs vides pour sa création
-                    document.getElementById('edit-pseudo').value = "";
-                    document.getElementById('edit-roster').value = "";
-                    document.getElementById('edit-role').value = "";
-                    document.getElementById('edit-rank').value = "";
-                    document.getElementById('edit-join-date').value = "";
-                    document.getElementById('edit-staff-message').value = "";
-                    alert("Cet UID n'a pas encore de fiche dans Firestore. Remplir le formulaire va l'initialiser.");
-                }
 
-                adminEditFormContainer.classList.remove('hidden');
+                    adminEditFormContainer.classList.remove('hidden');
+                } else {
+                    // Si aucune fiche n'existe encore avec cet e-mail dans Firestore
+                    if(confirm("Aucun profil n'existe pour cet e-mail. Si ce joueur s'est déjà connecté une fois, tu peux créer sa fiche initiale. Continuer ?")) {
+                        currentTargetUid = "u_" + Date.now(); // ID temporaire s'il n'a pas d'UID connu
+                        currentTargetEmail = emailRecherche;
+                        
+                        document.getElementById('edit-pseudo').value = "";
+                        document.getElementById('edit-roster').value = "";
+                        document.getElementById('edit-role').value = "";
+                        document.getElementById('edit-rank').value = "";
+                        document.getElementById('edit-join-date').value = "";
+                        document.getElementById('edit-staff-message').value = "";
+                        
+                        adminEditFormContainer.classList.remove('hidden');
+                    }
+                }
             } catch (err) {
                 console.error(err);
-                adminSearchError.textContent = "Erreur d'accès à Firestore ou droits insuffisants.";
+                adminSearchError.textContent = "Erreur lors de la recherche dans la base de données.";
                 adminSearchError.classList.remove('hidden');
             }
         });
 
-        // Soumettre les modifications globales de l'espace joueur cible
+        // Enregistrement
         adminModifyForm.addEventListener('submit', async () => {
             adminSuccessMsg.classList.add('hidden');
             if(!currentTargetUid) return;
 
             const updatedData = {
+                email: currentTargetEmail, // Conserve ou ajoute l'e-mail pour les futures recherches
                 pseudo: document.getElementById('edit-pseudo').value.trim(),
                 roster: document.getElementById('edit-roster').value.trim(),
                 role: document.getElementById('edit-role').value.trim(),
@@ -309,12 +315,11 @@
 
             try {
                 const targetDocRef = doc(db, "players", currentTargetUid);
-                // Utilise setDoc avec merge: true pour écraser ou créer proprement
                 await setDoc(targetDocRef, updatedData, { merge: true });
                 
                 adminSuccessMsg.classList.remove('hidden');
                 
-                // Si l'admin a modifié son propre UID de test, cela met à jour l'affichage en direct
+                // Actualisation synchrone si l'admin modifie son propre compte
                 if(currentTargetUid === auth.currentUser.uid) {
                     document.getElementById('player-pseudo').textContent = updatedData.pseudo;
                     document.getElementById('player-role').textContent = `Roster ${updatedData.roster || 'Global'}`;

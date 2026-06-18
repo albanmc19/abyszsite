@@ -367,20 +367,23 @@
                     if (!snapshot.empty) {
                         const playerDocRef = doc(db, "players", snapshot.docs[0].id);
 
+                        // Récupération directe et obligatoire de la chaîne textuelle du champ Option B
+                        const inputLienDoc = document.getElementById('player-doc-input').value.trim();
+
                         const dataMiseAJour = {
                             pseudo: document.getElementById('player-pseudo-input').value.trim(),
                             roster: document.getElementById('player-roster-input').value.trim(),
                             role: document.getElementById('player-role-input').value.trim(),
                             rank: document.getElementById('player-rank-input').value.trim(),
                             joinDate: document.getElementById('player-date-input').value.trim(),
-                            documentUrl: document.getElementById('player-doc-input').value.trim(), 
+                            documentUrl: inputLienDoc, 
                             staffMessage: document.getElementById('player-msg-input').value.trim()
                         };
 
                         await setDoc(playerDocRef, dataMiseAJour, { merge: true });
                         saveSuccess.classList.remove('hidden');
                     } else {
-                        alert("Erreur : Le document du joueur a disparu pendant l'opération.");
+                        alert("Erreur : Le document du joueur n'a pas pu être identifié.");
                     }
                 } catch (error) {
                     console.error("Erreur de sauvegarde :", error);

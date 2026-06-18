@@ -161,6 +161,7 @@
             <li><a href="boutique.html">Boutique</a></li>
             <li><a href="#annonces">Actualités</a></li>
             <li><a href="#rejoindre-commu">Rejoindre</a></li>
+            <li id="nav-espace-joueur" class="hidden"><a href="espace-joueur.html" style="color: #a855f7; font-weight: bold;">Mon Espace</a></li>
             <li id="nav-dashboard" class="nav-dashboard-link hidden"><a href="dashboard.html">📊 Dashboard</a></li>
         </ul>
     </nav>
@@ -305,6 +306,8 @@
         const userDisplayEmail = document.getElementById('user-display-email');
         const logoutBtn = document.getElementById('logout-btn');
         const feed = document.getElementById("announcements-feed");
+        // Variable pour l'onglet joueur
+        const navEspaceJoueur = document.getElementById('nav-espace-joueur');
 
         let currentUser = null;
 
@@ -383,6 +386,9 @@
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
+                // Gestionnaire d'affichage de l'onglet "Mon Espace" si connecté
+                navEspaceJoueur.classList.remove('hidden');
+
                 loginStep.classList.add('hidden');
                 panelStep.classList.remove('hidden');
                 userDisplayEmail.textContent = `Admin : ${user.email}`;
@@ -391,6 +397,9 @@
                 adminGateBtn.innerHTML = "🔒 Panel Admin";
                 adminGateBtn.classList.add("logged-in");
             } else {
+                // Masquer l'onglet "Mon Espace" si déconnecté
+                navEspaceJoueur.classList.add('hidden');
+
                 loginStep.classList.remove('hidden');
                 panelStep.classList.add('hidden');
                 userDisplayEmail.textContent = '';

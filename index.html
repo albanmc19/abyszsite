@@ -178,7 +178,7 @@
                 <h2>Annonces Récentes</h2>
                 <button class="add-announcement-btn hidden" id="quick-add-btn" title="Créer une annonce">+</button>
             </div>
-            <button class="admin-gate-btn" id="admin-gate-btn">🔑 Espace Admin</button>
+            <button class="admin-gate-btn" id="admin-gate-btn">🔑 Connexion</button>
         </div>
         <div id="announcements-feed" class="announcements-feed">
             <p class="loading-text">Connexion à la base de données Abysz...</p>
@@ -200,7 +200,7 @@
             <span class="modal-close" id="close-modal-btn">&times;</span>
             
             <div id="admin-login-step">
-                <h3>Connexion Admin</h3>
+                <h3>Connexion Portail Abysz</h3>
                 <form id="login-form" onsubmit="return false;">
                     <div class="input-group">
                         <label for="admin-email">Adresse e-mail</label>
@@ -276,7 +276,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -306,10 +306,10 @@
         const userDisplayEmail = document.getElementById('user-display-email');
         const logoutBtn = document.getElementById('logout-btn');
         const feed = document.getElementById("announcements-feed");
-        // Variable pour l'onglet joueur
         const navEspaceJoueur = document.getElementById('nav-espace-joueur');
 
         let currentUser = null;
+        let isUserAdmin = false; // Flag pour suivre si l'utilisateur connecté est admin
 
         const scrollObserver = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
@@ -366,7 +366,8 @@
                 let imgHtml = ann.imageUrl ? `<img src="${ann.imageUrl}" class="announcement-img" alt="Illustration">` : '';
                 let actionBtnHtml = (ann.btnText && ann.btnLink) ? `<a href="${ann.btnLink}" target="_blank" class="announcement-action-btn">${ann.btnText} →</a>` : '';
                 
-                const deleteButtonHtml = currentUser ? `<button class="delete-btn" data-id="${docSnap.id}">Supprimer</button>` : "";
+                // SÉCURITÉ : Bouton supprimer visible uniquement si l'utilisateur connecté est ADMIN
+                const deleteButtonHtml = (currentUser && isUserAdmin) ? `<button class="delete-btn" data-id="${docSnap.id}">Supprimer</button>` : "";
                 
                 card.innerHTML = `
                     <div class="announcement-meta">${badgesHtml}</div>
@@ -383,31 +384,55 @@
             setupDeleteButtons();
         });
 
-        onAuthStateChanged(auth, (user) => {
+        // GESTION ET CLASSIFICATION DES ROLES (Joueur vs Admin)
+        onAuthStateChanged(auth, async (user) => {
             currentUser = user;
             if (user) {
-                // Gestionnaire d'affichage de l'onglet "Mon Espace" si connecté
+                // Tout utilisateur connecté a accès à son onglet "Mon Espace"
                 navEspaceJoueur.classList.remove('hidden');
 
-                loginStep.classList.add('hidden');
-                panelStep.classList.remove('hidden');
-                userDisplayEmail.textContent = `Admin : ${user.email}`;
-                document.getElementById('nav-dashboard')?.classList.remove('hidden');
-                quickAddBtn.classList.remove('hidden');
-                adminGateBtn.innerHTML = "🔒 Panel Admin";
-                adminGateBtn.classList.add("logged-in");
+                // On va chercher ses permissions dans la collection 'players'
+                const userDocRef = doc(db, "players", user.uid);
+                const userDocSnap = await getDoc(userDocRef);
+                
+                if (userDocSnap.exists() && userDocSnap.data().role === "admin") {
+                    isUserAdmin = true;
+                    // L'utilisateur est admin -> On affiche les privilèges admins
+                    loginStep.classList.add('hidden');
+                    panelStep.classList.remove('hidden');
+                    userDisplayEmail.textContent = `Admin : ${user.email}`;
+                    document.getElementById('nav-dashboard')?.classList.remove('hidden');
+                    quickAddBtn.classList.remove('hidden');
+                    adminGateBtn.innerHTML = "🔒 Panel Admin";
+                    adminGateBtn.classList.add("logged-in");
+                } else {
+                    isUserAdmin = false;
+                    // L'utilisateur est un joueur -> On bloque/masque tous les outils d'administration
+                    loginStep.classList.add('hidden');
+                    panelStep.classList.add('hidden'); // Reste caché
+                    document.getElementById('nav-dashboard')?.classList.add('hidden');
+                    quickAddBtn.classList.add('hidden');
+                    
+                    // Transformation du bouton Espace Admin en bouton de déconnexion pour le joueur
+                    adminGateBtn.innerHTML = "🚪 Déconnexion";
+                    adminGateBtn.classList.add("logged-in");
+                }
             } else {
-                // Masquer l'onglet "Mon Espace" si déconnecté
+                isUserAdmin = false;
+                // Personne n'est connecté -> On nettoie tout l'affichage
                 navEspaceJoueur.classList.add('hidden');
-
                 loginStep.classList.remove('hidden');
                 panelStep.classList.add('hidden');
                 userDisplayEmail.textContent = '';
                 document.getElementById('nav-dashboard')?.classList.add('hidden');
                 quickAddBtn.classList.add('hidden');
-                adminGateBtn.innerHTML = "🔑 Espace Admin";
+                adminGateBtn.innerHTML = "🔑 Connexion";
                 adminGateBtn.classList.remove("logged-in");
             }
+            
+            // Forcer le rafraîchissement des boutons de suppression sur le flux d'annonces
+            const event = new CustomEvent('authChanged');
+            window.dispatchEvent(event);
         });
 
         loginForm.addEventListener('submit', async () => {
@@ -423,11 +448,28 @@
             }
         });
 
+        // Modification du comportement du bouton de connexion principal s'il est déjà connecté
+        adminGateBtn.onclick = () => { 
+            if (currentUser) {
+                if (!isUserAdmin) {
+                    // Si c'est un simple joueur, ce bouton sert à le déconnecter proprement
+                    signOut(auth);
+                } else {
+                    // Si c'est un admin, on lui ouvre le modal d'écriture
+                    modal.classList.add('active');
+                }
+            } else {
+                modal.classList.add('active');
+            }
+        };
+
         logoutBtn.onclick = () => { signOut(auth); modal.classList.remove('active'); };
-        adminGateBtn.onclick = () => { modal.classList.add('active'); };
-        quickAddBtn.onclick = () => { if (currentUser) modal.classList.add('active'); };
+        closeModalBtn.onclick = () => { modal.classList.remove('active'); };
+        quickAddBtn.onclick = () => { if (currentUser && isUserAdmin) modal.classList.add('active'); };
 
         announcementForm.addEventListener('submit', async () => {
+            if (!isUserAdmin) return alert("Action non autorisée."); // Double sécurité front
+            
             const titleInput = document.getElementById("annonce-title");
             const contentInput = document.getElementById("annonce-content");
             const categoryInput = document.getElementById("annonce-category");

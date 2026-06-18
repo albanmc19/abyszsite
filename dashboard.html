@@ -184,17 +184,9 @@
             const graphPC = [0, 0, 0, 0, 0, 0, 0];
             const graphMobile = [0, 0, 0, 0, 0, 0, 0];
 
-            console.log(`--- ANALYSE DE ${listeDocsAnalytics.length} DOCUMENTS ---`);
-
             listeDocsAnalytics.forEach((docData, index) => {
                 const pageDuDoc = docData.page || "";
                 
-                // On affiche les clés du premier document pour comprendre comment tu as nommé tes variables
-                if(index === 0) {
-                    console.log("Exemple de clés trouvées dans ta BDD :", Object.keys(docData), docData);
-                }
-
-                // 1. DÉTECTION DISCORD : On cherche le mot "discord" n'importe où
                 let estDiscord = false;
                 Object.values(docData).forEach(val => {
                     if(typeof val === 'string' && val.toLowerCase().includes('discord')) estDiscord = true;
@@ -203,23 +195,23 @@
 
                 if (estDiscord) {
                     totalDiscord++;
-                    // Si c'est une action Discord pure, on ne la compte pas forcément comme une visite de page
                     if (filtrePage !== "all") return;
                 } else {
-                    // Filtrage par page pour les visites classiques
                     if (filtrePage !== "all" && pageDuDoc !== filtrePage) return;
                     totalVisites++;
                 }
 
-                // 2. DÉTECTION DU JOUEUR (Recherche dynamique de clés)
                 const nomJoueur = docData.clickedPlayer || docData.playerName || docData.joueur || docData.player || docData.pseudo;
                 if (nomJoueur && nomJoueur !== "discord") {
                     clicsJoueurs[nomJoueur] = (clicsJoueurs[nomJoueur] || 0) + 1;
                 }
 
-                // 3. GRAPH_JS
+                // FIX DU GRAPH : Traitement local de la date pour éviter le décalage UTC d'un jour
                 if (docData.date) {
-                    const dateObj = new Date(docData.date);
+                    // On force des slashs à la place des tirets (YYYY/MM/DD) pour que JS l'interprète sur l'heure locale
+                    const dateClean = String(docData.date).replace(/-/g, "/");
+                    const dateObj = new Date(dateClean);
+                    
                     let indexJour = dateObj.getDay() - 1; 
                     if (indexJour === -1) indexJour = 6; 
 

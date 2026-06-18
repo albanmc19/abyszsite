@@ -11,31 +11,27 @@
         html { scroll-behavior: smooth; scrollbar-gutter: stable; }
         body { background: #0a0a0a; color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
         
-        .container { max-width: 800px; margin: 60px auto; padding: 20px; text-align: center; }
+        .container { max-width: 800px; margin: 60px auto; padding: 0 20px; text-align: center; }
         .card { background: #141414; border: 2px solid #a855f7; border-radius: 20px; padding: 40px 30px; box-shadow: 0 0 30px rgba(168, 85, 247, 0.15); margin-bottom: 30px; }
         h2, h3, h4 { font-family: 'Orbitron', sans-serif; color: white; }
         
         .input-group { margin-bottom: 20px; text-align: left; }
         .input-group label { display: block; margin-bottom: 8px; color: #a855f7; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; }
-        .input-group input, .input-group textarea, .input-group select { width: 100%; padding: 12px; background: #0a0a0a; border: 1px solid #2a2a2a; color: white; border-radius: 8px; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        .input-group input:focus, .input-group textarea:focus, .input-group select:focus { border-color: #a855f7; outline: none; }
+        .input-group input { width: 100%; padding: 12px; background: #0a0a0a; border: 1px solid #2a2a2a; color: white; border-radius: 8px; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        .input-group input:focus { border-color: #a855f7; outline: none; }
         
         .btn { background: #a855f7; color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: bold; font-family: 'Orbitron', sans-serif; cursor: pointer; transition: all 0.2s; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; }
         .btn:hover { background: #b975ff; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
         
         .hidden { display: none !important; }
         .error-message { color: #ff4444; margin-top: 15px; font-size: 0.9rem; }
-        .success-message { color: #22c55e; margin-top: 15px; font-size: 0.9rem; font-family: 'Orbitron', sans-serif; }
         
         .profile-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #2a2a2a; padding-bottom: 20px; margin-bottom: 20px; }
-        .logout-link { color: #ff4444; background: none; border: none; cursor: pointer; font-family: 'Orbitron', sans-serif; font-weight: bold; }
+        .logout-link { color: #ff4444; background: none; border: none; cursor: pointer; font-family: 'Orbitron', sans-serif; font-weight: bold; font-size: 0.9rem; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
         .stat-box { background: #1a1a1a; padding: 20px; border-radius: 12px; border-left: 4px solid #a855f7; text-align: left; }
         .stat-box span { display: block; font-size: 0.8rem; color: #777; font-family: 'Orbitron', sans-serif; }
         .stat-box strong { display: block; font-size: 1.2rem; color: white; margin-top: 5px; }
-
-        .admin-card { border-color: #22c55e; box-shadow: 0 0 30px rgba(34, 197, 94, 0.15); text-align: left; }
-        .admin-card h2 { color: #22c55e; }
     </style>
 </head>
 <body>
@@ -62,7 +58,7 @@
         <div id="profile-zone" class="card hidden">
             <div class="profile-header">
                 <div>
-                    <h2 id="player-pseudo" style="margin: 0; text-align: left;">Joueur</h2>
+                    <h2 id="player-pseudo" style="margin: 0; text-align: left;">Chargement...</h2>
                     <p id="player-role" style="margin: 5px 0 0 0; color: #a855f7; text-align: left; font-family: 'Orbitron', sans-serif; font-size: 0.9rem;">Roster</p>
                 </div>
                 <button id="player-logout-btn" class="logout-link">Déconnexion</button>
@@ -72,11 +68,11 @@
             <div class="stats-grid">
                 <div class="stat-box">
                     <span>Rôle Équipe</span>
-                    <strong id="stat-role">Membre</strong>
+                    <strong id="stat-role">-</strong>
                 </div>
                 <div class="stat-box">
                     <span>Rank Actuel</span>
-                    <strong id="stat-rank">Non Classé</strong>
+                    <strong id="stat-rank">-</strong>
                 </div>
                 <div class="stat-box">
                     <span>Date d'entrée</span>
@@ -86,60 +82,7 @@
             
             <div style="margin-top: 40px; background: #0a0a0a; padding: 20px; border-radius: 12px; text-align: left; border: 1px dashed #a855f7;">
                 <h4 style="margin: 0 0 10px 0; font-family: 'Orbitron', sans-serif; color: #a855f7;">Message du Staff</h4>
-                <p id="player-staff-message" style="margin: 0; font-size: 0.95rem; color: #ccc;">Bienvenue dans ton espace privé. Les plannings des entraînements et les stratégies d'équipe seront bientôt disponibles ici.</p>
-            </div>
-        </div>
-
-        <div id="admin-zone" class="card admin-card hidden">
-            <h2>🛠️ Gestion des Espaces Joueurs</h2>
-            <p style="color: #aaa; margin-bottom: 25px;">Modifier l'espace privé d'un joueur directement avec son adresse e-mail.</p>
-
-            <div class="input-group" style="border-bottom: 1px solid #22c55e; padding-bottom: 20px;">
-                <label style="color: #22c55e;">1. Rechercher le joueur par son E-mail</label>
-                <div style="display: flex; gap: 10px; margin-top: 5px;">
-                    <input type="email" id="admin-search-email" placeholder="Ex: joueur@gmail.com">
-                    <button type="button" class="btn" id="btn-admin-search" style="width: auto; background: #22c55e; white-space: nowrap;">Charger</button>
-                </div>
-                <p id="admin-search-error" class="error-message hidden"></p>
-            </div>
-
-            <div id="admin-edit-form-container" class="hidden" style="margin-top: 20px;">
-                <h3 style="color: #fff; margin-bottom: 20px;">Modification du profil cible</h3>
-                
-                <form id="admin-modify-player-form" onsubmit="return false;">
-                    <div class="input-group">
-                        <label>Pseudo Global</label>
-                        <input type="text" id="edit-pseudo" required>
-                    </div>
-
-                    <div class="input-group">
-                        <label>Roster Affecté</label>
-                        <input type="text" id="edit-roster" placeholder="Ex: Principal, Académie, CDF...">
-                    </div>
-
-                    <div class="input-group">
-                        <label>Rôle précis dans l'équipe</label>
-                        <input type="text" id="edit-role" placeholder="Ex: Capitaine, Joueur Flank, Coach...">
-                    </div>
-
-                    <div class="input-group">
-                        <label>Rank en jeu actuel</label>
-                        <input type="text" id="edit-rank" placeholder="Ex: Radiant, Unreal, GrandMaster...">
-                    </div>
-
-                    <div class="input-group">
-                        <label>Date d'intégration</label>
-                        <input type="text" id="edit-join-date" placeholder="Ex: Janvier 2026">
-                    </div>
-
-                    <div class="input-group">
-                        <label>Message personnalisé du Staff (Privé au joueur)</label>
-                        <textarea id="edit-staff-message" rows="4" placeholder="Consignes privées d'entraînement..."></textarea>
-                    </div>
-
-                    <button type="submit" class="btn" style="background: #22c55e;">Enregistrer les modifications</button>
-                </form>
-                <p id="admin-success-msg" class="success-message hidden">✅ Modifications appliquées avec succès !</p>
+                <p id="player-staff-message" style="margin: 0; font-size: 0.95rem; color: #ccc;">Aucun message pour le moment.</p>
             </div>
         </div>
     </div>
@@ -147,7 +90,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -162,69 +105,51 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        const ADMIN_EMAIL = "abyszofficial@gmail.com";
-
         const authZone = document.getElementById('auth-zone');
         const profileZone = document.getElementById('profile-zone');
         const loginForm = document.getElementById('player-login-form');
         const authError = document.getElementById('auth-error');
-        const adminZone = document.getElementById('admin-zone');
 
-        const adminSearchEmail = document.getElementById('admin-search-email');
-        const btnAdminSearch = document.getElementById('btn-admin-search');
-        const adminSearchError = document.getElementById('admin-search-error');
-        const adminEditFormContainer = document.getElementById('admin-edit-form-container');
-        const adminModifyForm = document.getElementById('admin-modify-player-form');
-        const adminSuccessMsg = document.getElementById('admin-success-msg');
-
-        let currentTargetUid = ""; 
-        let currentTargetEmail = "";
+        let unsubscribeProfile = null;
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 authZone.classList.add('hidden');
                 profileZone.classList.remove('hidden');
                 
-                if (user.email === ADMIN_EMAIL) {
-                    adminZone.classList.remove('hidden');
-                } else {
-                    adminZone.classList.add('hidden');
-                }
-                
-                // CRUCIAL : On force l'écriture/mise à jour du champ email avec le bon UID utilisateur
                 const docRef = doc(db, "players", user.uid);
+                
+                // Étape de sécurité indispensable : on s'assure que le document possède son e-mail en minuscules
                 const docSnap = await getDoc(docRef);
-
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    
-                    // Si le champ email est absent du document, on le rajoute de manière transparente
-                    if (!data.email) {
-                        await setDoc(docRef, { email: user.email.toLowerCase() }, { merge: true });
-                    }
-
-                    document.getElementById('player-pseudo').textContent = data.pseudo || "Joueur Abysz";
-                    document.getElementById('player-role').textContent = `Roster ${data.roster || 'Global'}`;
-                    document.getElementById('stat-role').textContent = data.role || "Joueur";
-                    document.getElementById('stat-rank').textContent = data.rank || "Inconnu";
-                    document.getElementById('stat-date').textContent = data.joinDate || "Récent";
-                    if(data.staffMessage) {
-                        document.getElementById('player-staff-message').textContent = data.staffMessage;
-                    }
-                } else {
-                    // Si c'est la première connexion, on initialise le document avec l'e-mail lié à son UID réel
+                if (!docSnap.exists() || !docSnap.data().email) {
                     await setDoc(docRef, { email: user.email.toLowerCase() }, { merge: true });
-                    document.getElementById('player-pseudo').textContent = user.email === ADMIN_EMAIL ? "Administrateur" : user.email;
-                    document.getElementById('player-role').textContent = user.email === ADMIN_EMAIL ? "Gestion Générale" : "Profil synchronisé, en attente de configuration admin.";
                 }
+
+                // ÉCOUTE EN TEMPS RÉEL : Dès que tu modifies sur le Dashboard, l'espace joueur change instantanément !
+                unsubscribeProfile = onSnapshot(docRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.data();
+                        document.getElementById('player-pseudo').textContent = data.pseudo || "Joueur Abysz";
+                        document.getElementById('player-role').textContent = `Roster : ${data.roster || 'Non assigné'}`;
+                        document.getElementById('stat-role').textContent = data.role || "Membre";
+                        document.getElementById('stat-rank').textContent = data.rank || "Non Classé";
+                        document.getElementById('stat-date').textContent = data.joinDate || "-";
+                        document.getElementById('player-staff-message').textContent = data.staffMessage || "Bienvenue dans ton espace privé. Les plannings et consignes d'équipe apparaîtront ici.";
+                    }
+                });
+
             } else {
+                // Déconnexion / Non connecté
+                if (unsubscribeProfile) {
+                    unsubscribeProfile();
+                    unsubscribeProfile = null;
+                }
                 authZone.classList.remove('hidden');
                 profileZone.classList.add('hidden');
-                adminZone.classList.add('hidden');
-                adminEditFormContainer.classList.add('hidden');
             }
         });
 
+        // Formulaire de Connexion
         loginForm.addEventListener('submit', async () => {
             authError.classList.add('hidden');
             const email = document.getElementById('player-email').value.trim();
@@ -232,90 +157,15 @@
             try {
                 await signInWithEmailAndPassword(auth, email, password);
             } catch (error) {
-                authError.textContent = "Erreur : Identifiants incorrects.";
+                authError.textContent = "Erreur : Identifiants invalides.";
                 authError.classList.remove('hidden');
             }
         });
 
+        // Bouton de Déconnexion
         document.getElementById('player-logout-btn').onclick = () => {
             signOut(auth);
         };
-
-        /* LOGIQUE RECHERCHE ADMIN VIA L'EMAIL */
-        btnAdminSearch.addEventListener('click', async () => {
-            adminSearchError.classList.add('hidden');
-            adminEditFormContainer.classList.add('hidden');
-            adminSuccessMsg.classList.add('hidden');
-            
-            const emailRecherche = adminSearchEmail.value.trim().toLowerCase();
-            if (!emailRecherche) {
-                adminSearchError.textContent = "Veuillez insérer une adresse e-mail.";
-                adminSearchError.classList.remove('hidden');
-                return;
-            }
-
-            try {
-                const q = query(collection(db, "players"), where("email", "==", emailRecherche));
-                const querySnapshot = await getDocs(q);
-
-                if (!querySnapshot.empty) {
-                    const targetDoc = querySnapshot.docs[0];
-                    currentTargetUid = targetDoc.id; // Récupère le VRAI UID lié à l'espace joueur
-                    currentTargetEmail = emailRecherche;
-
-                    const tData = targetDoc.data();
-                    document.getElementById('edit-pseudo').value = tData.pseudo || "";
-                    document.getElementById('edit-roster').value = tData.roster || "";
-                    document.getElementById('edit-role').value = tData.role || "";
-                    document.getElementById('edit-rank').value = tData.rank || "";
-                    document.getElementById('edit-join-date').value = tData.joinDate || "";
-                    document.getElementById('edit-staff-message').value = tData.staffMessage || "";
-
-                    adminEditFormContainer.classList.remove('hidden');
-                } else {
-                    adminSearchError.textContent = "Aucun joueur n'a encore été trouvé avec cet e-mail. Demandez au joueur de se connecter au moins une fois à cette page pour lier son profil.";
-                    adminSearchError.classList.remove('hidden');
-                }
-            } catch (err) {
-                console.error(err);
-                adminSearchError.textContent = "Erreur lors de la recherche.";
-                adminSearchError.classList.remove('hidden');
-            }
-        });
-
-        adminModifyForm.addEventListener('submit', async () => {
-            adminSuccessMsg.classList.add('hidden');
-            if(!currentTargetUid) return;
-
-            const updatedData = {
-                email: currentTargetEmail,
-                pseudo: document.getElementById('edit-pseudo').value.trim(),
-                roster: document.getElementById('edit-roster').value.trim(),
-                role: document.getElementById('edit-role').value.trim(),
-                rank: document.getElementById('edit-rank').value.trim(),
-                joinDate: document.getElementById('edit-join-date').value.trim(),
-                staffMessage: document.getElementById('edit-staff-message').value.trim()
-            };
-
-            try {
-                const targetDocRef = doc(db, "players", currentTargetUid);
-                await setDoc(targetDocRef, updatedData, { merge: true });
-                
-                adminSuccessMsg.classList.remove('hidden');
-                
-                if(currentTargetUid === auth.currentUser.uid) {
-                    document.getElementById('player-pseudo').textContent = updatedData.pseudo;
-                    document.getElementById('player-role').textContent = `Roster ${updatedData.roster || 'Global'}`;
-                    document.getElementById('stat-role').textContent = updatedData.role;
-                    document.getElementById('stat-rank').textContent = updatedData.rank;
-                    document.getElementById('stat-date').textContent = updatedData.joinDate;
-                    document.getElementById('player-staff-message').textContent = updatedData.staffMessage;
-                }
-            } catch (error) {
-                console.error(error);
-                alert("Erreur lors de l'enregistrement.");
-            }
-        });
     </script>
 </body>
 </html>

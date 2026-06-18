@@ -262,6 +262,10 @@
 
         document.querySelectorAll('.reveal').forEach((el) => scrollObserver.observe(el));
 
+        // ACTION DE FERMETURE DU MODAL (La croix + clic à l'extérieur)
+        closeModalBtn.onclick = () => { modal.classList.remove('active'); };
+        window.onclick = (e) => { if (e.target === modal) { modal.classList.remove('active'); } };
+
         function setupDeleteButtons() {
             document.querySelectorAll('.delete-btn').forEach(btn => {
                 btn.onclick = async (e) => {
@@ -329,7 +333,7 @@
                 userDisplayEmail.textContent = `Admin : ${user.email}`;
                 document.getElementById('nav-dashboard')?.classList.remove('hidden');
                 quickAddBtn.classList.remove('hidden');
-                adminGateBtn.innerHTML = "🔒 Déconnexion";
+                adminGateBtn.innerHTML = "🔒 Panel Admin";
                 adminGateBtn.classList.add("logged-in");
             } else {
                 loginStep.classList.remove('hidden');
@@ -356,7 +360,7 @@
         });
 
         logoutBtn.onclick = () => { signOut(auth); modal.classList.remove('active'); };
-        adminGateBtn.onclick = () => { if (currentUser) { if (confirm("Se déconnecter ?")) { signOut(auth); } } else { modal.classList.add('active'); } };
+        adminGateBtn.onclick = () => { modal.classList.add('active'); };
         quickAddBtn.onclick = () => { if (currentUser) modal.classList.add('active'); };
 
         announcementForm.addEventListener('submit', async () => {

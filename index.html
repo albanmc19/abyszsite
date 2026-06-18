@@ -14,16 +14,15 @@
     <style>
         /* ── DYNAMISME & FLUIDITÉ GÉNÉRALE ── */
         html {
-            scroll-behavior: smooth; /* Permet un défilement fluide lors des clics sur le menu */
-            scrollbar-gutter: stable; /* Évite les sauts d'écran latéraux lors du chargement des données */
+            scroll-behavior: smooth;
+            scrollbar-gutter: stable;
         }
 
-        /* Effet d'apparition au défilement (Scroll Reveal Optimisé) */
         .reveal {
             opacity: 0;
             transform: translateY(20px);
             transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-            will-change: transform, opacity; /* Soulage le processeur principal en déléguant au GPU */
+            will-change: transform, opacity;
         }
 
         .reveal-visible {
@@ -31,7 +30,6 @@
             transform: translateY(0);
         }
 
-        /* Dynamisme des liens du menu */
         nav ul li a {
             position: relative;
             transition: color 0.3s ease;
@@ -53,7 +51,6 @@
             width: 100%;
         }
 
-        /* Effet d'accentuation sur les boutons principaux */
         .btn {
             transition: transform 0.2s ease, box-shadow 0.3s ease;
         }
@@ -407,7 +404,6 @@
             setupDeleteButtons();
         });
 
-        // Charger dynamiquement la liste déroulante des joueurs pour l'admin
         async function loadPlayersDropdown() {
             const playerSelect = document.getElementById('select-player');
             if (!playerSelect) return;
@@ -428,7 +424,6 @@
             }
         }
 
-        // ÉCOUTE DES ÉTATS DE CONNEXION (Rôles Joueur / Admin)
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
             if (user) {
@@ -446,8 +441,6 @@
                     quickAddBtn.classList.remove('hidden');
                     adminGateBtn.innerHTML = "🔒 Panel Admin";
                     adminGateBtn.classList.add("logged-in");
-                    
-                    // L'utilisateur connecté est admin, on charge ses outils
                     loadPlayersDropdown();
                 } else {
                     isUserAdmin = false;
@@ -455,7 +448,6 @@
                     panelStep.classList.add('hidden'); 
                     document.getElementById('nav-dashboard')?.classList.add('hidden');
                     quickAddBtn.classList.add('hidden');
-                    
                     adminGateBtn.innerHTML = "🚪 Déconnexion";
                     adminGateBtn.classList.add("logged-in");
                 }
@@ -498,7 +490,6 @@
         };
 
         logoutBtn.onclick = () => { signOut(auth); modal.classList.remove('active'); };
-        closeModalBtn.onclick = () => { modal.classList.remove('active'); };
         quickAddBtn.onclick = () => { if (currentUser && isUserAdmin) modal.classList.add('active'); };
 
         announcementForm.addEventListener('submit', async () => {
@@ -521,7 +512,6 @@
             const btnLink = btnLinkInput.value.trim();
 
             const nowTimestamp = Date.now();
-            const dateStr = new Date(nowTimestamp).toLocaleDateString('fr-FR') + " à " + new Date(nowTimestamp).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
 
             try {
                 await addDoc(collection(db, "announcements"), { 
@@ -529,73 +519,67 @@
                 });
                 
                 if (DISCORD_WEBHOOK_URL) {
-                    let categoryLabels = { general: 'Général', match: 'Match / Tournoi', recrutement: 'Recrutement', evenement: 'Événement' };
-                    let prefix = priority === 'urgent' ? "🚨 [URGENT] " : "📢 ";
-                    fetch(DISCORD_WEBHOOK_URL, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            username: "ABYSZ Bot",
-                            embeds: [{
-                                title: `${prefix}ANNONCE [${categoryLabels[category]}] : ${title}`,
-                                description: content + (btnLink ? `\n\n[${btnText || 'Lien'}](${btnLink})` : ''),
-                                color: priority === 'urgent' ? 16724036 : 11032055, 
-                                image: imageUrl ? { url: imageUrl } : null,
-                                footer: { text: "Posté le " + dateStr + " • Abysz Esports" }
-                            }]
-                        })
-                    }).catch(err => console.error(err));
+                    try {
+                        await fetch(DISCORD_WEBHOOK_URL, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                content: `📢 **Nouvelle annonce Abysz !**\n**${title}**\n\n${content}`
+                            })
+                        });
+                    } catch (err) { console.error("Webhook Discord erreur:", err); }
                 }
-                
-                titleInput.value = ""; contentInput.value = ""; imgInput.value = ""; btnTextInput.value = ""; btnLinkInput.value = "";
-                categoryInput.value = "general"; priorityInput.value = "normal";
+
+                announcementForm.reset();
                 modal.classList.remove('active');
-            } catch (error) { alert("Erreur lors de la publication : " + error.message); }
-        });
-
-        // LOGIQUE D'ENVOI DE FICHIER SUR L'ESPACE JOUEUR
-        const uploadForm = document.getElementById('upload-file-form');
-        uploadForm.addEventListener('submit', async () => {
-            if (!isUserAdmin) return alert("Action interdite.");
-
-            const playerUid = document.getElementById('select-player').value;
-            const customName = document.getElementById('file-name').value.trim();
-            const fileInput = document.getElementById('file-input');
-            const statusText = document.getElementById('upload-status');
-            
-            if (!playerUid || fileInput.files.length === 0) return;
-            
-            const file = fileInput.files[0];
-            statusText.style.color = "#a855f7";
-            statusText.textContent = "Téléversement du fichier en cours...";
-
-            try {
-                // Upload sur Firebase Storage (Dossier unique /players/[UID]/)
-                const storageRef = ref(storage, `players/${playerUid}/${Date.now()}_${file.name}`);
-                const snapshot = await uploadBytes(storageRef, file);
-                
-                // Récupération de l'URL brute sécurisée
-                const downloadUrl = await getDownloadURL(snapshot.ref);
-                
-                // Insertion des métadonnées dans la base Firestore du joueur
-                const playerDocRef = doc(db, "players", playerUid);
-                await updateDoc(playerDocRef, {
-                    files: arrayUnion({
-                        name: customName,
-                        url: downloadUrl,
-                        uploadedAt: Date.now()
-                    })
-                });
-
-                statusText.style.color = "#10b981";
-                statusText.textContent = "Fichier envoyé avec succès au joueur !";
-                uploadForm.reset();
+                alert("Annonce publiée avec succès !");
             } catch (error) {
-                console.error(error);
-                statusText.style.color = "#ff4444";
-                statusText.textContent = "Erreur d'envoi : " + error.message;
+                alert("Erreur de publication : " + error.message);
             }
         });
+
+        const uploadFileForm = document.getElementById('upload-file-form');
+        if (uploadFileForm) {
+            uploadFileForm.addEventListener('submit', async () => {
+                if (!isUserAdmin) return alert("Action non autorisée.");
+                const playerSelect = document.getElementById('select-player');
+                const fileNameInput = document.getElementById('file-name');
+                const fileInput = document.getElementById('file-input');
+                const status = document.getElementById('upload-status');
+
+                const playerId = playerSelect.value;
+                const customName = fileNameInput.value.trim();
+                const file = fileInput.files[0];
+
+                if (!playerId || !customName || !file) return alert("Veuillez remplir tous les champs.");
+
+                status.style.color = "#a855f7";
+                status.textContent = "Téléversement en cours...";
+
+                try {
+                    const fileRef = ref(storage, `player_docs/${playerId}/${Date.now()}_${file.name}`);
+                    const uploadSnap = await uploadBytes(fileRef, file);
+                    const downloadUrl = await getDownloadURL(uploadSnap.ref);
+
+                    const playerDocRef = doc(db, "players", playerId);
+                    await updateDoc(playerDocRef, {
+                        documents: arrayUnion({
+                            name: customName,
+                            url: downloadUrl,
+                            uploadedAt: Date.now()
+                        })
+                    });
+
+                    status.style.color = "#22c55e";
+                    status.textContent = "✅ Fichier envoyé avec succès au joueur !";
+                    uploadFileForm.reset();
+                } catch (err) {
+                    console.error(err);
+                    status.style.color = "#ff4444";
+                    status.textContent = "❌ Erreur : " + err.message;
+                }
+            });
+        }
     </script>
 </body>
 </html>

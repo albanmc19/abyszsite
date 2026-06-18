@@ -166,8 +166,8 @@
         let localPlayersList = [];
         let estAdmin = false;
 
-        // CHANGER CETTE ADRESSE PAR VOTRE COMPTE UNIQUE ADMIN FIRESTORE
-        const ADMIN_EMAIL = "admin@abysz.com";
+        // COMPTE UNIQUE ADMIN MIS À JOUR
+        const ADMIN_EMAIL = "abyszofficial@gmail.com";
 
         document.addEventListener("DOMContentLoaded", () => {
             onAuthStateChanged(auth, (user) => {
@@ -177,22 +177,21 @@
                 const welcomeMsg = document.getElementById("user-welcome-msg");
                 
                 if (user) {
-                    // Si l'utilisateur connecté possède l'email admin exact
                     if (user.email === ADMIN_EMAIL) {
+                        // L'ADMINISTRATEUR RESTE ICI
                         estAdmin = true;
                         if (addBtn) addBtn.classList.remove("hidden");
                         if (welcomeMsg) welcomeMsg.innerText = "Espace Administrateur";
+                        if (logoutBtn) logoutBtn.classList.remove("hidden");
+                        if (loginBtn) loginBtn.classList.add("hidden");
                     } else {
-                        // C'est un joueur ou un utilisateur classique
+                        // TOUT AUTRE COMPTE EST REDIRIGÉ
                         estAdmin = false;
                         if (addBtn) addBtn.classList.add("hidden");
-                        if (welcomeMsg) welcomeMsg.innerText = "Mon Espace Joueur";
+                        window.location.href = "espace-joueur.html";
+                        return;
                     }
-                    
-                    if (logoutBtn) logoutBtn.classList.remove("hidden");
-                    if (loginBtn) loginBtn.classList.add("hidden");
                 } else {
-                    // Personne n'est connecté
                     estAdmin = false;
                     if (addBtn) addBtn.classList.add("hidden");
                     if (logoutBtn) logoutBtn.classList.add("hidden");
@@ -200,7 +199,6 @@
                     if (welcomeMsg) welcomeMsg.innerText = "";
                 }
 
-                // Rafraîchir l'affichage du roster actuel pour appliquer ou retirer les boutons d'édition
                 renderRosters(localPlayersList);
             });
 
@@ -209,9 +207,7 @@
                 logoutBtn.addEventListener("click", () => {
                     signOut(auth).then(() => {
                         alert("Déconnexion réussie.");
-                    }).catch((error) => {
-                        console.error("Erreur de déconnexion:", error);
-                    });
+                    }).catch((error) => console.error(error));
                 });
             }
 
@@ -233,7 +229,6 @@
                     <div class="popup" style="max-width: 360px;">
                         <span class="popup-close" id="close-login-popup">&times;</span>
                         <h3 style="font-family:'Orbitron', sans-serif; color:#a855f7; text-align:center; margin-bottom:20px; text-transform:uppercase; font-size:1.2rem;">Connexion</h3>
-                        
                         <form id="login-direct-form" onsubmit="return false;">
                             <div class="input-group">
                                 <label>Adresse E-mail</label>
@@ -277,14 +272,13 @@
                 });
                 renderRosters(localPlayersList);
             }, (error) => {
-                console.error("Erreur Firestore : ", error);
+                console.error(error);
                 showErrorMessageAllGrids();
             });
         }
 
         function showErrorMessageAllGrids() {
-            const gridIds = ["main-roster-grid", "academy-roster-grid", "cdf-roster-grid"];
-            gridIds.forEach(id => {
+            ["main-roster-grid", "academy-roster-grid", "cdf-roster-grid"].forEach(id => {
                 const g = document.getElementById(id);
                 if (g) g.innerHTML = `<p class="error-text">Erreur de chargement de l'équipe.</p>`;
             });
@@ -333,16 +327,8 @@
                 addBtn.addEventListener("click", () => {
                     if (!estAdmin) return;
                     openPlayerPopup({
-                        pseudo: "",
-                        team: "main",
-                        role: "",
-                        earnings: "",
-                        image: "logo.png",
-                        prHistory: [],
-                        twitter: "",
-                        twitch: "",
-                        youtube: "",
-                        tiktok: ""
+                        pseudo: "", team: "main", role: "", earnings: "", image: "logo.png",
+                        prHistory: [], twitter: "", twitch: "", youtube: "", tiktok: ""
                     }, true);
                 });
             }
@@ -362,7 +348,6 @@
 
             if (startInEditMode && !estAdmin) startInEditMode = false;
 
-            // ── CALCUL TENDANCE ──
             let trendHtml = "";
             if (localPrHistory.length >= 2) {
                 const valAncienne = Number(localPrHistory[localPrHistory.length - 2].value) || 0;
@@ -375,7 +360,6 @@
                 }
             }
 
-            // ── RÉSEAUX SOCIAUX ──
             let socialHtml = "";
             if (!isNewPlayer && (player.twitter || player.twitch || player.youtube || player.tiktok)) {
                 socialHtml = `<div class="social-links-container">`;
@@ -394,13 +378,8 @@
                         <div id="view-mode-${playerId}" class="${startInEditMode ? 'hidden' : ''}">
                             <img src="${avatar}" class="popup-avatar-img" id="view-avatar-${playerId}" alt="">
                             <h3 class="popup-pseudo">${player.pseudo || 'Nouveau Joueur'}</h3>
-                            
-                            <div style="text-align:center; margin-bottom:5px;">
-                                ${trendHtml}
-                            </div>
-
+                            <div style="text-align:center; margin-bottom:5px;">${trendHtml}</div>
                             ${socialHtml}
-
                             <p style="text-align:center; color:#aaa; margin-top:5px; margin-bottom:10px; font-family:'Inter', sans-serif;">${player.role || 'Rôle non défini'}</p>
                             <p style="text-align:center; color:#22c55e; font-weight:600; font-family:'Orbitron', sans-serif; margin-bottom:15px;">Earnings : ${player.earnings || '0 €'}</p>
                             
@@ -421,7 +400,6 @@
                             <h3 style="font-family:'Orbitron', sans-serif; color:#a855f7; text-align:center; margin-bottom:15px;">
                                 ${isNewPlayer ? 'Créer le joueur' : 'Modifier le profil'}
                             </h3>
-                            
                             <img src="${avatar}" class="popup-avatar-img" id="edit-preview-${playerId}" style="max-height: 100px;">
 
                             <form id="form-${playerId}" onsubmit="return false;">
@@ -484,243 +462,194 @@
                             </form>
                         </div>
                         ` : ''}
-
                     </div>
                 </div>
             `;
 
             const popupOverlay = document.getElementById(`popup-${playerId}`);
-            const viewModeDiv = document.getElementById(`view-mode-${playerId}`);
-            const editModeDiv = document.getElementById(`edit-mode-${playerId}`);
-            
             const closePopup = () => { popupOverlay.classList.remove("active"); setTimeout(() => popupOverlay.remove(), 200); };
             popupOverlay.querySelector(".popup-close").addEventListener("click", closePopup);
 
-            // ── GENERATION DU TABLEAU PUBLIC PR ──
-            const tableContainer = document.getElementById(`pr-table-container-${playerId}`);
-            if (tableContainer) {
+            // Remplissage du tableau PR en mode Vue
+            const updatePrTable = () => {
+                const tableContainer = document.getElementById(`pr-table-container-${playerId}`);
+                if (!tableContainer) return;
                 if (localPrHistory.length > 0) {
-                    let tableRows = "";
-                    localPrHistory.forEach((row) => {
-                        tableRows += `
-                            <tr>
-                                <td>${row.date || ''}</td>
-                                <td>${row.label || row.event || 'Tournoi'}</td>
-                                <td class="pr-val-col">${Number(row.value).toLocaleString('fr-FR')}</td>
-                            </tr>
-                        `;
-                    });
-                    tableContainer.innerHTML = `
-                        <table class="pr-table">
-                            <thead>
-                                <tr>
-                                    <th>DATE</th>
-                                    <th>ÉVÉNEMENT</th>
-                                    <th>PR TOTAL</th>
-                                </tr>
-                            </thead>
-                            <tbody>${tableRows}</tbody>
-                        </table>
-                    `;
+                    let rows = localPrHistory.map(r => `
+                        <tr>
+                            <td>${r.date || ''}</td>
+                            <td>${r.label || 'Tournoi'}</td>
+                            <td class="pr-val-col">${Number(r.value).toLocaleString('fr-FR')}</td>
+                        </tr>`).join("");
+                    tableContainer.innerHTML = `<table class="pr-table"><thead><tr><th>DATE</th><th>ÉVÉNEMENT</th><th>PR TOTAL</th></tr></thead><tbody>${rows}</tbody></table>`;
                 } else {
                     tableContainer.innerHTML = `<div style="text-align:center; color:#666; font-size:0.85rem; padding:10px;">Aucun historique de PR.</div>`;
                 }
-            }
+            };
+            updatePrTable();
 
-            // ── GENERATION DU GRAPHIQUE CHART.JS ──
-            const canvasElement = document.getElementById(`canvas-${playerId}`);
-            const chartBox = document.getElementById(`chart-box-${playerId}`);
-            if (canvasElement && chartBox) {
-                if (localPrHistory.length >= 1) {
-                    const labels = localPrHistory.map(item => item.date);
-                    const dataValues = localPrHistory.map(item => Number(item.value));
-                    
-                    new Chart(canvasElement, {
-                        type: 'line',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                label: 'Points PR',
-                                data: dataValues,
-                                borderColor: '#a855f7',
-                                backgroundColor: 'rgba(168, 85, 247, 0.1)',
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.3
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: { legend: { display: false } },
-                            scales: {
-                                x: { grid: { color: '#1a1a1a' }, ticks: { color: '#666', font: { size: 9 } } },
-                                y: { grid: { color: '#1a1a1a' }, ticks: { color: '#666', font: { size: 9 } } }
-                            }
+            // Rendu graphique Chart.js
+            let prChart = null;
+            const buildChart = () => {
+                const ctx = document.getElementById(`canvas-${playerId}`);
+                if (!ctx) return;
+                if (prChart) prChart.destroy();
+                
+                const labels = localPrHistory.map(r => r.date || "");
+                const dataPoints = localPrHistory.map(r => Number(r.value) || 0);
+
+                prChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels.length ? labels : ["Début"],
+                        datasets: [{
+                            label: 'Points PR',
+                            data: dataPoints.length ? dataPoints : [0],
+                            borderColor: '#a855f7',
+                            backgroundColor: 'rgba(168,85,247,0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { grid: { display: false }, ticks: { color: '#666', font: { size: 9 } } },
+                            y: { grid: { color: '#1a1a1a' }, ticks: { color: '#666', font: { size: 9 } } }
                         }
-                    });
-                } else {
-                    chartBox.classList.add("hidden");
-                }
-            }
-
-            // ── SÉCURISATION DES ACTIONS DU MODE EDITION ──
-            if (estAdmin) {
-                const rafraichirListeEditeurPR = () => {
-                    const box = document.getElementById(`edit-pr-list-${playerId}`);
-                    if (!box) return;
-                    if (localPrHistory.length === 0) {
-                        box.innerHTML = `<p style="color:#555; font-size:0.8rem; margin:5px 0; text-align:center;">Aucun historique.</p>`;
-                        return;
                     }
-                    let html = "";
-                    localPrHistory.forEach((item, index) => {
-                        html += `
-                            <div style="display:flex; justify-content:space-between; align-items:center; background:#111; padding:4px 8px; margin-bottom:4px; border-radius:4px; font-size:0.8rem; color:#ccc;">
-                                <span><b>${item.date}</b> - ${item.label || item.event || 'Tournoi'} (${item.value} PR)</span>
-                                <span class="btn-del-pr-row" data-index="${index}" style="color:#ff4444; cursor:pointer; font-weight:bold; padding:0 4px;">×</span>
-                            </div>
-                        `;
-                    });
-                    box.innerHTML = html;
+                });
+            };
+            buildChart();
 
-                    box.querySelectorAll(".btn-del-pr-row").forEach(btn => {
-                        btn.addEventListener("click", (e) => {
-                            const idx = parseInt(e.target.getAttribute("data-index"));
-                            localPrHistory.splice(idx, 1);
-                            rafraichirListeEditeurPR();
-                        });
-                    });
-                };
+            if (!estAdmin) return;
 
-                rafraichirListeEditeurPR();
-
-                const toEditBtn = document.getElementById(`btn-to-edit-${playerId}`);
-                if (toEditBtn) {
-                    toEditBtn.addEventListener("click", () => {
-                        viewModeDiv.classList.add("hidden");
-                        editModeDiv.classList.remove("hidden");
-                    });
+            // Logique de modification de l'historique PR en mode édition
+            const renderEditPrList = () => {
+                const editPrBox = document.getElementById(`edit-pr-list-${playerId}`);
+                if (!editPrBox) return;
+                if (localPrHistory.length === 0) {
+                    editPrBox.innerHTML = `<span style="color:#444; font-size:0.8rem; display:block; padding:5px;">Aucune ligne enregistrée.</span>`;
+                    return;
                 }
+                editPrBox.innerHTML = localPrHistory.map((r, idx) => `
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:#111; padding:4px 8px; margin-bottom:4px; border-radius:4px; font-size:0.8rem;">
+                        <span style="color:#aaa;">[${r.date}] ${r.label} : <b>${r.value}</b></span>
+                        <button type="button" class="btn-del-pr-row" data-index="${idx}" style="background:none; border:none; color:#ff4444; cursor:pointer;">❌</button>
+                    </div>
+                `).join("");
 
-                const cancelBtn = document.getElementById(`btn-cancel-${playerId}`);
-                if (cancelBtn) {
-                    cancelBtn.addEventListener("click", () => {
-                        if (isNewPlayer) {
-                            closePopup();
-                        } else {
-                            editModeDiv.classList.add("hidden");
-                            viewModeDiv.classList.remove("hidden");
-                        }
+                editPrBox.querySelectorAll(".btn-del-pr-row").forEach(btn => {
+                    btn.addEventListener("click", (e) => {
+                        const index = parseInt(e.target.getAttribute("data-index"));
+                        localPrHistory.splice(index, 1);
+                        renderEditPrList();
                     });
+                });
+            };
+            renderEditPrList();
+
+            // Ajouter un point PR
+            document.getElementById(`btn-add-pr-row-${playerId}`).addEventListener("click", () => {
+                const dateIn = document.getElementById(`new-pr-date-${playerId}`).value.trim();
+                const labelIn = document.getElementById(`new-pr-label-${playerId}`).value.trim();
+                const valIn = document.getElementById(`new-pr-value-${playerId}`).value.trim();
+                
+                if (!dateIn || !valIn) { alert("La date et la valeur PR sont obligatoires."); return; }
+                
+                localPrHistory.push({ date: dateIn, label: labelIn || "Tournoi", value: parseInt(valIn) || 0 });
+                localPrHistory.sort((a,b) => new Date(a.date) - new Date(b.date));
+                
+                document.getElementById(`new-pr-date-${playerId}`).value = "";
+                document.getElementById(`new-pr-label-${playerId}`).value = "";
+                document.getElementById(`new-pr-value-${playerId}`).value = "";
+                renderEditPrList();
+            });
+
+            // Conversion Image Base64
+            document.getElementById(`file-input-${playerId}`).addEventListener("change", (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        imageBase64String = event.target.result;
+                        document.getElementById(`edit-preview-${playerId}`).src = imageBase64String;
+                    };
+                    reader.readAsDataURL(file);
                 }
+            });
 
-                const addPrRowBtn = document.getElementById(`btn-add-pr-row-${playerId}`);
-                if (addPrRowBtn) {
-                    addPrRowBtn.addEventListener("click", () => {
-                        const dInput = document.getElementById(`new-pr-date-${playerId}`);
-                        const lInput = document.getElementById(`new-pr-label-${playerId}`);
-                        const vInput = document.getElementById(`new-pr-value-${playerId}`);
-                        
-                        if (!dInput.value.trim() || !vInput.value.trim()) {
-                            alert("Veuillez remplir au moins la date et la valeur du PR.");
-                            return;
-                        }
+            // Supprimer la photo
+            document.getElementById(`btn-clear-img-${playerId}`).addEventListener("click", () => {
+                imageBase64String = "logo.png";
+                document.getElementById(`edit-preview-${playerId}`).src = "logo.png";
+            });
 
-                        localPrHistory.push({
-                            date: dInput.value.trim(),
-                            label: lInput.value.trim() || "Tournoi",
-                            value: Number(vInput.value)
-                        });
+            // Toggle des écrans Vue/Édition
+            const viewMode = document.getElementById(`view-mode-${playerId}`);
+            const editMode = document.getElementById(`edit-mode-${playerId}`);
 
-                        localPrHistory.sort((a, b) => new Date(a.date) - new Date(b.date));
+            document.getElementById(`btn-to-edit-${playerId}`).addEventListener("click", () => {
+                viewMode.classList.add("hidden");
+                editMode.classList.remove("hidden");
+                renderEditPrList();
+            });
 
-                        dInput.value = "";
-                        lInput.value = "";
-                        vInput.value = "";
-                        rafraichirListeEditeurPR();
-                    });
+            document.getElementById(`btn-cancel-${playerId}`).addEventListener("click", () => {
+                if (isNewPlayer) { closePopup(); } else {
+                    editMode.classList.add("hidden");
+                    viewMode.classList.remove("hidden");
                 }
+            });
 
-                const fileInput = document.getElementById(`file-input-${playerId}`);
-                if (fileInput) {
-                    fileInput.addEventListener("change", (e) => {
-                        const file = e.target.files[0];
-                        if (file) {
-                            const reader = new FileReader();
-                            reader.onload = function(event) {
-                                imageBase64String = event.target.result;
-                                document.getElementById(`edit-preview-${playerId}`).src = imageBase64String;
-                            };
-                            reader.readAsDataURL(file);
-                        }
-                    });
+            // Formulaire de sauvegarde globale (Firebase)
+            document.getElementById(`form-${playerId}`).addEventListener("submit", async () => {
+                const pseudo = document.getElementById(`input-pseudo-${playerId}`).value.trim();
+                const team = document.getElementById(`input-team-${playerId}`).value;
+                const role = document.getElementById(`input-role-${playerId}`).value.trim();
+                const earnings = document.getElementById(`input-earnings-${playerId}`).value.trim();
+                
+                const twitter = document.getElementById(`input-twitter-${playerId}`).value.trim();
+                const twitch = document.getElementById(`input-twitch-${playerId}`).value.trim();
+                const youtube = document.getElementById(`input-youtube-${playerId}`).value.trim();
+                const tiktok = document.getElementById(`input-tiktok-${playerId}`).value.trim();
+
+                try {
+                    const playerDocRef = doc(db, "roster", playerId);
+                    const dataToSave = {
+                        pseudo, team, role, earnings,
+                        image: imageBase64String,
+                        prHistory: localPrHistory,
+                        twitter, twitch, youtube, tiktok
+                    };
+                    if (isNewPlayer) dataToSave.createdAt = serverTimestamp();
+
+                    await setDoc(playerDocRef, dataToSave, { merge: true });
+                    alert("Profil sauvegardé avec succès.");
+                    closePopup();
+                } catch (err) {
+                    console.error(err);
+                    alert("Erreur lors de la sauvegarde.");
                 }
+            });
 
-                const clearImgBtn = document.getElementById(`btn-clear-img-${playerId}`);
-                if (clearImgBtn) {
-                    clearImgBtn.addEventListener("click", () => {
-                        imageBase64String = "logo.png";
-                        document.getElementById(`edit-preview-${playerId}`).src = "logo.png";
-                    });
-                }
-
-                const form = document.getElementById(`form-${playerId}`);
-                if (form) {
-                    form.addEventListener("submit", async () => {
-                        const pseudoValue = document.getElementById(`input-pseudo-${playerId}`).value.trim();
-                        const teamValue = document.getElementById(`input-team-${playerId}`).value;
-                        const roleValue = document.getElementById(`input-role-${playerId}`).value.trim();
-                        const earningsValue = document.getElementById(`input-earnings-${playerId}`).value.trim();
-                        
-                        const twitterVal = document.getElementById(`input-twitter-${playerId}`).value.trim();
-                        const twitchVal = document.getElementById(`input-twitch-${playerId}`).value.trim();
-                        const youtubeVal = document.getElementById(`input-youtube-${playerId}`).value.trim();
-                        const tiktokVal = document.getElementById(`input-tiktok-${playerId}`).value.trim();
-
-                        const pData = {
-                            pseudo: pseudoValue,
-                            team: teamValue,
-                            role: roleValue,
-                            earnings: earningsValue,
-                            image: imageBase64String,
-                            prHistory: localPrHistory,
-                            twitter: twitterVal,
-                            twitch: twitchVal,
-                            youtube: youtubeVal,
-                            tiktok: tiktokVal
-                        };
-
-                        if (isNewPlayer) {
-                            pData.createdAt = serverTimestamp();
-                        }
-
+            // Suppression du joueur
+            if (!isNewPlayer) {
+                document.getElementById(`btn-delete-${playerId}`).addEventListener("click", async () => {
+                    if (confirm(`Voulez-vous vraiment retirer ${player.pseudo || 'ce joueur'} du roster ?`)) {
                         try {
-                            await setDoc(doc(db, "roster", playerId), pData, { merge: true });
-                            alert("Profil joueur enregistré !");
+                            await deleteDoc(doc(db, "roster", playerId));
+                            alert("Joueur supprimé.");
                             closePopup();
                         } catch (err) {
                             console.error(err);
-                            alert("Erreur lors de l'enregistrement.");
+                            alert("Erreur lors de la suppression.");
                         }
-                    });
-                }
-
-                const deleteBtn = document.getElementById(`btn-delete-${playerId}`);
-                if (deleteBtn) {
-                    deleteBtn.addEventListener("click", async () => {
-                        if (confirm(`Supprimer définitivement ${player.pseudo || ''} ?`)) {
-                            try {
-                                await deleteDoc(doc(db, "roster", playerId));
-                                alert("Joueur supprimé.");
-                                closePopup();
-                            } catch (err) {
-                                console.error(err);
-                                alert("Erreur lors de la suppression.");
-                            }
-                        }
-                    });
-                }
+                    }
+                });
             }
         }
     </script>

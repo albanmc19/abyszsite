@@ -113,8 +113,9 @@
         <div class="roster-header-container">
             <h2 style="font-family:'Orbitron', sans-serif; color:#fff; font-size:2rem; margin:0;">Notre Roster 2026</h2>
             <div class="admin-actions-header">
+                <span id="user-welcome-msg" style="font-family:'Inter', sans-serif; color:#aaa; font-size:0.9rem; margin-right:10px;"></span>
                 <button class="admin-gate-btn hidden" id="add-player-btn">➕ Nouveau Joueur</button>
-                <button class="admin-gate-btn login-btn" id="login-btn">🔑 Connexion Admin</button>
+                <button class="admin-gate-btn login-btn" id="login-btn">🔑 Connexion</button>
                 <button class="admin-gate-btn logout-btn hidden" id="logout-btn">🔒 Déconnexion</button>
             </div>
         </div>
@@ -165,30 +166,49 @@
         let localPlayersList = [];
         let estAdmin = false;
 
+        // CHANGER CETTE ADRESSE PAR VOTRE COMPTE UNIQUE ADMIN FIRESTORE
+        const ADMIN_EMAIL = "admin@abysz.com";
+
         document.addEventListener("DOMContentLoaded", () => {
             onAuthStateChanged(auth, (user) => {
                 const addBtn = document.getElementById("add-player-btn");
                 const loginBtn = document.getElementById("login-btn");
                 const logoutBtn = document.getElementById("logout-btn");
+                const welcomeMsg = document.getElementById("user-welcome-msg");
                 
                 if (user) {
-                    estAdmin = true;
-                    if (addBtn) addBtn.classList.remove("hidden");
+                    // Si l'utilisateur connecté possède l'email admin exact
+                    if (user.email === ADMIN_EMAIL) {
+                        estAdmin = true;
+                        if (addBtn) addBtn.classList.remove("hidden");
+                        if (welcomeMsg) welcomeMsg.innerText = "Espace Administrateur";
+                    } else {
+                        // C'est un joueur ou un utilisateur classique
+                        estAdmin = false;
+                        if (addBtn) addBtn.classList.add("hidden");
+                        if (welcomeMsg) welcomeMsg.innerText = "Mon Espace Joueur";
+                    }
+                    
                     if (logoutBtn) logoutBtn.classList.remove("hidden");
                     if (loginBtn) loginBtn.classList.add("hidden");
                 } else {
+                    // Personne n'est connecté
                     estAdmin = false;
                     if (addBtn) addBtn.classList.add("hidden");
                     if (logoutBtn) logoutBtn.classList.add("hidden");
                     if (loginBtn) loginBtn.classList.remove("hidden");
+                    if (welcomeMsg) welcomeMsg.innerText = "";
                 }
+
+                // Rafraîchir l'affichage du roster actuel pour appliquer ou retirer les boutons d'édition
+                renderRosters(localPlayersList);
             });
 
             const logoutBtn = document.getElementById("logout-btn");
             if (logoutBtn) {
                 logoutBtn.addEventListener("click", () => {
                     signOut(auth).then(() => {
-                        alert("Déconnecté de l'espace administration.");
+                        alert("Déconnexion réussie.");
                     }).catch((error) => {
                         console.error("Erreur de déconnexion:", error);
                     });
@@ -212,12 +232,12 @@
                 <div id="login-popup-overlay" class="popup-overlay active">
                     <div class="popup" style="max-width: 360px;">
                         <span class="popup-close" id="close-login-popup">&times;</span>
-                        <h3 style="font-family:'Orbitron', sans-serif; color:#a855f7; text-align:center; margin-bottom:20px; text-transform:uppercase; font-size:1.2rem;">Espace Admin</h3>
+                        <h3 style="font-family:'Orbitron', sans-serif; color:#a855f7; text-align:center; margin-bottom:20px; text-transform:uppercase; font-size:1.2rem;">Connexion</h3>
                         
                         <form id="login-direct-form" onsubmit="return false;">
                             <div class="input-group">
                                 <label>Adresse E-mail</label>
-                                <input type="email" id="login-email" placeholder="admin@abysz.com" required>
+                                <input type="email" id="login-email" placeholder="votre@email.com" required>
                             </div>
                             <div class="input-group">
                                 <label>Mot de passe</label>
@@ -311,6 +331,7 @@
             const addBtn = document.getElementById("add-player-btn");
             if (addBtn) {
                 addBtn.addEventListener("click", () => {
+                    if (!estAdmin) return;
                     openPlayerPopup({
                         pseudo: "",
                         team: "main",
@@ -543,7 +564,7 @@
                 }
             }
 
-            // ── ACTIONS MODE EDITION (POUR LES ADMINS) ──
+            // ── SÉCURISATION DES ACTIONS DU MODE EDITION ──
             if (estAdmin) {
                 const rafraichirListeEditeurPR = () => {
                     const box = document.getElementById(`edit-pr-list-${playerId}`);
@@ -574,7 +595,6 @@
 
                 rafraichirListeEditeurPR();
 
-                // Basculer vers l'édition
                 const toEditBtn = document.getElementById(`btn-to-edit-${playerId}`);
                 if (toEditBtn) {
                     toEditBtn.addEventListener("click", () => {
@@ -583,7 +603,6 @@
                     });
                 }
 
-                // Annuler
                 const cancelBtn = document.getElementById(`btn-cancel-${playerId}`);
                 if (cancelBtn) {
                     cancelBtn.addEventListener("click", () => {
@@ -596,7 +615,6 @@
                     });
                 }
 
-                // Insertion rapide d'une ligne PR
                 const addPrRowBtn = document.getElementById(`btn-add-pr-row-${playerId}`);
                 if (addPrRowBtn) {
                     addPrRowBtn.addEventListener("click", () => {
@@ -615,7 +633,6 @@
                             value: Number(vInput.value)
                         });
 
-                        // Tri par date croissant automatiquement
                         localPrHistory.sort((a, b) => new Date(a.date) - new Date(b.date));
 
                         dInput.value = "";
@@ -625,7 +642,6 @@
                     });
                 }
 
-                // Gestion de l'image (Upload local transformé en Base64)
                 const fileInput = document.getElementById(`file-input-${playerId}`);
                 if (fileInput) {
                     fileInput.addEventListener("change", (e) => {
@@ -641,7 +657,6 @@
                     });
                 }
 
-                // Réinitialiser au logo par défaut
                 const clearImgBtn = document.getElementById(`btn-clear-img-${playerId}`);
                 if (clearImgBtn) {
                     clearImgBtn.addEventListener("click", () => {
@@ -650,7 +665,6 @@
                     });
                 }
 
-                // Soumission du formulaire & sauvegarde Firestore
                 const form = document.getElementById(`form-${playerId}`);
                 if (form) {
                     form.addEventListener("submit", async () => {
@@ -683,23 +697,22 @@
 
                         try {
                             await setDoc(doc(db, "roster", playerId), pData, { merge: true });
-                            alert("Profil joueur enregistré avec succès !");
+                            alert("Profil joueur enregistré !");
                             closePopup();
                         } catch (err) {
-                            console.error("Erreur de sauvegarde Firestore :", err);
-                            alert("Une erreur est survenue lors de l'enregistrement.");
+                            console.error(err);
+                            alert("Erreur lors de l'enregistrement.");
                         }
                     });
                 }
 
-                // Suppression d'un joueur
                 const deleteBtn = document.getElementById(`btn-delete-${playerId}`);
                 if (deleteBtn) {
                     deleteBtn.addEventListener("click", async () => {
-                        if (confirm(`Êtes-vous sûr de vouloir supprimer définitivement le joueur ${player.pseudo || ''} ?`)) {
+                        if (confirm(`Supprimer définitivement ${player.pseudo || ''} ?`)) {
                             try {
                                 await deleteDoc(doc(db, "roster", playerId));
-                                alert("Joueur supprimé du roster.");
+                                alert("Joueur supprimé.");
                                 closePopup();
                             } catch (err) {
                                 console.error(err);

@@ -114,6 +114,9 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // CONFIGURATION SÉCURITÉ ADMIN
+        const ADMIN_EMAIL = "abyszofficial@gmail.com";
+
         const authZone = document.getElementById('auth-zone');
         const profileZone = document.getElementById('profile-zone');
         const loginForm = document.getElementById('player-login-form');
@@ -125,19 +128,24 @@
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
+                const emailMinuscule = user.email.toLowerCase().trim();
+
+                // 1. REDIRECTION AUTOMATIQUE SI C'EST L'ADMIN
+                if (emailMinuscule === ADMIN_EMAIL) {
+                    window.location.href = "dashboard.html";
+                    return; // Stoppe l'exécution du reste du script
+                }
+
+                // 2. LOGIQUE NORMALE POUR LES JOUEURS
                 authZone.classList.add('hidden');
                 profileZone.classList.remove('hidden');
                 
-                // Référence directe au document en se basant sur le UID de connexion
                 const docRef = doc(db, "players", user.uid);
-                
-                // Si le document n'existe pas encore ou n'a pas l'e-mail, on l'initialise proprement
                 const docSnap = await getDoc(docRef);
-                if (!docSnap.exists() || !docSnap.data().email) {
-                    await setDoc(docRef, { email: user.email.toLowerCase() }, { merge: true });
+                if (!docSnap.exists() || !docSnap.data().email || docSnap.data().email !== emailMinuscule) {
+                    await setDoc(docRef, { email: emailMinuscule }, { merge: true });
                 }
 
-                // Écoute dynamique : met à jour l'interface automatiquement dès que le Dashboard enregistre
                 unsubscribeProfile = onSnapshot(docRef, (snapshot) => {
                     if (snapshot.exists()) {
                         const data = snapshot.data();
@@ -149,7 +157,6 @@
                         document.getElementById('stat-date').textContent = data.joinDate || "-";
                         document.getElementById('player-staff-message').textContent = data.staffMessage || "Bienvenue dans ton espace privé.";
                         
-                        // Si l'admin a renseigné un lien de document dans le Dashboard
                         if (data.documentUrl && data.documentUrl.trim() !== "") {
                             playerDownloadLink.href = data.documentUrl;
                             documentZone.classList.remove('hidden');
@@ -160,7 +167,6 @@
                 });
 
             } else {
-                // Nettoyage de l'écoute à la déconnexion
                 if (unsubscribeProfile) {
                     unsubscribeProfile();
                     unsubscribeProfile = null;

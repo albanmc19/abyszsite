@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espace Joueur - Abysz Esports</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        html { scroll-behavior: smooth; scrollbar-gutter: stable; }
+        body { background: #0a0a0a; color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
+        
+        .container { max-width: 800px; margin: 60px auto; padding: 20px; text-align: center; }
+        .card { background: #141414; border: 2px solid #a855f7; border-radius: 20px; padding: 40px 30px; box-shadow: 0 0 30px rgba(168, 85, 247, 0.15); }
+        h2, h3 { font-family: 'Orbitron', sans-serif; color: white; }
+        
+        /* Formulaires */
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 8px; color: #a855f7; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; }
+        .input-group input { width: 100%; padding: 12px; background: #0a0a0a; border: 1px solid #2a2a2a; color: white; border-radius: 8px; box-sizing: border-box; }
+        .input-group input:focus { border-color: #a855f7; outline: none; }
+        
+        .btn { background: #a855f7; color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: bold; font-family: 'Orbitron', sans-serif; cursor: pointer; transition: all 0.2s; }
+        .btn:hover { background: #b975ff; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
+        
+        .hidden { display: none !important; }
+        .error-message { color: #ff4444; margin-top: 15px; font-size: 0.9rem; }
+        
+        /* Layout Profil Joueur */
+        .profile-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #2a2a2a; padding-bottom: 20px; margin-bottom: 20px; }
+        .logout-link { color: #ff4444; background: none; border: none; cursor: pointer; font-family: 'Orbitron', sans-serif; font-weight: bold; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
+        .stat-box { background: #1a1a1a; padding: 20px; border-radius: 12px; border-left: 4px solid #a855f7; text-align: left; }
+        .stat-box span { display: block; font-size: 0.8rem; color: #777; font-family: 'Orbitron', sans-serif; }
+        .stat-box strong { display: block; font-size: 1.2rem; color: white; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="auth-zone" class="card">
+            <h2>Connexion Joueur</h2>
+            <p style="color: #777; margin-bottom: 30px;">Accède à tes statistiques et ton espace d'entraînement Abysz.</p>
+            
+            <form id="player-login-form" onsubmit="return false;">
+                <div class="input-group">
+                    <label for="player-email">Adresse E-mail</label>
+                    <input type="email" id="player-email" placeholder="joueur@abysz.com" required>
+                </div>
+                <div class="input-group">
+                    <label for="player-password">Mot de passe</label>
+                    <input type="password" id="player-password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn" id="btn-connect">Se connecter</button>
+            </form>
+            <p id="auth-error" class="error-message hidden"></p>
+        </div>
+
+        <div id="profile-zone" class="card hidden">
+            <div class="profile-header">
+                <div>
+                    <h2 id="player-pseudo" style="margin: 0; text-align: left;">Joueur</h2>
+                    <p id="player-role" style="margin: 5px 0 0 0; color: #a855f7; text-align: left; font-family: 'Orbitron', sans-serif; font-size: 0.9rem;">Roster</p>
+                </div>
+                <button id="player-logout-btn" class="logout-link">Déconnexion</button>
+            </div>
+
+            <h3>Tes Informations & Statistiques</h3>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <span>Rôle Équipe</span>
+                    <strong id="stat-role">Membre</strong>
+                </div>
+                <div class="stat-box">
+                    <span>Rank Actuel</span>
+                    <strong id="stat-rank">Non Classé</strong>
+                </div>
+                <div class="stat-box">
+                    <span>Date d'entrée</span>
+                    <strong id="stat-date">-</strong>
+                </div>
+            </div>
+            
+            <div style="margin-top: 40px; background: #0a0a0a; padding: 20px; border-radius: 12px; text-align: left; border: 1px dashed #a855f7;">
+                <h4 style="margin: 0 0 10px 0; font-family: 'Orbitron', sans-serif; color: #a855f7;">Message du Staff</h4>
+                <p style="margin: 0; font-size: 0.95rem; color: #ccc;">Bienvenue dans ton espace privé. Les plannings des entraînements et les stratégies d'équipe seront bientôt disponibles ici.</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        // Configuration identique à ton index.html
+        const firebaseConfig = {
+            apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
+            authDomain: "abysz-esports.firebaseapp.com",
+            projectId: "abysz-esports",
+            storageBucket: "abysz-esports.firebasestorage.app",
+            messagingSenderId: "200968659347",
+            appId: "1:200968659347:web:3a13d1614d00ed29968866"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Éléments DOM
+        const authZone = document.getElementById('auth-zone');
+        const profileZone = document.getElementById('profile-zone');
+        const loginForm = document.getElementById('player-login-form');
+        const authError = document.getElementById('auth-error');
+
+        // Écouteur d'état de connexion
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                authZone.classList.add('hidden');
+                profileZone.classList.remove('hidden');
+                
+                // Récupération des données du joueur dans Firestore via son UID unique
+                const docRef = doc(db, "players", user.uid);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('player-pseudo').textContent = data.pseudo || "Joueur Abysz";
+                    document.getElementById('player-role').textContent = `Roster ${data.roster || 'Global'}`;
+                    document.getElementById('stat-role').textContent = data.role || "Joueur";
+                    document.getElementById('stat-rank').textContent = data.rank || "Inconnu";
+                    document.getElementById('stat-date').textContent = data.joinDate || "Récent";
+                } else {
+                    // Si le compte existe dans Auth mais pas encore dans Firestore
+                    document.getElementById('player-pseudo').textContent = user.email;
+                    document.getElementById('player-role').textContent = "Profil en attente de configuration par le Staff";
+                }
+            } else {
+                authZone.classList.remove('hidden');
+                profileZone.classList.add('hidden');
+            }
+        });
+
+        // Connexion
+        loginForm.addEventListener('submit', async () => {
+            authError.classList.add('hidden');
+            const email = document.getElementById('player-email').value.trim();
+            const password = document.getElementById('player-password').value;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                authError.textContent = "Erreur : Identifiants incorrects ou compte inexistant.";
+                authError.classList.remove('hidden');
+            }
+        });
+
+        // Déconnexion
+        document.getElementById('player-logout-btn').onclick = () => {
+            signOut(auth);
+        };
+    </script>
+</body>
+</html>

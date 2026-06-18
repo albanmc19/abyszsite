@@ -56,7 +56,7 @@
         .action-btn:hover { background: #b975ff; }
         .hidden { display: none !important; }
 
-        /* Styles pour le nouveau module d'édition de l'espace joueur */
+        /* Styles du module d'édition */
         .admin-edit-box { background: #141414; border: 2px solid #22c55e; border-radius: 16px; padding: 30px; margin-top: 40px; box-shadow: 0 0 30px rgba(34, 197, 94, 0.05); }
         .admin-edit-box h2 { font-family: 'Orbitron', sans-serif; color: #22c55e; margin-top: 0; margin-bottom: 15px; font-size: 1.3rem; display: flex; align-items: center; gap: 10px; }
         .search-row { display: flex; gap: 12px; background: #0a0a0a; padding: 15px; border-radius: 10px; border: 1px dashed #22c55e; margin-bottom: 25px; align-items: flex-end; }
@@ -167,11 +167,11 @@
         <div class="section-title">🔒 Gestion des Espaces Privés Joueurs</div>
         <div class="admin-edit-box">
             <h2>🛠️ Configurer l'espace d'un joueur</h2>
-            <p style="color: #777; font-size: 0.85rem; margin-top: -5px; margin-bottom: 20px;">Permet de modifier l'espace privé d'un membre à partir de son adresse e-mail d'authentification.</p>
+            <p style="color: #777; font-size: 0.85rem; margin-top: -5px; margin-bottom: 20px;">Recherchez l'adresse e-mail exacte avec laquelle le joueur se connecte.</p>
 
             <div class="search-row">
                 <div class="input-group">
-                    <label for="search-player-email">Rechercher par adresse e-mail</label>
+                    <label for="search-player-email">Adresse e-mail du compte joueur</label>
                     <input type="email" id="search-player-email" placeholder="Ex: joueur@gmail.com">
                 </div>
                 <button type="button" class="btn-admin" id="btn-search-player">Charger l'Espace</button>
@@ -194,11 +194,11 @@
                     <div class="form-grid">
                         <div class="input-group">
                             <label>Rôle précis dans l'équipe</label>
-                            <input type="text" id="player-role-input" placeholder="Ex: Capitaine, Joueur Flank, Coach...">
+                            <input type="text" id="player-role-input" placeholder="Ex: Capitaine, Joueur Flank...">
                         </div>
                         <div class="input-group">
                             <label>Rank Actuel en jeu</label>
-                            <input type="text" id="player-rank-input" placeholder="Ex: Radiant, Unreal, GrandMaster...">
+                            <input type="text" id="player-rank-input" placeholder="Ex: Radiant, Unreal...">
                         </div>
                         <div class="input-group">
                             <label>Date d'intégration</label>
@@ -206,14 +206,19 @@
                         </div>
                     </div>
 
+                    <div class="input-group" style="margin-bottom: 20px;">
+                        <label style="color: #22c55e;">Lien du document / Stratégie (PDF, Image, Drive...)</label>
+                        <input type="url" id="player-doc-input" placeholder="https://drive.google.com/file/... ou lien de téléchargement direct">
+                    </div>
+
                     <div class="input-group" style="margin-bottom: 25px;">
                         <label>Message personnalisé du Staff (Privé au joueur)</label>
-                        <textarea id="player-msg-input" rows="4" placeholder="Écris les consignes privées d'entraînement, plannings ou liens de builds..."></textarea>
+                        <textarea id="player-msg-input" rows="4" placeholder="Écris les consignes privées d'entraînement, plannings..."></textarea>
                     </div>
 
                     <button type="submit" class="btn-admin" id="btn-save-player">Enregistrer les modifications</button>
                 </form>
-                <p id="save-success" class="success-message hidden">✅ Espace privé mis à jour avec succès dans Firestore !</p>
+                <p id="save-success" class="success-message hidden">✅ Espace privé mis à jour et synchronisé avec le joueur !</p>
             </div>
         </div>
     </main>
@@ -237,7 +242,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Configuration de sécurité Administrateur principal
         const ADMIN_EMAIL = "abyszofficial@gmail.com";
 
         const accessDeniedSec = document.getElementById('access-denied');
@@ -255,7 +259,6 @@
         const pageFilter = document.getElementById('page-filter');
         const resetBtn = document.getElementById('reset-analytics-btn');
 
-        // Éléments du nouveau module de modification
         const searchPlayerEmail = document.getElementById('search-player-email');
         const btnSearchPlayer = document.getElementById('btn-search-player');
         const searchError = document.getElementById('search-error');
@@ -267,7 +270,6 @@
         let pieChart = null;
         let listeDocsAnalytics = [];
         
-        // Variables pour mémoriser le joueur en cours de modification
         let activeTargetUid = "";
         let activeTargetEmail = "";
 
@@ -280,7 +282,7 @@
                 ecouterCollectionAnalytics();
                 pageFilter.addEventListener('change', () => calculerEtAfficherStats(pageFilter.value));
                 setupResetButton();
-                setupPlayerEditing(); // Liaison logique de la case d'édition
+                setupPlayerEditing(); 
             } else {
                 accessDeniedSec.classList.remove('hidden');
                 dashboardContentSec.classList.add('hidden');
@@ -289,7 +291,7 @@
 
         function setupResetButton() {
             resetBtn.onclick = async () => {
-                const conf = confirm("Êtes-vous sûr de vouloir réinitialiser les statistiques de visites ? (Vos joueurs et données du Roster ne seront PAS supprimés)");
+                const conf = confirm("Êtes-vous sûr de vouloir réinitialiser les statistiques de visites ?");
                 if (conf) {
                     resetBtn.textContent = "Suppression...";
                     resetBtn.disabled = true;
@@ -300,9 +302,9 @@
                             deletePromises.push(deleteDoc(doc(db, "analytics", docSnap.id)));
                         });
                         await Promise.all(deletePromises);
-                        alert("Les statistiques de visites ont été remises à zéro !");
+                        alert("Statistiques remises à zéro !");
                     } catch (error) {
-                        alert("Erreur lors du nettoyage : " + error.message);
+                        alert("Erreur : " + error.message);
                     }
                     resetBtn.textContent = "🗑️ Réinitialiser les statistiques";
                     resetBtn.disabled = false;
@@ -321,18 +323,12 @@
         }
 
         function calculerEtAfficherStats(filtrePage) {
-            let totalVisites = 0;
-            let totalDiscord = 0;
-            let totalBoutique = 0;
-            let clicsJoueurs = {};
-            let pagesDist = { index: 0, roster: 0, boutique: 0 };
-
-            const graphPC = [0, 0, 0, 0, 0, 0, 0];
-            const graphMobile = [0, 0, 0, 0, 0, 0, 0];
+            let totalVisites = 0; let totalDiscord = 0; let totalBoutique = 0;
+            let clicsJoueurs = {}; let pagesDist = { index: 0, roster: 0, boutique: 0 };
+            const graphPC = [0, 0, 0, 0, 0, 0, 0]; const graphMobile = [0, 0, 0, 0, 0, 0, 0];
 
             listeDocsAnalytics.forEach((docData) => {
                 const pageDuDoc = docData.page || "";
-                
                 if (pageDuDoc.includes("index")) pagesDist.index++;
                 else if (pageDuDoc.includes("roster")) pagesDist.roster++;
                 else if (pageDuDoc.includes("boutique")) pagesDist.boutique++;
@@ -353,24 +349,17 @@
                 }
 
                 const nomJoueur = docData.clickedPlayer || docData.playerName || docData.joueur || docData.player || docData.pseudo;
-                if (nomJoueur && nomJoueur !== "discord") {
-                    clicsJoueurs[nomJoueur] = (clicsJoueurs[nomJoueur] || 0) + 1;
-                }
+                if (nomJoueur && nomJoueur !== "discord") { clicsJoueurs[nomJoueur] = (clicsJoueurs[nomJoueur] || 0) + 1; }
 
                 if (docData.date) {
                     const dateClean = String(docData.date).replace(/-/g, "/");
                     const dateObj = new Date(dateClean);
-                    
                     let indexJour = dateObj.getDay() - 1; 
                     if (indexJour === -1) indexJour = 6; 
-
                     if (indexJour >= 0 && indexJour < 7) {
                         const appareil = String(docData.device || "").toLowerCase();
-                        if (appareil.includes("ord") || appareil.includes("desk") || appareil.includes("pc")) {
-                            graphPC[indexJour]++;
-                        } else {
-                            graphMobile[indexJour]++;
-                        }
+                        if (appareil.includes("ord") || appareil.includes("desk") || appareil.includes("pc")) graphPC[indexJour]++;
+                        else graphMobile[indexJour]++;
                     }
                 }
             });
@@ -378,34 +367,15 @@
             siteVisitesNum.textContent = totalVisites;
             discordClicksNum.textContent = totalDiscord;
             boutiqueInterestNum.textContent = totalBoutique;
+            conversionRateNum.textContent = totalVisites > 0 ? `${((totalDiscord / totalVisites) * 100).toFixed(1)}%` : "0%";
 
-            if (totalVisites > 0) {
-                const taux = ((totalDiscord / totalVisites) * 100).toFixed(1);
-                conversionRateNum.textContent = `${taux}%`;
-            } else {
-                conversionRateNum.textContent = "0%";
-            }
-
-            let topJoueur = "Aucun clic";
-            let maxClics = 0;
+            let topJoueur = "Aucun clic"; let maxClics = 0;
             for (const [joueur, clics] of Object.entries(clicsJoueurs)) {
-                if (clics > maxClics) {
-                    maxClics = clics;
-                    topJoueur = `${joueur} (${clics} 🖱️)`;
-                }
+                if (clics > maxClics) { maxClics = clics; topJoueur = `${joueur} (${clics} 🖱️)`; }
             }
             topPlayerClickStr.textContent = topJoueur;
-
-            if(myChart) {
-                myChart.data.datasets[0].data = graphPC;
-                myChart.data.datasets[1].data = graphMobile;
-                myChart.update();
-            }
-
-            if(pieChart) {
-                pieChart.data.datasets[0].data = [pagesDist.index, pagesDist.roster, pagesDist.boutique];
-                pieChart.update();
-            }
+            if(myChart) { myChart.data.datasets[0].data = graphPC; myChart.data.datasets[1].data = graphMobile; myChart.update(); }
+            if(pieChart) { pieChart.data.datasets[0].data = [pagesDist.index, pagesDist.roster, pagesDist.boutique]; pieChart.update(); }
         }
 
         function initialiserGraphiques() {
@@ -415,36 +385,18 @@
                 data: {
                     labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
                     datasets: [
-                        { label: 'PC', data: [0, 0, 0, 0, 0, 0, 0], borderColor: '#a855f7', backgroundColor: 'transparent', tension: 0.2, pointBackgroundColor: '#a855f7' },
-                        { label: 'Mobile', data: [0, 0, 0, 0, 0, 0, 0], borderColor: '#00bfff', backgroundColor: 'transparent', tension: 0.2, pointBackgroundColor: '#00bfff' }
+                        { label: 'PC', data: [0, 0, 0, 0, 0, 0, 0], borderColor: '#a855f7', backgroundColor: 'transparent', tension: 0.2 },
+                        { label: 'Mobile', data: [0, 0, 0, 0, 0, 0, 0], borderColor: '#00bfff', backgroundColor: 'transparent', tension: 0.2 }
                     ]
                 },
-                options: { 
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { labels: { color: '#fff' } } }, 
-                    scales: { y: { grid: { color: '#111' }, ticks: { color: '#666' } }, x: { grid: { color: '#111' }, ticks: { color: '#666' } } } 
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#fff' } } } }
             });
 
             const ctxPie = document.getElementById('pagesPieChart').getContext('2d');
             pieChart = new Chart(ctxPie, {
                 type: 'doughnut',
-                data: {
-                    labels: ['Accueil', 'Roster', 'Boutique'],
-                    datasets: [{
-                        data: [0, 0, 0],
-                        backgroundColor: ['#a855f7', '#22c55e', '#eab308'],
-                        borderWidth: 1,
-                        borderColor: '#050505'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { color: '#fff', font: { family: 'Orbitron' } } }
-                    }
-                }
+                data: { labels: ['Accueil', 'Roster', 'Boutique'], datasets: [{ data: [0, 0, 0], backgroundColor: ['#a855f7', '#22c55e', '#eab308'], borderColor: '#050505' }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } } }
             });
         }
 
@@ -453,15 +405,10 @@
             onSnapshot(q, (snapshot) => {
                 playersRows.innerHTML = "";
                 let mCount = 0, aCount = 0, cCount = 0;
-                if(snapshot.empty) {
-                    playersRows.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #666; padding: 30px;">Aucun joueur.</td></tr>`;
-                }
+                if(snapshot.empty) { playersRows.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #666; padding: 30px;">Aucun joueur.</td></tr>`; }
                 snapshot.forEach((docSnap) => {
                     const player = docSnap.data();
-                    if (player.team === "main") mCount++;
-                    else if (player.team === "academy") aCount++;
-                    else if (player.team === "cdf") cCount++;
-
+                    if (player.team === "main") mCount++; else if (player.team === "academy") aCount++; else if (player.team === "cdf") cCount++;
                     const imgSrc = (player.image && player.image !== "#") ? player.image : "logo.png";
                     let dernierPR = player.prHistory && player.prHistory.length > 0 ? Number(player.prHistory[player.prHistory.length - 1].value).toLocaleString('fr-FR') : "Aucun";
                     let badgeClass = player.team === "academy" ? "academy" : (player.team === "cdf" ? "cdf" : "main");
@@ -474,14 +421,12 @@
                         <td><button class="action-btn" onclick="window.location.href='roster.html'">Modifier</button></td>`;
                     playersRows.appendChild(tr);
                 });
-                countMain.textContent = mCount;
-                countAcademy.textContent = aCount;
-                countCdf.textContent = cCount;
+                countMain.textContent = mCount; countAcademy.textContent = aCount; countCdf.textContent = cCount;
             });
         }
 
         /* ─────────────────────────────────────────────────────────────
-           LOGIQUE DE RECHERCHE ET DE SÉCURISATION DU MODULE ESPACE JOUEUR
+           LOGIQUE RECTIFIÉE DE RECHERCHE ET MISE À JOUR SYNCHRONISÉE
            ───────────────────────────────────────────────────────────── */
         function setupPlayerEditing() {
             btnSearchPlayer.onclick = async () => {
@@ -497,13 +442,13 @@
                 }
 
                 try {
-                    // Recherche du joueur possédant ce champ e-mail précis dans Firestore
+                    // Recherche par l'e-mail dans la collection "players"
                     const q = query(collection(db, "players"), where("email", "==", emailRecherche));
                     const snapshot = await getDocs(q);
 
                     if (!snapshot.empty) {
                         const targetDoc = snapshot.docs[0];
-                        activeTargetUid = targetDoc.id; // Son UID réel issu de l'authentification
+                        activeTargetUid = targetDoc.id; // Récupère le véritable UID de connexion du joueur
                         activeTargetEmail = emailRecherche;
 
                         const data = targetDoc.data();
@@ -512,21 +457,21 @@
                         document.getElementById('player-role-input').value = data.role || "";
                         document.getElementById('player-rank-input').value = data.rank || "";
                         document.getElementById('player-date-input').value = data.joinDate || "";
+                        document.getElementById('player-doc-input').value = data.documentUrl || "";
                         document.getElementById('player-msg-input').value = data.staffMessage || "";
 
                         playerEditFormContainer.classList.remove('hidden');
                     } else {
-                        searchError.textContent = "Aucun joueur n'a encore été trouvé avec cet e-mail. Demandez au joueur de se connecter au moins une fois à son 'Espace Joueur' pour lier automatiquement son profil.";
+                        searchError.textContent = "Aucun joueur trouvé avec cet e-mail. Demandez au joueur de se connecter au moins une fois à son 'Espace Joueur' pour initialiser sa fiche.";
                         searchError.classList.remove('hidden');
                     }
                 } catch (err) {
                     console.error(err);
-                    searchError.textContent = "Erreur lors de l'accès à la base de données Firestore.";
+                    searchError.textContent = "Erreur de chargement Firestore.";
                     searchError.classList.remove('hidden');
                 }
             };
 
-            // Événement d'enregistrement du formulaire
             dashboardPlayerModifyForm.onsubmit = async () => {
                 saveSuccess.classList.add('hidden');
                 if(!activeTargetUid) return;
@@ -538,17 +483,19 @@
                     role: document.getElementById('player-role-input').value.trim(),
                     rank: document.getElementById('player-rank-input').value.trim(),
                     joinDate: document.getElementById('player-date-input').value.trim(),
+                    documentUrl: document.getElementById('player-doc-input').value.trim(),
                     staffMessage: document.getElementById('player-msg-input').value.trim()
                 };
 
                 try {
+                    // ÉCRITURE CRITIQUE : Écrit exactement sur l'identifiant (UID) lu par espace-joueur.html
                     const docPlayerRef = doc(db, "players", activeTargetUid);
                     await setDoc(docPlayerRef, dataMiseAJour, { merge: true });
                     
                     saveSuccess.classList.remove('hidden');
                 } catch (error) {
                     console.error(error);
-                    alert("Une erreur est survenue lors de l'enregistrement de la fiche joueur.");
+                    alert("Erreur lors de la sauvegarde.");
                 }
             };
         }

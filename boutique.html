@@ -15,56 +15,27 @@
         .shop-header h1 { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; color: #fff; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
         .shop-header p { color: #aaa; font-family: 'Inter', sans-serif; }
 
-        /* Grille des produits */
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
-        .product-card { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; overflow: hidden; transition: all 0.3s ease; display: flex; flex-direction: column; position: relative; }
+        /* Alignement centré pour le produit unique */
+        .products-grid { display: flex; justify-content: center; gap: 30px; }
+        .product-card { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; overflow: hidden; transition: all 0.3s ease; display: flex; flex-direction: column; position: relative; width: 100%; max-width: 340px; }
         .product-card:hover { transform: translateY(-5px); border-color: #a855f7; box-shadow: 0 0 20px rgba(168, 85, 247, 0.15); }
         
-        .product-img-box { width: 100%; height: 280px; background: #0a0a0a; display: flex; align-items: center; justify-content: center; overflow: hidden; border-bottom: 1px solid #2a2a2a; }
+        .product-img-box { width: 100%; height: 300px; background: #0a0a0a; display: flex; align-items: center; justify-content: center; overflow: hidden; border-bottom: 1px solid #2a2a2a; }
         .product-img { width: 90%; height: 90%; object-fit: contain; transition: transform 0.3s ease; }
         .product-card:hover .product-img { transform: scale(1.05); }
 
-        .product-info { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .product-title { font-family: 'Orbitron', sans-serif; color: #fff; font-size: 1.2rem; margin: 0 0 8px 0; }
-        .product-desc { color: #777; font-size: 0.85rem; font-family: 'Inter', sans-serif; line-height: 1.4; margin-bottom: 15px; }
+        .product-info { padding: 25px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .product-title { font-family: 'Orbitron', sans-serif; color: #fff; font-size: 1.3rem; margin: 0 0 8px 0; }
+        .product-desc { color: #777; font-size: 0.85rem; font-family: 'Inter', sans-serif; line-height: 1.5; margin-bottom: 20px; }
         
         .product-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
-        .product-price { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 1.3rem; font-weight: bold; }
+        .product-price { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 1.4rem; font-weight: bold; }
         
-        .add-to-cart-btn { background: transparent; border: 1px solid #a855f7; color: #a855f7; padding: 10px 16px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: all 0.2s ease; }
+        .add-to-cart-btn { background: transparent; border: 1px solid #a855f7; color: #a855f7; padding: 10px 20px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: all 0.2s ease; }
         .add-to-cart-btn:hover { background: #a855f7; color: #fff; box-shadow: 0 0 10px rgba(168, 85, 247, 0.4); }
 
-        /* Badge "Nouveau" ou "Promo" */
-        .product-badge { position: absolute; top: 15px; left: 15px; background: #22c55e; color: #fff; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: bold; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
-
-        /* ── ZONE FLOTTANTE DU PANIER ── */
-        .cart-toggle-btn { position: fixed; bottom: 30px; right: 30px; background: #a855f7; color: white; border: none; width: 60px; height: 60px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 0 20px rgba(168, 85, 247, 0.5); z-index: 999; transition: transform 0.2s; }
-        .cart-toggle-btn:hover { transform: scale(1.1); }
-        .cart-count { position: absolute; top: -2px; right: -2px; background: #ff4444; color: white; font-size: 0.75rem; font-family: 'Orbitron', sans-serif; font-weight: bold; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #a855f7; }
-
-        /* Sidebar du panier */
-        .cart-sidebar { position: fixed; top: 0; right: -400px; width: 380px; height: 100vh; background: #141414; border-left: 2px solid #a855f7; z-index: 10000; box-shadow: -10px 0 30px rgba(0,0,0,0.5); transition: right 0.3s ease; display: flex; flex-direction: column; box-sizing: border-box; }
-        .cart-sidebar.active { right: 0; }
-        
-        .cart-header { padding: 25px; border-bottom: 1px solid #2a2a2a; display: flex; justify-content: space-between; align-items: center; }
-        .cart-header h2 { font-family: 'Orbitron', sans-serif; color: #fff; margin: 0; font-size: 1.3rem; }
-        .cart-close { font-size: 1.8rem; color: #777; cursor: pointer; transition: color 0.2s; }
-        .cart-close:hover { color: #ff4444; }
-
-        .cart-items-list { flex-grow: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .cart-item { display: flex; justify-content: space-between; align-items: center; background: #0a0a0a; padding: 12px; border-radius: 8px; border: 1px solid #2a2a2a; }
-        .cart-item-info h4 { font-family: 'Orbitron', sans-serif; color: #fff; margin: 0 0 4px 0; font-size: 0.95rem; }
-        .cart-item-info p { color: #a855f7; margin: 0; font-size: 0.85rem; font-family: 'Inter', sans-serif; font-weight: bold; }
-        .remove-item-btn { background: none; border: none; color: #ff4444; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
-
-        .cart-footer { padding: 25px; border-top: 1px solid #2a2a2a; background: #0a0a0a; }
-        .cart-total-box { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-family: 'Orbitron', sans-serif; }
-        .cart-total-box span { color: #aaa; }
-        .cart-total-price { color: #fff; font-size: 1.4rem; font-weight: bold; }
-        
-        .checkout-btn { background: #22c55e; color: white; border: none; width: 100%; padding: 14px; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: 'Orbitron', sans-serif; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; transition: background 0.2s, box-shadow 0.2s; }
-        .checkout-btn:hover { background: #16a34a; box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); }
-        .checkout-btn:disabled { background: #333; color: #666; cursor: not-allowed; box-shadow: none; }
+        /* Badge "Nouveau" */
+        .product-badge { position: absolute; top: 15px; left: 15px; background: #22c55e; color: #fff; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: bold; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; z-index: 2; }
     </style>
 </head>
 <body>
@@ -109,127 +80,12 @@
                 </div>
             </div>
 
-            <div class="product-card">
-                <div class="product-img-box">
-                    <img src="hoodie.png" alt="Hoodie ABYSZ" class="product-img" onerror="this.src='logo.png'">
-                </div>
-                <div class="product-info">
-                    <div>
-                        <h3 class="product-title">Cyber Hoodie</h3>
-                        <p class="product-desc">Sweat à capuche ultra confortable avec logo réfléchissant au dos. Parfait pour les longues sessions de grind hivernales.</p>
-                    </div>
-                    <div class="product-footer">
-                        <span class="product-price">59.99 €</span>
-                        <button class="add-to-cart-btn" onclick="ajouterAuPanier('Cyber Hoodie', 59.99)">Ajouter</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <div class="product-img-box">
-                    <img src="tapis.png" alt="Tapis de souris ABYSZ" class="product-img" onerror="this.src='logo.png'">
-                </div>
-                <div class="product-info">
-                    <div>
-                        <h3 class="product-title">Tapis XXL Abyss</h3>
-                        <p class="product-desc">Surface optimisée pour une glisse parfaite et une précision chirurgicale sur Fortnite. Base en caoutchouc antidérapante.</p>
-                    </div>
-                    <div class="product-footer">
-                        <span class="product-price">29.99 €</span>
-                        <button class="add-to-cart-btn" onclick="ajouterAuPanier('Tapis XXL Abyss', 29.99)">Ajouter</button>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </section>
-
-    <button class="cart-toggle-btn" id="cart-toggle">
-        🛒 <span class="cart-count" id="cart-count">0</span>
-    </button>
-
-    <div class="cart-sidebar" id="cart-sidebar">
-        <div class="cart-header">
-            <h2>Votre Panier</h2>
-            <span class="cart-close" id="cart-close">&times;</span>
-        </div>
-        
-        <div class="cart-items-list" id="cart-items-container">
-            </div>
-
-        <div class="cart-footer">
-            <div class="cart-total-box">
-                <span>Total :</span>
-                <span class="cart-total-price" id="cart-total-price">0.00 €</span>
-            </div>
-            <button class="checkout-btn" id="checkout-btn" disabled onclick="validerCommande()">Acheter sur Breakday</button>
-        </div>
-    </div>
 
     <footer>
         <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
     </footer>
 
-    <script>
-        let panier = [];
-
-        const sidebar = document.getElementById('cart-sidebar');
-        document.getElementById('cart-toggle').onclick = () => sidebar.classList.add('active');
-        document.getElementById('cart-close').onclick = () => sidebar.classList.remove('active');
-
-        function ajouterAuPanier(nom, prix) {
-            panier.push({ nom, prix });
-            majPanier();
-            
-            if(panier.length === 1) {
-                sidebar.classList.add('active');
-            }
-        }
-
-        function retirerDuPanier(index) {
-            panier.splice(index, 1);
-            majPanier();
-        }
-
-        function majPanier() {
-            const countElement = document.getElementById('cart-count');
-            const listContainer = document.getElementById('cart-items-container');
-            const totalPriceElement = document.getElementById('cart-total-price');
-            const checkoutBtn = document.getElementById('checkout-btn');
-
-            countElement.textContent = panier.length;
-            listContainer.innerHTML = "";
-
-            if (panier.length === 0) {
-                listContainer.innerHTML = `<p style="color:#555; text-align:center; font-family:'Inter',sans-serif; margin-top:40px; font-style:italic;">Votre panier est vide.</p>`;
-                totalPriceElement.textContent = "0.00 €";
-                checkoutBtn.disabled = true;
-                return;
-            }
-
-            let total = 0;
-            panier.forEach((item, index) => {
-                total += item.prix;
-                const div = document.createElement('div');
-                div.className = 'cart-item';
-                div.innerHTML = `
-                    <div class="cart-item-info">
-                        <h4>${item.nom}</h4>
-                        <p>${item.prix.toFixed(2)} €</p>
-                    </div>
-                    <button class="remove-item-btn" onclick="retirerDuPanier(${index})">&times;</button>
-                `;
-                listContainer.appendChild(div);
-            });
-
-            totalPriceElement.textContent = total.toFixed(2) + " €";
-            checkoutBtn.disabled = false;
-        }
-
-        // Fonction de redirection vers Breakday
-        function validerCommande() {
-            window.open('https://breakday.fr', '_blank');
-        }
-    </script>
 </body>
 </html>

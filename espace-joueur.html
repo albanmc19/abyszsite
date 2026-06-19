@@ -8,35 +8,63 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #0a0a0a; color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
+        body { 
+            background: #0a0a0a; 
+            color: white; 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; 
+            padding: 0;
+            background-image: radial-gradient(circle at 50% -20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%);
+            background-attachment: fixed;
+        }
         .container { max-width: 800px; margin: 60px auto; padding: 0 20px; text-align: center; }
-        .card { background: #141414; border: 2px solid #a855f7; border-radius: 20px; padding: 40px 30px; box-shadow: 0 0 30px rgba(168, 85, 247, 0.15); margin-bottom: 30px; }
-        h2, h3, h4 { font-family: 'Orbitron', sans-serif; color: white; }
+        .card { 
+            background: #141414; 
+            border: 2px solid #a855f7; 
+            border-radius: 20px; 
+            padding: 40px 30px; 
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.1), 0 0 40px rgba(0, 0, 0, 0.5); 
+            margin-bottom: 30px; 
+            backdrop-filter: blur(10px);
+        }
+        h2, h3, h4 { font-family: 'Orbitron', sans-serif; color: white; letter-spacing: 0.5px; }
         .input-group { margin-bottom: 20px; text-align: left; }
-        .input-group label { display: block; margin-bottom: 8px; color: #a855f7; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; }
-        .input-group input { width: 100%; padding: 12px; background: #0a0a0a; border: 1px solid #2a2a2a; color: white; border-radius: 8px; box-sizing: border-box; }
-        .btn { background: #a855f7; color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: bold; font-family: 'Orbitron', sans-serif; cursor: pointer; text-transform: uppercase; font-size: 0.85rem; text-decoration: none; display: block; text-align: center; }
-        .btn:hover { background: #b975ff; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
-        .btn-download { background: #22c55e; margin-top: 15px; }
-        .btn-download:hover { background: #2ed96f; box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); }
-        .hidden { display: none !important; }
-        .error-message { color: #ff4444; margin-top: 15px; font-size: 0.9rem; }
-        .profile-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #2a2a2a; padding-bottom: 20px; margin-bottom: 20px; }
-        .logout-link { color: #ff4444; background: none; border: none; cursor: pointer; font-family: 'Orbitron', sans-serif; font-weight: bold; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
-        .stat-box { background: #1a1a1a; padding: 20px; border-radius: 12px; border-left: 4px solid #a855f7; text-align: left; }
-        .stat-box span { display: block; font-size: 0.8rem; color: #777; font-family: 'Orbitron', sans-serif; }
-        .stat-box strong { display: block; font-size: 1.2rem; color: white; margin-top: 5px; }
+        .input-group label { display: block; margin-bottom: 8px; color: #a855f7; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: 600; }
+        .input-group input { width: 100%; padding: 14px; background: #0a0a0a; border: 1px solid #2a2a2a; color: white; border-radius: 8px; box-sizing: border-box; font-family: 'Inter', sans-serif; transition: border-color 0.3s, box-shadow 0.3s; }
+        .input-group input:focus { border-color: #a855f7; outline: none; box-shadow: 0 0 10px rgba(168, 85, 247, 0.2); }
         
-        /* Zone URL brute ajoutée */
-        .url-display-box { background: #050505; border: 1px dashed #22c55e; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 0.8rem; color: #2ed96f; word-break: break-all; margin-bottom: 15px; display: block; text-align: center; }
+        .btn { background: #a855f7; color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: bold; font-family: 'Orbitron', sans-serif; cursor: pointer; text-transform: uppercase; font-size: 0.85rem; text-decoration: none; display: block; text-align: center; box-sizing: border-box; transition: transform 0.2s, background 0.2s, box-shadow 0.2s; }
+        .btn:hover { background: #b975ff; transform: translateY(-2px); box-shadow: 0 0 20px rgba(168, 85, 247, 0.5); }
+        
+        .btn-download { background: #22c55e; margin-top: 15px; }
+        .btn-download:hover { background: #2ed96f; box-shadow: 0 0 20px rgba(34, 197, 94, 0.5); }
+        .hidden { display: none !important; }
+        .error-message { color: #ff4444; margin-top: 15px; font-size: 0.9rem; font-weight: 600; }
+        
+        .profile-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #2a2a2a; padding-bottom: 25px; margin-bottom: 25px; }
+        .logout-link { color: #ff4444; background: none; border: 1px solid rgba(255, 68, 68, 0.3); padding: 8px 16px; border-radius: 20px; cursor: pointer; font-family: 'Orbitron', sans-serif; font-weight: bold; font-size: 0.8rem; transition: all 0.2s; }
+        .logout-link:hover { background: #ff4444; color: white; box-shadow: 0 0 15px rgba(255, 68, 68, 0.4); }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
+        .stat-box { background: #1a1a1a; padding: 20px; border-radius: 12px; border-left: 4px solid #a855f7; text-align: left; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: transform 0.2s; }
+        .stat-box:hover { transform: translateX(3px); }
+        .stat-box span { display: block; font-size: 0.75rem; color: #777; font-family: 'Orbitron', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-box strong { display: block; font-size: 1.25rem; color: white; margin-top: 6px; font-family: 'Inter', sans-serif; }
+        
+        .url-display-box { background: #050505; border: 1px dashed #22c55e; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 0.8rem; color: #2ed96f; word-break: break-all; margin-bottom: 15px; display: block; text-align: center; }
+        
+        /* Liste multi-fichiers */
+        .file-list-item { display: flex; justify-content: space-between; align-items: center; background: #0a140e; border: 1px solid rgba(34, 197, 94, 0.2); padding: 12px 18px; border-radius: 8px; margin-bottom: 10px; gap: 10px; }
+        .file-info-text { font-weight: 600; color: #fff; font-size: 0.95rem; }
+        .btn-mini-download { background: #22c55e; color: white; text-decoration: none; padding: 6px 14px; border-radius: 6px; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: bold; transition: background 0.2s; }
+        .btn-mini-download:hover { background: #2ed96f; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <div id="auth-zone" class="card">
-            <h2>Connexion Joueur</h2>
+            <h2 style="font-size: 1.8rem; margin-bottom: 30px;">Connexion Joueur</h2>
             <form id="player-login-form" onsubmit="return false;">
                 <div class="input-group">
                     <label for="player-email">Adresse E-mail</label>
@@ -54,13 +82,13 @@
         <div id="profile-zone" class="card hidden">
             <div class="profile-header">
                 <div>
-                    <h2 id="player-pseudo" style="margin: 0; text-align: left;">Chargement...</h2>
-                    <p id="player-role" style="margin: 5px 0 0 0; color: #a855f7; text-align: left; font-family: 'Orbitron', sans-serif; font-size: 0.9rem;">Roster</p>
+                    <h2 id="player-pseudo" style="margin: 0; text-align: left; font-size: 1.6rem;">Chargement...</h2>
+                    <p id="player-role" style="margin: 6px 0 0 0; color: #a855f7; text-align: left; font-family: 'Orbitron', sans-serif; font-size: 0.9rem; font-weight: bold;">Roster</p>
                 </div>
                 <button id="player-logout-btn" class="logout-link">Déconnexion</button>
             </div>
 
-            <h3>Tes Informations & Statistiques</h3>
+            <h3 style="text-align: left; font-size: 1.1rem; margin-top: 30px; color: #a855f7;">Tes Informations & Statistiques</h3>
             <div class="stats-grid">
                 <div class="stat-box">
                     <span>Rôle Équipe</span>
@@ -76,18 +104,21 @@
                 </div>
             </div>
             
-            <div id="document-zone" class="hidden" style="margin-top: 30px; background: #0c1a10; padding: 20px; border-radius: 12px; text-align: left; border: 1px solid #22c55e;">
-                <h4 style="margin: 0 0 5px 0; font-family: 'Orbitron', sans-serif; color: #22c55e;">📄 Document partagé par le Staff</h4>
-                <p style="margin: 0 0 15px 0; font-size: 0.85rem; color: #aaa;">Une stratégie ou un document d'équipe vient d'être mis à ta disposition.</p>
+            <div id="document-zone" class="hidden" style="margin-top: 35px; background: linear-gradient(135deg, #0c1a10 0%, #07100a 100%); padding: 25px; border-radius: 16px; text-align: left; border: 1px solid #22c55e; box-shadow: 0 4px 20px rgba(34, 197, 94, 0.05);">
+                <h4 style="margin: 0 0 6px 0; font-family: 'Orbitron', sans-serif; color: #22c55e; font-size: 1.1rem;">📄 Documents partagés par le Staff</h4>
+                <p style="margin: 0 0 20px 0; font-size: 0.85rem; color: #aaa;">Des fichiers stratégiques ou administratifs ont été mis à ta disposition.</p>
                 
-                <div id="player-url-text" class="url-display-box">Chargement du lien...</div>
+                <div id="multi-files-container"></div>
 
-                <a id="player-download-link" href="#" target="_blank" class="btn btn-download">Consulter / Télécharger le fichier</a>
+                <div id="single-file-fallback" class="hidden">
+                    <div id="player-url-text" class="url-display-box">Chargement du lien...</div>
+                    <a id="player-download-link" href="#" target="_blank" class="btn btn-download">Consulter / Télécharger le fichier</a>
+                </div>
             </div>
 
-            <div style="margin-top: 30px; background: #0a0a0a; padding: 20px; border-radius: 12px; text-align: left; border: 1px dashed #a855f7;">
-                <h4 style="margin: 0 0 10px 0; font-family: 'Orbitron', sans-serif; color: #a855f7;">Message du Staff</h4>
-                <p id="player-staff-message" style="margin: 0; font-size: 0.95rem; color: #ccc;">Aucun message pour le moment.</p>
+            <div style="margin-top: 30px; background: #111; padding: 25px; border-radius: 16px; text-align: left; border: 1px dashed rgba(168, 85, 247, 0.4);">
+                <h4 style="margin: 0 0 12px 0; font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 1.05rem;">Message du Staff</h4>
+                <p id="player-staff-message" style="margin: 0; font-size: 0.95rem; color: #ccc; line-height: 1.5; white-space: pre-wrap;">Aucun message pour le moment.</p>
             </div>
         </div>
     </div>
@@ -119,6 +150,8 @@
         const documentZone = document.getElementById('document-zone');
         const playerDownloadLink = document.getElementById('player-download-link');
         const playerUrlText = document.getElementById('player-url-text');
+        const multiFilesContainer = document.getElementById('multi-files-container');
+        const singleFileFallback = document.getElementById('single-file-fallback');
 
         let unsubscribeProfile = null;
 
@@ -147,10 +180,36 @@
                         document.getElementById('stat-date').textContent = data.joinDate || "-";
                         document.getElementById('player-staff-message').textContent = data.staffMessage || "Bienvenue.";
                         
-                        // Traitement dynamique du lien ou fichier reçu
-                        if (data.documentUrl && data.documentUrl.trim() !== "") {
+                        let hasFiles = false;
+                        multiFilesContainer.innerHTML = "";
+
+                        // Gestion de la liste moderne de documents (multi-fichiers) envoyé par votre panel
+                        if (data.documents && Array.isArray(data.documents) && data.documents.length > 0) {
+                            hasFiles = true;
+                            singleFileFallback.classList.add('hidden');
+                            
+                            // Classer du plus récent au plus ancien
+                            const sortedDocs = [...data.documents].sort((a, b) => (b.uploadedAt || 0) - (a.uploadedAt || 0));
+                            
+                            sortedDocs.forEach(file => {
+                                const item = document.createElement('div');
+                                item.className = 'file-list-item';
+                                item.innerHTML = `
+                                    <span class="file-info-text">📂 ${file.name || 'Document'}</span>
+                                    <a href="${file.url}" target="_blank" class="btn-mini-download">Ouvrir</a>
+                                `;
+                                multiFilesContainer.appendChild(item);
+                            });
+                        } 
+                        // Gestion de l'ancienne variable unique par sécurité
+                        else if (data.documentUrl && data.documentUrl.trim() !== "") {
+                            hasFiles = true;
+                            singleFileFallback.classList.remove('hidden');
                             playerDownloadLink.href = data.documentUrl;
-                            playerUrlText.textContent = data.documentUrl; // Affiche l'adresse brute du fichier
+                            playerUrlText.textContent = data.documentUrl;
+                        }
+
+                        if (hasFiles) {
                             documentZone.classList.remove('hidden');
                         } else {
                             documentZone.classList.add('hidden');

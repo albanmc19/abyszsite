@@ -15,11 +15,9 @@
         h1, h2 { font-family: 'Orbitron', sans-serif; color: white; }
         .hidden { display: none !important; }
         
-        /* Style temporaire pour la boutique en attente */
+        /* Style de votre boutique officielle */
         .shop-waiting { background: #141414; border: 2px dashed #a855f7; border-radius: 20px; padding: 60px 30px; box-shadow: 0 0 30px rgba(168, 85, 247, 0.15); margin-top: 4px; }
         .shop-waiting p { color: #ccc; font-size: 1.1rem; line-height: 1.6; }
-        
-        .nav-dashboard-link a { color: #22c55e !important; font-weight: bold; text-decoration: none; }
     </style>
 </head>
 <body>
@@ -35,13 +33,12 @@
             <li><a href="boutique.html">Boutique</a></li>
             <li><a href="index.html#annonces">Actualités</a></li>
             <li><a href="index.html#rejoindre-commu">Rejoindre</a></li>
-            <li id="nav-espace-joueur" class="hidden"><a href="espace-joueur.html" style="color: #a855f7; font-weight: bold;">Mon Espace</a></li>
-            <li id="nav-dashboard" class="nav-dashboard-link hidden"><a href="dashboard.html">📊 Dashboard</a></li>
+            <li id="nav-dynamic-item" class="hidden"><a id="nav-dynamic-link" href="#" style="font-weight: bold;">Espace</a></li>
         </ul>
     </nav>
 
     <div class="container">
-        <h1>Boutique Abysz Esports</h1>
+        <h1 style="display: none;">Boutique Abysz Esports</h1>
         
         <div class="shop-waiting">
             <h2>🛒 Ouverture Prochaine</h2>
@@ -71,26 +68,34 @@
         const auth = getAuth(app);
 
         const ADMIN_EMAIL = "abyszofficial@gmail.com";
-        const navEspaceJoueur = document.getElementById('nav-espace-joueur');
-        const navDashboard = document.getElementById('nav-dashboard');
+        const navDynamicItem = document.getElementById('nav-dynamic-item');
+        const navDynamicLink = document.getElementById('nav-dynamic-link');
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 const userEmail = user.email.toLowerCase().trim();
+                
+                // On affiche le bouton dans la navigation puisqu'un utilisateur est connecté
+                if (navDynamicItem) navDynamicItem.classList.remove('hidden');
 
                 if (userEmail === ADMIN_EMAIL) {
-                    // C'est le compte admin principal : On affiche le Dashboard admin
-                    navEspaceJoueur.classList.add('hidden');
-                    navDashboard.classList.remove('hidden');
+                    // Si connecté avec l'adresse admin
+                    if (navDynamicLink) {
+                        navDynamicLink.textContent = "Accéder au dashboard";
+                        navDynamicLink.href = "dashboard.html";
+                        navDynamicLink.style.color = "#22c55e"; // Couleur Verte
+                    }
                 } else {
-                    // C'est un joueur connecté : On affiche uniquement "Mon Espace" et on cache le panel admin
-                    navEspaceJoueur.classList.remove('hidden');
-                    navDashboard.classList.add('hidden');
+                    // Si connecté avec n'importe quel autre compte (joueur)
+                    if (navDynamicLink) {
+                        navDynamicLink.textContent = "Mon Espace";
+                        navDynamicLink.href = "espace-joueur.html";
+                        navDynamicLink.style.color = "#a855f7"; // Couleur Violette
+                    }
                 }
             } else {
-                // Déconnecté : Tout est masqué
-                navEspaceJoueur.classList.add('hidden');
-                navDashboard.classList.add('hidden');
+                // Si personne n'est connecté, on cache complètement l'élément
+                if (navDynamicItem) navDynamicItem.classList.add('hidden');
             }
         });
     </script>

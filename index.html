@@ -84,7 +84,7 @@
             .announcement-meta { padding-right: 0; }
         }
     </style>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com https://calm-breeze-1656.albanmc29.workers.dev; img-src 'self' data: blob: https:; frame-ancestors 'none';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com https://www.gstatic.com https://calm-breeze-1656.albanmc29.workers.dev; img-src 'self' data: blob: https:; frame-ancestors 'none';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -476,62 +476,17 @@
                 await fetch("/send-discord", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ title, content, category, priority, imageUrl, btnText, btnLink })
+                    body: JSON.stringify({
+                        message: `📢 **Nouvelle annonce sur Abysz !**\n\n**${title}**\n${content}`
+                    })
                 });
- 
+                
                 announcementForm.reset();
                 modal.classList.remove('active');
             } catch (error) {
                 alert("Erreur lors de la publication : " + error.message);
             }
         });
- 
-        // Gestion dépôt de fichier joueur
-        const uploadFileForm = document.getElementById('upload-file-form');
-        const uploadStatus = document.getElementById('upload-status');
-        
-        if (uploadFileForm) {
-            uploadFileForm.addEventListener('submit', async () => {
-                if (!isUserAdmin) return alert("Action non autorisée.");
-                
-                const playerId = document.getElementById('select-player').value;
-                const docName = document.getElementById('file-name').value.trim();
-                const fileInput = document.getElementById('file-input');
-                const file = fileInput.files[0];
-                
-                if (!playerId || !docName || !file) {
-                    uploadStatus.style.color = '#ff4444';
-                    uploadStatus.textContent = "Veuillez remplir tous les champs.";
-                    return;
-                }
-                
-                uploadStatus.style.color = '#666';
-                uploadStatus.textContent = "Téléversement du fichier...";
-                
-                try {
-                    const fileRef = ref(storage, `player_files/${playerId}/${Date.now()}_${file.name}`);
-                    const snapshot = await uploadBytes(fileRef, file);
-                    const downloadUrl = await getDownloadURL(snapshot.ref);
-                    
-                    const playerDocRef = doc(db, "players", playerId);
-                    await updateDoc(playerDocRef, {
-                        files: arrayUnion({
-                            name: docName,
-                            url: downloadUrl,
-                            uploadedAt: Date.now()
-                        })
-                    });
-                    
-                    uploadStatus.style.color = '#22c55e';
-                    uploadStatus.textContent = "Fichier envoyé avec succès au joueur !";
-                    uploadFileForm.reset();
-                } catch (err) {
-                    console.error(err);
-                    uploadStatus.style.color = '#ff4444';
-                    uploadStatus.textContent = "Erreur : " + err.message;
-                }
-            });
-        }
     </script>
 </body>
 </html>

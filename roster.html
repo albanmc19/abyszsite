@@ -92,6 +92,10 @@
         .pr-table tr:last-child td { border-bottom: none; }
         .pr-table td.pr-val-col { color: #b975ff; font-weight: 700; font-family: 'Orbitron', sans-serif; }
     </style>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; connect-src https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com; img-src 'self' data: blob:; frame-ancestors 'none';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
 </head>
 <body>
     <nav>
@@ -372,10 +376,10 @@
             let socialHtml = "";
             if (!isNewPlayer && (player.twitter || player.twitch || player.youtube || player.tiktok)) {
                 socialHtml = `<div class="social-links-container">`;
-                if (player.twitter) socialHtml += `<a href="${player.twitter}" target="_blank" class="social-icon-link" title="Twitter / X">🐦</a>`;
-                if (player.twitch) socialHtml += `<a href="${player.twitch}" target="_blank" class="social-icon-link" title="Twitch">🎮</a>`;
-                if (player.youtube) socialHtml += `<a href="${player.youtube}" target="_blank" class="social-icon-link" title="YouTube">📺</a>`;
-                if (player.tiktok) socialHtml += `<a href="${player.tiktok}" target="_blank" class="social-icon-link" title="TikTok">🎵</a>`;
+                if (player.twitter) socialHtml += `<a href="${player.twitter}" target="_blank" rel="noopener noreferrer" class="social-icon-link" title="Twitter / X">🐦</a>`;
+                if (player.twitch) socialHtml += `<a href="${player.twitch}" target="_blank" rel="noopener noreferrer" class="social-icon-link" title="Twitch">🎮</a>`;
+                if (player.youtube) socialHtml += `<a href="${player.youtube}" target="_blank" rel="noopener noreferrer" class="social-icon-link" title="YouTube">📺</a>`;
+                if (player.tiktok) socialHtml += `<a href="${player.tiktok}" target="_blank" rel="noopener noreferrer" class="social-icon-link" title="TikTok">🎵</a>`;
                 socialHtml += `</div>`;
             }
 

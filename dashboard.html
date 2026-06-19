@@ -62,6 +62,10 @@
             .btn-admin { width: 100%; }
         }
     </style>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; connect-src https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com; img-src 'self' data: blob:; frame-ancestors 'none';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
 </head>
 <body>
 
@@ -306,8 +310,32 @@
                     else if (player.team === "academy") aCount++; 
                     else if (player.team === "cdf") cCount++;
                     
+                    // ✅ Sécurisé : textContent échappe automatiquement le HTML (pas de XSS)
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `<td>${player.pseudo || 'Inconnu'}</td><td>${player.team || '-'}</td><td>${player.role || '-'}</td><td>${player.earnings || '0'}</td><td><button class="action-btn" onclick="document.getElementById('search-player-email').value='${player.email || ''}'; document.getElementById('btn-search-player').click();">Gérer</button></td>`;
+                    const cols = [
+                        player.pseudo || 'Inconnu',
+                        player.team || '-',
+                        player.role || '-',
+                        player.earnings || '0'
+                    ];
+                    cols.forEach(val => {
+                        const td = document.createElement('td');
+                        td.textContent = val;
+                        tr.appendChild(td);
+                    });
+                    const tdAction = document.createElement('td');
+                    const btn = document.createElement('button');
+                    btn.className = 'action-btn';
+                    btn.textContent = 'Gérer';
+                    const emailSafe = player.email || '';
+                    btn.addEventListener('click', () => {
+                        const emailInput = document.getElementById('search-player-email');
+                        if (emailInput) { emailInput.value = emailSafe; }
+                        const searchBtn = document.getElementById('btn-search-player');
+                        if (searchBtn) searchBtn.click();
+                    });
+                    tdAction.appendChild(btn);
+                    tr.appendChild(tdAction);
                     playersRows.appendChild(tr);
                 });
                 if(countMain) countMain.textContent = mCount; 

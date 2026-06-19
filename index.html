@@ -6,78 +6,35 @@
     <title>Abysz Esports</title>
     
     <link rel="icon" type="image/png" href="logo.png">
-
+ 
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* ── DYNAMISME & FLUIDITÉ GÉNÉRALE ── */
-        html {
-            scroll-behavior: smooth;
-            scrollbar-gutter: stable;
-        }
-
-        .reveal {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-            will-change: transform, opacity;
-        }
-
-        .reveal-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        nav ul li a {
-            position: relative;
-            transition: color 0.3s ease;
-        }
-        nav ul li a::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -5px;
-            left: 0;
-            background-color: #a855f7;
-            transition: width 0.3s ease;
-        }
-        nav ul li a:hover {
-            color: #a855f7;
-        }
-        nav ul li a:hover::after {
-            width: 100%;
-        }
-
-        .btn {
-            transition: transform 0.2s ease, box-shadow 0.3s ease;
-        }
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
-        }
-
-        /* ── ZONE DES ANNONCES & MODAL ── */
+        html { scroll-behavior: smooth; scrollbar-gutter: stable; }
+        .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); will-change: transform, opacity; }
+        .reveal-visible { opacity: 1; transform: translateY(0); }
+        nav ul li a { position: relative; transition: color 0.3s ease; }
+        nav ul li a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: #a855f7; transition: width 0.3s ease; }
+        nav ul li a:hover { color: #a855f7; }
+        nav ul li a:hover::after { width: 100%; }
+        .btn { transition: transform 0.2s ease, box-shadow 0.3s ease; }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 0 20px rgba(168, 85, 247, 0.6); }
         .announcements-container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
         .announcements-header { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 30px; }
-        
         .title-area { display: flex; align-items: center; gap: 12px; }
         .add-announcement-btn { background: #a855f7; border: none; color: white; width: 34px; height: 34px; border-radius: 50%; font-size: 1.3rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; box-shadow: 0 0 10px rgba(168, 85, 247, 0.3); flex-shrink: 0; }
         .add-announcement-btn:hover { background: #b975ff; transform: scale(1.05); box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
-
         .admin-gate-btn { background: transparent; border: 1px solid #a855f7; color: #a855f7; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-family: 'Orbitron', sans-serif; transition: all 0.3s ease; font-size: 0.9rem; white-space: nowrap; }
         .admin-gate-btn:hover { background: #a855f7; color: white; box-shadow: 0 0 15px #a855f7; }
         .admin-gate-btn.logged-in { border-color: #ff4444; color: #ff4444; }
         .admin-gate-btn.logged-in:hover { background: #ff4444; color: white; box-shadow: 0 0 15px #ff4444; }
-
         .announcements-feed { display: flex; flex-direction: column; gap: 25px; text-align: left; }
         .announcement-card { background: #1a1a1a; border-left: 4px solid #a855f7; padding: 25px; border-radius: 0 16px 16px 0; position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 14px; transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .announcement-card:hover { transform: translateX(5px); box-shadow: 0 6px 25px rgba(168, 85, 247, 0.15); }
         .announcement-card.priority-urgent { border-left-color: #ff4444; background: linear-gradient(90deg, rgba(255,68,68,0.03) 0%, #1a1a1a 100%); }
         .announcement-card.priority-urgent:hover { box-shadow: 0 6px 25px rgba(255, 68, 68, 0.15); }
-        
         .announcement-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-right: 100px; }
         .badge { font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: bold; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
         .badge-general { background: #a855f7; color: white; }
@@ -85,21 +42,15 @@
         .badge-recrutement { background: #10b981; color: white; }
         .badge-evenement { background: #f59e0b; color: white; }
         .badge-urgent { background: #ff4444; color: white; animation: pulse 1.5s infinite; }
-        
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-
         .announcement-card h3 { font-family: 'Orbitron', sans-serif; color: #ffffff; margin: 0; font-size: 1.3rem; line-height: 1.4; word-break: break-word; }
         .announcement-card p { color: #ccc; font-size: 0.95rem; line-height: 1.6; margin: 0; white-space: pre-wrap; word-break: break-word; }
-        
         .announcement-img { max-width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; border: 1px solid #2a2a2a; margin-top: 4px; width: 100%; }
         .announcement-action-btn { background: #a855f7; color: white; text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: bold; padding: 10px 20px; border-radius: 6px; align-self: flex-start; transition: all 0.2s ease; margin-top: 4px; text-align: center; }
         .announcement-action-btn:hover { background: #b975ff; box-shadow: 0 0 10px rgba(168, 85, 247, 0.4); }
-
         .announcement-date { font-size: 0.8rem; color: #777; margin-top: 4px; }
-        
         .delete-btn { position: absolute; top: 20px; right: 20px; background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: background 0.2s; z-index: 10; }
         .delete-btn:hover { background: #cc3333; }
-        
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 15px; opacity: 0; transition: opacity 0.3s ease; }
         .modal-overlay.active { display: flex; opacity: 1; }
         .modal-content { background: #141414; border: 2px solid #a855f7; border-radius: 20px; max-width: 550px; width: 100%; padding: 30px 25px; position: relative; box-shadow: 0 0 30px rgba(168, 85, 247, 0.25); box-sizing: border-box; max-height: 90vh; overflow-y: auto; transform: scale(0.9); transition: transform 0.3s ease; }
@@ -107,11 +58,9 @@
         .modal-content::-webkit-scrollbar { width: 6px; }
         .modal-content::-webkit-scrollbar-track { background: #0a0a0a; }
         .modal-content::-webkit-scrollbar-thumb { background: #a855f7; border-radius: 10px; }
-
         .modal-close { position: absolute; top: 12px; right: 18px; font-size: 1.8rem; color: #777; cursor: pointer; transition: color 0.2s; z-index: 15; }
         .modal-close:hover { color: #ff4444; }
         .modal-content h3 { font-family: 'Orbitron', sans-serif; color: #ffffff; margin-top: 5px; margin-bottom: 25px; font-size: 1.4rem; text-align: center; letter-spacing: 1px; }
-        
         .input-row { display: flex; gap: 15px; }
         .input-row .input-group { flex: 1; }
         .input-group { margin-bottom: 18px; text-align: left; }
@@ -119,16 +68,13 @@
         .input-group input, .input-group textarea, .input-group select { width: 100%; padding: 12px 14px; background: #0a0a0a; border: 1px solid #2a2a2a; color: white; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.95rem; transition: border-color 0.3s, box-shadow 0.3s; box-sizing: border-box; }
         .input-group input:focus, .input-group textarea:focus, .input-group select:focus { border-color: #a855f7; outline: none; box-shadow: 0 0 10px rgba(168, 85, 247, 0.2); }
         .input-group select { appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='white'><path d='M0 0l5 6 5-6z'/></svg>"); background-repeat: no-repeat; background-position: right 16px center; }
-
         .form-btn { background: #a855f7; color: white; border: none; width: 100%; padding: 14px; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: 'Orbitron', sans-serif; font-size: 0.95rem; transition: background 0.2s, box-shadow 0.2s; margin-top: 5px; box-sizing: border-box; }
         .form-btn:hover { background: #b975ff; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
         .hidden { display: none !important; }
-        
         .admin-header-actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 25px; background: #0a0a0a; padding: 12px 15px; border-radius: 8px; border: 1px solid #2a2a2a; }
         .error-message { color: #ff4444; font-size: 0.85rem; margin-top: 15px; text-align: center; font-family: 'Inter', sans-serif; line-height: 1.4; }
         .loading-text { color: #666; font-style: italic; text-align: center; }
         .nav-dashboard-link a { color: #22c55e !important; font-weight: bold; text-decoration: none; }
-
         @media (max-width: 768px) {
             .announcements-header { flex-direction: column; align-items: flex-start; gap: 20px; }
             .admin-gate-btn { width: 100%; text-align: center; padding: 12px; }
@@ -138,13 +84,13 @@
             .announcement-meta { padding-right: 0; }
         }
     </style>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; connect-src https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com; img-src 'self' data: blob:; frame-ancestors 'none';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; connect-src https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com https://calm-breeze-1656.albanmc29.workers.dev; img-src 'self' data: blob: https:; frame-ancestors 'none';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta name="referrer" content="strict-origin-when-cross-origin">
 </head>
 <body>
-
+ 
     <nav>
         <div class="logo">
             <img src="logo.png" alt="Logo ABYSZ">
@@ -156,7 +102,7 @@
                 <a href="https://www.twitch.tv/abysz_o" target="_blank" rel="noopener noreferrer" aria-label="Twitch ABYSZ"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg></a>
             </div>
         </div>
-        <ul>
+        <ul id="nav-links-list">
             <li><a href="index.html">Accueil</a></li>
             <li><a href="roster.html">Roster</a></li>
             <li><a href="boutique.html">Boutique</a></li>
@@ -166,13 +112,13 @@
             <li id="nav-dashboard" class="nav-dashboard-link hidden"><a href="dashboard.html">📊 Dashboard</a></li>
         </ul>
     </nav>
-
+ 
     <section id="accueil" class="hero" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url('./baniere.png');">
         <h1>ABYSZ</h1>
         <p class="slogan">The beginning of every legend</p>
         <a href="roster.html" class="btn">Découvrir le roster</a>
     </section>
-
+ 
     <section id="annonces" class="announcements-container reveal">
         <div class="announcements-header">
             <div class="title-area">
@@ -185,17 +131,17 @@
             <p class="loading-text">Connexion à la base de données Abysz...</p>
         </div>
     </section>
-
+ 
     <section id="rejoindre-commu" class="reveal" style="padding: 60px 20px; text-align: center;">
         <h2>REJOINDRE LA COMMUNAUTÉ</h2>
         <p class="subtitle">Entre dans l'univers Abysz, échange avec les joueurs et suis nos événements en direct !</p>
         <a href="https://discord.gg/KeSPkvjBVy" target="_blank" rel="noopener noreferrer" class="btn" id="discord-btn">Rejoindre le Discord</a>
     </section>
-
+ 
     <footer>
         <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
     </footer>
-
+ 
     <div id="admin-modal" class="modal-overlay">
         <div class="modal-content">
             <span class="modal-close" id="close-modal-btn">&times;</span>
@@ -215,7 +161,7 @@
                 </form>
                 <p id="login-error" class="error-message hidden"></p>
             </div>
-
+ 
             <div id="admin-panel-step" class="hidden">
                 <h3>Publier une annonce</h3>
                 <div class="admin-header-actions">
@@ -227,7 +173,6 @@
                         <label for="annonce-title">Titre de l'actualité</label>
                         <input type="text" id="annonce-title" placeholder="Ex: Match ce soir à 21h !" required>
                     </div>
-                    
                     <div class="input-row">
                         <div class="input-group">
                             <label for="annonce-category">Catégorie / Tag</label>
@@ -246,12 +191,10 @@
                             </select>
                         </div>
                     </div>
-
                     <div class="input-group">
-                        <label for="annonce-img-url">URL d'une Image d'illustration (Optionnel)</label>
+                        <label for="annonce-img-url">URL d'une Image (Optionnel)</label>
                         <input type="url" id="annonce-img-url" placeholder="https://lien-vers-mon-image.png">
                     </div>
-
                     <div class="input-row">
                         <div class="input-group">
                             <label for="annonce-btn-text">Texte du Bouton (Optionnel)</label>
@@ -262,15 +205,13 @@
                             <input type="url" id="annonce-btn-link" placeholder="https://twitch.tv/...">
                         </div>
                     </div>
-
                     <div class="input-group">
                         <label for="annonce-content">Message</label>
                         <textarea id="annonce-content" rows="4" placeholder="Écrivez le contenu de l'annonce..." required></textarea>
                     </div>
-                    
                     <button type="submit" class="form-btn" id="publish-btn">Publier l'annonce</button>
                 </form>
-
+ 
                 <div style="margin-top: 30px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
                     <h3>📁 Déposer un fichier pour un joueur</h3>
                     <form id="upload-file-form" onsubmit="return false;">
@@ -281,8 +222,8 @@
                             </select>
                         </div>
                         <div class="input-group">
-                            <label for="file-name">Nom du document (Ex: Livret d'accueil)</label>
-                            <input type="text" id="file-name" placeholder="Nom pour le joueur" required>
+                            <label for="file-name">Nom du document</label>
+                            <input type="text" id="file-name" placeholder="Ex: Livret d'accueil" required>
                         </div>
                         <div class="input-group">
                             <label for="file-input">Choisir le fichier</label>
@@ -295,13 +236,13 @@
             </div>
         </div>
     </div>
-
+ 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, getDoc, getDocs, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-
+ 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
             authDomain: "abysz-esports.firebaseapp.com",
@@ -311,14 +252,15 @@
             appId: "1:200968659347:web:3a13d1614d00ed29968866",
             measurementId: "G-HPQNQK5XL1"
         };
-
-        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1517648124058013858/hVWTp8nrsXYnV863rImBg7KPMUpneRmnHR5YhT1_rEVcZLgnnMeK4WXudkoBnEwZxI2S";
-
+ 
+        // ✅ SÉCURISÉ : le webhook passe par Cloudflare Workers, invisible dans le code source
+        const WORKER_URL = "https://calm-breeze-1656.albanmc29.workers.dev";
+ 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const storage = getStorage(app);
-
+ 
         const modal = document.getElementById('admin-modal');
         const adminGateBtn = document.getElementById('admin-gate-btn');
         const quickAddBtn = document.getElementById('quick-add-btn');
@@ -332,23 +274,20 @@
         const logoutBtn = document.getElementById('logout-btn');
         const feed = document.getElementById("announcements-feed");
         const navEspaceJoueur = document.getElementById('nav-espace-joueur');
-
+ 
         let currentUser = null;
-        let isUserAdmin = false; 
-
+        let isUserAdmin = false;
+ 
         const scrollObserver = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('reveal-visible');
-                }
+                if (entry.isIntersecting) entry.target.classList.add('reveal-visible');
             });
         }, { threshold: 0.15 });
-
         document.querySelectorAll('.reveal').forEach((el) => scrollObserver.observe(el));
-
+ 
         closeModalBtn.onclick = () => { modal.classList.remove('active'); };
-        window.onclick = (e) => { if (e.target === modal) { modal.classList.remove('active'); } };
-
+        window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
+ 
         function setupDeleteButtons() {
             document.querySelectorAll('.delete-btn').forEach(btn => {
                 btn.onclick = async (e) => {
@@ -364,9 +303,8 @@
                 };
             });
         }
-
+ 
         const q = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
-        
         onSnapshot(q, (snapshot) => {
             feed.innerHTML = "";
             if (snapshot.empty) {
@@ -375,39 +313,69 @@
             }
             snapshot.forEach((docSnap) => {
                 const ann = docSnap.data();
-                
                 let dateRaw = (ann.createdAt && typeof ann.createdAt.seconds === 'number') ? new Date(ann.createdAt.seconds * 1000) : (typeof ann.createdAt === 'number' ? new Date(ann.createdAt) : new Date());
                 const dateStr = dateRaw.toLocaleDateString('fr-FR') + " à " + dateRaw.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
-                
+ 
                 const card = document.createElement("div");
                 card.className = `announcement-card ${ann.priority === 'urgent' ? 'priority-urgent' : ''}`;
-                
+ 
                 let categoryLabels = { general: 'Général', match: 'Match / Tournoi', recrutement: 'Recrutement', evenement: 'Événement' };
                 let badgesHtml = `<span class="badge badge-${ann.category || 'general'}">${categoryLabels[ann.category || 'general']}</span>`;
-                if(ann.priority === 'urgent') {
-                    badgesHtml += `<span class="badge badge-urgent">🚨 Important</span>`;
+                if (ann.priority === 'urgent') badgesHtml += `<span class="badge badge-urgent">🚨 Important</span>`;
+ 
+                // ✅ Sécurisé : on construit le card via DOM pour les données dynamiques
+                const metaDiv = document.createElement('div');
+                metaDiv.className = 'announcement-meta';
+                metaDiv.innerHTML = badgesHtml;
+ 
+                const titleEl = document.createElement('h3');
+                titleEl.textContent = ann.title || 'Sans titre';
+ 
+                const contentEl = document.createElement('p');
+                contentEl.textContent = ann.content || '';
+ 
+                const dateEl = document.createElement('div');
+                dateEl.className = 'announcement-date';
+                dateEl.textContent = `Posté le ${dateStr}`;
+ 
+                card.appendChild(metaDiv);
+                card.appendChild(titleEl);
+ 
+                if (ann.imageUrl && /^https?:\/\//i.test(ann.imageUrl)) {
+                    const img = document.createElement('img');
+                    img.src = ann.imageUrl;
+                    img.className = 'announcement-img';
+                    img.alt = 'Illustration';
+                    card.appendChild(img);
                 }
-
-                let imgHtml = ann.imageUrl ? `<img src="${ann.imageUrl}" class="announcement-img" alt="Illustration">` : '';
-                let actionBtnHtml = (ann.btnText && ann.btnLink) ? `<a href="${ann.btnLink}" target="_blank" rel="noopener noreferrer" class="announcement-action-btn">${ann.btnText} →</a>` : '';
-                
-                const deleteButtonHtml = (currentUser && isUserAdmin) ? `<button class="delete-btn" data-id="${docSnap.id}">Supprimer</button>` : "";
-                
-                card.innerHTML = `
-                    <div class="announcement-meta">${badgesHtml}</div>
-                    <h3>${ann.title || 'Sans titre'}</h3>
-                    ${imgHtml}
-                    <p>${ann.content || ''}</p>
-                    ${actionBtnHtml}
-                    <div class="announcement-date">Posté le ${dateStr}</div>
-                    ${deleteButtonHtml}
-                `;
+ 
+                card.appendChild(contentEl);
+ 
+                if (ann.btnText && ann.btnLink && /^https?:\/\//i.test(ann.btnLink)) {
+                    const actionBtn = document.createElement('a');
+                    actionBtn.href = ann.btnLink;
+                    actionBtn.target = '_blank';
+                    actionBtn.rel = 'noopener noreferrer';
+                    actionBtn.className = 'announcement-action-btn';
+                    actionBtn.textContent = ann.btnText + ' →';
+                    card.appendChild(actionBtn);
+                }
+ 
+                card.appendChild(dateEl);
+ 
+                if (currentUser && isUserAdmin) {
+                    const delBtn = document.createElement('button');
+                    delBtn.className = 'delete-btn';
+                    delBtn.setAttribute('data-id', docSnap.id);
+                    delBtn.textContent = 'Supprimer';
+                    card.appendChild(delBtn);
+                }
+ 
                 feed.appendChild(card);
             });
-
             setupDeleteButtons();
         });
-
+ 
         async function loadPlayersDropdown() {
             const playerSelect = document.getElementById('select-player');
             if (!playerSelect) return;
@@ -418,7 +386,7 @@
                     const data = docSnap.data();
                     if (data.role !== 'admin') {
                         const option = document.createElement('option');
-                        option.value = docSnap.id; 
+                        option.value = docSnap.id;
                         option.textContent = data.name || data.email || docSnap.id;
                         playerSelect.appendChild(option);
                     }
@@ -427,15 +395,13 @@
                 console.error("Erreur chargement joueurs dropdown:", err);
             }
         }
-
+ 
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
             if (user) {
                 navEspaceJoueur.classList.remove('hidden');
-
                 const userDocRef = doc(db, "players", user.uid);
                 const userDocSnap = await getDoc(userDocRef);
-                
                 if (userDocSnap.exists() && userDocSnap.data().role === "admin") {
                     isUserAdmin = true;
                     loginStep.classList.add('hidden');
@@ -449,7 +415,7 @@
                 } else {
                     isUserAdmin = false;
                     loginStep.classList.add('hidden');
-                    panelStep.classList.add('hidden'); 
+                    panelStep.classList.add('hidden');
                     document.getElementById('nav-dashboard')?.classList.add('hidden');
                     quickAddBtn.classList.add('hidden');
                     adminGateBtn.innerHTML = "🚪 Déconnexion";
@@ -467,7 +433,7 @@
                 adminGateBtn.classList.remove("logged-in");
             }
         });
-
+ 
         loginForm.addEventListener('submit', async () => {
             loginError.classList.add('hidden');
             const email = document.getElementById('admin-email').value.trim();
@@ -480,60 +446,48 @@
                 loginError.classList.remove('hidden');
             }
         });
-
-        adminGateBtn.onclick = () => { 
+ 
+        adminGateBtn.onclick = () => {
             if (currentUser) {
-                if (!isUserAdmin) {
-                    signOut(auth);
-                } else {
-                    modal.classList.add('active');
-                }
+                if (!isUserAdmin) { signOut(auth); }
+                else { modal.classList.add('active'); }
             } else {
                 modal.classList.add('active');
             }
         };
-
+ 
         logoutBtn.onclick = () => { signOut(auth); modal.classList.remove('active'); };
         quickAddBtn.onclick = () => { if (currentUser && isUserAdmin) modal.classList.add('active'); };
-
+ 
         announcementForm.addEventListener('submit', async () => {
-            if (!isUserAdmin) return alert("Action non autorisée."); 
-            
-            const titleInput = document.getElementById("annonce-title");
-            const contentInput = document.getElementById("annonce-content");
-            const categoryInput = document.getElementById("annonce-category");
-            const priorityInput = document.getElementById("annonce-priority");
-            const imgInput = document.getElementById("annonce-img-url");
-            const btnTextInput = document.getElementById("annonce-btn-text");
-            const btnLinkInput = document.getElementById("annonce-btn-link");
-
-            const title = titleInput.value.trim();
-            const content = contentInput.value.trim();
-            const category = categoryInput.value;
-            const priority = priorityInput.value;
-            const imageUrl = imgInput.value.trim();
-            const btnText = btnTextInput.value.trim();
-            const btnLink = btnLinkInput.value.trim();
-
+            if (!isUserAdmin) return alert("Action non autorisée.");
+ 
+            const title = document.getElementById("annonce-title").value.trim();
+            const content = document.getElementById("annonce-content").value.trim();
+            const category = document.getElementById("annonce-category").value;
+            const priority = document.getElementById("annonce-priority").value;
+            const imageUrl = document.getElementById("annonce-img-url").value.trim();
+            const btnText = document.getElementById("annonce-btn-text").value.trim();
+            const btnLink = document.getElementById("annonce-btn-link").value.trim();
             const nowTimestamp = Date.now();
-
+ 
             try {
-                await addDoc(collection(db, "announcements"), { 
-                    title, content, category, priority, imageUrl, btnText, btnLink, createdAt: nowTimestamp 
+                await addDoc(collection(db, "announcements"), {
+                    title, content, category, priority, imageUrl, btnText, btnLink, createdAt: nowTimestamp
                 });
-                
-                if (DISCORD_WEBHOOK_URL) {
-                    try {
-                        await fetch(DISCORD_WEBHOOK_URL, {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                content: `📢 **Nouvelle annonce Abysz !**\n**${title}**\n\n${content}`
-                            })
-                        });
-                    } catch (err) { console.error("Webhook Discord erreur:", err); }
+ 
+                // ✅ SÉCURISÉ : on appelle notre Worker Cloudflare, pas le webhook directement
+                try {
+                    const res = await fetch(WORKER_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ message: `**${title}**\n\n${content}` })
+                    });
+                    if (!res.ok) console.warn("Worker Discord: réponse non-OK", res.status);
+                } catch (err) {
+                    console.error("Erreur appel Worker Discord:", err);
                 }
-
+ 
                 announcementForm.reset();
                 modal.classList.remove('active');
                 alert("Annonce publiée avec succès !");
@@ -541,7 +495,7 @@
                 alert("Erreur de publication : " + error.message);
             }
         });
-
+ 
         const uploadFileForm = document.getElementById('upload-file-form');
         if (uploadFileForm) {
             uploadFileForm.addEventListener('submit', async () => {
@@ -550,35 +504,24 @@
                 const fileNameInput = document.getElementById('file-name');
                 const fileInput = document.getElementById('file-input');
                 const status = document.getElementById('upload-status');
-
                 const playerId = playerSelect.value;
                 const customName = fileNameInput.value.trim();
                 const file = fileInput.files[0];
-
                 if (!playerId || !customName || !file) return alert("Veuillez remplir tous les champs.");
-
                 status.style.color = "#a855f7";
                 status.textContent = "Téléversement en cours...";
-
                 try {
                     const fileRef = ref(storage, `player_docs/${playerId}/${Date.now()}_${file.name}`);
                     const uploadSnap = await uploadBytes(fileRef, file);
                     const downloadUrl = await getDownloadURL(uploadSnap.ref);
-
                     const playerDocRef = doc(db, "players", playerId);
                     await updateDoc(playerDocRef, {
-                        documents: arrayUnion({
-                            name: customName,
-                            url: downloadUrl,
-                            uploadedAt: Date.now()
-                        })
+                        documents: arrayUnion({ name: customName, url: downloadUrl, uploadedAt: Date.now() })
                     });
-
                     status.style.color = "#22c55e";
                     status.textContent = "✅ Fichier envoyé avec succès au joueur !";
                     uploadFileForm.reset();
                 } catch (err) {
-                    console.error(err);
                     status.style.color = "#ff4444";
                     status.textContent = "❌ Erreur : " + err.message;
                 }

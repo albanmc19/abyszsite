@@ -3,184 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABYSZ | Boutique Officielle</title>
+    <title>Boutique - Abysz Esports</title>
+    <link rel="icon" type="image/png" href="logo.png">
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        .logo-link { display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; }
+        body { background: #0a0a0a; color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
+        .container { max-width: 1200px; margin: 60px auto; padding: 0 20px; text-align: center; }
+        h1, h2 { font-family: 'Orbitron', sans-serif; color: white; }
+        .hidden { display: none !important; }
         
-        /* ── CONFIGURATION DU MENU ET BOUTONS COHÉRENTS AVEC ROSTER ── */
-        .admin-gate-btn { 
-            background: transparent; 
-            border: 1px solid #a855f7; 
-            color: #a855f7; 
-            padding: 6px 14px; 
-            border-radius: 20px; 
-            cursor: pointer; 
-            font-family: 'Orbitron', sans-serif; 
-            font-size: 0.85rem;
-            transition: all 0.3s ease; 
-            margin-left: 15px;
-        }
-        .admin-gate-btn:hover { background:#a855f7; color:white; box-shadow:0 0 15px #a855f7; }
+        /* Style temporaire pour la boutique en attente */
+        .shop-waiting { background: #141414; border: 2px dashed #a855f7; border-radius: 20px; padding: 60px 30px; box-shadow: 0 0 30px rgba(168, 85, 247, 0.15); margin-top: 4px; }
+        .shop-waiting p { color: #ccc; font-size: 1.1rem; line-height: 1.6; }
         
-        .nav-dashboard-link a { color: #22c55e !important; font-weight: bold; }
-        .hidden { display:none !important; }
-
-        /* ── DESIGN DE LA PAGE BOUTIQUE MAILLOT ── */
-        .shop-container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
-        
-        .shop-header { margin-bottom: 40px; }
-        .shop-header h2 { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; background: linear-gradient(to right, #fff, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .shop-header p { font-family: 'Inter', sans-serif; color: #aaa; font-size: 1.1rem; }
-
-        /* Bloc Présentation Produit Unique */
-        .product-highlight {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 50px;
-            background: #141414;
-            border: 1px solid #222;
-            border-radius: 24px;
-            padding: 40px;
-            align-items: center;
-            text-align: left;
-            box-shadow: 0 0 40px rgba(168, 85, 247, 0.05);
-            margin-bottom: 50px;
-        }
-
-        .product-image-side {
-            background: #0a0a0a;
-            border: 1px solid rgba(168, 85, 247, 0.1);
-            border-radius: 16px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 400px;
-        }
-        .product-image-side img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6));
-        }
-
-        .product-info-side {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        .badge-new {
-            align-self: flex-start;
-            background: rgba(168, 85, 247, 0.15);
-            color: #a855f7;
-            border: 1px solid rgba(168, 85, 247, 0.3);
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.75rem;
-            font-weight: 700;
-            padding: 4px 12px;
-            border-radius: 20px;
-            margin-bottom: 15px;
-            letter-spacing: 1px;
-        }
-        .product-title { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; color: #fff; margin: 0 0 10px 0; }
-        .product-subtitle { font-family: 'Inter', sans-serif; color: #666; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 2px; margin-bottom: 20px; font-weight: 600; }
-        .product-description { font-family: 'Inter', sans-serif; color: #aaa; font-size: 1rem; line-height: 1.6; margin: 0 0 30px 0; }
-        
-        .price-tag { font-family: 'Orbitron', sans-serif; font-size: 2rem; color: #fff; font-weight: 700; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
-        .price-tag span { font-size: 1rem; color: #555; text-decoration: line-through; font-weight: 400; }
-
-        .order-btn {
-            background: #a855f7;
-            color: #fff;
-            text-decoration: none;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.05rem;
-            font-weight: 700;
-            text-align: center;
-            padding: 16px 32px;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
-            display: inline-block;
-        }
-        .order-btn:hover { background: #b975ff; box-shadow: 0 0 30px #a855f7; transform: translateY(-3px); }
-
-        .back-home-btn {
-            display: inline-block;
-            background: transparent;
-            border: 1px solid #2a2a2a;
-            color: #aaa;
-            text-decoration: none;
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: 0.95rem;
-            padding: 12px 28px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            margin-bottom: 60px;
-        }
-        .back-home-btn:hover { border-color: #fff; color: #fff; }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .product-highlight { grid-template-columns: 1fr; gap: 30px; padding: 20px; }
-            .product-image-side { height: 300px; }
-            .product-title { font-size: 1.8rem; }
-        }
+        .nav-dashboard-link a { color: #22c55e !important; font-weight: bold; text-decoration: none; }
     </style>
 </head>
 <body>
+
     <nav>
         <div class="logo">
-            <a href="index.html" class="logo-link">
-                <img src="logo.png" alt="Logo ABYSZ">
-                ABYSZ
-            </a>
+            <img src="logo.png" alt="Logo ABYSZ">
+            ABYSZ
         </div>
         <ul>
             <li><a href="index.html">Accueil</a></li>
             <li><a href="roster.html">Roster</a></li>
             <li><a href="boutique.html">Boutique</a></li>
+            <li><a href="index.html#annonces">Actualités</a></li>
+            <li><a href="index.html#rejoindre-commu">Rejoindre</a></li>
+            <li id="nav-espace-joueur" class="hidden"><a href="espace-joueur.html" style="color: #a855f7; font-weight: bold;">Mon Espace</a></li>
             <li id="nav-dashboard" class="nav-dashboard-link hidden"><a href="dashboard.html">📊 Dashboard</a></li>
-            <li><button class="admin-gate-btn" id="admin-gate-btn">🔑 Connexion</button></li>
         </ul>
     </nav>
 
-    <section style="padding-top: 160px; text-align: center;">
-        <div class="shop-container">
-            
-            <div class="shop-header">
-                <h2>Boutique Officielle</h2>
-                <p>Représentez l'équipe avec nos équipements certifiés</p>
-            </div>
-
-            <div class="product-highlight">
-                
-                <div class="product-image-side">
-                    <img src="maillot.png" alt="Maillot Officiel ABYSZ 2026">
-                </div>
-
-                <div class="product-info-side">
-                    <div class="badge-new">DISPONIBLE</div>
-                    <h3 class="product-title">Maillot Officiel 2026</h3>
-                    <div class="product-subtitle">Collection Edition 1</div>
-                    <p class="product-description">
-                        Arborez fièrement les couleurs d'ABYSZ Esports avec le maillot officiel de la saison 2026. Conçu avec un tissu respirant de haute qualité, il est identique à celui porté par nos joueurs pros lors des compétitions.
-                    </p>
-                    
-                    <div class="price-tag">31,99 €</div>
-
-                    <a href="https://breakday.shop/products/maillot-abysz-e-sport?_pos=1&_sid=054205dee&_ss=r" target="_blank" class="order-btn">Commander sur Breakday →</a>
-                </div>
-
-            </div>
-
-            <a href="index.html" class="back-home-btn">← Retour à l'accueil</a>
-
+    <div class="container">
+        <h1>Boutique Abysz Esports</h1>
+        
+        <div class="shop-waiting">
+            <h2>🛒 Ouverture Prochaine</h2>
+            <p>La boutique officielle d'Abysz Esports est actuellement en cours de préparation.<br>
+            Maillots, vêtements et accessoires exclusifs arrivent très bientôt pour vous permettre de porter haut nos couleurs !</p>
         </div>
-    </section>
+    </div>
 
     <footer>
         <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
@@ -189,7 +57,6 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -197,45 +64,35 @@
             projectId: "abysz-esports",
             storageBucket: "abysz-esports.firebasestorage.app",
             messagingSenderId: "200968659347",
-            appId: "1:200968659347:web:3a13d1614d00ed29968866",
-            measurementId: "G-HPQNQK5XL1"
+            appId: "1:200968659347:web:3a13d1614d00ed29968866"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
 
+        const ADMIN_EMAIL = "abyszofficial@gmail.com";
+        const navEspaceJoueur = document.getElementById('nav-espace-joueur');
         const navDashboard = document.getElementById('nav-dashboard');
-        const adminGateBtn = document.getElementById('admin-gate-btn');
 
-        // Écoute de la connexion pour le menu
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                adminGateBtn.textContent = "⚙️ Panel Admin";
-                navDashboard.classList.remove('hidden');
+                const userEmail = user.email.toLowerCase().trim();
+
+                if (userEmail === ADMIN_EMAIL) {
+                    // C'est le compte admin principal : On affiche le Dashboard admin
+                    navEspaceJoueur.classList.add('hidden');
+                    navDashboard.classList.remove('hidden');
+                } else {
+                    // C'est un joueur connecté : On affiche uniquement "Mon Espace" et on cache le panel admin
+                    navEspaceJoueur.classList.remove('hidden');
+                    navDashboard.classList.add('hidden');
+                }
             } else {
-                adminGateBtn.textContent = "🔑 Connexion";
+                // Déconnecté : Tout est masqué
+                navEspaceJoueur.classList.add('hidden');
                 navDashboard.classList.add('hidden');
             }
         });
-
-        adminGateBtn.onclick = () => {
-            window.location.href = "roster.html";
-        };
-
-        // Tracker de statistiques
-        async function trackBoutiquePage() {
-            const support = window.innerWidth < 768 ? "Mobile" : "Ordinateur";
-            try {
-                await addDoc(collection(db, "analytics"), {
-                    date: new Date().toISOString().split('T')[0],
-                    page: "boutique.html",
-                    device: support,
-                    timestamp: new Date()
-                });
-            } catch (e) { console.error("Analytics Error:", e); }
-        }
-        trackBoutiquePage();
     </script>
 </body>
 </html>

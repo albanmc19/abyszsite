@@ -63,6 +63,10 @@
         .btn-mini-download { background: #22c55e; color: white; text-decoration: none; padding: 6px 14px; border-radius: 6px; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: bold; transition: background 0.2s; }
         .btn-mini-download:hover { background: #2ed96f; }
     </style>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; connect-src https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com; img-src 'self' data: blob:; frame-ancestors 'none';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
 </head>
 <body>
 
@@ -122,7 +126,7 @@
 
                 <div id="single-file-fallback" class="hidden">
                     <div id="player-url-text" class="url-display-box">Chargement du lien...</div>
-                    <a id="player-download-link" href="#" target="_blank" class="btn btn-download">Consulter / Télécharger le fichier</a>
+                    <a id="player-download-link" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-download">Consulter / Télécharger le fichier</a>
                 </div>
             </div>
 
@@ -202,18 +206,32 @@
                             sortedDocs.forEach(file => {
                                 const item = document.createElement('div');
                                 item.className = 'file-list-item';
-                                item.innerHTML = `
-                                    <span class="file-info-text">📂 ${file.name || 'Document'}</span>
-                                    <a href="${file.url}" target="_blank" class="btn-mini-download">Ouvrir</a>
-                                `;
+                                // ✅ Sécurisé : textContent pour le nom, setAttribute pour l'URL
+                                const span = document.createElement('span');
+                                span.className = 'file-info-text';
+                                span.textContent = '📂 ' + (file.name || 'Document');
+                                const a = document.createElement('a');
+                                // ✅ Validation de l'URL : on accepte uniquement http/https
+                                const safeUrl = (file.url && /^https?:\/\//i.test(file.url)) ? file.url : '#';
+                                a.href = safeUrl;
+                                a.target = '_blank';
+                                a.rel = 'noopener noreferrer';
+                                a.className = 'btn-mini-download';
+                                a.textContent = 'Ouvrir';
+                                item.appendChild(span);
+                                item.appendChild(a);
                                 multiFilesContainer.appendChild(item);
                             });
                         } 
                         else if (data.documentUrl && data.documentUrl.trim() !== "") {
                             hasFiles = true;
                             singleFileFallback.classList.remove('hidden');
-                            playerDownloadLink.href = data.documentUrl;
-                            playerUrlText.textContent = data.documentUrl;
+                            // ✅ Validation : uniquement les URLs http/https acceptées
+                            const rawUrl = data.documentUrl.trim();
+                            const safeDocUrl = /^https?:\/\//i.test(rawUrl) ? rawUrl : '#';
+                            playerDownloadLink.href = safeDocUrl;
+                            playerDownloadLink.rel = 'noopener noreferrer';
+                            playerUrlText.textContent = rawUrl;
                         }
 
                         if (hasFiles) {

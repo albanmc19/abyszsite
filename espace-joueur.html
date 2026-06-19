@@ -42,6 +42,11 @@
         .error-message { color: #ff4444; margin-top: 15px; font-size: 0.9rem; font-weight: 600; }
         
         .profile-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #2a2a2a; padding-bottom: 25px; margin-bottom: 25px; }
+        .header-actions { display: flex; gap: 10px; align-items: center; }
+        
+        .btn-home-link { color: #ccc; text-decoration: none; border: 1px solid rgba(255, 255, 255, 0.2); padding: 8px 16px; border-radius: 20px; font-family: 'Orbitron', sans-serif; font-weight: bold; font-size: 0.8rem; transition: all 0.2s; }
+        .btn-home-link:hover { background: #ffffff; color: #000; box-shadow: 0 0 15px rgba(255, 255, 255, 0.3); }
+
         .logout-link { color: #ff4444; background: none; border: 1px solid rgba(255, 68, 68, 0.3); padding: 8px 16px; border-radius: 20px; cursor: pointer; font-family: 'Orbitron', sans-serif; font-weight: bold; font-size: 0.8rem; transition: all 0.2s; }
         .logout-link:hover { background: #ff4444; color: white; box-shadow: 0 0 15px rgba(255, 68, 68, 0.4); }
         
@@ -53,7 +58,6 @@
         
         .url-display-box { background: #050505; border: 1px dashed #22c55e; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 0.8rem; color: #2ed96f; word-break: break-all; margin-bottom: 15px; display: block; text-align: center; }
         
-        /* Liste multi-fichiers */
         .file-list-item { display: flex; justify-content: space-between; align-items: center; background: #0a140e; border: 1px solid rgba(34, 197, 94, 0.2); padding: 12px 18px; border-radius: 8px; margin-bottom: 10px; gap: 10px; }
         .file-info-text { font-weight: 600; color: #fff; font-size: 0.95rem; }
         .btn-mini-download { background: #22c55e; color: white; text-decoration: none; padding: 6px 14px; border-radius: 6px; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: bold; transition: background 0.2s; }
@@ -64,7 +68,10 @@
 
     <div class="container">
         <div id="auth-zone" class="card">
-            <h2 style="font-size: 1.8rem; margin-bottom: 30px;">Connexion Joueur</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h2 style="font-size: 1.8rem; margin: 0;">Connexion Joueur</h2>
+                <a href="index.html" class="btn-home-link">← Retour au site</a>
+            </div>
             <form id="player-login-form" onsubmit="return false;">
                 <div class="input-group">
                     <label for="player-email">Adresse E-mail</label>
@@ -85,7 +92,10 @@
                     <h2 id="player-pseudo" style="margin: 0; text-align: left; font-size: 1.6rem;">Chargement...</h2>
                     <p id="player-role" style="margin: 6px 0 0 0; color: #a855f7; text-align: left; font-family: 'Orbitron', sans-serif; font-size: 0.9rem; font-weight: bold;">Roster</p>
                 </div>
-                <button id="player-logout-btn" class="logout-link">Déconnexion</button>
+                <div class="header-actions">
+                    <a href="index.html" class="btn-home-link">🏠 Accueil Site</a>
+                    <button id="player-logout-btn" class="logout-link">Déconnexion</button>
+                </div>
             </div>
 
             <h3 style="text-align: left; font-size: 1.1rem; margin-top: 30px; color: #a855f7;">Tes Informations & Statistiques</h3>
@@ -183,12 +193,10 @@
                         let hasFiles = false;
                         multiFilesContainer.innerHTML = "";
 
-                        // Gestion de la liste moderne de documents (multi-fichiers) envoyé par votre panel
                         if (data.documents && Array.isArray(data.documents) && data.documents.length > 0) {
                             hasFiles = true;
                             singleFileFallback.classList.add('hidden');
                             
-                            // Classer du plus récent au plus ancien
                             const sortedDocs = [...data.documents].sort((a, b) => (b.uploadedAt || 0) - (a.uploadedAt || 0));
                             
                             sortedDocs.forEach(file => {
@@ -201,7 +209,6 @@
                                 multiFilesContainer.appendChild(item);
                             });
                         } 
-                        // Gestion de l'ancienne variable unique par sécurité
                         else if (data.documentUrl && data.documentUrl.trim() !== "") {
                             hasFiles = true;
                             singleFileFallback.classList.remove('hidden');

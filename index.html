@@ -476,9 +476,7 @@
                 await fetch("/send-discord", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        message: `📢 **Nouvelle annonce : ${title}**\n\n${content}`
-                    })
+                    body: JSON.stringify({ title, content, category, priority, imageUrl, btnText, btnLink })
                 });
  
                 announcementForm.reset();
@@ -488,41 +486,49 @@
             }
         });
  
+        // Gestion dépôt de fichier joueur
         const uploadFileForm = document.getElementById('upload-file-form');
+        const uploadStatus = document.getElementById('upload-status');
+        
         if (uploadFileForm) {
             uploadFileForm.addEventListener('submit', async () => {
                 if (!isUserAdmin) return alert("Action non autorisée.");
+                
                 const playerId = document.getElementById('select-player').value;
                 const docName = document.getElementById('file-name').value.trim();
                 const fileInput = document.getElementById('file-input');
-                const status = document.getElementById('upload-status');
-                
-                if (!playerId || !docName || !fileInput.files[0]) return alert("Veuillez remplir tous les champs.");
                 const file = fileInput.files[0];
-                status.style.color = 'white';
-                status.textContent = "Téléversement du document en cours...";
+                
+                if (!playerId || !docName || !file) {
+                    uploadStatus.style.color = '#ff4444';
+                    uploadStatus.textContent = "Veuillez remplir tous les champs.";
+                    return;
+                }
+                
+                uploadStatus.style.color = '#666';
+                uploadStatus.textContent = "Téléversement du fichier...";
                 
                 try {
-                    const fileRef = ref(storage, `players_documents/${playerId}/${Date.now()}_${file.name}`);
-                    const uploadResult = await uploadBytes(fileRef, file);
-                    const fileUrl = await getDownloadURL(uploadResult.ref);
+                    const fileRef = ref(storage, `player_files/${playerId}/${Date.now()}_${file.name}`);
+                    const snapshot = await uploadBytes(fileRef, file);
+                    const downloadUrl = await getDownloadURL(snapshot.ref);
                     
                     const playerDocRef = doc(db, "players", playerId);
                     await updateDoc(playerDocRef, {
-                        documents: arrayUnion({
+                        files: arrayUnion({
                             name: docName,
-                            url: fileUrl,
+                            url: downloadUrl,
                             uploadedAt: Date.now()
                         })
                     });
                     
-                    status.style.color = '#22c55e';
-                    status.textContent = "Le document a bien été partagé avec le joueur !";
+                    uploadStatus.style.color = '#22c55e';
+                    uploadStatus.textContent = "Fichier envoyé avec succès au joueur !";
                     uploadFileForm.reset();
                 } catch (err) {
                     console.error(err);
-                    status.style.color = '#ff4444';
-                    status.textContent = "Erreur pendant l'envoi : " + err.message;
+                    uploadStatus.style.color = '#ff4444';
+                    uploadStatus.textContent = "Erreur : " + err.message;
                 }
             });
         }

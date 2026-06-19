@@ -1,0 +1,16 @@
+name: Notification Discord
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Envoyer au Webhook
+        run: |
+          curl -H "Content-Type: application/json" \
+          -X POST \
+          -d '{"content": "🚀 Une nouvelle mise à jour est disponible sur le site Abysz !"}' \
+          ${{ secrets.DISCORD_WEBHOOK }}

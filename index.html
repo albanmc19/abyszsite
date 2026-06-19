@@ -84,7 +84,7 @@
             .announcement-meta { padding-right: 0; }
         }
     </style>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; connect-src https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com https://calm-breeze-1656.albanmc29.workers.dev; img-src 'self' data: blob: https:; frame-ancestors 'none';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com https://calm-breeze-1656.albanmc29.workers.dev; img-src 'self' data: blob: https:; frame-ancestors 'none';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -253,9 +253,6 @@
             measurementId: "G-HPQNQK5XL1"
         };
  
-        // ✅ SÉCURISÉ : le webhook passe par Cloudflare Workers, invisible dans le code source
-        const WORKER_URL = "https://calm-breeze-1656.albanmc29.workers.dev";
- 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -323,7 +320,6 @@
                 let badgesHtml = `<span class="badge badge-${ann.category || 'general'}">${categoryLabels[ann.category || 'general']}</span>`;
                 if (ann.priority === 'urgent') badgesHtml += `<span class="badge badge-urgent">🚨 Important</span>`;
  
-                // ✅ Sécurisé : on construit le card via DOM pour les données dynamiques
                 const metaDiv = document.createElement('div');
                 metaDiv.className = 'announcement-meta';
                 metaDiv.innerHTML = badgesHtml;
@@ -476,23 +472,19 @@
                     title, content, category, priority, imageUrl, btnText, btnLink, createdAt: nowTimestamp
                 });
  
-                // ✅ SÉCURISÉ : on appelle notre Worker Cloudflare, pas le webhook directement
-                try {
-                    const res = await fetch(WORKER_URL, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ message: `**${title}**\n\n${content}` })
-                    });
-                    if (!res.ok) console.warn("Worker Discord: réponse non-OK", res.status);
-                } catch (err) {
-                    console.error("Erreur appel Worker Discord:", err);
-                }
+                // Envoi via le tunnel secret Cloudflare Functions
+                await fetch("/send-discord", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        message: `📢 **Nouvelle annonce : ${title}**\n\n${content}`
+                    })
+                });
  
                 announcementForm.reset();
                 modal.classList.remove('active');
-                alert("Annonce publiée avec succès !");
             } catch (error) {
-                alert("Erreur de publication : " + error.message);
+                alert("Erreur lors de la publication : " + error.message);
             }
         });
  
@@ -500,30 +492,37 @@
         if (uploadFileForm) {
             uploadFileForm.addEventListener('submit', async () => {
                 if (!isUserAdmin) return alert("Action non autorisée.");
-                const playerSelect = document.getElementById('select-player');
-                const fileNameInput = document.getElementById('file-name');
+                const playerId = document.getElementById('select-player').value;
+                const docName = document.getElementById('file-name').value.trim();
                 const fileInput = document.getElementById('file-input');
                 const status = document.getElementById('upload-status');
-                const playerId = playerSelect.value;
-                const customName = fileNameInput.value.trim();
+                
+                if (!playerId || !docName || !fileInput.files[0]) return alert("Veuillez remplir tous les champs.");
                 const file = fileInput.files[0];
-                if (!playerId || !customName || !file) return alert("Veuillez remplir tous les champs.");
-                status.style.color = "#a855f7";
-                status.textContent = "Téléversement en cours...";
+                status.style.color = 'white';
+                status.textContent = "Téléversement du document en cours...";
+                
                 try {
-                    const fileRef = ref(storage, `player_docs/${playerId}/${Date.now()}_${file.name}`);
-                    const uploadSnap = await uploadBytes(fileRef, file);
-                    const downloadUrl = await getDownloadURL(uploadSnap.ref);
+                    const fileRef = ref(storage, `players_documents/${playerId}/${Date.now()}_${file.name}`);
+                    const uploadResult = await uploadBytes(fileRef, file);
+                    const fileUrl = await getDownloadURL(uploadResult.ref);
+                    
                     const playerDocRef = doc(db, "players", playerId);
                     await updateDoc(playerDocRef, {
-                        documents: arrayUnion({ name: customName, url: downloadUrl, uploadedAt: Date.now() })
+                        documents: arrayUnion({
+                            name: docName,
+                            url: fileUrl,
+                            uploadedAt: Date.now()
+                        })
                     });
-                    status.style.color = "#22c55e";
-                    status.textContent = "✅ Fichier envoyé avec succès au joueur !";
+                    
+                    status.style.color = '#22c55e';
+                    status.textContent = "Le document a bien été partagé avec le joueur !";
                     uploadFileForm.reset();
                 } catch (err) {
-                    status.style.color = "#ff4444";
-                    status.textContent = "❌ Erreur : " + err.message;
+                    console.error(err);
+                    status.style.color = '#ff4444';
+                    status.textContent = "Erreur pendant l'envoi : " + err.message;
                 }
             });
         }

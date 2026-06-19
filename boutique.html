@@ -6,8 +6,6 @@
     <title>Boutique - Abysz Esports</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { background: #0a0a0a; color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
@@ -15,7 +13,7 @@
         h1, h2 { font-family: 'Orbitron', sans-serif; color: white; }
         .hidden { display: none !important; }
         
-        /* Style de votre boutique officielle */
+        /* Ton design de boutique d'origine */
         .shop-waiting { background: #141414; border: 2px dashed #a855f7; border-radius: 20px; padding: 60px 30px; box-shadow: 0 0 30px rgba(168, 85, 247, 0.15); margin-top: 4px; }
         .shop-waiting p { color: #ccc; font-size: 1.1rem; line-height: 1.6; }
     </style>
@@ -55,6 +53,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+        // Ta configuration Firebase d'origine
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
             authDomain: "abysz-esports.firebaseapp.com",
@@ -75,26 +74,26 @@
             if (user) {
                 const userEmail = user.email.toLowerCase().trim();
                 
-                // On affiche le bouton dans la navigation puisqu'un utilisateur est connecté
+                // On affiche l'élément puisqu'un compte est connecté
                 if (navDynamicItem) navDynamicItem.classList.remove('hidden');
 
                 if (userEmail === ADMIN_EMAIL) {
-                    // Si connecté avec l'adresse admin
+                    // Si l'admin se connecte : le bouton se transforme en accès Dashboard
                     if (navDynamicLink) {
                         navDynamicLink.textContent = "Accéder au dashboard";
                         navDynamicLink.href = "dashboard.html";
-                        navDynamicLink.style.color = "#22c55e"; // Couleur Verte
+                        navDynamicLink.style.color = "#22c55e"; // Vert Admin
                     }
                 } else {
-                    // Si connecté avec n'importe quel autre compte (joueur)
+                    // Si un joueur se connecte : le bouton se transforme en Mon Espace
                     if (navDynamicLink) {
                         navDynamicLink.textContent = "Mon Espace";
                         navDynamicLink.href = "espace-joueur.html";
-                        navDynamicLink.style.color = "#a855f7"; // Couleur Violette
+                        navDynamicLink.style.color = "#a855f7"; // Violet Joueur
                     }
                 }
             } else {
-                // Si personne n'est connecté, on cache complètement l'élément
+                // Si personne n'est connecté : le bouton disparaît complètement
                 if (navDynamicItem) navDynamicItem.classList.add('hidden');
             }
         });

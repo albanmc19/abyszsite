@@ -103,8 +103,8 @@
                         <p class="product-desc">Le maillot officiel porté par nos joueurs pros lors des FNCS et événements officiels. Tissu respirant haut de gamme.</p>
                     </div>
                     <div class="product-footer">
-                        <span class="product-price">49.99 €</span>
-                        <button class="add-to-cart-btn" onclick="ajouterAuPanier('Maillot Pro 2026', 49.99)">Ajouter</button>
+                        <span class="product-price">31.99 €</span>
+                        <button class="add-to-cart-btn" onclick="window.open('https://breakday.shop/products/maillot-abysz-e-sport', '_blank')">Acheter</button>
                     </div>
                 </div>
             </div>
@@ -162,7 +162,7 @@
                 <span>Total :</span>
                 <span class="cart-total-price" id="cart-total-price">0.00 €</span>
             </div>
-            <button class="checkout-btn" id="checkout-btn" disabled onclick="validerCommande()">Commander via Discord</button>
+            <button class="checkout-btn" id="checkout-btn" disabled onclick="validerCommande()">Acheter sur Breakday</button>
         </div>
     </div>
 
@@ -171,9 +171,6 @@
     </footer>
 
     <script>
-        // Utilisation du même webhook Discord que sur la page d'accueil pour centraliser les logs de commande
-        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1516291585351090206/i4pbx0B2sPw1yAD63cBN56s37-GSyrrGxYUca34GSgwlsRLUoxQWqD6oZmEwjrr6oJif";
-        
         let panier = [];
 
         const sidebar = document.getElementById('cart-sidebar');
@@ -184,7 +181,6 @@
             panier.push({ nom, prix });
             majPanier();
             
-            // Petit effet visuel d'ouverture auto du panier au premier ajout
             if(panier.length === 1) {
                 sidebar.classList.add('active');
             }
@@ -230,51 +226,9 @@
             checkoutBtn.disabled = false;
         }
 
-        async function validerCommande() {
-            if (panier.length === 0) return;
-
-            const pseudoPrompt = prompt("Veuillez entrer votre pseudo Discord pour finaliser la simulation de commande :");
-            if (!pseudoPrompt) return;
-
-            let descriptionCommande = "";
-            let total = 0;
-            panier.forEach(item => {
-                descriptionCommande += `• **${item.nom}** (${item.prix.toFixed(2)} €)\n`;
-                total += item.prix;
-            });
-
-            const embedPayload = {
-                username: "ABYSZ Shop Bot",
-                embeds: [{
-                    title: "🛒 NOUVELLE SIMULATION DE COMMANDE",
-                    description: `L'utilisateur **${pseudoPrompt}** vient d'initier un panier sur le site.\n\n**Articles demandés :**\n${descriptionCommande}`,
-                    color: 11032055,
-                    fields: [
-                        { name: "Total du panier", value: `**${total.toFixed(2)} €**`, inline: true }
-                    ],
-                    footer: { text: "Fausse commande - Simulation boutique ABYSZ" }
-                }]
-            };
-
-            try {
-                const response = await fetch(DISCORD_WEBHOOK_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(embedPayload)
-                });
-
-                if (response.ok) {
-                    alert(`Merci ${pseudoPrompt} ! Ta demande de commande a été envoyée sur Discord. Notre staff va analyser le log.`);
-                    panier = [];
-                    majPanier();
-                    sidebar.classList.remove('active');
-                } else {
-                    alert("Erreur de liaison avec le serveur Discord.");
-                }
-            } catch (error) {
-                console.error(error);
-                alert("Une erreur réseau est survenue.");
-            }
+        // Fonction de redirection vers Breakday
+        function validerCommande() {
+            window.open('https://breakday.fr', '_blank');
         }
     </script>
 </body>

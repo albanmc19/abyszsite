@@ -87,10 +87,7 @@
             .announcement-meta { padding-right: 0; }
         }
     </style>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com https://www.gstatic.com https://calm-breeze-1656.albanmc29.workers.dev; img-src 'self' data: blob: https:; frame-ancestors 'none';">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com https://www.gstatic.com https://*.workers.dev; img-src 'self' data: blob: https:; referrer: strict-origin-when-cross-origin;">
 </head>
 <body>
  
@@ -285,7 +282,7 @@
  
         let currentUser = null;
         let isUserAdmin = false;
-        let announcementsData = {}; // Permet de stocker localement les données pour la modification rapide
+        let announcementsData = {};
  
         const scrollObserver = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
@@ -297,9 +294,7 @@
         closeModalBtn.onclick = () => { modal.classList.remove('active'); };
         window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
  
-        // Configuration des boutons Supprimer et Modifier
         function setupCardButtons() {
-            // Supprimer
             document.querySelectorAll('.delete-btn').forEach(btn => {
                 btn.onclick = async (e) => {
                     e.preventDefault();
@@ -314,7 +309,6 @@
                 };
             });
 
-            // Modifier
             document.querySelectorAll('.edit-btn').forEach(btn => {
                 btn.onclick = (e) => {
                     e.preventDefault();
@@ -322,7 +316,6 @@
                     const ann = announcementsData[docId];
                     if (!ann) return;
 
-                    // On remplit le formulaire avec les valeurs existantes
                     document.getElementById("annonce-id").value = docId;
                     document.getElementById("annonce-title").value = ann.title || "";
                     document.getElementById("annonce-content").value = ann.content || "";
@@ -341,14 +334,14 @@
         const q = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
         onSnapshot(q, (snapshot) => {
             feed.innerHTML = "";
-            announcementsData = {}; // Reset
+            announcementsData = {};
             if (snapshot.empty) {
                 feed.innerHTML = '<p class="loading-text">Aucune annonce publiée pour le moment.</p>';
                 return;
             }
             snapshot.forEach((docSnap) => {
                 const ann = docSnap.data();
-                announcementsData[docSnap.id] = ann; // Sauvegarde locale
+                announcementsData[docSnap.id] = ann;
 
                 let dateRaw = (ann.createdAt && typeof ann.createdAt.seconds === 'number') ? new Date(ann.createdAt.seconds * 1000) : (typeof ann.createdAt === 'number' ? new Date(ann.createdAt) : new Date());
                 const dateStr = dateRaw.toLocaleDateString('fr-FR') + " à " + dateRaw.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
@@ -399,7 +392,6 @@
  
                 card.appendChild(dateEl);
  
-                // Interface Admin : Actions d'édition et suppression
                 if (currentUser && isUserAdmin) {
                     const actionsDiv = document.createElement('div');
                     actionsDiv.className = 'card-actions';
@@ -499,7 +491,6 @@
             if (currentUser) {
                 if (!isUserAdmin) { signOut(auth); }
                 else { 
-                    // Reset du titre en mode création par défaut
                     document.getElementById("annonce-id").value = "";
                     document.getElementById("panel-form-title").textContent = "Publier une annonce";
                     announcementForm.reset();
@@ -539,16 +530,14 @@
  
             try {
                 if (annonceId) {
-                    // MODE MODIFICATION : On met à jour le document existant
                     await updateDoc(doc(db, "announcements", annonceId), payload);
                 } else {
-                    // MODE CRÉATION : On ajoute un nouveau document
                     payload.createdAt = Date.now();
                     await addDoc(collection(db, "announcements"), payload);
                 }
  
-                // Envoi sécurisé vers le Worker Cloudflare pour Discord si la case est cochée
                 if (shouldSendDiscord) {
+                    // L'adresse de ton worker reste inchangée, elle passera grâce au correctif CSP (*.workers.dev)
                     await fetch("https://calm-breeze-1656.albanmc29.workers.dev/send-discord", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },

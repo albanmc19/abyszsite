@@ -35,7 +35,7 @@
         .announcement-card:hover { transform: translateX(5px); box-shadow: 0 6px 25px rgba(168, 85, 247, 0.15); }
         .announcement-card.priority-urgent { border-left-color: #ff4444; background: linear-gradient(90deg, rgba(255,68,68,0.03) 0%, #1a1a1a 100%); }
         .announcement-card.priority-urgent:hover { box-shadow: 0 6px 25px rgba(255, 68, 68, 0.15); }
-        .announcement-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-right: 100px; }
+        .announcement-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-right: 180px; }
         .badge { font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: bold; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
         .badge-general { background: #a855f7; color: white; }
         .badge-match { background: #3b82f6; color: white; }
@@ -49,7 +49,10 @@
         .announcement-action-btn { background: #a855f7; color: white; text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: bold; padding: 10px 20px; border-radius: 6px; align-self: flex-start; transition: all 0.2s ease; margin-top: 4px; text-align: center; }
         .announcement-action-btn:hover { background: #b975ff; box-shadow: 0 0 10px rgba(168, 85, 247, 0.4); }
         .announcement-date { font-size: 0.8rem; color: #777; margin-top: 4px; }
-        .delete-btn { position: absolute; top: 20px; right: 20px; background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: background 0.2s; z-index: 10; }
+        .card-actions { position: absolute; top: 20px; right: 20px; display: flex; gap: 8px; z-index: 10; }
+        .edit-btn { background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: background 0.2s; }
+        .edit-btn:hover { background: #2563eb; }
+        .delete-btn { background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: background 0.2s; }
         .delete-btn:hover { background: #cc3333; }
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 15px; opacity: 0; transition: opacity 0.3s ease; }
         .modal-overlay.active { display: flex; opacity: 1; }
@@ -80,7 +83,7 @@
             .admin-gate-btn { width: 100%; text-align: center; padding: 12px; }
             .input-row { flex-direction: column; gap: 0; }
             .announcement-card { padding: 20px; }
-            .delete-btn { position: relative; top: auto; right: auto; align-self: flex-start; margin-top: 5px; width: 100%; text-align: center; }
+            .card-actions { position: relative; top: auto; right: auto; align-self: flex-start; margin-top: 5px; width: 100%; justify-content: space-between; }
             .announcement-meta { padding-right: 0; }
         }
     </style>
@@ -163,12 +166,14 @@
             </div>
  
             <div id="admin-panel-step" class="hidden">
-                <h3>Publier une annonce</h3>
+                <h3 id="panel-form-title">Publier une annonce</h3>
                 <div class="admin-header-actions">
                     <span id="user-display-email" style="color:#a855f7; font-weight:600; font-size: 0.85rem; font-family: 'Inter', sans-serif;"></span>
                     <button id="logout-btn" style="background:none; border:none; color:#ff4444; cursor:pointer; font-weight: 600; font-family: 'Orbitron', sans-serif; font-size:0.85rem;">Déconnexion</button>
                 </div>
                 <form id="announcement-form" onsubmit="return false;">
+                    <input type="hidden" id="annonce-id" value="">
+                    
                     <div class="input-group">
                         <label for="annonce-title">Titre de l'actualité</label>
                         <input type="text" id="annonce-title" placeholder="Ex: Match ce soir à 21h !" required>
@@ -209,7 +214,13 @@
                         <label for="annonce-content">Message</label>
                         <textarea id="annonce-content" rows="4" placeholder="Écrivez le contenu de l'annonce..." required></textarea>
                     </div>
-                    <button type="submit" class="form-btn" id="publish-btn">Publier l'annonce</button>
+                    
+                    <div class="input-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                        <input type="checkbox" id="send-to-discord" style="width: auto; cursor: pointer;">
+                        <label for="send-to-discord" style="margin-bottom: 0; cursor: pointer; color: #5865F2;">🚀 Envoyer (ou mettre à jour) sur Discord</label>
+                    </div>
+
+                    <button type="submit" class="form-btn" id="publish-btn">Enregistrer l'annonce</button>
                 </form>
  
                 <div style="margin-top: 30px; border-top: 1px solid #2a2a2a; padding-top: 20px;">
@@ -240,7 +251,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, getDoc, getDocs, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, getDoc, getDocs, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
  
         const firebaseConfig = {
@@ -274,6 +285,7 @@
  
         let currentUser = null;
         let isUserAdmin = false;
+        let announcementsData = {}; // Permet de stocker localement les données pour la modification rapide
  
         const scrollObserver = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
@@ -285,7 +297,9 @@
         closeModalBtn.onclick = () => { modal.classList.remove('active'); };
         window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
  
-        function setupDeleteButtons() {
+        // Configuration des boutons Supprimer et Modifier
+        function setupCardButtons() {
+            // Supprimer
             document.querySelectorAll('.delete-btn').forEach(btn => {
                 btn.onclick = async (e) => {
                     e.preventDefault();
@@ -299,17 +313,43 @@
                     }
                 };
             });
+
+            // Modifier
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.preventDefault();
+                    const docId = btn.getAttribute('data-id');
+                    const ann = announcementsData[docId];
+                    if (!ann) return;
+
+                    // On remplit le formulaire avec les valeurs existantes
+                    document.getElementById("annonce-id").value = docId;
+                    document.getElementById("annonce-title").value = ann.title || "";
+                    document.getElementById("annonce-content").value = ann.content || "";
+                    document.getElementById("annonce-category").value = ann.category || "general";
+                    document.getElementById("annonce-priority").value = ann.priority || "normal";
+                    document.getElementById("annonce-img-url").value = ann.imageUrl || "";
+                    document.getElementById("annonce-btn-text").value = ann.btnText || "";
+                    document.getElementById("annonce-btn-link").value = ann.btnLink || "";
+                    
+                    document.getElementById("panel-form-title").textContent = "✏️ Modifier l'annonce";
+                    modal.classList.add('active');
+                };
+            });
         }
  
         const q = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
         onSnapshot(q, (snapshot) => {
             feed.innerHTML = "";
+            announcementsData = {}; // Reset
             if (snapshot.empty) {
                 feed.innerHTML = '<p class="loading-text">Aucune annonce publiée pour le moment.</p>';
                 return;
             }
             snapshot.forEach((docSnap) => {
                 const ann = docSnap.data();
+                announcementsData[docSnap.id] = ann; // Sauvegarde locale
+
                 let dateRaw = (ann.createdAt && typeof ann.createdAt.seconds === 'number') ? new Date(ann.createdAt.seconds * 1000) : (typeof ann.createdAt === 'number' ? new Date(ann.createdAt) : new Date());
                 const dateStr = dateRaw.toLocaleDateString('fr-FR') + " à " + dateRaw.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
  
@@ -359,17 +399,29 @@
  
                 card.appendChild(dateEl);
  
+                // Interface Admin : Actions d'édition et suppression
                 if (currentUser && isUserAdmin) {
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.className = 'card-actions';
+                    
+                    const editBtn = document.createElement('button');
+                    editBtn.className = 'edit-btn';
+                    editBtn.setAttribute('data-id', docSnap.id);
+                    editBtn.textContent = 'Modifier';
+                    
                     const delBtn = document.createElement('button');
                     delBtn.className = 'delete-btn';
                     delBtn.setAttribute('data-id', docSnap.id);
                     delBtn.textContent = 'Supprimer';
-                    card.appendChild(delBtn);
+                    
+                    actionsDiv.appendChild(editBtn);
+                    actionsDiv.appendChild(delBtn);
+                    card.appendChild(actionsDiv);
                 }
  
                 feed.appendChild(card);
             });
-            setupDeleteButtons();
+            setupCardButtons();
         });
  
         async function loadPlayersDropdown() {
@@ -446,18 +498,32 @@
         adminGateBtn.onclick = () => {
             if (currentUser) {
                 if (!isUserAdmin) { signOut(auth); }
-                else { modal.classList.add('active'); }
+                else { 
+                    // Reset du titre en mode création par défaut
+                    document.getElementById("annonce-id").value = "";
+                    document.getElementById("panel-form-title").textContent = "Publier une annonce";
+                    announcementForm.reset();
+                    modal.classList.add('active'); 
+                }
             } else {
                 modal.classList.add('active');
             }
         };
  
         logoutBtn.onclick = () => { signOut(auth); modal.classList.remove('active'); };
-        quickAddBtn.onclick = () => { if (currentUser && isUserAdmin) modal.classList.add('active'); };
+        quickAddBtn.onclick = () => { 
+            if (currentUser && isUserAdmin) {
+                document.getElementById("annonce-id").value = "";
+                document.getElementById("panel-form-title").textContent = "Publier une annonce";
+                announcementForm.reset();
+                modal.classList.add('active');
+            }
+        };
  
         announcementForm.addEventListener('submit', async () => {
             if (!isUserAdmin) return alert("Action non autorisée.");
  
+            const annonceId = document.getElementById("annonce-id").value;
             const title = document.getElementById("annonce-title").value.trim();
             const content = document.getElementById("annonce-content").value.trim();
             const category = document.getElementById("annonce-category").value;
@@ -465,26 +531,37 @@
             const imageUrl = document.getElementById("annonce-img-url").value.trim();
             const btnText = document.getElementById("annonce-btn-text").value.trim();
             const btnLink = document.getElementById("annonce-btn-link").value.trim();
-            const nowTimestamp = Date.now();
+            const shouldSendDiscord = document.getElementById("send-to-discord").checked;
+ 
+            const payload = {
+                title, content, category, priority, imageUrl, btnText, btnLink
+            };
  
             try {
-                await addDoc(collection(db, "announcements"), {
-                    title, content, category, priority, imageUrl, btnText, btnLink, createdAt: nowTimestamp
-                });
+                if (annonceId) {
+                    // MODE MODIFICATION : On met à jour le document existant
+                    await updateDoc(doc(db, "announcements", annonceId), payload);
+                } else {
+                    // MODE CRÉATION : On ajoute un nouveau document
+                    payload.createdAt = Date.now();
+                    await addDoc(collection(db, "announcements"), payload);
+                }
  
-                // Envoi via le tunnel secret Cloudflare Functions
-                await fetch("/send-discord", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        message: `📢 **Nouvelle annonce sur Abysz !**\n\n**${title}**\n${content}`
-                    })
-                });
+                // Envoi sécurisé vers le Worker Cloudflare pour Discord si la case est cochée
+                if (shouldSendDiscord) {
+                    await fetch("https://calm-breeze-1656.albanmc29.workers.dev/send-discord", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            message: `📢 **${annonceId ? 'Mise à jour d\'actualité' : 'Nouvelle annonce'} sur Abysz !**\n\n**${title}**\n${content}`
+                        })
+                    });
+                }
                 
                 announcementForm.reset();
                 modal.classList.remove('active');
             } catch (error) {
-                alert("Erreur lors de la publication : " + error.message);
+                alert("Erreur lors de l'enregistrement : " + error.message);
             }
         });
     </script>

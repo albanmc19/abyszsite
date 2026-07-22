@@ -52,7 +52,6 @@
         .announcement-card.priority-urgent { border-left-color: #ff4444; background: linear-gradient(90deg, rgba(255,68,68,0.03) 0%, #1a1a1a 100%); }
         .announcement-card.priority-urgent:hover { box-shadow: 0 6px 25px rgba(255, 68, 68, 0.15); }
         
-        /* Réserve de l'espace pour éviter la superposition avec les boutons admin en mode desktop */
         .announcement-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-right: 180px; }
         .badge { font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: bold; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
         .badge-general { background: #a855f7; color: white; }
@@ -105,7 +104,6 @@
         
         /* --- DESIGN RESPONSIVE MOBILE --- */
         @media (max-width: 768px) {
-            /* Activation et transformation du menu en rideau déroulant */
             .menu-toggle { display: flex; }
             
             nav ul {
@@ -126,23 +124,19 @@
             
             nav ul.mobile-open { display: flex; }
             nav ul li a { display: block; padding: 10px 0; font-size: 1.1rem; }
-            nav ul li a::after { display: none; } /* Évite les bugs visuels d'animation sur mobile */
+            nav ul li a::after { display: none; }
 
-            /* Animations de l'icône burger */
             .menu-toggle.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
             .menu-toggle.open span:nth-child(2) { opacity: 0; }
             .menu-toggle.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
-            /* Hero Section ajustée pour les petits écrans */
             .hero h1 { font-size: 2.5rem !important; }
             .hero p.slogan { font-size: 1rem !important; }
             
-            /* Ajustements des flux et structures */
             .announcements-header { flex-direction: column; align-items: stretch; gap: 15px; text-align: center; }
             .title-area { justify-content: center; }
             .admin-gate-btn { width: 100%; text-align: center; padding: 12px; box-sizing: border-box; }
             
-            /* Repositionnement propre des boutons admin des cartes */
             .announcement-card { padding: 20px; padding-top: 45px; }
             .announcement-meta { padding-right: 0; }
             .card-actions { position: absolute; top: 12px; right: 12px; width: auto; justify-content: flex-end; gap: 6px; }
@@ -151,7 +145,6 @@
             .input-row { flex-direction: column; gap: 0; }
             .modal-content { padding: 25px 15px; border-radius: 12px; }
             
-            /* Ajustement de la structure interne des boutons de déconnexion admin */
             .admin-header-actions { flex-direction: column; text-align: center; gap: 8px; }
         }
     </style>
@@ -355,8 +348,9 @@
         const logoutBtn = document.getElementById('logout-btn');
         const feed = document.getElementById("announcements-feed");
         const navEspaceJoueur = document.getElementById('nav-espace-joueur');
+        const navDashboard = document.getElementById('nav-dashboard');
         
-        // Système d'ouverture du menu mobile
+        // Menu mobile
         const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
         const navLinksList = document.getElementById('nav-links-list');
 
@@ -365,7 +359,6 @@
             navLinksList.classList.toggle('mobile-open');
         });
 
-        // Ferme le menu mobile automatiquement si on clique sur un lien d'ancrage
         document.querySelectorAll('#nav-links-list a').forEach(link => {
             link.addEventListener('click', () => {
                 mobileMenuToggle.classList.remove('open');
@@ -377,16 +370,80 @@
         let isUserAdmin = false;
         let announcementsData = {};
  
+        // Gestion de l'état d'authentification
+        onAuthStateChanged(auth, async (user) => {
+            currentUser = user;
+            if (user) {
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                isUserAdmin = userDoc.exists() && userDoc.data().role === "admin";
+
+                adminGateBtn.textContent = "⚙️ Espace Administration";
+                adminGateBtn.classList.add('logged-in');
+                
+                if (navEspaceJoueur) navEspaceJoueur.classList.remove('hidden');
+                if (isUserAdmin) {
+                    if (quickAddBtn) quickAddBtn.classList.remove('hidden');
+                    if (navDashboard) navDashboard.classList.remove('hidden');
+                }
+
+                loginStep.classList.add('hidden');
+                panelStep.classList.remove('hidden');
+                if (userDisplayEmail) userDisplayEmail.textContent = user.email;
+            } else {
+                isUserAdmin = false;
+                adminGateBtn.textContent = "🔑 Connexion";
+                adminGateBtn.classList.remove('logged-in');
+                
+                if (quickAddBtn) quickAddBtn.classList.add('hidden');
+                if (navEspaceJoueur) navEspaceJoueur.classList.add('hidden');
+                if (navDashboard) navDashboard.classList.add('hidden');
+
+                loginStep.classList.remove('hidden');
+                panelStep.classList.add('hidden');
+            }
+        });
+
+        // Actions d'ouverture de modal
+        adminGateBtn.onclick = () => { modal.classList.add('active'); };
+        if (quickAddBtn) {
+            quickAddBtn.onclick = () => {
+                document.getElementById("annonce-id").value = "";
+                document.getElementById("announcement-form").reset();
+                document.getElementById("panel-form-title").textContent = "Publier une annonce";
+                modal.classList.add('active');
+            };
+        }
+
+        // Connexion
+        document.getElementById('login-btn').onclick = async () => {
+            const email = document.getElementById('admin-email').value;
+            const pass = document.getElementById('admin-password').value;
+            loginError.classList.add('hidden');
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+            } catch (err) {
+                loginError.textContent = "Erreur de connexion : Identifiants invalides.";
+                loginError.classList.remove('hidden');
+            }
+        };
+
+        // Déconnexion
+        logoutBtn.onclick = async () => {
+            await signOut(auth);
+            modal.classList.remove('active');
+        };
+
+        closeModalBtn.onclick = () => { modal.classList.remove('active'); };
+        window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
+
+        // Animation scroll
         const scrollObserver = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
                 if (entry.isIntersecting) entry.target.classList.add('reveal-visible');
             });
         }, { threshold: 0.15 });
         document.querySelectorAll('.reveal').forEach((el) => scrollObserver.observe(el));
- 
-        closeModalBtn.onclick = () => { modal.classList.remove('active'); };
-        window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
- 
+
         function setupCardButtons() {
             document.querySelectorAll('.delete-btn').forEach(btn => {
                 btn.onclick = async (e) => {
@@ -423,7 +480,8 @@
                 };
             });
         }
- 
+
+        // Flux des annonces
         const q = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
         onSnapshot(q, (snapshot) => {
             feed.innerHTML = "";

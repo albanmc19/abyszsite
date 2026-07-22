@@ -3,133 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Staff et Administration de l'équipe ABYSZ Esports">
     <title>ABYSZ | Staff 2026</title>
+    
+    <link rel="icon" type="image/png" href="logo.png">
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
     <style>
-        /* ── ARCHITECTURE GLOBALE & NAV ── */
-        .logo-link { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
-        .staff-header-container { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto 30px auto; padding: 0 20px; }
-        .admin-actions-header { display: flex; gap: 10px; align-items: center; }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #0a0a0a; position: relative; z-index: 1000; }
+        nav ul { display: flex; list-style: none; gap: 20px; margin: 0; padding: 0; }
+        nav ul li a { text-decoration: none; color: white; transition: color 0.3s; }
+        nav ul li a:hover { color: #a855f7; }
+        .logo { display: flex; align-items: center; gap: 10px; color: white; font-family: 'Orbitron', sans-serif; font-weight: bold; }
         
-        .admin-gate-btn { background: transparent; border: 1px solid #a855f7; color: #a855f7; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-family: 'Orbitron', sans-serif; transition: all 0.3s ease; }
-        .admin-gate-btn:hover { background: #a855f7; color: white; box-shadow: 0 0 15px #a855f7; }
+        .staff-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; text-align: center; }
+        .staff-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 15px; }
+        .staff-header h1 { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; margin: 0; color: #fff; }
         
-        .login-btn { border: 1px solid #22c55e; color: #22c55e; }
-        .login-btn:hover { background: #22c55e; color: white; box-shadow: 0 0 15px #22c55e; }
+        .admin-controls { display: flex; gap: 10px; align-items: center; }
+        .btn-admin { background: #a855f7; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-weight: bold; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-admin:hover { background: #b975ff; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
+        .btn-logout { background: transparent; border: 1px solid #ff4444; color: #ff4444; }
+        .btn-logout:hover { background: #ff4444; color: white; box-shadow: 0 0 15px rgba(255, 68, 68, 0.4); }
+
+        .pole-section { margin-bottom: 60px; }
+        .pole-title { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; color: #a855f7; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .pole-desc { color: #888; font-size: 0.95rem; margin-bottom: 30px; }
         
-        .logout-btn { border: 1px solid #ff4444; color: #ff4444; }
-        .logout-btn:hover { background: #ff4444; color: white; box-shadow: 0 0 15px #ff4444; }
-
-        .loading-text { text-align: center; color: #666; font-style: italic; grid-column: 1/-1; padding: 20px; }
-        .error-text { text-align: center; color: #ef4444; font-family: 'Orbitron', sans-serif; font-style: italic; grid-column: 1/-1; padding: 20px; font-size: 0.9rem; }
-
-        /* ── STAFF GRID ── */
-        .staff-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-
-        /* ── IMAGES ── */
-        .staff-avatar-img { width: 100%; height: 230px; object-fit: cover; border-bottom: 2px solid #a855f7; background: #141414; }
-        .popup-avatar-img { width: 100%; max-height: 160px; object-fit: contain; border: 2px solid #a855f7; border-radius: 12px; margin: 0 auto 15px auto; display: block; background: #0a0a0a; }
-
-        /* ── MODAL & POPUPS ── */
-        .popup-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
-        .popup-overlay.active { display: flex; }
+        .staff-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
+        .staff-card { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; padding: 25px; position: relative; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; }
+        .staff-card:hover { transform: translateY(-5px); border-color: #a855f7; box-shadow: 0 10px 25px rgba(168, 85, 247, 0.15); }
         
-        .popup { background: #141414; border: 2px solid #a855f7; border-radius: 24px; max-width: 500px; width: 100%; padding: 30px; position: relative; box-shadow: 0 0 30px rgba(168,85,247,0.25); box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
-        .popup-close { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; color: #777; cursor: pointer; transition: color 0.2s; }
-        .popup-close:hover { color: #ff4444; }
+        .staff-avatar { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 2px solid #a855f7; margin-bottom: 15px; background: #0a0a0a; }
+        .staff-name { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; color: #fff; margin: 0 0 5px 0; }
+        .staff-role { color: #a855f7; font-weight: 600; font-size: 0.9rem; margin-bottom: 12px; }
+        .staff-bio { color: #aaa; font-size: 0.85rem; line-height: 1.5; margin-bottom: 15px; white-space: pre-wrap; }
         
-        .popup-pseudo { font-family: 'Orbitron', sans-serif; color: #fff; margin-top: 0; margin-bottom: 5px; font-size: 1.5rem; text-align: center; }
+        .card-actions { position: absolute; top: 12px; right: 12px; display: flex; gap: 6px; }
+        .action-btn { background: #222; border: 1px solid #333; color: #fff; padding: 5px 8px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; transition: background 0.2s; }
+        .action-btn.edit:hover { background: #3b82f6; border-color: #3b82f6; }
+        .action-btn.delete:hover { background: #ff4444; border-color: #ff4444; }
 
-        /* Réseaux sociaux */
-        .social-links-container { display: flex; justify-content: center; gap: 15px; margin: 15px 0; }
-        .social-icon-link { font-size: 1.4rem; text-decoration: none; transition: transform 0.2s; }
-        .social-icon-link:hover { transform: scale(1.2); }
-
-        /* ── FORMULAIRES EDITION ── */
-        .input-group { margin-bottom: 15px; text-align: left; }
-        .input-group label { display: block; margin-bottom: 6px; color: #a855f7; font-size: 0.8rem; font-family: 'Orbitron', sans-serif; font-weight: 600; }
-        .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 10px 14px; background: #0a0a0a; border: 1px solid #2a2a2a; color: white; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.9rem; box-sizing: border-box; }
+        /* Modal Form */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 15px; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: #141414; border: 2px solid #a855f7; border-radius: 16px; max-width: 500px; width: 100%; padding: 30px; position: relative; max-height: 90vh; overflow-y: auto; text-align: left; }
+        .modal-close { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; color: #777; cursor: pointer; }
+        .modal-close:hover { color: #ff4444; }
         
-        .file-upload-btn { display: block; text-align: center; background: #1a1a1a; border: 1px dashed #a855f7; color: #ccc; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; }
-        .file-upload-btn:hover { background: rgba(168,85,247,0.1); color: #fff; }
-        
-        .form-btn { background: #a855f7; color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: 'Orbitron', sans-serif; transition: background 0.2s; margin-top: 10px; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; }
-        .form-btn:hover { background: #b975ff; }
-        .edit-toggle-btn { background: #222; border: 1px solid #a855f7; color: #fff; margin-bottom: 15px; }
-        .edit-toggle-btn:hover { background: #a855f7; }
-        .delete-btn { background: #ff4444 !important; margin-top: 5px; }
-        .delete-btn:hover { background: #ff6666 !important; }
-
-        .image-actions { display: flex; gap: 10px; margin-top: 5px; }
-        .btn-remove-img { background: #331c1c; border: 1px solid #ff4444; color: #ff4444; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; width: 100%; font-family: 'Orbitron', sans-serif; }
-        .btn-remove-img:hover { background: #ff4444; color: #fff; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 6px; color: #a855f7; font-size: 0.85rem; font-family: 'Orbitron', sans-serif; }
+        .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 10px 12px; background: #0a0a0a; border: 1px solid #2a2a2a; color: white; border-radius: 8px; font-family: 'Inter', sans-serif; box-sizing: border-box; }
         .hidden { display: none !important; }
+        .error-msg { color: #ff4444; font-size: 0.9rem; margin-top: 15px; text-align: center; }
+        .nav-dashboard-link a { color: #22c55e !important; font-weight: bold; }
     </style>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; connect-src https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com; img-src 'self' data: blob:; frame-ancestors 'none';">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta name="referrer" content="strict-origin-when-cross-origin">
 </head>
 <body>
+
     <nav>
         <div class="logo">
-            <a href="index.html" class="logo-link">
-                <img src="logo.png" alt="Logo ABYSZ" style="height:30px;">
-                ABYSZ
-            </a>
+            <img src="logo.png" alt="Logo ABYSZ" width="30" height="30">
+            ABYSZ
         </div>
-        <ul id="nav-links-list">
+        <ul>
             <li><a href="index.html">Accueil</a></li>
             <li><a href="roster.html">Roster</a></li>
-            <li><a href="staff.html">Staff</a></li>
+            <li><a href="staffabysz.html">Staff</a></li>
             <li><a href="boutique.html">Boutique</a></li>
-            <li><a href="dashboard.html">📊 Dashboard</a></li>
+            <li id="nav-dashboard" class="nav-dashboard-link hidden"><a href="dashboard.html">📊 Dashboard</a></li>
         </ul>
     </nav>
 
-    <section style="padding-top: 160px; padding-bottom: 80px;">
-        <div class="staff-header-container">
-            <h2 style="font-family:'Orbitron', sans-serif; color:#fff; font-size:2rem; margin:0;">Staff & Administration</h2>
-            <div class="admin-actions-header">
-                <span id="user-welcome-msg" style="font-family:'Inter', sans-serif; color:#aaa; font-size:0.9rem; margin-right:10px;"></span>
-                <button class="admin-gate-btn hidden" id="add-staff-btn">➕ Nouveau Staff</button>
-                <button class="admin-gate-btn login-btn" id="login-btn">🔑 Connexion</button>
-                <button class="admin-gate-btn logout-btn hidden" id="logout-btn">🔒 Déconnexion</button>
+    <div class="staff-container">
+        <div class="staff-header">
+            <h1>Staff & Administration</h1>
+            <div id="admin-bar" class="admin-controls hidden">
+                <span id="admin-indicator" style="color: #aaa; font-size: 0.85rem;">Espace Administrateur</span>
+                <button id="open-add-modal-btn" class="btn-admin">+ Nouveau Staff</button>
+                <button id="logout-btn" class="btn-admin btn-logout">🔒 Déconnexion</button>
             </div>
         </div>
 
-        <h2 style="text-align:center; font-family:'Orbitron', sans-serif; color:#fff; margin-top:20px;">Direction</h2>
-        <p style="text-align:center; margin-bottom:30px; color:#aaa; font-family:'Inter', sans-serif;">Fondateurs et directeurs de la structure ABYSZ</p>
-        <div class="staff-grid" id="direction-staff-grid">
-            <p class="loading-text">Connexion à Firestore...</p>
+        <div class="pole-section">
+            <h2 class="pole-title">Direction</h2>
+            <p class="pole-desc">Fondateurs et directeurs de la structure ABYSZ</p>
+            <div id="grid-direction" class="staff-grid">
+                <p style="color:#666; grid-column: 1/-1;">Chargement...</p>
+            </div>
         </div>
 
-        <h2 style="margin-top:80px; text-align:center; font-family:'Orbitron', sans-serif; color:#fff;">Pôle Sportif & Management</h2>
-        <p style="text-align:center; margin-bottom:30px; color:#aaa; font-family:'Inter', sans-serif;">Encadrement des joueurs et tacticiens</p>
-        <div class="staff-grid" id="management-staff-grid">
-            <p class="loading-text">Connexion à Firestore...</p>
+        <div class="pole-section">
+            <h2 class="pole-title">Pôle Sportif & Management</h2>
+            <p class="pole-desc">Encadrement des joueurs et tacticiens</p>
+            <div id="grid-sportif" class="staff-grid">
+                <p style="color:#666; grid-column: 1/-1;">Chargement...</p>
+            </div>
         </div>
 
-        <h2 style="margin-top:80px; text-align:center; font-family:'Orbitron', sans-serif; color:#fff;">Communication & Création</h2>
-        <p style="text-align:center; margin-bottom:30px; color:#aaa; font-family:'Inter', sans-serif;">Responsables visuels, réseaux et événementiel</p>
-        <div class="staff-grid" id="comms-staff-grid">
-            <p class="loading-text">Connexion à Firestore...</p>
+        <div class="pole-section">
+            <h2 class="pole-title">Communication & Création</h2>
+            <p class="pole-desc">Créatifs, modérateurs et responsables médias</p>
+            <div id="grid-com" class="staff-grid">
+                <p style="color:#666; grid-column: 1/-1;">Chargement...</p>
+            </div>
         </div>
+    </div>
 
-        <br><br><br>
-        <div style="text-align: center;">
-            <a href="index.html" style="color: #a855f7; text-decoration: none; font-family: 'Orbitron', sans-serif; font-weight: bold;">← Retour à l'accueil</a>
+    <div id="staff-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span id="close-modal-btn" class="modal-close">&times;</span>
+            <h3 id="modal-title" style="font-family:'Orbitron', sans-serif; color:white; margin-top:0;">Ajouter un membre</h3>
+            
+            <form id="staff-form">
+                <input type="hidden" id="staff-id" value="">
+                
+                <div class="input-group">
+                    <label for="staff-name">Pseudo / Nom</label>
+                    <input type="text" id="staff-name" required placeholder="Ex: albanmc">
+                </div>
+
+                <div class="input-group">
+                    <label for="staff-pole">Pôle / Section</label>
+                    <select id="staff-pole" required>
+                        <option value="direction">Direction</option>
+                        <option value="sportif">Pôle Sportif & Management</option>
+                        <option value="com">Communication & Création</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="staff-role">Poste / Rôle</label>
+                    <input type="text" id="staff-role" required placeholder="Ex: CEO, Manager, Graphiste...">
+                </div>
+
+                <div class="input-group">
+                    <label for="staff-avatar">URL Photo / Avatar (Optionnel)</label>
+                    <input type="url" id="staff-avatar" placeholder="https://...">
+                </div>
+
+                <div class="input-group">
+                    <label for="staff-bio">Présentation / Description</label>
+                    <textarea id="staff-bio" rows="3" placeholder="Petite bio..."></textarea>
+                </div>
+
+                <button type="submit" id="save-btn" class="btn-admin" style="width:100%; justify-content:center; padding:12px;">💾 SAUVEGARDER</button>
+            </form>
+            <p id="modal-error" class="error-msg hidden"></p>
         </div>
-    </section>
-
-    <div id="popups-container"></div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, deleteDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -137,390 +166,171 @@
             projectId: "abysz-esports",
             storageBucket: "abysz-esports.firebasestorage.app",
             messagingSenderId: "200968659347",
-            appId: "1:200968659347:web:3a13d1614d00ed29968866",
-            measurementId: "G-HPQNQK5XL1"
+            appId: "1:200968659347:web:3a13d1614d00ed29968866"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let localStaffList = [];
-        let estAdmin = false;
+        const adminBar = document.getElementById('admin-bar');
+        const openAddModalBtn = document.getElementById('open-add-modal-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const modal = document.getElementById('staff-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const staffForm = document.getElementById('staff-form');
+        const modalError = document.getElementById('modal-error');
+        const navDashboard = document.getElementById('nav-dashboard');
 
-        const ADMIN_EMAIL = "abyszofficial@gmail.com";
+        let isUserAdmin = false;
+        let staffCache = {};
 
-        document.addEventListener("DOMContentLoaded", () => {
-            onAuthStateChanged(auth, (user) => {
-                const addBtn = document.getElementById("add-staff-btn");
-                const loginBtn = document.getElementById("login-btn");
-                const logoutBtn = document.getElementById("logout-btn");
-                const welcomeMsg = document.getElementById("user-welcome-msg");
-                const navLinks = document.getElementById("nav-links-list");
-                
-                const oldSpaceLink = document.getElementById("nav-player-space");
-                if (oldSpaceLink) oldSpaceLink.remove();
-
-                if (user) {
-                    if (user.email === ADMIN_EMAIL) {
-                        estAdmin = true;
-                        if (addBtn) addBtn.classList.remove("hidden");
-                        if (welcomeMsg) welcomeMsg.innerText = "Espace Administrateur";
-                    } else {
-                        estAdmin = false;
-                        if (addBtn) addBtn.classList.add("hidden");
-                        if (welcomeMsg) welcomeMsg.innerText = "Espace Staff";
-                        
-                        if (navLinks) {
-                            const li = document.createElement("li");
-                            li.id = "nav-player-space";
-                            li.innerHTML = `<a href="espace-joueur.html" style="color:#22c55e; font-weight:bold;">👤 Mon Espace</a>`;
-                            navLinks.appendChild(li);
-                        }
+        // 1. Gestion Authentification
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    isUserAdmin = userDoc.exists() && userDoc.data().role === "admin";
+                    
+                    if (isUserAdmin) {
+                        adminBar.classList.remove('hidden');
+                        if (navDashboard) navDashboard.classList.remove('hidden');
                     }
-                    if (logoutBtn) logoutBtn.classList.remove("hidden");
-                    if (loginBtn) loginBtn.classList.add("hidden");
-                } else {
-                    estAdmin = false;
-                    if (addBtn) addBtn.classList.add("hidden");
-                    if (logoutBtn) logoutBtn.classList.add("hidden");
-                    if (loginBtn) loginBtn.classList.remove("hidden");
-                    if (welcomeMsg) welcomeMsg.innerText = "";
+                } catch(e) {
+                    console.error("Erreur vérification admin:", e);
                 }
-
-                renderStaff(localStaffList);
-            });
-
-            const logoutBtn = document.getElementById("logout-btn");
-            if (logoutBtn) {
-                logoutBtn.addEventListener("click", () => {
-                    signOut(auth).then(() => {
-                        alert("Déconnexion réussie.");
-                    }).catch((error) => console.error(error));
-                });
+            } else {
+                isUserAdmin = false;
+                adminBar.classList.add('hidden');
+                if (navDashboard) navDashboard.classList.add('hidden');
             }
-
-            const loginBtn = document.getElementById("login-btn");
-            if (loginBtn) {
-                loginBtn.addEventListener("click", openLoginPopup);
-            }
-
-            ecouterStaffFirestore();
-            setupAddStaffButton();
+            loadStaffMembers();
         });
 
-        function openLoginPopup() {
-            const container = document.getElementById("popups-container");
-            if (!container) return;
+        // 2. Déconnexion
+        logoutBtn.onclick = async () => {
+            await signOut(auth);
+            window.location.reload();
+        };
 
-            container.innerHTML = `
-                <div id="login-popup-overlay" class="popup-overlay active">
-                    <div class="popup" style="max-width: 360px;">
-                        <span class="popup-close" id="close-login-popup">&times;</span>
-                        <h3 style="font-family:'Orbitron', sans-serif; color:#a855f7; text-align:center; margin-bottom:20px; text-transform:uppercase; font-size:1.2rem;">Connexion</h3>
-                        <form id="login-direct-form" onsubmit="return false;">
-                            <div class="input-group">
-                                <label>Adresse E-mail</label>
-                                <input type="email" id="login-email" placeholder="votre@email.com" required>
-                            </div>
-                            <div class="input-group">
-                                <label>Mot de passe</label>
-                                <input type="password" id="login-password" placeholder="••••••••" required>
-                            </div>
-                            <button type="submit" class="form-btn" style="margin-top:15px; background:#22c55e;">Se connecter</button>
-                        </form>
-                    </div>
-                </div>
-            `;
+        // 3. Modales
+        openAddModalBtn.onclick = () => {
+            document.getElementById('staff-id').value = "";
+            staffForm.reset();
+            document.getElementById('modal-title').textContent = "Ajouter un membre";
+            modalError.classList.add('hidden');
+            modal.classList.add('active');
+        };
+        closeModalBtn.onclick = () => modal.classList.remove('active');
 
-            const overlay = document.getElementById("login-popup-overlay");
-            const fermerPopup = () => { overlay.classList.remove("active"); setTimeout(() => overlay.remove(), 200); };
-            
-            document.getElementById("close-login-popup").addEventListener("click", fermerPopup);
+        // 4. Sauvegarde Membre
+        staffForm.onsubmit = async (e) => {
+            e.preventDefault();
+            modalError.classList.add('hidden');
 
-            document.getElementById("login-direct-form").addEventListener("submit", async () => {
-                const email = document.getElementById("login-email").value.trim();
-                const pass = document.getElementById("login-password").value;
+            if (!isUserAdmin) {
+                modalError.textContent = "Erreur : Tu dois être connecté avec un compte Administrateur.";
+                modalError.classList.remove('hidden');
+                return;
+            }
 
-                try {
-                    await signInWithEmailAndPassword(auth, email, pass);
-                    fermerPopup();
-                } catch (error) {
-                    alert("Identifiants incorrects ou problème réseau.");
-                    console.error(error);
-                }
-            });
-        }
-
-        function ecouterStaffFirestore() {
-            const q = query(collection(db, "staff"), orderBy("createdAt", "asc"));
-            onSnapshot(q, (snapshot) => {
-                localStaffList = [];
-                snapshot.forEach((docSnap) => {
-                    localStaffList.push({ id: docSnap.id, ...docSnap.data() });
-                });
-                renderStaff(localStaffList);
-            }, (error) => {
-                console.error(error);
-                showErrorMessageAllGrids();
-            });
-        }
-
-        function showErrorMessageAllGrids() {
-            ["direction-staff-grid", "management-staff-grid", "comms-staff-grid"].forEach(id => {
-                const g = document.getElementById(id);
-                if (g) g.innerHTML = `<p class="error-text">Erreur de chargement des membres du staff.</p>`;
-            });
-        }
-
-        function renderStaff(members) {
-            const grids = {
-                direction: document.getElementById("direction-staff-grid"),
-                management: document.getElementById("management-staff-grid"),
-                comms: document.getElementById("comms-staff-grid")
+            const staffId = document.getElementById('staff-id').value || "staff_" + Date.now();
+            const data = {
+                name: document.getElementById('staff-name').value,
+                pole: document.getElementById('staff-pole').value,
+                role: document.getElementById('staff-role').value,
+                avatar: document.getElementById('staff-avatar').value || "logo.png",
+                bio: document.getElementById('staff-bio').value
             };
 
-            Object.values(grids).forEach(grid => { if (grid) grid.innerHTML = ""; });
-
-            members.forEach(member => {
-                const grid = grids[member.section || "direction"];
-                if (!grid) return;
-
-                const card = document.createElement("div");
-                card.className = "staff-card-container";
-                
-                const avatar = (member.image && member.image !== "#" && member.image.trim() !== "") ? member.image : "logo.png";
-                const pseudo = member.pseudo || "Membre";
-                const role = member.role || "Staff ABYSZ";
-
-                card.innerHTML = `
-                    <div class="staff-card" style="cursor:pointer; background:#141414; border-radius:12px; overflow:hidden; border: 1px solid #2a2a2a; text-align:center; padding-bottom:15px; transition: transform 0.2s;">
-                        <img src="${avatar}" class="staff-avatar-img" alt="${pseudo}">
-                        <h3 style="font-family:'Orbitron', sans-serif; margin:15px 0 5px 0; color:#fff;">${pseudo}</h3>
-                        <p style="color:#a855f7; font-size:0.9rem; margin:0; font-family:'Inter', sans-serif;">${role}</p>
-                    </div>
-                `;
-
-                const internalCard = card.querySelector(".staff-card");
-                internalCard.addEventListener("mouseenter", function() { this.style.transform = "translateY(-5px)"; });
-                internalCard.addEventListener("mouseleave", function() { this.style.transform = "translateY(0)"; });
-                internalCard.addEventListener("click", () => openStaffPopup(member));
-
-                grid.appendChild(card);
-            });
-        }
-
-        function setupAddStaffButton() {
-            const addBtn = document.getElementById("add-staff-btn");
-            if (addBtn) {
-                addBtn.addEventListener("click", () => {
-                    if (!estAdmin) return;
-                    openStaffPopup({
-                        pseudo: "", section: "direction", role: "", description: "", image: "logo.png",
-                        twitter: "", twitch: "", youtube: "", tiktok: ""
-                    }, true);
-                });
+            try {
+                await setDoc(doc(db, "staff", staffId), data);
+                modal.classList.remove('active');
+                staffForm.reset();
+            } catch (err) {
+                console.error(err);
+                modalError.textContent = "Erreur lors de la sauvegarde : " + err.message;
+                modalError.classList.remove('hidden');
             }
-        }
+        };
 
-        function openStaffPopup(member, startInEditMode = false) {
-            const container = document.getElementById("popups-container");
-            if (!container) return;
+        // 5. Affichage dynamique du staff
+        function loadStaffMembers() {
+            onSnapshot(collection(db, "staff"), (snapshot) => {
+                const gridDirection = document.getElementById('grid-direction');
+                const gridSportif = document.getElementById('grid-sportif');
+                const gridCom = document.getElementById('grid-com');
 
-            const isNew = !member.id;
-            const staffId = member.id || "s_" + Date.now();
-            
-            let imageBase64String = member.image || "logo.png";
-            const avatar = (imageBase64String && imageBase64String !== "#" && imageBase64String.trim() !== "") ? imageBase64String : "logo.png";
+                gridDirection.innerHTML = "";
+                gridSportif.innerHTML = "";
+                gridCom.innerHTML = "";
+                staffCache = {};
 
-            if (startInEditMode && !estAdmin) startInEditMode = false;
+                let counts = { direction: 0, sportif: 0, com: 0 };
 
-            let socialHtml = "";
-            if (!isNew && (member.twitter || member.twitch || member.youtube || member.tiktok)) {
-                socialHtml = `<div class="social-links-container">`;
-                if (member.twitter) socialHtml += `<a href="${member.twitter}" target="_blank" rel="noopener noreferrer" class="social-icon-link" title="Twitter / X">🐦</a>`;
-                if (member.twitch) socialHtml += `<a href="${member.twitch}" target="_blank" rel="noopener noreferrer" class="social-icon-link" title="Twitch">🎮</a>`;
-                if (member.youtube) socialHtml += `<a href="${member.youtube}" target="_blank" rel="noopener noreferrer" class="social-icon-link" title="YouTube">📺</a>`;
-                if (member.tiktok) socialHtml += `<a href="${member.tiktok}" target="_blank" rel="noopener noreferrer" class="social-icon-link" title="TikTok">🎵</a>`;
-                socialHtml += `</div>`;
-            }
+                snapshot.forEach((docSnap) => {
+                    const member = docSnap.data();
+                    const id = docSnap.id;
+                    staffCache[id] = member;
 
-            container.innerHTML = `
-                <div id="popup-${staffId}" class="popup-overlay active">
-                    <div class="popup">
-                        <span class="popup-close">&times;</span>
-                        
-                        <div id="view-mode-${staffId}" class="${startInEditMode ? 'hidden' : ''}">
-                            <img src="${avatar}" class="popup-avatar-img" id="view-avatar-${staffId}" alt="">
-                            <h3 class="popup-pseudo">${member.pseudo || 'Nouveau Staff'}</h3>
-                            <p style="text-align:center; color:#a855f7; font-weight:600; margin-top:5px; margin-bottom:10px; font-family:'Orbitron', sans-serif;">${member.role || 'Rôle non défini'}</p>
-                            ${socialHtml}
-                            <p style="text-align:center; color:#aaa; font-family:'Inter', sans-serif; font-size:0.9rem; line-height:1.4;">${member.description || ''}</p>
-                            
-                            <button class="form-btn edit-toggle-btn ${estAdmin ? '' : 'hidden'}" id="btn-to-edit-${staffId}" style="margin-top:20px;">✏️ Éditer le membre</button>
-                        </div>
-
-                        ${estAdmin ? `
-                        <div id="edit-mode-${staffId}" class="${startInEditMode ? '' : 'hidden'}">
-                            <h3 style="font-family:'Orbitron', sans-serif; color:#a855f7; text-align:center; margin-bottom:15px;">
-                                ${isNew ? 'Ajouter un staff' : 'Modifier le membre'}
-                            </h3>
-                            <img src="${avatar}" class="popup-avatar-img" id="edit-preview-${staffId}" style="max-height: 100px;">
-
-                            <form id="form-${staffId}" onsubmit="return false;">
-                                <div class="input-group">
-                                    <label>Photo de profil</label>
-                                    <label for="file-input-${staffId}" class="file-upload-btn">📁 Choisir une image</label>
-                                    <input type="file" id="file-input-${staffId}" accept="image/*" class="hidden">
-                                    <div class="image-actions">
-                                        <button type="button" class="btn-remove-img" id="btn-clear-img-${staffId}">🗑️ Remettre le logo par défaut</button>
-                                    </div>
-                                </div>
-
-                                <div class="input-group">
-                                    <label>Pseudo</label>
-                                    <input type="text" id="input-pseudo-${staffId}" value="${member.pseudo || ''}" required>
-                                </div>
-                                <div class="input-group">
-                                    <label>Pôle / Section</label>
-                                    <select id="input-section-${staffId}">
-                                        <option value="direction" ${member.section === 'direction' ? 'selected' : ''}>Direction</option>
-                                        <option value="management" ${member.section === 'management' ? 'selected' : ''}>Pôle Sportif & Management</option>
-                                        <option value="comms" ${member.section === 'comms' ? 'selected' : ''}>Communication & Création</option>
-                                    </select>
-                                </div>
-                                <div class="input-group">
-                                    <label>Poste / Rôle</label>
-                                    <input type="text" id="input-role-${staffId}" value="${member.role || ''}" placeholder="Ex: Head Coach, Manager, Graphiste..." required>
-                                </div>
-                                <div class="input-group">
-                                    <label>Présentation / Description</label>
-                                    <textarea id="input-desc-${staffId}" rows="3" placeholder="Présentation rapide du membre...">${member.description || ''}</textarea>
-                                </div>
-
-                                <div class="input-group" style="border-top: 1px solid #222; padding-top:15px; margin-top:15px;">
-                                    <label style="color:#fff;">🔗 Liens des Réseaux Sociaux</label>
-                                    <input type="url" id="input-twitter-${staffId}" value="${member.twitter || ''}" placeholder="Lien Twitter / X" style="margin-bottom:8px;">
-                                    <input type="url" id="input-twitch-${staffId}" value="${member.twitch || ''}" placeholder="Lien Twitch" style="margin-bottom:8px;">
-                                    <input type="url" id="input-youtube-${staffId}" value="${member.youtube || ''}" placeholder="Lien YouTube" style="margin-bottom:8px;">
-                                    <input type="url" id="input-tiktok-${staffId}" value="${member.tiktok || ''}" placeholder="Lien TikTok">
-                                </div>
-
-                                <button type="submit" class="form-btn" style="margin-top:20px;">💾 Sauvegarder</button>
-                                ${!isNew ? `<button type="button" class="form-btn delete-btn" id="btn-delete-${staffId}">🗑️ Supprimer le membre</button>` : ''}
-                                <button type="button" class="form-btn edit-toggle-btn" id="btn-cancel-${staffId}" style="margin-top:5px;">Annuler</button>
-                            </form>
-                        </div>
+                    const card = document.createElement('div');
+                    card.className = 'staff-card';
+                    card.innerHTML = `
+                        ${isUserAdmin ? `
+                            <div class="card-actions">
+                                <button class="action-btn edit" data-id="${id}">✏️</button>
+                                <button class="action-btn delete" data-id="${id}">🗑️</button>
+                            </div>
                         ` : ''}
-                    </div>
-                </div>
-            `;
+                        <img src="${member.avatar || 'logo.png'}" class="staff-avatar" alt="${member.name}">
+                        <h3 class="staff-name">${member.name}</h3>
+                        <div class="staff-role">${member.role}</div>
+                        ${member.bio ? `<div class="staff-bio">${member.bio}</div>` : ''}
+                    `;
 
-            const popupOverlay = document.getElementById(`popup-${staffId}`);
-            const closePopup = () => { popupOverlay.classList.remove("active"); setTimeout(() => popupOverlay.remove(), 200); };
-            popupOverlay.querySelector(".popup-close").addEventListener("click", closePopup);
+                    if (member.pole === 'direction') {
+                        gridDirection.appendChild(card);
+                        counts.direction++;
+                    } else if (member.pole === 'sportif') {
+                        gridSportif.appendChild(card);
+                        counts.sportif++;
+                    } else {
+                        gridCom.appendChild(card);
+                        counts.com++;
+                    }
+                });
 
-            if (estAdmin) {
-                const viewDiv = document.getElementById(`view-mode-${staffId}`);
-                const editDiv = document.getElementById(`edit-mode-${staffId}`);
-                const btnToEdit = document.getElementById(`btn-to-edit-${staffId}`);
-                const btnCancel = document.getElementById(`btn-cancel-${staffId}`);
+                if (counts.direction === 0) gridDirection.innerHTML = `<p style="color:#666; grid-column: 1/-1;">Aucun membre dans ce pôle.</p>`;
+                if (counts.sportif === 0) gridSportif.innerHTML = `<p style="color:#666; grid-column: 1/-1;">Aucun membre dans ce pôle.</p>`;
+                if (counts.com === 0) gridCom.innerHTML = `<p style="color:#666; grid-column: 1/-1;">Aucun membre dans ce pôle.</p>`;
 
-                if (btnToEdit) {
-                    btnToEdit.addEventListener("click", () => {
-                        viewDiv.classList.add("hidden");
-                        editDiv.classList.remove("hidden");
-                    });
-                }
-
-                if (btnCancel) {
-                    btnCancel.addEventListener("click", () => {
-                        if (isNew) {
-                            closePopup();
-                        } else {
-                            editDiv.classList.add("hidden");
-                            viewDiv.classList.remove("hidden");
+                // Events Boutons
+                document.querySelectorAll('.action-btn.delete').forEach(btn => {
+                    btn.onclick = async () => {
+                        if (confirm("Supprimer ce membre du staff ?")) {
+                            await deleteDoc(doc(db, "staff", btn.dataset.id));
                         }
-                    });
-                }
+                    };
+                });
 
-                // File Upload Base64 Handling
-                const fileInput = document.getElementById(`file-input-${staffId}`);
-                const editPreview = document.getElementById(`edit-preview-${staffId}`);
-                const btnClearImg = document.getElementById(`btn-clear-img-${staffId}`);
-
-                if (fileInput) {
-                    fileInput.addEventListener("change", (e) => {
-                        const file = e.target.files[0];
-                        if (file) {
-                            const reader = new FileReader();
-                            reader.onload = (evt) => {
-                                imageBase64String = evt.target.result;
-                                editPreview.src = imageBase64String;
-                            };
-                            reader.readAsDataURL(file);
-                        }
-                    });
-                }
-
-                if (btnClearImg) {
-                    btnClearImg.addEventListener("click", () => {
-                        imageBase64String = "logo.png";
-                        editPreview.src = "logo.png";
-                        if (fileInput) fileInput.value = "";
-                    });
-                }
-
-                // Form Submit Handling
-                const form = document.getElementById(`form-${staffId}`);
-                if (form) {
-                    form.addEventListener("submit", async () => {
-                        const pseudoVal = document.getElementById(`input-pseudo-${staffId}`).value.trim();
-                        const sectionVal = document.getElementById(`input-section-${staffId}`).value;
-                        const roleVal = document.getElementById(`input-role-${staffId}`).value.trim();
-                        const descVal = document.getElementById(`input-desc-${staffId}`).value.trim();
-                        const twitterVal = document.getElementById(`input-twitter-${staffId}`).value.trim();
-                        const twitchVal = document.getElementById(`input-twitch-${staffId}`).value.trim();
-                        const youtubeVal = document.getElementById(`input-youtube-${staffId}`).value.trim();
-                        const tiktokVal = document.getElementById(`input-tiktok-${staffId}`).value.trim();
-
-                        const staffData = {
-                            pseudo: pseudoVal,
-                            section: sectionVal,
-                            role: roleVal,
-                            description: descVal,
-                            image: imageBase64String,
-                            twitter: twitterVal,
-                            twitch: twitchVal,
-                            youtube: youtubeVal,
-                            tiktok: tiktokVal,
-                            createdAt: member.createdAt || Date.now()
-                        };
-
-                        try {
-                            await setDoc(doc(db, "staff", staffId), staffData);
-                            closePopup();
-                        } catch (err) {
-                            alert("Erreur lors de la sauvegarde : " + err.message);
-                        }
-                    });
-                }
-
-                // Delete Member Handling
-                const btnDelete = document.getElementById(`btn-delete-${staffId}`);
-                if (btnDelete) {
-                    btnDelete.addEventListener("click", async () => {
-                        if (confirm(`Voulez-vous vraiment supprimer ${member.pseudo} du staff ?`)) {
-                            try {
-                                await deleteDoc(doc(db, "staff", staffId));
-                                closePopup();
-                            } catch (err) {
-                                alert("Erreur lors de la suppression : " + err.message);
-                            }
-                        }
-                    });
-                }
-            }
+                document.querySelectorAll('.action-btn.edit').forEach(btn => {
+                    btn.onclick = () => {
+                        const m = staffCache[btn.dataset.id];
+                        if (!m) return;
+                        document.getElementById('staff-id').value = btn.dataset.id;
+                        document.getElementById('staff-name').value = m.name || "";
+                        document.getElementById('staff-pole').value = m.pole || "direction";
+                        document.getElementById('staff-role').value = m.role || "";
+                        document.getElementById('staff-avatar').value = m.avatar || "";
+                        document.getElementById('staff-bio').value = m.bio || "";
+                        document.getElementById('modal-title').textContent = "Modifier le membre";
+                        modal.classList.add('active');
+                    };
+                });
+            }, (error) => {
+                console.error("Erreur lecture Firestore :", error);
+                document.getElementById('grid-direction').innerHTML = `<p style="color:#ff4444; grid-column: 1/-1;">Erreur de chargement des membres du staff.</p>`;
+            });
         }
     </script>
 </body>

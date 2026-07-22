@@ -171,7 +171,6 @@
             </div>
         </div>
         
-        <!-- Bouton Burger (visible uniquement sur mobile) -->
         <button class="menu-toggle" id="mobile-menu-toggle" aria-label="Ouvrir le menu">
             <span></span>
             <span></span>
@@ -181,6 +180,7 @@
         <ul id="nav-links-list">
             <li><a href="index.html">Accueil</a></li>
             <li><a href="roster.html">Roster</a></li>
+            <li><a href="staffabysz.html">Staff</a></li>
             <li><a href="boutique.html">Boutique</a></li>
             <li><a href="#annonces">Actualités</a></li>
             <li><a href="#rejoindre-commu">Rejoindre</a></li>
@@ -188,7 +188,7 @@
             <li id="nav-dashboard" class="nav-dashboard-link hidden"><a href="dashboard.html">📊 Dashboard</a></li>
         </ul>
     </nav>
- 
+
     <section id="accueil" class="hero" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url('./baniere.png');">
         <h1>ABYSZ</h1>
         <p class="slogan">The beginning of every legend</p>
@@ -470,123 +470,35 @@
                     img.alt = 'Illustration';
                     card.appendChild(img);
                 }
- 
+
                 card.appendChild(contentEl);
- 
+
                 if (ann.btnText && ann.btnLink && /^https?:\/\//i.test(ann.btnLink)) {
-                    const actionBtn = document.createElement('a');
-                    actionBtn.href = ann.btnLink;
-                    actionBtn.target = '_blank';
-                    actionBtn.rel = 'noopener noreferrer';
-                    actionBtn.className = 'announcement-action-btn';
-                    actionBtn.textContent = ann.btnText + ' →';
-                    card.appendChild(actionBtn);
+                    const btnLink = document.createElement('a');
+                    btnLink.href = ann.btnLink;
+                    btnLink.target = '_blank';
+                    btnLink.rel = 'noopener noreferrer';
+                    btnLink.className = 'announcement-action-btn';
+                    btnLink.textContent = ann.btnText;
+                    card.appendChild(btnLink);
                 }
- 
+
                 card.appendChild(dateEl);
- 
-                if (currentUser && isUserAdmin) {
+
+                if (isUserAdmin) {
                     const actionsDiv = document.createElement('div');
                     actionsDiv.className = 'card-actions';
-                    
-                    const editBtn = document.createElement('button');
-                    editBtn.className = 'edit-btn';
-                    editBtn.setAttribute('data-id', docSnap.id);
-                    editBtn.textContent = 'Modifier';
-                    
-                    const delBtn = document.createElement('button');
-                    delBtn.className = 'delete-btn';
-                    delBtn.setAttribute('data-id', docSnap.id);
-                    delBtn.textContent = 'Supprimer';
-                    
-                    actionsDiv.appendChild(editBtn);
-                    actionsDiv.appendChild(delBtn);
+                    actionsDiv.innerHTML = `
+                        <button class="edit-btn" data-id="${docSnap.id}">Éditer</button>
+                        <button class="delete-btn" data-id="${docSnap.id}">Supprimer</button>
+                    `;
                     card.appendChild(actionsDiv);
                 }
- 
+
                 feed.appendChild(card);
             });
             setupCardButtons();
         });
- 
-        async function loadPlayersDropdown() {
-            const playerSelect = document.getElementById('select-player');
-            if (!playerSelect) return;
-            playerSelect.innerHTML = '<option value="">-- Choisir un joueur --</option>';
-            try {
-                const querySnapshot = await getDocs(collection(db, "players"));
-                querySnapshot.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    if (data.role !== 'admin') {
-                        const option = document.createElement('option');
-                        option.value = docSnap.id;
-                        option.textContent = data.name || data.email || docSnap.id;
-                        playerSelect.appendChild(option);
-                    }
-                });
-            } catch (err) {
-                console.error("Erreur chargement joueurs dropdown:", err);
-            }
-        }
- 
-        onAuthStateChanged(auth, async (user) => {
-            currentUser = user;
-            if (user) {
-                if (navEspaceJoueur) navEspaceJoueur.classList.remove('hidden');
-                const userDocRef = doc(db, "players", user.uid);
-                const userDocSnap = await getDoc(userDocRef);
-                if (userDocSnap.exists() && userDocSnap.data().role === "admin") {
-                    isUserAdmin = true;
-                    if (loginStep) loginStep.classList.add('hidden');
-                    if (panelStep) panelStep.classList.remove('hidden');
-                    if (userDisplayEmail) userDisplayEmail.textContent = `Admin : ${user.email}`;
-                    document.getElementById('nav-dashboard')?.classList.remove('hidden');
-                    if (quickAddBtn) quickAddBtn.classList.remove('hidden');
-                    adminGateBtn.innerHTML = "🔒 Panel Admin";
-                    adminGateBtn.classList.add("logged-in");
-                    loadPlayersDropdown();
-                } else {
-                    isUserAdmin = false;
-                    if (loginStep) loginStep.classList.add('hidden');
-                    if (panelStep) panelStep.classList.add('hidden');
-                    document.getElementById('nav-dashboard')?.classList.add('hidden');
-                    if (quickAddBtn) quickAddBtn.classList.add('hidden');
-                    adminGateBtn.innerHTML = "🚪 Déconnexion";
-                    adminGateBtn.classList.add("logged-in");
-                }
-            } else {
-                isUserAdmin = false;
-                if (navEspaceJoueur) navEspaceJoueur.classList.add('hidden');
-                if (loginStep) loginStep.classList.remove('hidden');
-                if (panelStep) panelStep.classList.add('hidden');
-                document.getElementById('nav-dashboard')?.classList.add('hidden');
-                if (quickAddBtn) quickAddBtn.classList.add('hidden');
-                adminGateBtn.innerHTML = "🔑 Connexion";
-                adminGateBtn.classList.remove("logged-in");
-            }
-        });
-        
-        // Fonctions simplifiées de trigger de clic pour les formulaires (à relier à vos scripts de soumission existants)
-        if (adminGateBtn) {
-            adminGateBtn.onclick = () => {
-                if (currentUser) {
-                    signOut(auth);
-                } else {
-                    if (loginStep) loginStep.classList.remove('hidden');
-                    if (panelStep) panelStep.classList.add('hidden');
-                    if (loginError) loginError.classList.add('hidden');
-                    modal.classList.add('active');
-                }
-            };
-        }
-        if (quickAddBtn) {
-            quickAddBtn.onclick = () => {
-                document.getElementById("annonce-id").value = "";
-                if (announcementForm) announcementForm.reset();
-                document.getElementById("panel-form-title").textContent = "Publier une annonce";
-                modal.classList.add('active');
-            };
-        }
     </script>
 </body>
 </html>

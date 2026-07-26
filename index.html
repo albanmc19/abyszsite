@@ -93,7 +93,7 @@
         /* Discord Community Bar Component */
         .discord-widget-wrapper { display: inline-flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap; background: #141414; padding: 10px 20px; border-radius: 12px; border: 1px solid #2a2a2a; margin-top: 15px; }
         .discord-online-counter { display: flex; align-items: center; gap: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.9rem; font-weight: 600; color: #ccc; background: #0a0a0a; padding: 10px 16px; border-radius: 8px; border: 1px solid #1a1a1a; }
-        .online-dot { width: 10px; height: 10px; background-color: #23a55a; border-radius: 50%; box-shadow: 0 0 8px #23a55a; display: inline-block; }
+        .online-dot { width: 10px; height: 10px; background-color: #23a55a; border-radius: 50%; box-shadow: 0 0 8px #23a55a; display: inline-block; flex-shrink: 0; }
         
         /* Modal Overlay */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 15px; opacity: 0; transition: opacity 0.3s ease; }
@@ -212,7 +212,7 @@
             <a href="https://discord.gg/KeSPkvjBVy" target="_blank" rel="noopener noreferrer" class="btn" id="discord-btn">Rejoindre le Discord</a>
             <div class="discord-online-counter">
                 <span class="online-dot"></span>
-                <span id="discord-online-count">-- membres en ligne</span>
+                <span id="discord-online-count">Chargement...</span>
             </div>
         </div>
     </section>
@@ -363,22 +363,31 @@
             const countElement = document.getElementById('discord-online-count');
             if (!countElement) return;
 
+            const targetUrl = `https://discord.com/api/guilds/${DISCORD_SERVER_ID}/widget.json`;
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+
             try {
-                const response = await fetch(`https://discord.com/api/guilds/${DISCORD_SERVER_ID}/widget.json`);
+                const response = await fetch(proxyUrl);
                 if (response.ok) {
                     const data = await response.json();
-                    const onlineCount = data.presence_count || 0;
-                    countElement.textContent = `${onlineCount} membre${onlineCount > 1 ? 's' : ''} en ligne`;
+                    const onlineCount = data.presence_count ?? 0;
+                    
+                    if (onlineCount > 0) {
+                        countElement.textContent = `${onlineCount} membre${onlineCount > 1 ? 's' : ''} en ligne`;
+                    } else {
+                        countElement.textContent = "Serveur en ligne";
+                    }
                 } else {
                     countElement.textContent = "Communauté Active";
                 }
             } catch (err) {
-                countElement.textContent = "En Ligne";
+                console.error("Erreur de récupération Discord:", err);
+                countElement.textContent = "Communauté Active";
             }
         }
 
         fetchDiscordOnlineCount();
-        setInterval(fetchDiscordOnlineCount, 60000); // Mise à jour toutes les minutes
+        setInterval(fetchDiscordOnlineCount, 30000); // Mise à jour toutes les 30s
 
         // Écoute de la connexion Firebase
         onAuthStateChanged(auth, (user) => {

@@ -17,7 +17,7 @@
         
         /* Navigation Base */
         nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; position: relative; z-index: 1000; background: #0a0a0a; border-bottom: 1px solid #1a1a1a; }
-        nav ul { display: flex; list-style: none; gap: 20px; margin: 0; padding: 0; }
+        nav ul { display: flex; list-style: none; gap: 20px; margin: 0; padding: 0; align-items: center; }
         nav ul li a { position: relative; transition: color 0.3s ease; text-decoration: none; color: white; }
         nav ul li a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: #a855f7; transition: width 0.3s ease; }
         nav ul li a:hover { color: #a855f7; }
@@ -27,6 +27,35 @@
         .social-links { display: flex; gap: 10px; margin-left: 10px; }
         .social-links a { color: #ccc; transition: color 0.2s; }
         .social-links a:hover { color: #a855f7; }
+
+        /* Widget Visiteurs en temps réel */
+        .online-counter-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid #2a2a2a;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.78rem;
+            color: #e0e0e0;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10b981;
+            animation: pulse-live 1.8s infinite;
+        }
+
+        @keyframes pulse-live {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
 
         .menu-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; z-index: 1100; }
         .menu-toggle span { display: block; width: 25px; height: 3px; background: white; transition: all 0.3s ease; }
@@ -91,7 +120,7 @@
         .delete-btn { background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: background 0.2s; }
         .delete-btn:hover { background: #cc3333; }
 
-        /* SECTION PARTENAIRES REDESSINÉE */
+        /* SECTION PARTENAIRES */
         .partners-container { max-width: 1100px; margin: 0 auto; padding: 50px 20px; border-top: 1px solid #1a1a1a; }
         .partners-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; margin-top: 10px; }
         
@@ -218,7 +247,7 @@
             font-family: 'Orbitron', sans-serif;
             font-size: 0.8rem;
             font-weight: 700;
-            transition: all 0.25 ease;
+            transition: all 0.25s ease;
             width: 100%;
             box-sizing: border-box;
             display: inline-block;
@@ -324,6 +353,12 @@
             <li><a href="#annonces">Actualités</a></li>
             <li><a href="#partenaires">Partenaires</a></li>
             <li><a href="#rejoindre-commu">Rejoindre</a></li>
+            <li>
+                <div class="online-counter-badge">
+                    <span class="pulse-dot"></span>
+                    <span id="site-online-count">1 en ligne</span>
+                </div>
+            </li>
             <li id="nav-espace-joueur" class="hidden"><a href="espace-joueur.html" style="color: #a855f7; font-weight: bold;">Mon Espace</a></li>
             <li id="nav-dashboard" class="nav-dashboard-link hidden"><a href="dashboard.html">📊 Dashboard</a></li>
         </ul>
@@ -550,10 +585,12 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
- 
+        import { getDatabase, ref, push, onValue, onDisconnect, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
             authDomain: "abysz-esports.firebaseapp.com",
+            databaseURL: "https://abysz-esports-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "abysz-esports",
             storageBucket: "abysz-esports.firebasestorage.app",
             messagingSenderId: "200968659347",
@@ -563,7 +600,28 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
- 
+        const rtdb = getDatabase(app);
+
+        // --- GESTION DES VISITEURS EN EN TEMPS RÉEL ---
+        const connectedRef = ref(rtdb, ".info/connected");
+        const onlineUsersRef = ref(rtdb, "online_users");
+        const siteOnlineCountElement = document.getElementById("site-online-count");
+
+        onValue(connectedRef, (snap) => {
+            if (snap.val() === true) {
+                const userPresenceRef = push(onlineUsersRef);
+                onDisconnect(userPresenceRef).remove();
+                set(userPresenceRef, true);
+            }
+        });
+
+        onValue(onlineUsersRef, (snapshot) => {
+            const count = snapshot.exists() ? Object.keys(snapshot.val()).length : 1;
+            if (siteOnlineCountElement) {
+                siteOnlineCountElement.textContent = `${count} en ligne`;
+            }
+        });
+
         // Éléments HTML
         const modal = document.getElementById('admin-modal');
         const adminGateBtn = document.getElementById('admin-gate-btn');
@@ -613,7 +671,7 @@
         let autoSlideTimer = null;
 
         // SYSTEME UPLOAD D'IMAGE DE LOGO (via ImgBB API)
-        const IMGBB_API_KEY = "3b08e547bc58ff093b1eb885c3b99f2e"; // Clé publique de téléversement
+        const IMGBB_API_KEY = "3b08e547bc58ff093b1eb885c3b99f2e";
 
         if (partnerLogoFileInput) {
             partnerLogoFileInput.addEventListener('change', async (e) => {
@@ -687,7 +745,7 @@
         fetchDiscordOnlineCount();
         setInterval(fetchDiscordOnlineCount, 30000);
 
-        // Connexion Firebase
+        // Connexion Firebase Auth
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
@@ -807,7 +865,7 @@
             }
         });
 
-        // Publier / Éditer Partenaire avec options étendues
+        // Publier / Éditer Partenaire
         partnerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!isUserAdmin) return alert("Droits insuffisants.");
@@ -1007,7 +1065,7 @@
             startAutoSlide();
         });
 
-        // Realtime Partenaires avec mise en page haut de gamme
+        // Realtime Partenaires
         const qPartners = query(collection(db, "partners"), orderBy("createdAt", "desc"));
         onSnapshot(qPartners, (snapshot) => {
             partnersFeed.innerHTML = "";

@@ -40,11 +40,11 @@
         
         /* Annonces - Système de Carrousel */
         .announcements-container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
-        .announcements-header { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 20px; }
         .title-area { display: flex; align-items: center; gap: 12px; }
         .title-area h2 { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; margin: 0; }
-        .add-announcement-btn { background: #a855f7; border: none; color: white; width: 34px; height: 34px; border-radius: 50%; font-size: 1.3rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; box-shadow: 0 0 10px rgba(168, 85, 247, 0.3); flex-shrink: 0; }
-        .add-announcement-btn:hover { background: #b975ff; transform: scale(1.05); box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
+        .add-btn { background: #a855f7; border: none; color: white; width: 34px; height: 34px; border-radius: 50%; font-size: 1.3rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; box-shadow: 0 0 10px rgba(168, 85, 247, 0.3); flex-shrink: 0; }
+        .add-btn:hover { background: #b975ff; transform: scale(1.05); box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
         
         .admin-gate-btn { background: transparent; border: 1px solid #a855f7; color: #a855f7; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-family: 'Orbitron', sans-serif; transition: all 0.3s ease; font-size: 0.9rem; white-space: nowrap; }
         .admin-gate-btn:hover { background: #a855f7; color: white; box-shadow: 0 0 15px #a855f7; }
@@ -59,7 +59,7 @@
         .announcement-card { min-width: 100%; box-sizing: border-box; padding: 30px; border-left: 5px solid #a855f7; position: relative; display: flex; flex-direction: column; gap: 14px; background: #1a1a1a; }
         .announcement-card.priority-urgent { border-left-color: #ff4444; background: linear-gradient(90deg, rgba(255,68,68,0.05) 0%, #1a1a1a 100%); }
         
-        /* Controles Carrousel - Repositionnés sans chevauchement */
+        /* Controles Carrousel */
         .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: #1a1a1a; border: 1px solid #a855f7; color: white; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; z-index: 20; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
         .carousel-btn:hover { background: #a855f7; box-shadow: 0 0 12px #a855f7; }
         .carousel-btn.prev { left: 12px; }
@@ -90,6 +90,18 @@
         .edit-btn:hover { background: #2563eb; }
         .delete-btn { background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: background 0.2s; }
         .delete-btn:hover { background: #cc3333; }
+
+        /* SECTION PARTENAIRES */
+        .partners-container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; border-top: 1px solid #1a1a1a; }
+        .partners-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
+        .partner-card { background: #141414; border: 1px solid #2a2a2a; border-radius: 12px; padding: 25px; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; }
+        .partner-card:hover { transform: translateY(-5px); border-color: var(--partner-color, #a855f7); box-shadow: 0 0 20px rgba(168, 85, 247, 0.2); }
+        .partner-logo { width: 90px; height: 90px; object-fit: contain; border-radius: 50%; background: #0a0a0a; border: 2px solid var(--partner-color, #a855f7); padding: 5px; margin-bottom: 15px; }
+        .partner-name { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; margin: 0 0 5px 0; color: #fff; }
+        .partner-role { font-size: 0.8rem; font-family: 'Orbitron', sans-serif; color: var(--partner-color, #a855f7); text-transform: uppercase; font-weight: 700; margin-bottom: 12px; letter-spacing: 0.5px; }
+        .partner-desc { font-size: 0.9rem; color: #ccc; margin: 0 0 20px 0; line-height: 1.5; flex-grow: 1; }
+        .partner-link-btn { background: transparent; border: 1px solid var(--partner-color, #a855f7); color: #fff; text-decoration: none; padding: 8px 18px; border-radius: 6px; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; transition: all 0.2s ease; }
+        .partner-link-btn:hover { background: var(--partner-color, #a855f7); color: white; box-shadow: 0 0 12px var(--partner-color, #a855f7); }
 
         /* Discord Community Bar Component */
         .discord-widget-wrapper { display: inline-flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap; background: #141414; padding: 10px 20px; border-radius: 12px; border: 1px solid #2a2a2a; margin-top: 15px; }
@@ -138,7 +150,7 @@
             .menu-toggle.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
             .menu-toggle.open span:nth-child(2) { opacity: 0; }
             .menu-toggle.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
-            .announcements-header { flex-direction: column; align-items: stretch; gap: 15px; text-align: center; }
+            .section-header { flex-direction: column; align-items: stretch; gap: 15px; text-align: center; }
             .title-area { justify-content: center; }
             .admin-gate-btn { width: 100%; text-align: center; padding: 12px; box-sizing: border-box; }
             .announcement-card { padding: 20px; padding-top: 50px; }
@@ -178,6 +190,7 @@
             <li><a href="staffabysz.html">Staff</a></li>
             <li><a href="boutique.html">Boutique</a></li>
             <li><a href="#annonces">Actualités</a></li>
+            <li><a href="#partenaires">Partenaires</a></li>
             <li><a href="#rejoindre-commu">Rejoindre</a></li>
             <li id="nav-espace-joueur" class="hidden"><a href="espace-joueur.html" style="color: #a855f7; font-weight: bold;">Mon Espace</a></li>
             <li id="nav-dashboard" class="nav-dashboard-link hidden"><a href="dashboard.html">📊 Dashboard</a></li>
@@ -191,10 +204,10 @@
     </section>
  
     <section id="annonces" class="announcements-container reveal">
-        <div class="announcements-header">
+        <div class="section-header">
             <div class="title-area">
                 <h2>Annonces Récentes</h2>
-                <button class="add-announcement-btn hidden" id="quick-add-btn" title="Créer une annonce">+</button>
+                <button class="add-btn hidden" id="quick-add-btn" title="Créer une annonce">+</button>
             </div>
             <button class="admin-gate-btn" id="admin-gate-btn">🔑 Connexion</button>
         </div>
@@ -209,6 +222,19 @@
             <button class="carousel-btn next" id="next-slide">❯</button>
         </div>
         <div class="carousel-dots" id="carousel-dots"></div>
+    </section>
+
+    <section id="partenaires" class="partners-container reveal">
+        <div class="section-header">
+            <div class="title-area">
+                <h2>Nos Partenaires</h2>
+                <button class="add-btn hidden" id="quick-add-partner-btn" title="Ajouter un partenaire">+</button>
+            </div>
+        </div>
+        
+        <div class="partners-grid" id="partners-feed">
+            <p class="loading-text">Chargement des partenaires...</p>
+        </div>
     </section>
  
     <section id="rejoindre-commu" class="reveal" style="padding: 60px 20px; text-align: center;">
@@ -249,61 +275,101 @@
             </div>
  
             <div id="admin-panel-step" class="hidden">
-                <h3 id="panel-form-title">Publier une annonce</h3>
                 <div class="admin-header-actions">
                     <span id="user-display-email" style="color:#a855f7; font-weight:600; font-size: 0.85rem; font-family: 'Inter', sans-serif;"></span>
                     <button id="logout-btn" style="background:none; border:none; color:#ff4444; cursor:pointer; font-weight: 600; font-family: 'Orbitron', sans-serif; font-size:0.85rem;">Déconnexion</button>
                 </div>
-                <form id="announcement-form">
-                    <input type="hidden" id="annonce-id" value="">
-                    
-                    <div class="input-group">
-                        <label for="annonce-title">Titre de l'actualité</label>
-                        <input type="text" id="annonce-title" placeholder="Ex: Match ce soir à 21h !" required>
-                    </div>
-                    <div class="input-row">
-                        <div class="input-group">
-                            <label for="annonce-category">Catégorie / Tag</label>
-                            <select id="annonce-category">
-                                <option value="general">Général</option>
-                                <option value="match">Match / Tournoi</option>
-                                <option value="recrutement">Recrutement</option>
-                                <option value="evenement">Événement</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label for="annonce-priority">Importance</label>
-                            <select id="annonce-priority">
-                                <option value="normal">Normal</option>
-                                <option value="urgent">Urgent / Important</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <label for="annonce-expires">Disparition automatique (Optionnel)</label>
-                        <input type="datetime-local" id="annonce-expires">
-                    </div>
-                    <div class="input-group">
-                        <label for="annonce-img-url">URL d'une Image (Optionnel)</label>
-                        <input type="url" id="annonce-img-url" placeholder="https://lien-vers-mon-image.png">
-                    </div>
-                    <div class="input-row">
-                        <div class="input-group">
-                            <label for="annonce-btn-text">Texte du Bouton (Optionnel)</label>
-                            <input type="text" id="annonce-btn-text" placeholder="Ex: Regarder le match">
-                        </div>
-                        <div class="input-group">
-                            <label for="annonce-btn-link">Lien du Bouton (Optionnel)</label>
-                            <input type="url" id="annonce-btn-link" placeholder="https://twitch.tv/...">
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <label for="annonce-content">Message</label>
-                        <textarea id="annonce-content" rows="4" placeholder="Écrivez le contenu de l'annonce..." required></textarea>
-                    </div>
 
-                    <button type="submit" class="form-btn" id="publish-btn">Enregistrer l'annonce</button>
-                </form>
+                <div id="form-annonce-wrapper">
+                    <h3 id="panel-form-title">Publier une annonce</h3>
+                    <form id="announcement-form">
+                        <input type="hidden" id="annonce-id" value="">
+                        
+                        <div class="input-group">
+                            <label for="annonce-title">Titre de l'actualité</label>
+                            <input type="text" id="annonce-title" placeholder="Ex: Match ce soir à 21h !" required>
+                        </div>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label for="annonce-category">Catégorie / Tag</label>
+                                <select id="annonce-category">
+                                    <option value="general">Général</option>
+                                    <option value="match">Match / Tournoi</option>
+                                    <option value="recrutement">Recrutement</option>
+                                    <option value="evenement">Événement</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="annonce-priority">Importance</label>
+                                <select id="annonce-priority">
+                                    <option value="normal">Normal</option>
+                                    <option value="urgent">Urgent / Important</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="annonce-expires">Disparition automatique (Optionnel)</label>
+                            <input type="datetime-local" id="annonce-expires">
+                        </div>
+                        <div class="input-group">
+                            <label for="annonce-img-url">URL d'une Image (Optionnel)</label>
+                            <input type="url" id="annonce-img-url" placeholder="https://lien-vers-mon-image.png">
+                        </div>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label for="annonce-btn-text">Texte du Bouton (Optionnel)</label>
+                                <input type="text" id="annonce-btn-text" placeholder="Ex: Regarder le match">
+                            </div>
+                            <div class="input-group">
+                                <label for="annonce-btn-link">Lien du Bouton (Optionnel)</label>
+                                <input type="url" id="annonce-btn-link" placeholder="https://twitch.tv/...">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="annonce-content">Message</label>
+                            <textarea id="annonce-content" rows="4" placeholder="Écrivez le contenu de l'annonce..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="form-btn" id="publish-btn">Enregistrer l'annonce</button>
+                    </form>
+                </div>
+
+                <div id="form-partner-wrapper" class="hidden" style="margin-top: 20px;">
+                    <h3 id="partner-form-title">Gestion du Partenaire</h3>
+                    <form id="partner-form">
+                        <input type="hidden" id="partner-id" value="">
+                        
+                        <div class="input-group">
+                            <label for="partner-name">Nom du Partenaire</label>
+                            <input type="text" id="partner-name" placeholder="Ex: Razer" required>
+                        </div>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label for="partner-role">Rôle / Type de partenariat</label>
+                                <input type="text" id="partner-role" placeholder="Ex: Équipementier Officiel" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="partner-color">Couleur Thème (Hex)</label>
+                                <input type="color" id="partner-color" value="#a855f7" style="height: 45px; cursor: pointer;">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="partner-logo-url">URL du Logo / Image</label>
+                            <input type="url" id="partner-logo-url" placeholder="https://lien-vers-logo.png" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="partner-site-url">Lien du Site Web / Réseau Social</label>
+                            <input type="url" id="partner-site-url" placeholder="https://partner-website.com" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="partner-desc">Description Courte</label>
+                            <textarea id="partner-desc" rows="3" placeholder="Présentation du partenaire et de la collaboration..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="form-btn" id="publish-partner-btn">Enregistrer le partenaire</button>
+                    </form>
+                </div>
+
             </div>
         </div>
     </div>
@@ -330,15 +396,20 @@
         const modal = document.getElementById('admin-modal');
         const adminGateBtn = document.getElementById('admin-gate-btn');
         const quickAddBtn = document.getElementById('quick-add-btn');
+        const quickAddPartnerBtn = document.getElementById('quick-add-partner-btn');
         const closeModalBtn = document.getElementById('close-modal-btn');
         const loginForm = document.getElementById('login-form');
         const announcementForm = document.getElementById('announcement-form');
+        const partnerForm = document.getElementById('partner-form');
+        const formAnnonceWrapper = document.getElementById('form-annonce-wrapper');
+        const formPartnerWrapper = document.getElementById('form-partner-wrapper');
         const loginStep = document.getElementById('admin-login-step');
         const panelStep = document.getElementById('admin-panel-step');
         const loginError = document.getElementById('login-error');
         const userDisplayEmail = document.getElementById('user-display-email');
         const logoutBtn = document.getElementById('logout-btn');
         const feed = document.getElementById("announcements-feed");
+        const partnersFeed = document.getElementById("partners-feed");
         const dotsContainer = document.getElementById("carousel-dots");
         const prevBtn = document.getElementById("prev-slide");
         const nextBtn = document.getElementById("next-slide");
@@ -359,11 +430,12 @@
         let currentUser = null;
         let isUserAdmin = false;
         let announcementsData = {};
+        let partnersData = {};
         let currentSlide = 0;
         let totalSlides = 0;
         let autoSlideTimer = null;
 
-        // Récupération du nombre de membres Discord en direct (Mise à jour avec le bon ID)
+        // Récupération Discord
         const DISCORD_SERVER_ID = "1370836256556187771";
 
         async function fetchDiscordOnlineCount() {
@@ -372,7 +444,6 @@
 
             const targetUrl = `https://discord.com/api/guilds/${DISCORD_SERVER_ID}/widget.json`;
 
-            // Tentative 1 : Accès Direct
             try {
                 const response = await fetch(targetUrl);
                 if (response.ok) {
@@ -381,11 +452,8 @@
                     countElement.textContent = `${onlineCount} membre${onlineCount > 1 ? 's' : ''} en ligne`;
                     return;
                 }
-            } catch (e) {
-                // Échec direct
-            }
+            } catch (e) {}
 
-            // Tentative 2 : Via un proxy CORS
             try {
                 const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
                 const response = await fetch(proxyUrl);
@@ -397,16 +465,16 @@
                     return;
                 }
             } catch (err) {
-                console.error("Erreur de récupération Discord:", err);
+                console.error("Erreur Discord:", err);
             }
 
             countElement.textContent = "Communauté Active";
         }
 
         fetchDiscordOnlineCount();
-        setInterval(fetchDiscordOnlineCount, 30000); // Rafraîchissement toutes les 30s
+        setInterval(fetchDiscordOnlineCount, 30000);
 
-        // Écoute de la connexion Firebase
+        // Connexion Firebase
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
@@ -418,6 +486,7 @@
                 if (navEspaceJoueur) navEspaceJoueur.classList.remove('hidden');
                 if (isUserAdmin) {
                     if (quickAddBtn) quickAddBtn.classList.remove('hidden');
+                    if (quickAddPartnerBtn) quickAddPartnerBtn.classList.remove('hidden');
                     if (navDashboard) navDashboard.classList.remove('hidden');
                 }
 
@@ -430,6 +499,7 @@
                 adminGateBtn.classList.remove('logged-in');
                 
                 if (quickAddBtn) quickAddBtn.classList.add('hidden');
+                if (quickAddPartnerBtn) quickAddPartnerBtn.classList.add('hidden');
                 if (navEspaceJoueur) navEspaceJoueur.classList.add('hidden');
                 if (navDashboard) navDashboard.classList.add('hidden');
 
@@ -438,7 +508,6 @@
             }
         });
 
-        // Connexion
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('admin-email').value;
@@ -454,22 +523,39 @@
             }
         });
 
-        // Déconnexion
         logoutBtn.onclick = async () => {
             await signOut(auth);
             modal.classList.remove('active');
         };
 
-        // Modal
-        adminGateBtn.onclick = () => modal.classList.add('active');
+        adminGateBtn.onclick = () => {
+            formAnnonceWrapper.classList.remove('hidden');
+            formPartnerWrapper.classList.add('hidden');
+            modal.classList.add('active');
+        };
+
         if (quickAddBtn) {
             quickAddBtn.onclick = () => {
                 document.getElementById("annonce-id").value = "";
                 announcementForm.reset();
                 document.getElementById("panel-form-title").textContent = "Publier une annonce";
+                formAnnonceWrapper.classList.remove('hidden');
+                formPartnerWrapper.classList.add('hidden');
                 modal.classList.add('active');
             };
         }
+
+        if (quickAddPartnerBtn) {
+            quickAddPartnerBtn.onclick = () => {
+                document.getElementById("partner-id").value = "";
+                partnerForm.reset();
+                document.getElementById("partner-form-title").textContent = "Ajouter un Partenaire";
+                formAnnonceWrapper.classList.add('hidden');
+                formPartnerWrapper.classList.remove('hidden');
+                modal.classList.add('active');
+            };
+        }
+
         closeModalBtn.onclick = () => modal.classList.remove('active');
         window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
 
@@ -503,6 +589,36 @@
                 announcementForm.reset();
             } catch (err) {
                 alert("Erreur lors de l'enregistrement : " + err.message);
+            }
+        });
+
+        // Publier / Éditer Partenaire
+        partnerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!isUserAdmin) return alert("Droits insuffisants.");
+
+            const partnerId = document.getElementById("partner-id").value;
+            
+            const payload = {
+                name: document.getElementById("partner-name").value,
+                role: document.getElementById("partner-role").value,
+                color: document.getElementById("partner-color").value,
+                logoUrl: document.getElementById("partner-logo-url").value,
+                siteUrl: document.getElementById("partner-site-url").value,
+                description: document.getElementById("partner-desc").value,
+                createdAt: Date.now()
+            };
+
+            try {
+                if (partnerId) {
+                    await updateDoc(doc(db, "partners", partnerId), payload);
+                } else {
+                    await addDoc(collection(db, "partners"), payload);
+                }
+                modal.classList.remove('active');
+                partnerForm.reset();
+            } catch (err) {
+                alert("Erreur enregistrement partenaire : " + err.message);
             }
         });
 
@@ -541,9 +657,9 @@
         prevBtn.onclick = () => { prevSlide(); startAutoSlide(); };
         nextBtn.onclick = () => { nextSlide(); startAutoSlide(); };
 
-        // Dynamic Feed
-        const q = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
-        onSnapshot(q, (snapshot) => {
+        // Realtime Annonces
+        const qAnn = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
+        onSnapshot(qAnn, (snapshot) => {
             feed.innerHTML = "";
             dotsContainer.innerHTML = "";
             announcementsData = {};
@@ -552,12 +668,10 @@
 
             snapshot.forEach((docSnap) => {
                 const ann = docSnap.data();
-                
                 if (ann.expiresAt && ann.expiresAt <= now) {
                     deleteDoc(doc(db, "announcements", docSnap.id));
                     return;
                 }
-
                 validCards.push({ id: docSnap.id, ...ann });
             });
 
@@ -598,8 +712,8 @@
                 if (isUserAdmin) {
                     adminActionsHtml = `
                         <div class="card-actions">
-                            <button class="edit-btn" data-id="${ann.id}">✏️ Éditer</button>
-                            <button class="delete-btn" data-id="${ann.id}">🗑️</button>
+                            <button class="edit-btn edit-ann-btn" data-id="${ann.id}">✏️ Éditer</button>
+                            <button class="delete-btn delete-ann-btn" data-id="${ann.id}">🗑️</button>
                         </div>
                     `;
                 }
@@ -630,16 +744,16 @@
             });
 
             if (isUserAdmin) {
-                feed.querySelectorAll('.delete-btn').forEach(btn => {
+                feed.querySelectorAll('.delete-ann-btn').forEach(btn => {
                     btn.onclick = async (e) => {
                         const id = e.target.getAttribute('data-id');
-                        if (confirm("Voulez-vous vraiment supprimer cette annonce ?")) {
+                        if (confirm("Supprimer cette annonce ?")) {
                             await deleteDoc(doc(db, "announcements", id));
                         }
                     };
                 });
 
-                feed.querySelectorAll('.edit-btn').forEach(btn => {
+                feed.querySelectorAll('.edit-ann-btn').forEach(btn => {
                     btn.onclick = (e) => {
                         const id = e.target.getAttribute('data-id');
                         const ann = announcementsData[id];
@@ -663,6 +777,8 @@
                         }
 
                         document.getElementById("panel-form-title").textContent = "Éditer l'annonce";
+                        formAnnonceWrapper.classList.remove('hidden');
+                        formPartnerWrapper.classList.add('hidden');
                         modal.classList.add('active');
                     };
                 });
@@ -670,6 +786,80 @@
 
             updateCarouselPosition();
             startAutoSlide();
+        });
+
+        // Realtime Partenaires
+        const qPartners = query(collection(db, "partners"), orderBy("createdAt", "desc"));
+        onSnapshot(qPartners, (snapshot) => {
+            partnersFeed.innerHTML = "";
+            partnersData = {};
+
+            if (snapshot.empty) {
+                partnersFeed.innerHTML = '<p class="loading-text">Aucun partenaire affiché pour le moment.</p>';
+                return;
+            }
+
+            snapshot.forEach((docSnap) => {
+                const partner = docSnap.data();
+                partnersData[docSnap.id] = partner;
+
+                const partnerCard = document.createElement("div");
+                partnerCard.className = "partner-card";
+                partnerCard.style.setProperty('--partner-color', partner.color || '#a855f7');
+
+                let adminActionsHtml = '';
+                if (isUserAdmin) {
+                    adminActionsHtml = `
+                        <div class="card-actions">
+                            <button class="edit-btn edit-partner-btn" data-id="${docSnap.id}">✏️</button>
+                            <button class="delete-btn delete-partner-btn" data-id="${docSnap.id}">🗑️</button>
+                        </div>
+                    `;
+                }
+
+                partnerCard.innerHTML = `
+                    ${adminActionsHtml}
+                    <img src="${partner.logoUrl}" alt="${partner.name}" class="partner-logo">
+                    <h3 class="partner-name">${partner.name}</h3>
+                    <span class="partner-role">${partner.role}</span>
+                    <p class="partner-desc">${partner.description}</p>
+                    <a href="${partner.siteUrl}" target="_blank" rel="noopener noreferrer" class="partner-link-btn">Visiter le site</a>
+                `;
+
+                partnersFeed.appendChild(partnerCard);
+            });
+
+            if (isUserAdmin) {
+                partnersFeed.querySelectorAll('.delete-partner-btn').forEach(btn => {
+                    btn.onclick = async (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        if (confirm("Voulez-vous vraiment retirer ce partenaire ?")) {
+                            await deleteDoc(doc(db, "partners", id));
+                        }
+                    };
+                });
+
+                partnersFeed.querySelectorAll('.edit-partner-btn').forEach(btn => {
+                    btn.onclick = (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        const partner = partnersData[id];
+                        if (!partner) return;
+
+                        document.getElementById("partner-id").value = id;
+                        document.getElementById("partner-name").value = partner.name || "";
+                        document.getElementById("partner-role").value = partner.role || "";
+                        document.getElementById("partner-color").value = partner.color || "#a855f7";
+                        document.getElementById("partner-logo-url").value = partner.logoUrl || "";
+                        document.getElementById("partner-site-url").value = partner.siteUrl || "";
+                        document.getElementById("partner-desc").value = partner.description || "";
+
+                        document.getElementById("partner-form-title").textContent = "Éditer le Partenaire";
+                        formAnnonceWrapper.classList.add('hidden');
+                        formPartnerWrapper.classList.remove('hidden');
+                        modal.classList.add('active');
+                    };
+                });
+            }
         });
 
         // Scroll Reveal

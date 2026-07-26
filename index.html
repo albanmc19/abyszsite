@@ -585,7 +585,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-        import { getDatabase, ref, push, onValue, onDisconnect, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+        import { getDatabase, ref, onValue, onDisconnect, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -602,19 +602,32 @@
         const db = getFirestore(app);
         const rtdb = getDatabase(app);
 
-        // --- GESTION DES VISITEURS EN EN TEMPS RÉEL ---
+        // --- GESTION DES VISITEURS EN TEMPS RÉEL (Unique par utilisateur) ---
         const connectedRef = ref(rtdb, ".info/connected");
         const onlineUsersRef = ref(rtdb, "online_users");
         const siteOnlineCountElement = document.getElementById("site-online-count");
 
+        // 1. Obtient un identifiant persistant dans le navigateur
+        let visitorId = localStorage.getItem("abysz_visitor_id");
+        if (!visitorId) {
+            visitorId = "user_" + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
+            localStorage.setItem("abysz_visitor_id", visitorId);
+        }
+
+        const userPresenceRef = ref(rtdb, `online_users/${visitorId}`);
+
+        // 2. Met à jour la présence unique
         onValue(connectedRef, (snap) => {
             if (snap.val() === true) {
-                const userPresenceRef = push(onlineUsersRef);
                 onDisconnect(userPresenceRef).remove();
-                set(userPresenceRef, true);
+                set(userPresenceRef, {
+                    online: true,
+                    last_seen: Date.now()
+                });
             }
         });
 
+        // 3. Écoute le nombre total de visiteurs uniques
         onValue(onlineUsersRef, (snapshot) => {
             const count = snapshot.exists() ? Object.keys(snapshot.val()).length : 1;
             if (siteOnlineCountElement) {

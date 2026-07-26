@@ -55,7 +55,7 @@
         .carousel-wrapper { position: relative; width: 100%; overflow: hidden; border-radius: 16px; background: #141414; border: 1px solid #2a2a2a; }
         .carousel-track { display: flex; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); width: 100%; }
         
-        .announcement-card { min-width: 100%; box-sizing: border-radius: 16px; box-sizing: border-box; padding: 30px; border-left: 5px solid #a855f7; position: relative; display: flex; flex-direction: column; gap: 14px; background: #1a1a1a; }
+        .announcement-card { min-width: 100%; box-sizing: border-box; padding: 30px; border-left: 5px solid #a855f7; position: relative; display: flex; flex-direction: column; gap: 14px; background: #1a1a1a; }
         .announcement-card.priority-urgent { border-left-color: #ff4444; background: linear-gradient(90deg, rgba(255,68,68,0.05) 0%, #1a1a1a 100%); }
         
         /* Controles Carrousel */
@@ -89,6 +89,11 @@
         .edit-btn:hover { background: #2563eb; }
         .delete-btn { background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: background 0.2s; }
         .delete-btn:hover { background: #cc3333; }
+
+        /* Discord Community Bar Component */
+        .discord-widget-wrapper { display: inline-flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap; background: #141414; padding: 10px 20px; border-radius: 12px; border: 1px solid #2a2a2a; margin-top: 15px; }
+        .discord-online-counter { display: flex; align-items: center; gap: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.9rem; font-weight: 600; color: #ccc; background: #0a0a0a; padding: 10px 16px; border-radius: 8px; border: 1px solid #1a1a1a; }
+        .online-dot { width: 10px; height: 10px; background-color: #23a55a; border-radius: 50%; box-shadow: 0 0 8px #23a55a; display: inline-block; }
         
         /* Modal Overlay */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 15px; opacity: 0; transition: opacity 0.3s ease; }
@@ -136,6 +141,9 @@
             .input-row { flex-direction: column; gap: 0; }
             .modal-content { padding: 25px 15px; border-radius: 12px; }
             .carousel-btn { width: 32px; height: 32px; font-size: 0.9rem; }
+            .discord-widget-wrapper { flex-direction: column; width: 100%; box-sizing: border-box; }
+            .discord-online-counter { width: 100%; justify-content: center; box-sizing: border-box; }
+            .discord-widget-wrapper .btn { width: 100%; box-sizing: border-box; }
         }
     </style>
 </head>
@@ -199,7 +207,14 @@
     <section id="rejoindre-commu" class="reveal" style="padding: 60px 20px; text-align: center;">
         <h2>REJOINDRE LA COMMUNAUTÉ</h2>
         <p class="subtitle" style="color:#ccc; margin-bottom: 20px;">Entre dans l'univers Abysz, échange avec les joueurs et suis nos événements en direct !</p>
-        <a href="https://discord.gg/KeSPkvjBVy" target="_blank" rel="noopener noreferrer" class="btn" id="discord-btn">Rejoindre le Discord</a>
+        
+        <div class="discord-widget-wrapper">
+            <a href="https://discord.gg/KeSPkvjBVy" target="_blank" rel="noopener noreferrer" class="btn" id="discord-btn">Rejoindre le Discord</a>
+            <div class="discord-online-counter">
+                <span class="online-dot"></span>
+                <span id="discord-online-count">-- membres en ligne</span>
+            </div>
+        </div>
     </section>
  
     <footer>
@@ -340,6 +355,30 @@
         let currentSlide = 0;
         let totalSlides = 0;
         let autoSlideTimer = null;
+
+        // Récupération du nombre de membres Discord en direct
+        const DISCORD_SERVER_ID = "1203023887265697843"; // ID Discord Abysz
+
+        async function fetchDiscordOnlineCount() {
+            const countElement = document.getElementById('discord-online-count');
+            if (!countElement) return;
+
+            try {
+                const response = await fetch(`https://discord.com/api/guilds/${DISCORD_SERVER_ID}/widget.json`);
+                if (response.ok) {
+                    const data = await response.json();
+                    const onlineCount = data.presence_count || 0;
+                    countElement.textContent = `${onlineCount} membre${onlineCount > 1 ? 's' : ''} en ligne`;
+                } else {
+                    countElement.textContent = "Communauté Active";
+                }
+            } catch (err) {
+                countElement.textContent = "En Ligne";
+            }
+        }
+
+        fetchDiscordOnlineCount();
+        setInterval(fetchDiscordOnlineCount, 60000); // Mise à jour toutes les minutes
 
         // Écoute de la connexion Firebase
         onAuthStateChanged(auth, (user) => {
@@ -488,7 +527,6 @@
             snapshot.forEach((docSnap) => {
                 const ann = docSnap.data();
                 
-                // Vérifier si l'annonce a expiré
                 if (ann.expiresAt && ann.expiresAt <= now) {
                     deleteDoc(doc(db, "announcements", docSnap.id));
                     return;
@@ -514,34 +552,47 @@
             validCards.forEach((ann, index) => {
                 announcementsData[ann.id] = ann;
 
-                let dateRaw = typeof ann.createdAt === 'number' ? new Date(ann.createdAt) : (ann.createdAt?.seconds ? new Date(ann.createdAt.seconds * 1000) : new Date());
-                const dateStr = dateRaw.toLocaleDateString('fr-FR') + " à " + dateRaw.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
-
                 const card = document.createElement("div");
                 card.className = `announcement-card ${ann.priority === 'urgent' ? 'priority-urgent' : ''}`;
 
-                let categoryLabels = { general: 'Général', match: 'Match / Tournoi', recrutement: 'Recrutement', evenement: 'Événement' };
-                let badgesHtml = `<span class="badge badge-${ann.category || 'general'}">${categoryLabels[ann.category || 'general']}</span>`;
-                if (ann.priority === 'urgent') badgesHtml += `<span class="badge badge-urgent">🚨 Important</span>`;
+                const formattedDate = ann.createdAt 
+                    ? new Date(ann.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+                    : '';
+
+                let categoryLabel = 'Général';
+                let categoryBadgeClass = 'badge-general';
+                
+                switch(ann.category) {
+                    case 'match': categoryLabel = 'Match / Tournoi'; categoryBadgeClass = 'badge-match'; break;
+                    case 'recrutement': categoryLabel = 'Recrutement'; categoryBadgeClass = 'badge-recrutement'; break;
+                    case 'evenement': categoryLabel = 'Événement'; categoryBadgeClass = 'badge-evenement'; break;
+                }
+
+                let adminActionsHtml = '';
+                if (isUserAdmin) {
+                    adminActionsHtml = `
+                        <div class="card-actions">
+                            <button class="edit-btn" data-id="${ann.id}">✏️ Éditer</button>
+                            <button class="delete-btn" data-id="${ann.id}">🗑️</button>
+                        </div>
+                    `;
+                }
 
                 card.innerHTML = `
-                    <div class="announcement-meta">${badgesHtml}</div>
-                    <h3>${ann.title || 'Sans titre'}</h3>
-                    ${ann.imageUrl ? `<img src="${ann.imageUrl}" class="announcement-img" alt="Illustration">` : ''}
-                    <p>${ann.content || ''}</p>
-                    ${ann.btnText && ann.btnLink ? `<a href="${ann.btnLink}" target="_blank" class="announcement-action-btn">${ann.btnText}</a>` : ''}
-                    <div class="announcement-date">Posté le ${dateStr}</div>
-                    ${isUserAdmin ? `
-                        <div class="card-actions">
-                            <button class="edit-btn" data-id="${ann.id}">Éditer</button>
-                            <button class="delete-btn" data-id="${ann.id}">Supprimer</button>
-                        </div>
-                    ` : ''}
+                    ${adminActionsHtml}
+                    <div class="announcement-meta">
+                        <span class="badge ${categoryBadgeClass}">${categoryLabel}</span>
+                        ${ann.priority === 'urgent' ? '<span class="badge badge-urgent">URGENT</span>' : ''}
+                    </div>
+                    <h3>${ann.title}</h3>
+                    <p>${ann.content}</p>
+                    ${ann.imageUrl ? `<img src="${ann.imageUrl}" class="announcement-img" alt="${ann.title}">` : ''}
+                    ${(ann.btnText && ann.btnLink) ? `<a href="${ann.btnLink}" target="_blank" rel="noopener noreferrer" class="announcement-action-btn">${ann.btnText}</a>` : ''}
+                    <span class="announcement-date">Publié le ${formattedDate}</span>
                 `;
 
                 feed.appendChild(card);
 
-                // Crée les puces (dots)
                 const dot = document.createElement("div");
                 dot.className = `dot ${index === 0 ? 'active' : ''}`;
                 dot.onclick = () => {
@@ -552,49 +603,59 @@
                 dotsContainer.appendChild(dot);
             });
 
+            if (isUserAdmin) {
+                feed.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.onclick = async (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        if (confirm("Voulez-vous vraiment supprimer cette annonce ?")) {
+                            await deleteDoc(doc(db, "announcements", id));
+                        }
+                    };
+                });
+
+                feed.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.onclick = (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        const ann = announcementsData[id];
+                        if (!ann) return;
+
+                        document.getElementById("annonce-id").value = id;
+                        document.getElementById("annonce-title").value = ann.title || "";
+                        document.getElementById("annonce-category").value = ann.category || "general";
+                        document.getElementById("annonce-priority").value = ann.priority || "normal";
+                        document.getElementById("annonce-img-url").value = ann.imageUrl || "";
+                        document.getElementById("annonce-btn-text").value = ann.btnText || "";
+                        document.getElementById("annonce-btn-link").value = ann.btnLink || "";
+                        document.getElementById("annonce-content").value = ann.content || "";
+                        
+                        if (ann.expiresAt) {
+                            const dateObj = new Date(ann.expiresAt);
+                            dateObj.setMinutes(dateObj.getMinutes() - dateObj.getTimezoneOffset());
+                            document.getElementById("annonce-expires").value = dateObj.toISOString().slice(0, 16);
+                        } else {
+                            document.getElementById("annonce-expires").value = "";
+                        }
+
+                        document.getElementById("panel-form-title").textContent = "Éditer l'annonce";
+                        modal.classList.add('active');
+                    };
+                });
+            }
+
             updateCarouselPosition();
             startAutoSlide();
-
-            // Handlers suppression/édition
-            document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.onclick = async () => {
-                    if (confirm("Supprimer cette annonce ?")) {
-                        await deleteDoc(doc(db, "announcements", btn.dataset.id));
-                    }
-                };
-            });
-
-            document.querySelectorAll('.edit-btn').forEach(btn => {
-                btn.onclick = () => {
-                    const ann = announcementsData[btn.dataset.id];
-                    if (!ann) return;
-                    document.getElementById("annonce-id").value = btn.dataset.id;
-                    document.getElementById("annonce-title").value = ann.title || "";
-                    document.getElementById("annonce-content").value = ann.content || "";
-                    document.getElementById("annonce-category").value = ann.category || "general";
-                    document.getElementById("annonce-priority").value = ann.priority || "normal";
-                    document.getElementById("annonce-img-url").value = ann.imageUrl || "";
-                    document.getElementById("annonce-btn-text").value = ann.btnText || "";
-                    document.getElementById("annonce-btn-link").value = ann.btnLink || "";
-                    
-                    if (ann.expiresAt) {
-                        const dateObj = new Date(ann.expiresAt);
-                        dateObj.setMinutes(dateObj.getMinutes() - dateObj.getTimezoneOffset());
-                        document.getElementById("annonce-expires").value = dateObj.toISOString().slice(0,16);
-                    } else {
-                        document.getElementById("annonce-expires").value = "";
-                    }
-
-                    document.getElementById("panel-form-title").textContent = "✏️ Modifier l'annonce";
-                    modal.classList.add('active');
-                };
-            });
         });
 
-        // Reveal animation
+        // Scroll Reveal
+        const observerOptions = { threshold: 0.15 };
         const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('reveal-visible'); });
-        }, { threshold: 0.15 });
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('reveal-visible');
+                }
+            });
+        }, observerOptions);
+
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     </script>
 </body>

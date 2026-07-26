@@ -356,38 +356,48 @@
         let totalSlides = 0;
         let autoSlideTimer = null;
 
-        // Récupération du nombre de membres Discord en direct
-        const DISCORD_SERVER_ID = "1203023887265697843"; // ID Discord Abysz
+        // Récupération du nombre de membres Discord en direct (Mise à jour avec le bon ID)
+        const DISCORD_SERVER_ID = "1370836256556187771";
 
         async function fetchDiscordOnlineCount() {
             const countElement = document.getElementById('discord-online-count');
             if (!countElement) return;
 
             const targetUrl = `https://discord.com/api/guilds/${DISCORD_SERVER_ID}/widget.json`;
-            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
 
+            // Tentative 1 : Accès Direct
             try {
-                const response = await fetch(proxyUrl);
+                const response = await fetch(targetUrl);
                 if (response.ok) {
                     const data = await response.json();
                     const onlineCount = data.presence_count ?? 0;
-                    
-                    if (onlineCount > 0) {
-                        countElement.textContent = `${onlineCount} membre${onlineCount > 1 ? 's' : ''} en ligne`;
-                    } else {
-                        countElement.textContent = "Serveur en ligne";
-                    }
-                } else {
-                    countElement.textContent = "Communauté Active";
+                    countElement.textContent = `${onlineCount} membre${onlineCount > 1 ? 's' : ''} en ligne`;
+                    return;
+                }
+            } catch (e) {
+                // Échec direct (souvent lié à un test en local)
+            }
+
+            // Tentative 2 : Via un proxy CORS
+            try {
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+                const response = await fetch(proxyUrl);
+                if (response.ok) {
+                    const result = await response.json();
+                    const data = JSON.parse(result.contents);
+                    const onlineCount = data.presence_count ?? 0;
+                    countElement.textContent = `${onlineCount} membre${onlineCount > 1 ? 's' : ''} en ligne`;
+                    return;
                 }
             } catch (err) {
                 console.error("Erreur de récupération Discord:", err);
-                countElement.textContent = "Communauté Active";
             }
+
+            countElement.textContent = "Communauté Active";
         }
 
         fetchDiscordOnlineCount();
-        setInterval(fetchDiscordOnlineCount, 30000); // Mise à jour toutes les 30s
+        setInterval(fetchDiscordOnlineCount, 30000); // Rafraîchissement toutes les 30s
 
         // Écoute de la connexion Firebase
         onAuthStateChanged(auth, (user) => {

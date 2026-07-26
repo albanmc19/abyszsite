@@ -252,6 +252,9 @@
         .input-group input, .input-group textarea, .input-group select { width: 100%; padding: 12px 14px; background: #0a0a0a; border: 1px solid #2a2a2a; color: white; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.95rem; transition: border-color 0.3s, box-shadow 0.3s; box-sizing: border-box; }
         .input-group input:focus, .input-group textarea:focus, .input-group select:focus { border-color: #a855f7; outline: none; box-shadow: 0 0 10px rgba(168, 85, 247, 0.2); }
         
+        .upload-wrapper { margin-bottom: 8px; }
+        .upload-status { font-size: 0.78rem; color: #a855f7; margin-top: 4px; display: block; font-family: 'Inter', sans-serif; }
+
         .form-btn { background: #a855f7; color: white; border: none; width: 100%; padding: 14px; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: 'Orbitron', sans-serif; font-size: 0.95rem; transition: background 0.2s, box-shadow 0.2s; margin-top: 5px; box-sizing: border-box; }
         .form-btn:hover { background: #b975ff; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
         .hidden { display: none !important; }
@@ -510,7 +513,12 @@
                         </div>
 
                         <div class="input-group">
-                            <label for="partner-logo-url">URL du Logo (Image PNG/SVG recommandée)</label>
+                            <label for="partner-logo-file">Téléverser le Logo (PNG / JPG / SVG)</label>
+                            <div class="upload-wrapper">
+                                <input type="file" id="partner-logo-file" accept="image/*">
+                                <span class="upload-status" id="partner-upload-status"></span>
+                            </div>
+                            <label for="partner-logo-url" style="margin-top: 10px;">Ou copier le Lien / URL du Logo</label>
                             <input type="url" id="partner-logo-url" placeholder="https://lien-vers-logo.png" required>
                         </div>
 
@@ -580,6 +588,11 @@
         const navEspaceJoueur = document.getElementById('nav-espace-joueur');
         const navDashboard = document.getElementById('nav-dashboard');
         
+        // Upload d'image
+        const partnerLogoFileInput = document.getElementById('partner-logo-file');
+        const partnerLogoUrlInput = document.getElementById('partner-logo-url');
+        const partnerUploadStatus = document.getElementById('partner-upload-status');
+
         // Menu Mobile
         const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
         const navLinksList = document.getElementById('nav-links-list');
@@ -598,6 +611,42 @@
         let currentSlide = 0;
         let totalSlides = 0;
         let autoSlideTimer = null;
+
+        // SYSTEME UPLOAD D'IMAGE DE LOGO (via ImgBB API)
+        const IMGBB_API_KEY = "3b08e547bc58ff093b1eb885c3b99f2e"; // Clé publique de téléversement
+
+        if (partnerLogoFileInput) {
+            partnerLogoFileInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                partnerUploadStatus.textContent = "⏳ Envoi du logo en cours...";
+                partnerUploadStatus.style.color = "#a855f7";
+
+                const formData = new FormData();
+                formData.append('image', file);
+
+                try {
+                    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await res.json();
+                    if (data.success) {
+                        partnerLogoUrlInput.value = data.data.url;
+                        partnerUploadStatus.textContent = "✅ Logo importé avec succès !";
+                        partnerUploadStatus.style.color = "#10b981";
+                    } else {
+                        partnerUploadStatus.textContent = "❌ Échec de l'envoi de l'image.";
+                        partnerUploadStatus.style.color = "#ff4444";
+                    }
+                } catch (err) {
+                    partnerUploadStatus.textContent = "❌ Erreur de réseau lors de l'upload.";
+                    partnerUploadStatus.style.color = "#ff4444";
+                }
+            });
+        }
 
         // Récupération Discord
         const DISCORD_SERVER_ID = "1370836256556187771";
@@ -713,6 +762,7 @@
             quickAddPartnerBtn.onclick = () => {
                 document.getElementById("partner-id").value = "";
                 partnerForm.reset();
+                partnerUploadStatus.textContent = "";
                 document.getElementById("partner-btn-label").value = "Visiter le site";
                 document.getElementById("partner-form-title").textContent = "Ajouter un Partenaire";
                 formAnnonceWrapper.classList.add('hidden');
@@ -978,7 +1028,7 @@
                 const mainColor = partner.color || '#a855f7';
                 partnerCard.style.setProperty('--partner-color', mainColor);
                 partnerCard.style.setProperty('--partner-btn-text', partner.btnTextColor || '#ffffff');
-                partnerCard.style.setProperty('--partner-glow', mainColor + '33'); // Transparence pour le halo
+                partnerCard.style.setProperty('--partner-glow', mainColor + '33');
 
                 let adminActionsHtml = '';
                 if (isUserAdmin) {
@@ -1033,6 +1083,7 @@
                         document.getElementById("partner-btn-label").value = partner.btnLabel || "Visiter le site";
                         document.getElementById("partner-site-url").value = partner.siteUrl || "";
                         document.getElementById("partner-desc").value = partner.description || "";
+                        partnerUploadStatus.textContent = "";
 
                         document.getElementById("partner-form-title").textContent = "Éditer le Partenaire";
                         formAnnonceWrapper.classList.add('hidden');

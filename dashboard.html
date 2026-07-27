@@ -256,7 +256,6 @@
         let trafficChartInstance = null;
         let chartDataHistory = [0, 0, 0, 0, 0, 0];
 
-        // Identifiant unique de session pour le calcul temps réel
         let sessionId = localStorage.getItem("abysz_session_id");
         if (!sessionId) {
             sessionId = "sess_" + Math.random().toString(36).substring(2, 11) + "_" + Date.now();
@@ -282,9 +281,8 @@
             }
         });
 
-        // --- TRAQUE EN TEMPS RÉEL (PRESENCE) ---
+        // --- TRAQUE EN TEMPS RÉEL (PRESENCE & GRAPHIQUE) ---
         function lancerTraqueTempsReel() {
-            // Signal de présence émis toutes les 10 secondes
             const majPresence = async () => {
                 try {
                     await setDoc(doc(db, "presence", sessionId), {
@@ -297,14 +295,12 @@
             majPresence();
             setInterval(majPresence, 10000);
 
-            // Écoute en temps réel des utilisateurs connectés
             onSnapshot(collection(db, "presence"), (snapshot) => {
                 const maintenant = Date.now();
                 let connectesActifs = 0;
 
                 snapshot.forEach((d) => {
                     const data = d.data();
-                    // On considère en ligne ceux qui ont envoyé un signal dans les 25 dernières secondes
                     if (data.lastSeen && (maintenant - data.lastSeen < 25000)) {
                         connectesActifs++;
                     }
@@ -314,7 +310,6 @@
                     liveOnlineNum.innerHTML = `<span class="live-indicator"></span>${connectesActifs}`;
                 }
 
-                // Mise à jour de la courbe du graphique avec la valeur temps réel
                 chartDataHistory.shift();
                 chartDataHistory.push(connectesActifs);
                 actualiserGraphique();
@@ -351,7 +346,7 @@
             }
         }
 
-        // --- GRAPHIQUE EN TEMPS RÉEL ---
+        // --- RENDER DU GRAPHIQUE ---
         function actualiserGraphique() {
             const ctx = document.getElementById('trafficChart');
             if(!ctx) return;

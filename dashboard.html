@@ -1,312 +1,4 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Dashboard de gestion ABYSZ Esports">
-    <title>ABYSZ | Dashboard Admin</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        .logo-link { display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; }
-        .restricted-zone { text-align: center; padding: 60px 20px; background: #0a0a0a; border: 2px dashed #ff4444; border-radius: 16px; max-width: 600px; margin: 100px auto; }
-        .restricted-zone h2 { font-family: 'Orbitron', sans-serif; color: #ff4444; margin-bottom: 15px; }
-        .dashboard-wrapper { max-width: 1200px; margin: 0 auto 80px auto; padding: 0 20px; }
-        .main-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 2.2rem; font-weight: 700; margin-bottom: 40px; text-shadow: 0 0 10px rgba(168, 85, 247, 0.3); text-align: center; }
-        .section-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; margin: 40px 0 20px 0; border-bottom: 1px solid #2a2a2a; padding-bottom: 8px; }
-        
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 25px; }
-        .stat-card { background: #0b0b0b; border: 1px solid #1a1a1a; border-radius: 12px; padding: 25px 15px; text-align: center; position: relative; }
-        .stat-card .num { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; font-weight: 700; color: #a855f7; margin-bottom: 10px; }
-        .stat-card .label { color: #555; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
-        
-        .live-indicator { display: inline-block; width: 10px; height: 10px; background-color: #22c55e; border-radius: 50%; margin-right: 6px; box-shadow: 0 0 8px #22c55e; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-
-        /* === GRAPHIQUE === */
-        .graph-card {
-            background: #0b0b0b;
-            border: 1px solid #1a1a1a;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 30px;
-        }
-        .graph-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .graph-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.05rem;
-            color: #ffffff;
-        }
-        .graph-subtitle {
-            font-size: 0.75rem;
-            color: #666;
-            margin-top: 4px;
-            font-family: 'Inter', sans-serif;
-        }
-        .online-counter-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(20, 20, 20, 0.8);
-            border: 1px solid #2a2a2a;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.78rem;
-            color: #e0e0e0;
-        }
-        .pulse-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #10b981;
-            border-radius: 50%;
-            box-shadow: 0 0 8px #10b981;
-            animation: pulse-live 1.8s infinite;
-            flex-shrink: 0;
-        }
-        @keyframes pulse-live {
-            0% { transform: scale(0.95); opacity: 0.8; }
-            50% { transform: scale(1.2); opacity: 1; }
-            100% { transform: scale(0.95); opacity: 0.8; }
-        }
-        .canvas-wrapper {
-            position: relative;
-            width: 100%;
-            height: 220px;
-            background: #0d0d0d;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid #1f1f1f;
-        }
-        canvas#trafficChart {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-        .graph-legend {
-            display: flex;
-            gap: 20px;
-            margin-top: 12px;
-            flex-wrap: wrap;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.78rem;
-            color: #888;
-        }
-        .graph-legend span { display: inline-flex; align-items: center; gap: 6px; }
-        .legend-dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
-
-        .filter-container { display: flex; justify-content: flex-end; align-items: center; gap: 15px; margin-bottom: 20px; }
-        .page-selector { background: #050505; color: #fff; border: 1px solid #222; padding: 10px 20px; border-radius: 8px; font-family: 'Inter', sans-serif; cursor: pointer; font-weight: 600; outline: none; }
-        .page-selector option { background: #0a0a0a; }
-        
-        .reset-btn { background: #0a0a0a; border: 1px solid #ff4444; color: #ff4444; padding: 10px 20px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: all 0.2s ease; }
-        .reset-btn:hover { background: #ff4444; color: white; box-shadow: 0 0 15px rgba(255, 68, 68, 0.4); }
-
-        .roster-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .roster-card { background: #141414; border-left: 3px solid #a855f7; padding: 15px 20px; border-radius: 8px; font-family: 'Orbitron', sans-serif; }
-        .roster-card .num { font-size: 1.5rem; color: #fff; font-weight: bold; }
-        .roster-card .label { color: #666; font-size: 0.75rem; text-transform: uppercase; }
-        
-        .db-table-wrapper { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; overflow: hidden; }
-        .db-table { width: 100%; border-collapse: collapse; font-family: 'Inter', sans-serif; text-align: left; }
-        .db-table th { background: #0a0a0a; color: #a855f7; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; padding: 16px; letter-spacing: 1px; border-bottom: 2px solid #2a2a2a; }
-        .db-table td { padding: 14px 16px; color: #ccc; border-bottom: 1px solid #1a1a1a; vertical-align: middle; }
-        .db-table tr:hover td { background: rgba(168, 85, 247, 0.02); }
-        
-        .action-btn { background: #a855f7; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: bold; font-family: 'Inter', sans-serif; transition: background 0.2s; text-decoration: none; }
-        .action-btn:hover { background: #b975ff; }
-        .hidden { display: none !important; }
-
-        .admin-edit-box { background: #141414; border: 2px solid #22c55e; border-radius: 16px; padding: 30px; margin-top: 40px; box-shadow: 0 0 30px rgba(34, 197, 94, 0.05); }
-        .admin-edit-box h2 { font-family: 'Orbitron', sans-serif; color: #22c55e; margin-top: 0; margin-bottom: 15px; font-size: 1.3rem; display: flex; align-items: center; gap: 10px; }
-        .search-row { display: flex; gap: 12px; background: #0a0a0a; padding: 15px; border-radius: 10px; border: 1px dashed #22c55e; margin-bottom: 25px; align-items: flex-end; }
-        .input-group { display: flex; flex-direction: column; gap: 6px; flex: 1; text-align: left; margin-bottom: 15px; }
-        .input-group label { color: #888; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; letter-spacing: 0.5px; }
-        .input-group input, .input-group textarea { background: #050505; border: 1px solid #222; border-radius: 8px; padding: 12px; color: #fff; font-family: 'Inter', sans-serif; font-size: 0.9rem; width: 100%; box-sizing: border-box; }
-        .input-group input:focus, .input-group textarea:focus { border-color: #22c55e; outline: none; }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 5px; }
-        .btn-admin { background: #22c55e; color: #fff; font-family: 'Orbitron', sans-serif; font-weight: bold; font-size: 0.85rem; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px; }
-        .btn-admin:hover { background: #2ed96f; box-shadow: 0 0 15px rgba(34, 197, 94, 0.3); }
-        .error-message { color: #ff4444; font-size: 0.85rem; margin-top: 10px; font-family: 'Inter', sans-serif; }
-        .success-message { color: #22c55e; font-size: 0.85rem; margin-top: 10px; font-family: 'Orbitron', sans-serif; }
-
-        @media (max-width: 900px) {
-            .filter-container { flex-direction: column; align-items: stretch; }
-            .search-row { flex-direction: column; align-items: stretch; }
-            .btn-admin { width: 100%; }
-            .graph-header { flex-direction: column; align-items: flex-start; }
-        }
-    </style>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; connect-src https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com; img-src 'self' data: blob:; frame-ancestors 'none';">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta name="referrer" content="strict-origin-when-cross-origin">
-</head>
-<body>
-
-    <nav>
-        <div class="logo"><a href="index.html" class="logo-link"><img src="logo.png" alt="Logo ABYSZ"> ABYSZ</a></div>
-        <ul>
-            <li><a href="index.html">Accueil</a></li>
-            <li><a href="roster.html">Roster</a></li>
-            <li><a href="boutique.html">Boutique</a></li>
-            <li><a href="espace-joueur.html" style="color: #a855f7; font-weight: bold;">👤 Espace Joueur</a></li>
-            <li id="nav-dashboard" class="nav-dashboard-link"><a href="dashboard.html">📊 Dashboard</a></li>
-        </ul>
-    </nav>
-
-    <div id="access-denied" class="restricted-zone hidden">
-        <h2>🔒 ACCÈS RESTREINT</h2>
-        <p style="color: #aaa; margin-bottom: 25px;">Vous devez être connecté avec un compte administrateur.</p>
-        <a href="roster.html" class="btn">Retour au Roster pour se connecter</a>
-    </div>
-
-    <main id="dashboard-content" style="padding-top: 140px;" class="dashboard-wrapper hidden">
-        <h1 class="main-title">📊 Tableau de Bord des Données Récoltées</h1>
-
-        <div class="stats-grid">
-            <div class="stat-card" style="border-color: #22c55e;">
-                <div id="live-online" class="num" style="color: #22c55e;"><span class="live-indicator"></span>0</div>
-                <div class="label">En Ligne Actuellement</div>
-            </div>
-            <div class="stat-card" style="border-color: #eab308;">
-                <div id="record-peak" class="num" style="color: #eab308;">0</div>
-                <div class="label">Pic Historique Record</div>
-                <div id="record-peak-date" style="color: #555; font-size: 0.65rem; margin-top: 6px; font-family: 'Inter', sans-serif;"></div>
-            </div>
-            <div class="stat-card">
-                <div id="site-visites" class="num">0</div>
-                <div class="label">Visites Totales</div>
-            </div>
-            <div class="stat-card">
-                <div id="discord-clicks" class="num">0</div>
-                <div class="label">Clics Discord</div>
-            </div>
-            <div class="stat-card">
-                <div id="boutique-interest" class="num">0</div>
-                <div class="label">Intérêt Boutique</div>
-            </div>
-            <div class="stat-card">
-                <div id="conversion-rate" class="num" style="color: #a855f7;">0%</div>
-                <div class="label">Conversion</div>
-            </div>
-        </div>
-
-        <div class="graph-card">
-            <div class="graph-header">
-                <div>
-                    <div class="graph-title">📈 Fréquentation — 30 derniers jours</div>
-                    <div class="graph-subtitle">Pic de connectés simultanés enregistré chaque jour</div>
-                </div>
-                <div class="online-counter-badge">
-                    <span class="pulse-dot"></span>
-                    <span id="graph-live-count">0 connecté(s)</span>
-                </div>
-            </div>
-            <div class="canvas-wrapper">
-                <canvas id="trafficChart"></canvas>
-            </div>
-            <div class="graph-legend">
-                <span><span class="legend-dot" style="background:#22c55e;"></span> Volume (aire)</span>
-                <span><span class="legend-dot" style="background:#eab308;"></span> Tendance</span>
-            </div>
-        </div>
-
-        <div class="filter-container">
-            <button id="reset-analytics-btn" class="reset-btn">🗑️ Réinitialiser Analytics</button>
-            <select id="page-filter" class="page-selector">
-                <option value="all">Toutes les pages</option>
-                <option value="index.html">Accueil</option>
-                <option value="roster.html">Roster</option>
-                <option value="boutique.html">Boutique</option>
-            </select>
-        </div>
-
-        <div class="section-title">👥 Gestion des Effectifs & Roster</div>
-        <div class="roster-stats">
-            <div class="roster-card"><div class="label">Équipe Principale</div><div id="count-main" class="num">0</div></div>
-            <div class="roster-card" style="border-left-color: #22c55e;"><div class="label">Académie</div><div id="count-academy" class="num">0</div></div>
-            <div class="roster-card" style="border-left-color: #eab308;"><div class="label">Centre de Formation</div><div id="count-cdf" class="num">0</div></div>
-        </div>
-
-        <div class="db-table-wrapper">
-            <table class="db-table">
-                <thead>
-                    <tr><th>Joueur</th><th>Catégorie</th><th>Rôle / Division</th><th>Earnings</th><th>Action</th></tr>
-                </thead>
-                <tbody id="db-players-rows">
-                    <tr><td colspan="5" style="text-align: center; color: #666; font-style: italic; padding: 30px;">Chargement...</td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="section-title">🔒 Gestion des Espaces Privés Joueurs</div>
-        <div class="admin-edit-box">
-            <h2>🛠️ Configurer l'espace d'un joueur</h2>
-            <p style="color: #777; font-size: 0.85rem; margin-top: -5px; margin-bottom: 20px;">Recherchez l'adresse e-mail exacte avec laquelle le joueur se connecte.</p>
-
-            <div class="search-row">
-                <div class="input-group" style="margin-bottom: 0;">
-                    <label for="search-player-email">Adresse e-mail du compte joueur</label>
-                    <input type="email" id="search-player-email" placeholder="Ex: joueur@gmail.com">
-                </div>
-                <button type="button" class="btn-admin" id="btn-search-player">Charger l'Espace</button>
-            </div>
-            <p id="search-error" class="error-message hidden"></p>
-
-            <div id="player-edit-form-container" class="hidden" style="border-top: 1px solid #222; padding-top: 25px;">
-                <form id="dashboard-player-modify-form">
-                    <div class="form-grid">
-                        <div class="input-group">
-                            <label>Pseudo Global</label>
-                            <input type="text" id="player-pseudo-input" required>
-                        </div>
-                        <div class="input-group">
-                            <label>Roster Affecté</label>
-                            <input type="text" id="player-roster-input" placeholder="Ex: Principal, Académie...">
-                        </div>
-                    </div>
-
-                    <div class="form-grid">
-                        <div class="input-group">
-                            <label>Rôle précis dans l'équipe</label>
-                            <input type="text" id="player-role-input" placeholder="Ex: Capitaine...">
-                        </div>
-                        <div class="input-group">
-                            <label>Rank Actuel en jeu</label>
-                            <input type="text" id="player-rank-input" placeholder="Ex: Radiant, Unreal...">
-                        </div>
-                        <div class="input-group">
-                            <label>Date d'intégration</label>
-                            <input type="text" id="player-date-input" placeholder="Ex: 1 Janvier 2026">
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label style="color: #22c55e;">Lien URL Document / Fiche</label>
-                        <input type="text" id="player-doc-input" placeholder="https://drive.google.com/file/...">
-                    </div>
-
-                    <div class="input-group" style="margin-bottom: 25px;">
-                        <label>Message personnalisé du Staff (Privé au joueur)</label>
-                        <textarea id="player-msg-input" rows="4" placeholder="Consignes, entraînements..."></textarea>
-                    </div>
-
-                    <button type="submit" class="btn-admin" id="btn-save-player">Enregistrer les modifications</button>
-                </form>
-                <p id="save-success" class="success-message hidden">✅ Espace privé mis à jour et synchronisé avec succès !</p>
-            </div>
-        </div>
-    </main>
-
-    <script type="module">
+<script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, query, orderBy, onSnapshot, getDocs, deleteDoc, doc, getDoc, where, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -347,20 +39,11 @@
         const recordPeakDateEl = document.getElementById('record-peak-date');
         const graphLiveCountEl = document.getElementById('graph-live-count');
 
-        const searchPlayerEmail = document.getElementById('search-player-email');
-        const btnSearchPlayer = document.getElementById('btn-search-player');
-        const searchError = document.getElementById('search-error');
-        const playerEditFormContainer = document.getElementById('player-edit-form-container');
-        const dashboardPlayerModifyForm = document.getElementById('dashboard-player-modify-form');
-        const saveSuccess = document.getElementById('save-success');
-
         let activeTargetUid = ""; 
         let activeTargetEmail = "";
         let listeDocsAnalytics = [];
 
-        // ===================================================================
-        // === HISTORIQUE 30 JOURS & PIC RECORD EN MÉMOIRE (Firestore) ======
-        // ===================================================================
+        // HISTORIQUE 30 JOURS & PIC RECORD
         const JOURS_HISTORIQUE = 30;
         let historique30j = Array(JOURS_HISTORIQUE).fill(0);
         let picDuJourCache = 0;
@@ -455,9 +138,7 @@
             }
         }
 
-        // ===================================================================
-        // === MOTEUR DE RENDU DU GRAPHIQUE (Canvas Natif) ===================
-        // ===================================================================
+        // GRAPHIQUE
         const canvas = document.getElementById('trafficChart');
         const ctx = canvas ? canvas.getContext('2d') : null;
 
@@ -546,7 +227,7 @@
 
         setTimeout(resizeCanvas, 100);
 
-        // --- AUTHENTIFICATION & ACCÈS ADMIN ---
+        // AUTHENTIFICATION
         onAuthStateChanged(auth, (user) => {
             if (user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
                 accessDeniedSec.classList.add('hidden');
@@ -567,7 +248,7 @@
             }
         });
 
-        // --- LECTURE DIRECTE DE ONLINE_USERS DEPUIS RTDB ---
+        // REALTIME DATABASE ONLINE USERS
         function lancerTraqueTempsReel() {
             const onlineUsersRef = ref(rtdb, "online_users");
 
@@ -691,13 +372,23 @@
             });
         }
 
+        // GESTION RECHERCHE & ÉDITION JOUEURS
         function setupPlayerEditing() {
-            btnSearchPlayer.onclick = async () => {
-                searchError.classList.add('hidden');
-                playerEditFormContainer.classList.add('hidden');
-                saveSuccess.classList.add('hidden');
+            const searchInput = document.getElementById('search-player-email');
+            const searchBtn = document.getElementById('btn-search-player');
+            const searchErr = document.getElementById('search-error');
+            const editFormContainer = document.getElementById('player-edit-form-container');
+            const modifyForm = document.getElementById('dashboard-player-modify-form');
+            const successMsg = document.getElementById('save-success');
 
-                const emailRecherche = searchPlayerEmail.value.trim().toLowerCase();
+            if (!searchBtn) return;
+
+            searchBtn.onclick = async () => {
+                if (searchErr) searchErr.classList.add('hidden');
+                if (editFormContainer) editFormContainer.classList.add('hidden');
+                if (successMsg) successMsg.classList.add('hidden');
+
+                const emailRecherche = searchInput ? searchInput.value.trim().toLowerCase() : "";
                 if (!emailRecherche) return;
 
                 try {
@@ -718,59 +409,63 @@
                         document.getElementById('player-doc-input').value = data.documentUrl || "";
                         document.getElementById('player-msg-input').value = data.staffMessage || "";
 
-                        playerEditFormContainer.classList.remove('hidden');
+                        if (editFormContainer) editFormContainer.classList.remove('hidden');
                     } else {
-                        searchError.textContent = "Aucun joueur trouvé avec cet e-mail. Demandez-lui de se connecter au moins une fois à son espace.";
-                        searchError.classList.remove('hidden');
+                        if (searchErr) {
+                            searchErr.textContent = "Aucun joueur trouvé avec cet e-mail. Demandez-lui de se connecter au moins une fois à son espace.";
+                            searchErr.classList.remove('hidden');
+                        }
                     }
-                } catch (err) { console.error(err); }
+                } catch (err) { console.error("Erreur recherche joueur:", err); }
             };
 
-            dashboardPlayerModifyForm.onsubmit = async (e) => {
-                if (e) e.preventDefault(); 
-                
-                saveSuccess.classList.add('hidden');
-                const emailRecherche = searchPlayerEmail.value.trim().toLowerCase();
-                if (!emailRecherche) return false;
+            if (modifyForm) {
+                modifyForm.onsubmit = async (e) => {
+                    e.preventDefault();
+                    
+                    if (successMsg) successMsg.classList.add('hidden');
+                    const emailRecherche = searchInput ? searchInput.value.trim().toLowerCase() : "";
+                    if (!emailRecherche) return;
 
-                const btnSave = document.getElementById('btn-save-player');
-                btnSave.disabled = true;
-                btnSave.textContent = "Enregistrement...";
-
-                try {
-                    const q = query(collection(db, "players"), where("email", "==", emailRecherche));
-                    const snapshot = await getDocs(q);
-
-                    if (!snapshot.empty) {
-                        const trueDocId = snapshot.docs[0].id;
-                        const playerDocRef = doc(db, "players", trueDocId);
-                        const inputLienDoc = document.getElementById('player-doc-input').value.trim();
-
-                        const dataMiseAJour = {
-                            pseudo: document.getElementById('player-pseudo-input').value.trim(),
-                            roster: document.getElementById('player-roster-input').value.trim(),
-                            role: document.getElementById('player-role-input').value.trim(),
-                            rank: document.getElementById('player-rank-input').value.trim(),
-                            joinDate: document.getElementById('player-date-input').value.trim(),
-                            documentUrl: inputLienDoc, 
-                            staffMessage: document.getElementById('player-msg-input').value.trim()
-                        };
-
-                        await setDoc(playerDocRef, dataMiseAJour, { merge: true });
-                        saveSuccess.classList.remove('hidden');
-                    } else {
-                        alert("Erreur : Impossible de localiser le compte de ce joueur dans Firestore.");
+                    const btnSave = document.getElementById('btn-save-player');
+                    if (btnSave) {
+                        btnSave.disabled = true;
+                        btnSave.textContent = "Enregistrement...";
                     }
-                } catch (error) {
-                    console.error("Erreur de sauvegarde :", error);
-                    alert("Erreur lors de l'enregistrement : " + error.message);
-                } finally {
-                    btnSave.disabled = false;
-                    btnSave.textContent = "Enregistrer les modifications";
-                }
-                return false;
-            };
+
+                    try {
+                        const q = query(collection(db, "players"), where("email", "==", emailRecherche));
+                        const snapshot = await getDocs(q);
+
+                        if (!snapshot.empty) {
+                            const trueDocId = snapshot.docs[0].id;
+                            const playerDocRef = doc(db, "players", trueDocId);
+
+                            const dataMiseAJour = {
+                                pseudo: document.getElementById('player-pseudo-input').value.trim(),
+                                roster: document.getElementById('player-roster-input').value.trim(),
+                                role: document.getElementById('player-role-input').value.trim(),
+                                rank: document.getElementById('player-rank-input').value.trim(),
+                                joinDate: document.getElementById('player-date-input').value.trim(),
+                                documentUrl: document.getElementById('player-doc-input').value.trim(), 
+                                staffMessage: document.getElementById('player-msg-input').value.trim()
+                            };
+
+                            await setDoc(playerDocRef, dataMiseAJour, { merge: true });
+                            if (successMsg) successMsg.classList.remove('hidden');
+                        } else {
+                            alert("Erreur : Impossible de localiser le compte de ce joueur dans Firestore.");
+                        }
+                    } catch (error) {
+                        console.error("Erreur de sauvegarde :", error);
+                        alert("Erreur lors de l'enregistrement : " + error.message);
+                    } finally {
+                        if (btnSave) {
+                            btnSave.disabled = false;
+                            btnSave.textContent = "Enregistrer les modifications";
+                        }
+                    }
+                };
+            }
         }
     </script>
-</body>
-</html>

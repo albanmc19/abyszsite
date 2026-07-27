@@ -28,7 +28,6 @@
         .social-links a { color: #ccc; transition: color 0.2s; }
         .social-links a:hover { color: #a855f7; }
 
-        /* Widget Visiteurs en temps réel */
         .online-counter-badge {
             display: inline-flex;
             align-items: center;
@@ -68,7 +67,6 @@
         .btn { transition: transform 0.2s ease, box-shadow 0.3s ease; display: inline-block; text-decoration: none; background: #a855f7; color: white; padding: 12px 28px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-weight: bold; }
         .btn:hover { transform: translateY(-3px); box-shadow: 0 0 20px rgba(168, 85, 247, 0.6); background: #b975ff; }
         
-        /* Section Header Globale */
         .section-header { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 25px; }
         .title-area { display: flex; align-items: center; gap: 12px; }
         .title-area h2 { font-family: 'Orbitron', sans-serif; font-size: 1.6rem; margin: 0; letter-spacing: 0.5px; }
@@ -81,7 +79,6 @@
         .admin-gate-btn.logged-in { border-color: #ff4444; color: #ff4444; }
         .admin-gate-btn.logged-in:hover { background: #ff4444; color: white; box-shadow: 0 0 15px #ff4444; }
 
-        /* Annonces - Carrousel */
         .announcements-container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
         .carousel-wrapper { position: relative; width: 100%; border-radius: 16px; background: #141414; border: 1px solid #2a2a2a; box-sizing: border-box; padding: 0 65px; }
         .carousel-track-container { overflow: hidden; width: 100%; border-radius: 8px; }
@@ -121,42 +118,6 @@
         .delete-btn { background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: background 0.2s; }
         .delete-btn:hover { background: #cc3333; }
 
-        /* SECTION STATISTIQUES ET GRAPHIQUE */
-        .analytics-container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
-        .graph-card {
-            background: #141414;
-            border: 1px solid #2a2a2a;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .graph-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .graph-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.1rem;
-            color: #ffffff;
-        }
-        .canvas-wrapper {
-            position: relative;
-            width: 100%;
-            height: 220px;
-            background: #0d0d0d;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid #1f1f1f;
-        }
-        canvas#trafficChart {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-
-        /* SECTION PARTENAIRES */
         .partners-container { max-width: 1100px; margin: 0 auto; padding: 50px 20px; border-top: 1px solid #1a1a1a; }
         .partners-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; margin-top: 10px; }
         
@@ -296,12 +257,10 @@
             box-shadow: 0 6px 15px var(--partner-glow, rgba(168, 85, 247, 0.4));
         }
 
-        /* Discord Community Bar Component */
         .discord-widget-wrapper { display: inline-flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; background: #141414; padding: 10px 20px; border-radius: 12px; border: 1px solid #2a2a2a; margin-top: 15px; }
         .discord-online-counter { display: inline-flex; align-items: center; gap: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: 600; color: #ccc; background: #0a0a0a; padding: 10px 16px; border-radius: 8px; border: 1px solid #1a1a1a; white-space: nowrap; }
         .online-dot { width: 8px; height: 8px; background-color: #23a55a; border-radius: 50%; box-shadow: 0 0 8px #23a55a; display: inline-block; flex-shrink: 0; }
         
-        /* Modal Overlay */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 15px; opacity: 0; transition: opacity 0.3s ease; }
         .modal-overlay.active { display: flex; opacity: 1; }
         .modal-content { background: #141414; border: 2px solid #a855f7; border-radius: 20px; max-width: 580px; width: 100%; padding: 30px 25px; position: relative; box-shadow: 0 0 30px rgba(168, 85, 247, 0.25); box-sizing: border-box; max-height: 90vh; overflow-y: auto; transform: scale(0.9); transition: transform 0.3s ease; }
@@ -331,7 +290,6 @@
         
         footer { padding: 30px; text-align: center; border-top: 1px solid #1a1a1a; color: #666; font-size: 0.9rem; }
 
-        /* Mobile */
         @media (max-width: 768px) {
             .carousel-wrapper { padding: 0 45px; }
             .carousel-btn { width: 34px; height: 34px; font-size: 0.9rem; }
@@ -425,21 +383,6 @@
             <button class="carousel-btn next" id="next-slide">❯</button>
         </div>
         <div class="carousel-dots" id="carousel-dots"></div>
-    </section>
-
-    <section class="analytics-container reveal">
-        <div class="graph-card">
-            <div class="graph-header">
-                <div class="graph-title">Activité & Fréquentation du Site</div>
-                <div class="online-counter-badge">
-                    <span class="pulse-dot"></span>
-                    <span id="graph-live-count">1 connecté(s)</span>
-                </div>
-            </div>
-            <div class="canvas-wrapper">
-                <canvas id="trafficChart"></canvas>
-            </div>
-        </div>
     </section>
 
     <section id="partenaires" class="partners-container reveal">
@@ -653,11 +596,10 @@
         const db = getFirestore(app);
         const rtdb = getDatabase(app);
 
-        // --- GESTION DES VISITEURS EN TEMPS RÉEL & HISTORIQUE DU GRAPHIQUE ---
+        // --- GESTION DES VISITEURS EN TEMPS RÉEL ---
         const connectedRef = ref(rtdb, ".info/connected");
         const onlineUsersRef = ref(rtdb, "online_users");
         const siteOnlineCountElement = document.getElementById("site-online-count");
-        const graphLiveCountElement = document.getElementById("graph-live-count");
 
         let visitorId = localStorage.getItem("abysz_visitor_id");
         if (!visitorId) {
@@ -675,9 +617,6 @@
             }
         });
 
-        // Historique de données pour le graphique (style Image 2)
-        const trafficData = Array(40).fill(1);
-
         onValue(onlineUsersRef, (snapshot) => {
             let uniqueCount = 0;
             if (snapshot.exists()) {
@@ -688,109 +627,7 @@
             if (siteOnlineCountElement) {
                 siteOnlineCountElement.textContent = `${activeCount} en ligne`;
             }
-            if (graphLiveCountElement) {
-                graphLiveCountElement.textContent = `${activeCount} connecté(s)`;
-            }
-
-            // Mise à jour de l'historique du graphique
-            trafficData.shift();
-            trafficData.push(activeCount);
-            drawTrafficChart();
         });
-
-        // --- MOTEUR DE RENDU DU GRAPHIQUE (CANVAS RENDERING) ---
-        const canvas = document.getElementById('trafficChart');
-        const ctx = canvas ? canvas.getContext('2d') : null;
-
-        function resizeCanvas() {
-            if (!canvas) return;
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-            drawTrafficChart();
-        }
-
-        window.addEventListener('resize', resizeCanvas);
-
-        function drawTrafficChart() {
-            if (!ctx || !canvas) return;
-
-            const width = canvas.width;
-            const height = canvas.height;
-
-            ctx.clearRect(0, 0, width, height);
-
-            // Grille d'arrière-plan discrète
-            ctx.strokeStyle = '#1a1a1a';
-            ctx.lineWidth = 1;
-            for (let y = height / 3; y < height; y += height / 3) {
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(width, y);
-                ctx.stroke();
-            }
-
-            const maxVal = Math.max(...trafficData, 5);
-            const stepX = width / (trafficData.length - 1);
-
-            // 1. Trace de la Zone Verte Dégradée (Partie basse)
-            const greenGradient = ctx.createLinearGradient(0, 0, 0, height);
-            greenGradient.addColorStop(0, 'rgba(34, 197, 94, 0.45)');
-            greenGradient.addColorStop(1, 'rgba(34, 197, 94, 0.02)');
-
-            ctx.beginPath();
-            ctx.moveTo(0, height);
-            trafficData.forEach((val, i) => {
-                const x = i * stepX;
-                // Décalage pour reproduire l'effet vert en bas du graphique
-                const y = height - (val / maxVal) * (height * 0.4) - 10;
-                if (i === 0) ctx.lineTo(x, y);
-                else {
-                    const prevX = (i - 1) * stepX;
-                    const prevY = height - (trafficData[i - 1] / maxVal) * (height * 0.4) - 10;
-                    const cx = (prevX + x) / 2;
-                    ctx.quadraticCurveTo(prevX, prevY, cx, (prevY + y) / 2);
-                }
-            });
-            ctx.lineTo(width, height - (trafficData[trafficData.length - 1] / maxVal) * (height * 0.4) - 10);
-            ctx.lineTo(width, height);
-            ctx.closePath();
-            ctx.fillStyle = greenGradient;
-            ctx.fill();
-
-            // Ligne de bordure verte supérieure
-            ctx.beginPath();
-            trafficData.forEach((val, i) => {
-                const x = i * stepX;
-                const y = height - (val / maxVal) * (height * 0.4) - 10;
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-            });
-            ctx.strokeStyle = 'rgba(34, 197, 94, 0.8)';
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
-
-            // 2. Trace de la Courbe Jaune Supérieure (Tendance principale)
-            ctx.beginPath();
-            trafficData.forEach((val, i) => {
-                const x = i * stepX;
-                const y = height - (val / maxVal) * (height * 0.75) - 35;
-                if (i === 0) ctx.moveTo(x, y);
-                else {
-                    const prevX = (i - 1) * stepX;
-                    const prevY = height - (trafficData[i - 1] / maxVal) * (height * 0.75) - 35;
-                    const cx = (prevX + x) / 2;
-                    ctx.quadraticCurveTo(prevX, prevY, cx, (prevY + y) / 2);
-                }
-            });
-            ctx.strokeStyle = '#eab308';
-            ctx.lineWidth = 2.5;
-            ctx.shadowColor = '#eab308';
-            ctx.shadowBlur = 6;
-            ctx.stroke();
-            ctx.shadowBlur = 0; // Reset ombre
-        }
-
-        setTimeout(resizeCanvas, 100);
 
         // Éléments HTML
         const modal = document.getElementById('admin-modal');
@@ -816,12 +653,10 @@
         const navEspaceJoueur = document.getElementById('nav-espace-joueur');
         const navDashboard = document.getElementById('nav-dashboard');
         
-        // Upload d'image
         const partnerLogoFileInput = document.getElementById('partner-logo-file');
         const partnerLogoUrlInput = document.getElementById('partner-logo-url');
         const partnerUploadStatus = document.getElementById('partner-upload-status');
 
-        // Menu Mobile
         const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
         const navLinksList = document.getElementById('nav-links-list');
 
@@ -840,7 +675,6 @@
         let totalSlides = 0;
         let autoSlideTimer = null;
 
-        // SYSTEME UPLOAD D'IMAGE DE LOGO (via ImgBB API)
         const IMGBB_API_KEY = "3b08e547bc58ff093b1eb885c3b99f2e";
 
         if (partnerLogoFileInput) {
@@ -876,7 +710,6 @@
             });
         }
 
-        // Récupération Discord Widget API
         const DISCORD_SERVER_ID = "1370836256556187771";
 
         async function fetchDiscordOnlineCount() {
@@ -915,13 +748,11 @@
         fetchDiscordOnlineCount();
         setInterval(fetchDiscordOnlineCount, 30000);
 
-        // Connexion Firebase Auth
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
                 isUserAdmin = user.email === "abyszofficial@gmail.com";
 
-                // Accès direct : si l'utilisateur est connecté, le bouton mène à l'Espace Joueur ou Dashboard
                 adminGateBtn.textContent = isUserAdmin ? "⚙️ Dashboard / Admin" : "👤 Mon Espace";
                 adminGateBtn.classList.add('logged-in');
                 
@@ -972,7 +803,6 @@
 
         adminGateBtn.onclick = () => {
             if (currentUser) {
-                // Redirection directe vers l'espace joueur ou le dashboard si déjà connecté
                 if (isUserAdmin) {
                     window.location.href = "dashboard.html";
                 } else {
@@ -1012,7 +842,6 @@
         closeModalBtn.onclick = () => modal.classList.remove('active');
         window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
 
-        // Publier / Éditer Annonce
         announcementForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!isUserAdmin) return alert("Droits insuffisants.");
@@ -1045,7 +874,6 @@
             }
         });
 
-        // Publier / Éditer Partenaire
         partnerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!isUserAdmin) return alert("Droits insuffisants.");
@@ -1079,7 +907,6 @@
             }
         });
 
-        // Carrousel Logic
         function updateCarouselPosition() {
             feed.style.transform = `translateX(-${currentSlide * 100}%)`;
             const dots = dotsContainer.querySelectorAll('.dot');
@@ -1114,7 +941,6 @@
         prevBtn.onclick = () => { prevSlide(); startAutoSlide(); };
         nextBtn.onclick = () => { nextSlide(); startAutoSlide(); };
 
-        // Realtime Annonces
         const qAnn = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
         onSnapshot(qAnn, (snapshot) => {
             feed.innerHTML = "";
@@ -1245,7 +1071,6 @@
             startAutoSlide();
         });
 
-        // Realtime Partenaires
         const qPartners = query(collection(db, "partners"), orderBy("createdAt", "desc"));
         onSnapshot(qPartners, (snapshot) => {
             partnersFeed.innerHTML = "";
@@ -1332,7 +1157,6 @@
             }
         });
 
-        // Scroll Reveal
         const observerOptions = { threshold: 0.15 };
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {

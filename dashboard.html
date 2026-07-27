@@ -310,7 +310,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, query, orderBy, onSnapshot, getDocs, deleteDoc, doc, getDoc, where, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-        import { getDatabase, ref, onValue, onDisconnect, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -567,47 +567,38 @@
             }
         });
 
-        // --- TRAQUE EN TEMPS RÉEL (REALTIME DATABASE PRESENCE) ---
+        // --- LECTURE DIRECTE DE ONLINE_USERS DEPUIS RTDB ---
         function lancerTraqueTempsReel() {
-            const connectedRef = ref(rtdb, ".info/connected");
             const onlineUsersRef = ref(rtdb, "online_users");
 
-            let visitorId = localStorage.getItem("abysz_visitor_id");
-            if (!visitorId) {
-                visitorId = "usr_" + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
-                localStorage.setItem("abysz_visitor_id", visitorId);
-            }
-
-            const tabSessionId = "session_" + Math.random().toString(36).substring(2, 9);
-            const currentTabRef = ref(rtdb, `online_users/${visitorId}/${tabSessionId}`);
-
-            onValue(connectedRef, (snap) => {
-                if (snap.val() === true) {
-                    onDisconnect(currentTabRef).remove();
-                    set(currentTabRef, true);
-                }
-            });
-
             onValue(onlineUsersRef, (snapshot) => {
-                let uniqueCount = 0;
-                if (snapshot.exists()) {
-                    uniqueCount = Object.keys(snapshot.val()).length;
+                let total = 0;
+                const val = snapshot.val();
+
+                if (val !== null && val !== undefined) {
+                    if (typeof val === 'object') {
+                        total = Object.keys(val).length;
+                    } else if (typeof val === 'number') {
+                        total = val;
+                    }
                 }
 
                 if (liveOnlineNum) {
-                    liveOnlineNum.innerHTML = `<span class="live-indicator"></span>${uniqueCount}`;
+                    liveOnlineNum.innerHTML = `<span class="live-indicator"></span>${total}`;
                 }
                 if (graphLiveCountEl) {
-                    graphLiveCountEl.textContent = `${uniqueCount} connecté(s)`;
+                    graphLiveCountEl.textContent = `${total} connecté(s)`;
                 }
 
                 if (historique30j.length) {
-                    historique30j[historique30j.length - 1] = Math.max(historique30j[historique30j.length - 1], uniqueCount);
+                    historique30j[historique30j.length - 1] = Math.max(historique30j[historique30j.length - 1], total);
                     dessinerGraphique();
                 }
 
-                enregistrerPicDuJour(uniqueCount);
-                mettreAJourPicRecord(uniqueCount);
+                enregistrerPicDuJour(total);
+                mettreAJourPicRecord(total);
+            }, (error) => {
+                console.error("Erreur de lecture RTDB online_users :", error);
             });
         }
 

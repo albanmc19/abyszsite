@@ -23,7 +23,7 @@
         .live-indicator { display: inline-block; width: 10px; height: 10px; background-color: #22c55e; border-radius: 50%; margin-right: 6px; box-shadow: 0 0 8px #22c55e; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
-        /* === GRAPHIQUE (repris du style de la page d'accueil) === */
+        /* === GRAPHIQUE AMÉLIORÉ === */
         .graph-card {
             background: #0b0b0b;
             border: 1px solid #1a1a1a;
@@ -80,7 +80,7 @@
             position: relative;
             width: 100%;
             height: 220px;
-            background: #0d0d0d;
+            background: #080808;
             border-radius: 8px;
             overflow: hidden;
             border: 1px solid #1f1f1f;
@@ -202,8 +202,8 @@
         <div class="graph-card">
             <div class="graph-header">
                 <div>
-                    <div class="graph-title">📈 Fréquentation — 30 derniers jours</div>
-                    <div class="graph-subtitle">Pic de connectés simultanés enregistré chaque jour</div>
+                    <div class="graph-title">📈 Fréquentation — Temps Réel & 30 jours</div>
+                    <div class="graph-subtitle">Évolution dynamique de l'activité en fonction des joueurs connectés</div>
                 </div>
                 <div class="online-counter-badge">
                     <span class="pulse-dot"></span>
@@ -214,8 +214,8 @@
                 <canvas id="trafficChart"></canvas>
             </div>
             <div class="graph-legend">
-                <span><span class="legend-dot" style="background:#22c55e;"></span> Volume (aire)</span>
-                <span><span class="legend-dot" style="background:#eab308;"></span> Tendance</span>
+                <span><span class="legend-dot" style="background:#22c55e;"></span> Volume d'activité (Temps réel)</span>
+                <span><span class="legend-dot" style="background:#eab308;"></span> Tendance / Ondulation dynamique</span>
             </div>
         </div>
 
@@ -354,6 +354,7 @@
         let activeTargetUid = ""; 
         let activeTargetEmail = "";
         let listeDocsAnalytics = [];
+        let connectesActifsGlobaux = 0;
 
         let sessionId = localStorage.getItem("abysz_session_id");
         if (!sessionId) {
@@ -365,13 +366,13 @@
         // === HISTORIQUE 30 JOURS & PIC RECORD EN MÉMOIRE (Firestore) ======
         // ===================================================================
         const JOURS_HISTORIQUE = 30;
-        let historique30j = Array(JOURS_HISTORIQUE).fill(0); // valeurs triées du plus ancien au plus récent (aujourd'hui = dernier)
-        let picDuJourCache = 0;      // pic déjà connu pour la journée en cours (évite d'écrire trop souvent)
-        let picRecordCache = 0;      // record absolu déjà connu, gardé en mémoire pour éviter des lectures répétées
+        let historique30j = Array(JOURS_HISTORIQUE).fill(1);
+        let picDuJourCache = 0;
+        let picRecordCache = 0;
         let picRecordDateCache = ""; 
 
         function getDateKey(date = new Date()) {
-            return date.toISOString().split('T')[0]; // format "YYYY-MM-DD"
+            return date.toISOString().split('T')[0];
         }
 
         function getCutoffKey() {
@@ -380,7 +381,6 @@
             return getDateKey(d);
         }
 
-        // Construit un tableau de 30 jours (rempli à 0 si aucune donnée) à partir des documents Firestore
         function construireTableau30Jours(docs) {
             const map = {};
             docs.forEach(d => { map[d.date] = d.peak || 0; });
@@ -396,7 +396,6 @@
             return tableau;
         }
 
-        // Charge l'historique des 30 derniers jours et reste synchronisé en temps réel
         function chargerHistorique30Jours() {
             const cutoff = getCutoffKey();
             const q = query(collection(db, "traffic_history"), where("date", ">=", cutoff), orderBy("date", "asc"));
@@ -409,14 +408,11 @@
                 const todayKey = getDateKey();
                 const todayDoc = docs.find(d => d.date === todayKey);
                 picDuJourCache = todayDoc ? (todayDoc.peak || 0) : 0;
-
-                dessinerGraphique();
             });
         }
 
-        // Enregistre en base le pic du jour si la valeur actuelle le dépasse (garde les données 30 jours)
         async function enregistrerPicDuJour(count) {
-            if (count <= picDuJourCache) return; // pas de nouveau pic, on n'écrit rien
+            if (count <= picDuJourCache) return;
             picDuJourCache = count;
             const todayKey = getDateKey();
             try {
@@ -428,7 +424,6 @@
             } catch (e) { console.error("Erreur enregistrement historique :", e); }
         }
 
-        // Charge le record absolu (pic de joueurs le plus haut jamais atteint) et le garde en mémoire
         async function chargerPicRecord() {
             try {
                 const snap = await getDoc(doc(db, "stats", "records"));
@@ -441,7 +436,6 @@
             } catch (e) { console.error("Erreur chargement du record :", e); }
         }
 
-        // Met à jour le record absolu si la valeur actuelle le dépasse, et le garde en mémoire
         async function mettreAJourPicRecord(count) {
             if (count <= picRecordCache) return;
             picRecordCache = count;
@@ -464,98 +458,128 @@
         }
 
         // ===================================================================
-        // === MOTEUR DE RENDU DU GRAPHIQUE (Canvas natif, style page d'accueil) ==
+        // === MOTEUR DE RENDU DU GRAPHIQUE ANIMÉ EN TEMPS RÉEL (CANVAS) =====
         // ===================================================================
         const canvas = document.getElementById('trafficChart');
         const ctx = canvas ? canvas.getContext('2d') : null;
+        let animationFrameId;
+        let animationTime = 0;
 
         function resizeCanvas() {
-            if (!canvas) return;
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-            dessinerGraphique();
+            if (!canvas || !canvas.parentElement) return;
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.parentElement.getBoundingClientRect();
+            
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
         }
         window.addEventListener('resize', resizeCanvas);
 
-        function dessinerGraphique() {
-            if (!ctx || !canvas) return;
+        function bouclerAnimationGraphique() {
+            dessinerGraphique();
+            animationTime += 0.04;
+            animationFrameId = requestAnimationFrame(bouclerAnimationGraphique);
+        }
 
-            const width = canvas.width;
-            const height = canvas.height;
+        function dessinerGraphique() {
+            if (!ctx || !canvas || !canvas.parentElement) return;
+
+            const rect = canvas.parentElement.getBoundingClientRect();
+            const width = rect.width;
+            const height = rect.height;
 
             ctx.clearRect(0, 0, width, height);
 
-            // Grille d'arrière-plan discrète
-            ctx.strokeStyle = '#1a1a1a';
+            // 1. Grille de fond
+            ctx.strokeStyle = '#161616';
             ctx.lineWidth = 1;
-            for (let y = height / 3; y < height; y += height / 3) {
+            const lines = 4;
+            for (let i = 1; i < lines; i++) {
+                const y = (height / lines) * i;
                 ctx.beginPath();
                 ctx.moveTo(0, y);
                 ctx.lineTo(width, y);
                 ctx.stroke();
             }
 
-            const data = historique30j.length ? historique30j : [0];
-            const maxVal = Math.max(...data, 5);
+            const data = [...historique30j];
+            data[data.length - 1] = Math.max(data[data.length - 1], connectesActifsGlobaux);
+
+            const maxVal = Math.max(...data, 10);
             const stepX = width / (data.length - 1 || 1);
 
-            // 1. Aire verte dégradée (volume)
+            // 2. Aire remplie verte (Volume réactif au nombre de joueurs)
             const greenGradient = ctx.createLinearGradient(0, 0, 0, height);
-            greenGradient.addColorStop(0, 'rgba(34, 197, 94, 0.45)');
-            greenGradient.addColorStop(1, 'rgba(34, 197, 94, 0.02)');
+            greenGradient.addColorStop(0, 'rgba(34, 197, 94, 0.40)');
+            greenGradient.addColorStop(1, 'rgba(34, 197, 94, 0.00)');
 
             ctx.beginPath();
             ctx.moveTo(0, height);
+
             data.forEach((val, i) => {
                 const x = i * stepX;
-                const y = height - (val / maxVal) * (height * 0.4) - 10;
-                if (i === 0) ctx.lineTo(x, y);
-                else {
+                // Calcul de l'onde dynamique modulée par le nombre de connectés
+                const dynamicWave = Math.sin(animationTime + i * 0.3) * (3 + connectesActifsGlobaux * 1.5);
+                const baselineY = height - (val / maxVal) * (height * 0.5) - 15;
+                const y = Math.max(10, Math.min(height - 5, baselineY + dynamicWave));
+
+                if (i === 0) {
+                    ctx.lineTo(x, y);
+                } else {
                     const prevX = (i - 1) * stepX;
-                    const prevY = height - (data[i - 1] / maxVal) * (height * 0.4) - 10;
+                    const prevVal = data[i - 1];
+                    const prevWave = Math.sin(animationTime + (i - 1) * 0.3) * (3 + connectesActifsGlobaux * 1.5);
+                    const prevY = Math.max(10, Math.min(height - 5, (height - (prevVal / maxVal) * (height * 0.5) - 15) + prevWave));
                     const cx = (prevX + x) / 2;
                     ctx.quadraticCurveTo(prevX, prevY, cx, (prevY + y) / 2);
                 }
             });
-            ctx.lineTo(width, height - (data[data.length - 1] / maxVal) * (height * 0.4) - 10);
+
             ctx.lineTo(width, height);
             ctx.closePath();
             ctx.fillStyle = greenGradient;
             ctx.fill();
 
+            // Ligne du haut verte
             ctx.beginPath();
             data.forEach((val, i) => {
                 const x = i * stepX;
-                const y = height - (val / maxVal) * (height * 0.4) - 10;
+                const dynamicWave = Math.sin(animationTime + i * 0.3) * (3 + connectesActifsGlobaux * 1.5);
+                const y = Math.max(10, Math.min(height - 5, (height - (val / maxVal) * (height * 0.5) - 15) + dynamicWave));
                 if (i === 0) ctx.moveTo(x, y);
                 else ctx.lineTo(x, y);
             });
-            ctx.strokeStyle = 'rgba(34, 197, 94, 0.8)';
-            ctx.lineWidth = 1.5;
+            ctx.strokeStyle = '#22c55e';
+            ctx.lineWidth = 2;
             ctx.stroke();
 
-            // 2. Courbe jaune (tendance)
+            // 3. Courbe de tendance jaune (Ondulation animée fluide)
             ctx.beginPath();
             data.forEach((val, i) => {
                 const x = i * stepX;
-                const y = height - (val / maxVal) * (height * 0.75) - 35;
-                if (i === 0) ctx.moveTo(x, y);
-                else {
+                const dynamicWaveYellow = Math.cos(animationTime * 1.2 + i * 0.4) * (5 + connectesActifsGlobaux * 2);
+                const y = Math.max(10, Math.min(height - 5, (height - (val / maxVal) * (height * 0.75) - 30) + dynamicWaveYellow));
+
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
                     const prevX = (i - 1) * stepX;
-                    const prevY = height - (data[i - 1] / maxVal) * (height * 0.75) - 35;
+                    const prevVal = data[i - 1];
+                    const prevWaveYellow = Math.cos(animationTime * 1.2 + (i - 1) * 0.4) * (5 + connectesActifsGlobaux * 2);
+                    const prevY = Math.max(10, Math.min(height - 5, (height - (prevVal / maxVal) * (height * 0.75) - 30) + prevWaveYellow));
                     const cx = (prevX + x) / 2;
                     ctx.quadraticCurveTo(prevX, prevY, cx, (prevY + y) / 2);
                 }
             });
+
             ctx.strokeStyle = '#eab308';
             ctx.lineWidth = 2.5;
-            ctx.shadowColor = '#eab308';
-            ctx.shadowBlur = 6;
+            ctx.shadowColor = 'rgba(234, 179, 8, 0.6)';
+            ctx.shadowBlur = 8;
             ctx.stroke();
-            ctx.shadowBlur = 0;
+            ctx.shadowBlur = 0; // réinitialisation de l'ombre
         }
-
-        setTimeout(resizeCanvas, 100);
 
         // --- AUTHENTIFICATION & ACCÈS ADMIN ---
         onAuthStateChanged(auth, (user) => {
@@ -563,6 +587,11 @@
                 accessDeniedSec.classList.add('hidden');
                 dashboardContentSec.classList.remove('hidden');
                 
+                setTimeout(() => {
+                    resizeCanvas();
+                    if (!animationFrameId) bouclerAnimationGraphique();
+                }, 100);
+
                 lancerTraqueTempsReel();
                 chargerDonneesDashboard();
                 ecouterCollectionAnalytics();
@@ -575,6 +604,7 @@
             } else {
                 accessDeniedSec.classList.remove('hidden');
                 dashboardContentSec.classList.add('hidden');
+                if (animationFrameId) cancelAnimationFrame(animationFrameId);
             }
         });
 
@@ -603,6 +633,8 @@
                     }
                 });
 
+                connectesActifsGlobaux = connectesActifs;
+
                 if (liveOnlineNum) {
                     liveOnlineNum.innerHTML = `<span class="live-indicator"></span>${connectesActifs}`;
                 }
@@ -610,13 +642,10 @@
                     graphLiveCountEl.textContent = `${connectesActifs} connecté(s)`;
                 }
 
-                // Met à jour la valeur du jour courant dans le graphique (affichage instantané)
                 if (historique30j.length) {
                     historique30j[historique30j.length - 1] = Math.max(historique30j[historique30j.length - 1], connectesActifs);
-                    dessinerGraphique();
                 }
 
-                // Persistance : pic du jour (historique 30 jours) et pic record absolu en mémoire
                 enregistrerPicDuJour(connectesActifs);
                 mettreAJourPicRecord(connectesActifs);
             });

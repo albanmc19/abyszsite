@@ -121,6 +121,19 @@
             font-size: 0.9rem;
         }
 
+        .badge-space {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            text-transform: uppercase;
+            background: rgba(168, 85, 247, 0.15);
+            color: #a855f7;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+
         .btn {
             background: #a855f7;
             color: white;
@@ -314,7 +327,7 @@
                 <thead>
                     <tr>
                         <th>Pseudo</th>
-                        <th>Équipe</th>
+                        <th>Espace / Équipe</th>
                         <th>Rôle</th>
                         <th>Earnings</th>
                         <th>Action</th>
@@ -350,18 +363,21 @@
                     <input type="text" id="edit-pseudo" required>
                 </div>
 
+                <!-- MODIFICATION DE L'ESPACE / ÉQUIPE DU JOUEUR -->
                 <div class="input-group">
-                    <label>Catégorie d'équipe</label>
-                    <select id="edit-team">
-                        <option value="main">Équipe Principale (Pro)</option>
-                        <option value="academy">Académie</option>
-                        <option value="cdf">Centre de Formation (CDF)</option>
+                    <label>Espace / Équipe assignée</label>
+                    <select id="edit-space">
+                        <option value="main">🔥 Équipe Principale (Pro)</option>
+                        <option value="academy">⚡ Équipe Académie</option>
+                        <option value="cdf">🌱 Centre de Formation (CDF)</option>
+                        <option value="staff">🛡️ Staff / Management</option>
+                        <option value="sub">🔄 Remplaçant / Sub</option>
                     </select>
                 </div>
 
                 <div class="input-group">
-                    <label>Rôle / Division</label>
-                    <input type="text" id="edit-role" required>
+                    <label>Rôle / Poste</label>
+                    <input type="text" id="edit-role" placeholder="Ex: Capitaine, Sniper, Entry..." required>
                 </div>
 
                 <div class="input-group">
@@ -430,7 +446,6 @@
 
         // 1. ÉCOUTE DU COMPTEUR TEMPS RÉEL (FIRESTORE)
         function ecouterCompteurEnTempsReel() {
-            // Écoute directe sur le document analytics / online ou collection active
             onSnapshot(doc(db, "analytics", "online"), (docSnap) => {
                 if (docSnap.exists()) {
                     document.getElementById("live-online-count").textContent = docSnap.data().count || 0;
@@ -442,7 +457,7 @@
             });
         }
 
-        // 2. ÉCOUTE DE LA LISTE DES JOUEURS
+        // 2. ÉCOUTE DE LA LISTE DES JOUEURS ET AFFICHAGE DES ESPACES
         function ecouterRoster() {
             const q = query(collection(db, "roster"), orderBy("createdAt", "asc"));
             onSnapshot(q, (snapshot) => {
@@ -458,11 +473,12 @@
 
                 snapshot.forEach((docSnap) => {
                     const player = { id: docSnap.id, ...docSnap.data() };
+                    const spaceLabel = player.space || player.team || 'main';
                     
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
                         <td style="font-weight:bold; color:#fff;">${player.pseudo || 'Inconnu'}</td>
-                        <td><span style="color:#a855f7; text-transform:uppercase; font-size:0.8rem;">${player.team || 'main'}</span></td>
+                        <td><span class="badge-space">${spaceLabel}</span></td>
                         <td>${player.role || '-'}</td>
                         <td style="color:#22c55e;">${player.earnings || '0 €'}</td>
                         <td>
@@ -506,7 +522,7 @@
             document.getElementById("modal-title").textContent = `Modifier : ${player.pseudo || 'Joueur'}`;
             previewImg.src = currentImageBase64;
             document.getElementById("edit-pseudo").value = player.pseudo || "";
-            document.getElementById("edit-team").value = player.team || "main";
+            document.getElementById("edit-space").value = player.space || player.team || "main";
             document.getElementById("edit-role").value = player.role || "";
             document.getElementById("edit-earnings").value = player.earnings || "";
             document.getElementById("edit-twitter").value = player.twitter || "";
@@ -517,13 +533,16 @@
             modalOverlay.classList.add("active");
         }
 
-        // Enregistrer modifications
+        // Enregistrer modifications de l'espace et des infos
         editForm.addEventListener("submit", async () => {
             if (!currentEditingPlayerId) return;
 
+            const selectedSpace = document.getElementById("edit-space").value;
+
             const updatedData = {
                 pseudo: document.getElementById("edit-pseudo").value.trim(),
-                team: document.getElementById("edit-team").value,
+                space: selectedSpace,
+                team: selectedSpace, // Maintient la rétrocompatibilité
                 role: document.getElementById("edit-role").value.trim(),
                 earnings: document.getElementById("edit-earnings").value.trim(),
                 image: currentImageBase64,
@@ -534,7 +553,7 @@
             };
 
             try {
-                await setDoc(doc(doc.db || db, "roster", currentEditingPlayerId), updatedData, { merge: true });
+                await setDoc(doc(db, "roster", currentEditingPlayerId), updatedData, { merge: true });
                 modalOverlay.classList.remove("active");
             } catch (err) {
                 console.error("Erreur de modification :", err);

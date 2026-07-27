@@ -174,7 +174,7 @@
         <div class="stats-grid">
             <div class="stat-card" style="border-color: #22c55e;">
                 <div id="live-online" class="num" style="color: #22c55e;"><span class="live-indicator"></span>0</div>
-                <div class="label">En Ligne (Page d'accueil)</div>
+                <div class="label">En Ligne Actuellement</div>
             </div>
             <div class="stat-card" style="border-color: #eab308;">
                 <div id="record-peak" class="num" style="color: #eab308;">0</div>
@@ -202,12 +202,12 @@
         <div class="graph-card">
             <div class="graph-header">
                 <div>
-                    <div class="graph-title">📈 Fréquentation Accueil — 30 derniers jours</div>
-                    <div class="graph-subtitle">Pic de connectés simultanés enregistré chaque jour sur l'index</div>
+                    <div class="graph-title">📈 Fréquentation — 30 derniers jours</div>
+                    <div class="graph-subtitle">Pic de connectés simultanés enregistré chaque jour</div>
                 </div>
                 <div class="online-counter-badge">
                     <span class="pulse-dot"></span>
-                    <span id="graph-live-count">0 sur l'accueil</span>
+                    <span id="graph-live-count">0 connecté(s)</span>
                 </div>
             </div>
             <div class="canvas-wrapper">
@@ -310,7 +310,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, query, orderBy, onSnapshot, getDocs, deleteDoc, doc, getDoc, where, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+        import { getDatabase, ref, onValue, onDisconnect, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -456,7 +456,7 @@
         }
 
         // ===================================================================
-        // === MOTEUR DE RENDU DU GRAPHIQUE (Canvas) =========================
+        // === MOTEUR DE RENDU DU GRAPHIQUE (Canvas Natif) ===================
         // ===================================================================
         const canvas = document.getElementById('trafficChart');
         const ctx = canvas ? canvas.getContext('2d') : null;
@@ -552,7 +552,7 @@
                 accessDeniedSec.classList.add('hidden');
                 dashboardContentSec.classList.remove('hidden');
                 
-                ecouterPresenceIndex();
+                lancerTraqueTempsReel();
                 chargerDonneesDashboard();
                 ecouterCollectionAnalytics();
                 chargerHistorique30Jours();
@@ -567,31 +567,47 @@
             }
         });
 
-        // --- ÉCOUTE DE LA PRÉSENCE DIRECTEMENT DEPUIS L'INDEX ---
-        function ecouterPresenceIndex() {
-            // Se branche sur le nœud mis à jour par l'index.html
-            const indexOnlineUsersRef = ref(rtdb, "online_users");
+        // --- TRAQUE EN TEMPS RÉEL (REALTIME DATABASE PRESENCE) ---
+        function lancerTraqueTempsReel() {
+            const connectedRef = ref(rtdb, ".info/connected");
+            const onlineUsersRef = ref(rtdb, "online_users");
 
-            onValue(indexOnlineUsersRef, (snapshot) => {
-                let connectesActifs = 0;
+            let visitorId = localStorage.getItem("abysz_visitor_id");
+            if (!visitorId) {
+                visitorId = "usr_" + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
+                localStorage.setItem("abysz_visitor_id", visitorId);
+            }
+
+            const tabSessionId = "session_" + Math.random().toString(36).substring(2, 9);
+            const currentTabRef = ref(rtdb, `online_users/${visitorId}/${tabSessionId}`);
+
+            onValue(connectedRef, (snap) => {
+                if (snap.val() === true) {
+                    onDisconnect(currentTabRef).remove();
+                    set(currentTabRef, true);
+                }
+            });
+
+            onValue(onlineUsersRef, (snapshot) => {
+                let uniqueCount = 0;
                 if (snapshot.exists()) {
-                    connectesActifs = Object.keys(snapshot.val()).length;
+                    uniqueCount = Object.keys(snapshot.val()).length;
                 }
 
                 if (liveOnlineNum) {
-                    liveOnlineNum.innerHTML = `<span class="live-indicator"></span>${connectesActifs}`;
+                    liveOnlineNum.innerHTML = `<span class="live-indicator"></span>${uniqueCount}`;
                 }
                 if (graphLiveCountEl) {
-                    graphLiveCountEl.textContent = `${connectesActifs} sur l'accueil`;
+                    graphLiveCountEl.textContent = `${uniqueCount} connecté(s)`;
                 }
 
                 if (historique30j.length) {
-                    historique30j[historique30j.length - 1] = Math.max(historique30j[historique30j.length - 1], connectesActifs);
+                    historique30j[historique30j.length - 1] = Math.max(historique30j[historique30j.length - 1], uniqueCount);
                     dessinerGraphique();
                 }
 
-                enregistrerPicDuJour(connectesActifs);
-                mettreAJourPicRecord(connectesActifs);
+                enregistrerPicDuJour(uniqueCount);
+                mettreAJourPicRecord(uniqueCount);
             });
         }
 

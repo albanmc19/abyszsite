@@ -140,7 +140,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, query, where, onSnapshot, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -181,13 +181,13 @@
                 authZone.classList.add('hidden');
                 profileZone.classList.remove('hidden');
                 
-                const q = query(collection(db, "players"), where("email", "==", emailMinuscule));
+                const userDocRef = doc(db, "players", user.uid);
                 
-                unsubscribeProfile = onSnapshot(q, (snapshot) => {
-                    if (!snapshot.empty) {
-                        const data = snapshot.docs[0].data();
+                unsubscribeProfile = onSnapshot(userDocRef, async (docSnap) => {
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
                         
-                        document.getElementById('player-pseudo').textContent = data.pseudo || "Joueur TEST";
+                        document.getElementById('player-pseudo').textContent = data.pseudo || "Joueur";
                         document.getElementById('player-role').textContent = `Roster : ${data.roster || 'Non assigné'}`;
                         document.getElementById('stat-role').textContent = data.role || "Membre";
                         document.getElementById('stat-rank').textContent = data.rank || "Non Classé";
@@ -206,18 +206,19 @@
                             sortedDocs.forEach(file => {
                                 const item = document.createElement('div');
                                 item.className = 'file-list-item';
-                                // ✅ Sécurisé : textContent pour le nom, setAttribute pour l'URL
+                                
                                 const span = document.createElement('span');
                                 span.className = 'file-info-text';
                                 span.textContent = '📂 ' + (file.name || 'Document');
+                                
                                 const a = document.createElement('a');
-                                // ✅ Validation de l'URL : on accepte uniquement http/https
                                 const safeUrl = (file.url && /^https?:\/\//i.test(file.url)) ? file.url : '#';
                                 a.href = safeUrl;
                                 a.target = '_blank';
                                 a.rel = 'noopener noreferrer';
                                 a.className = 'btn-mini-download';
                                 a.textContent = 'Ouvrir';
+                                
                                 item.appendChild(span);
                                 item.appendChild(a);
                                 multiFilesContainer.appendChild(item);
@@ -226,7 +227,6 @@
                         else if (data.documentUrl && data.documentUrl.trim() !== "") {
                             hasFiles = true;
                             singleFileFallback.classList.remove('hidden');
-                            // ✅ Validation : uniquement les URLs http/https acceptées
                             const rawUrl = data.documentUrl.trim();
                             const safeDocUrl = /^https?:\/\//i.test(rawUrl) ? rawUrl : '#';
                             playerDownloadLink.href = safeDocUrl;
@@ -240,7 +240,11 @@
                             documentZone.classList.add('hidden');
                         }
                     } else {
-                        setDoc(doc(db, "players", user.uid), { email: emailMinuscule }, { merge: true });
+                        // Création du profil initial basé sur le UID du compte connecté
+                        await setDoc(userDocRef, { 
+                            email: emailMinuscule,
+                            createdAt: new Date().toISOString()
+                        }, { merge: true });
                     }
                 });
 

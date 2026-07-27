@@ -15,6 +15,8 @@
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
+            background-image: radial-gradient(circle at 50% -20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%);
+            background-attachment: fixed;
         }
 
         .dashboard-container {
@@ -32,13 +34,44 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
         }
 
-        h2, h3 {
+        h2, h3, h4 {
             font-family: 'Orbitron', sans-serif;
             color: white;
             margin-top: 0;
         }
 
-        /* ── TABLEAU JOUEURS ── */
+        /* ── STATS & ANALYTICS ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: #0a0a0a;
+            border: 1px solid #2a2a2a;
+            border-left: 4px solid #a855f7;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .stat-card span {
+            display: block;
+            color: #777;
+            font-size: 0.8rem;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .stat-card strong {
+            display: block;
+            font-size: 1.8rem;
+            color: white;
+            margin-top: 8px;
+        }
+
+        /* ── TABLEAUX ── */
         .admin-table {
             width: 100%;
             border-collapse: collapse;
@@ -62,24 +95,97 @@
             font-size: 0.9rem;
         }
 
-        .btn-manage {
+        /* ── FORMULAIRES & BOUTONS ── */
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #a855f7;
+            font-size: 0.8rem;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+        }
+
+        .input-group input, .input-group select, .input-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: #0a0a0a;
+            border: 1px solid #2a2a2a;
+            color: white;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+        }
+
+        .btn {
             background: #a855f7;
             color: white;
             border: none;
-            padding: 6px 14px;
-            border-radius: 6px;
+            padding: 10px 18px;
+            border-radius: 8px;
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
+            font-weight: bold;
             cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            background: #b975ff;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+        }
+
+        .btn-danger {
+            background: #ff4444 !important;
+        }
+
+        .btn-danger:hover {
+            background: #ff6666 !important;
+            box-shadow: 0 0 15px rgba(255, 68, 68, 0.4);
+        }
+
+        .file-upload-btn {
+            display: block;
+            text-align: center;
+            background: #1a1a1a;
+            border: 1px dashed #a855f7;
+            color: #ccc;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
             transition: all 0.2s;
         }
 
-        .btn-manage:hover {
-            background: #b975ff;
-            box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
+        .file-upload-btn:hover {
+            background: rgba(168, 85, 247, 0.1);
+            color: #fff;
         }
 
-        /* ── MODAL & POPUPS ── */
+        .btn-remove-img {
+            background: #331c1c;
+            border: 1px solid #ff4444;
+            color: #ff4444;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            width: 100%;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .btn-remove-img:hover {
+            background: #ff4444;
+            color: #fff;
+        }
+
+        /* ── MODALS ── */
         .popup-overlay {
             display: none;
             position: fixed;
@@ -134,97 +240,6 @@
             background: #0a0a0a;
         }
 
-        /* ── FORMULAIRE POPUP ── */
-        .input-group {
-            margin-bottom: 15px;
-            text-align: left;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 6px;
-            color: #a855f7;
-            font-size: 0.8rem;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 600;
-        }
-
-        .input-group input, .input-group select {
-            width: 100%;
-            padding: 10px 14px;
-            background: #0a0a0a;
-            border: 1px solid #2a2a2a;
-            color: white;
-            border-radius: 8px;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.9rem;
-            box-sizing: border-box;
-        }
-
-        .file-upload-btn {
-            display: block;
-            text-align: center;
-            background: #1a1a1a;
-            border: 1px dashed #a855f7;
-            color: #ccc;
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-        }
-
-        .file-upload-btn:hover {
-            background: rgba(168, 85, 247, 0.1);
-            color: #fff;
-        }
-
-        .form-btn {
-            background: #a855f7;
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            font-family: 'Orbitron', sans-serif;
-            transition: background 0.2s;
-            margin-top: 10px;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-        }
-
-        .form-btn:hover {
-            background: #b975ff;
-        }
-
-        .delete-btn {
-            background: #ff4444 !important;
-            margin-top: 8px;
-        }
-
-        .delete-btn:hover {
-            background: #ff6666 !important;
-        }
-
-        .btn-remove-img {
-            background: #331c1c;
-            border: 1px solid #ff4444;
-            color: #ff4444;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            width: 100%;
-            font-family: 'Orbitron', sans-serif;
-        }
-
-        .btn-remove-img:hover {
-            background: #ff4444;
-            color: #fff;
-        }
-
         .hidden { display: none !important; }
     </style>
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; connect-src https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com; img-src 'self' data: blob:; frame-ancestors 'none';">
@@ -244,14 +259,72 @@
         <ul>
             <li><a href="index.html">Voir le site</a></li>
             <li><a href="roster.html">Roster</a></li>
+            <li><a href="espacejoueur.html">Espace Joueur</a></li>
             <li><button id="admin-logout-btn" style="background:none; border:1px solid #ff4444; color:#ff4444; padding:6px 12px; border-radius:12px; cursor:pointer; font-family:'Orbitron';">Déconnexion</button></li>
         </ul>
     </nav>
 
     <div class="dashboard-container">
-        <h2>Gestion du Roster</h2>
+        <h2>Tableau de Bord Administrateur</h2>
+
+        <!-- SECTION 1 : STATISTIQUES ET ANALYTICS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span>Visites Totales</span>
+                <strong id="stat-total-visits">0</strong>
+            </div>
+            <div class="stat-card">
+                <span>Joueurs Roster</span>
+                <strong id="stat-total-players">0</strong>
+            </div>
+            <div class="stat-card">
+                <span>Membres Staff</span>
+                <strong id="stat-total-staff">0</strong>
+            </div>
+        </div>
+
         <div class="card">
-            <h3>Liste des Joueurs</h3>
+            <h3>📈 Historique de Fréquentation</h3>
+            <div style="height: 200px;">
+                <canvas id="traffic-chart"></canvas>
+            </div>
+        </div>
+
+        <!-- SECTION 2 : GESTION DES ACTUALITÉS / ANNONCES -->
+        <div class="card">
+            <h3>📢 Ajouter une Actualité</h3>
+            <form id="announcement-form" onsubmit="return false;">
+                <div class="input-group">
+                    <label>Titre de l'annonce</label>
+                    <input type="text" id="announcement-title" required placeholder="Ex: Victoire en LAN !">
+                </div>
+                <div class="input-group">
+                    <label>Contenu</label>
+                    <textarea id="announcement-content" rows="3" required placeholder="Détails de l'actualité..."></textarea>
+                </div>
+                <button type="submit" class="btn">Publier l'annonce</button>
+            </form>
+
+            <h4 style="margin-top:25px;">Annonces Publiées</h4>
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Titre</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="announcements-tbody">
+                    <tr><td colspan="3" style="text-align:center; color:#666;">Chargement...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- SECTION 3 : GESTION DU ROSTER (JOUEURS) -->
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3>🎮 Gestion du Roster</h3>
+            </div>
             <table class="admin-table">
                 <thead>
                     <tr>
@@ -263,15 +336,66 @@
                     </tr>
                 </thead>
                 <tbody id="dashboard-roster-tbody">
-                    <tr>
-                        <td colspan="5" style="text-align:center; color:#666;">Chargement des joueurs...</td>
-                    </tr>
+                    <tr><td colspan="5" style="text-align:center; color:#666;">Chargement des joueurs...</td></tr>
                 </tbody>
             </table>
         </div>
+
+        <!-- SECTION 4 : DOCUMENTS & ESPACE PRIVE JOUEUR -->
+        <div class="card">
+            <h3>📁 Espace Privé Joueurs (Documents & Messages)</h3>
+            <p style="color:#aaa; font-size:0.85rem; margin-bottom:15px;">Transmettre un document ou un message à un joueur spécifique en recherchant son e-mail ou UID.</p>
+            <form id="player-doc-form" onsubmit="return false;">
+                <div class="input-group">
+                    <label>Adresse E-mail du Joueur</label>
+                    <input type="email" id="doc-player-email" required placeholder="joueur@gmail.com">
+                </div>
+                <div class="input-group">
+                    <label>Lien du document (URL Google Drive, Dropbox, etc.)</label>
+                    <input type="url" id="doc-player-url" placeholder="https://...">
+                </div>
+                <div class="input-group">
+                    <label>Message personnalisé du Staff</label>
+                    <textarea id="doc-player-message" rows="2" placeholder="Ex: Voici tes stratégies pour le prochain match."></textarea>
+                </div>
+                <button type="submit" class="btn">Envoyer au joueur</button>
+            </form>
+        </div>
+
+        <!-- SECTION 5 : GESTION DU STAFF -->
+        <div class="card">
+            <h3>🛡️ Membres du Staff</h3>
+            <form id="staff-form" onsubmit="return false;" style="margin-bottom:20px;">
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:15px;">
+                    <div class="input-group" style="margin:0;">
+                        <label>Nom / Pseudo</label>
+                        <input type="text" id="staff-name" required placeholder="Ex: Alex">
+                    </div>
+                    <div class="input-group" style="margin:0;">
+                        <label>Rôle Staff</label>
+                        <input type="text" id="staff-role" required placeholder="Ex: CEO / Head Coach">
+                    </div>
+                </div>
+                <button type="submit" class="btn" style="margin-top:15px;">Ajouter au Staff</button>
+            </form>
+
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Rôle</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="staff-tbody">
+                    <tr><td colspan="3" style="text-align:center; color:#666;">Chargement du staff...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
     </div>
 
-    <!-- POP-UP OVERLAY : EDITION DU JOUEUR -->
+    <!-- POP-UP OVERLAY : EDITION DU JOUEUR DU ROSTER -->
     <div id="edit-player-modal-overlay" class="popup-overlay">
         <div class="popup">
             <span class="popup-close" id="close-edit-player-modal">&times;</span>
@@ -321,8 +445,8 @@
                     <input type="url" id="edit-tiktok" placeholder="Lien TikTok">
                 </div>
 
-                <button type="submit" class="form-btn" style="margin-top:20px;">💾 Sauvegarder les modifications</button>
-                <button type="button" class="form-btn delete-btn" id="btn-delete-player">🗑️ Supprimer le joueur</button>
+                <button type="submit" class="btn" style="width:100%; margin-top:20px;">💾 Sauvegarder les modifications</button>
+                <button type="button" class="btn btn-danger" id="btn-delete-player" style="width:100%; margin-top:8px;">🗑️ Supprimer le joueur</button>
             </form>
         </div>
     </div>
@@ -330,7 +454,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, deleteDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, addDoc, deleteDoc, query, orderBy, onSnapshot, getDocs, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -347,7 +471,7 @@
 
         const ADMIN_EMAIL = "abyszofficial@gmail.com";
 
-        // Variables pour la Pop-up
+        // Variables d'état Modal
         let currentEditingPlayerId = null;
         let currentImageBase64 = "logo.png";
 
@@ -359,12 +483,12 @@
         const editForm = document.getElementById("edit-player-form");
         const btnDeletePlayer = document.getElementById("btn-delete-player");
 
-        // Contrôle d'Accès Admin
+        // Authentification Admin
         onAuthStateChanged(auth, (user) => {
             if (!user || user.email.toLowerCase().trim() !== ADMIN_EMAIL) {
                 window.location.href = "roster.html";
             } else {
-                ecouterRoster();
+                initDashboard();
             }
         });
 
@@ -372,15 +496,112 @@
             signOut(auth).then(() => window.location.href = "index.html");
         });
 
-        // 1. Écouter la collection Firestore Roster
+        function initDashboard() {
+            chargerAnalytics();
+            ecouterAnnonces();
+            ecouterRoster();
+            ecouterStaff();
+            setupPrivateDocsForm();
+        }
+
+        // 1. ANALYTICS & TRAFIC
+        function chargerAnalytics() {
+            onSnapshot(doc(db, "analytics", "traffic"), (docSnap) => {
+                if (docSnap.exists()) {
+                    document.getElementById("stat-total-visits").textContent = docSnap.data().count || 0;
+                }
+            });
+
+            const qTraffic = query(collection(db, "traffic_history"), orderBy("date", "asc"));
+            onSnapshot(qTraffic, (snapshot) => {
+                const labels = [];
+                const data = [];
+                snapshot.forEach(docSnap => {
+                    labels.push(docSnap.data().date || "");
+                    data.push(docSnap.data().visits || 0);
+                });
+
+                const ctx = document.getElementById('traffic-chart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels.length ? labels : ["Aujourd'hui"],
+                        datasets: [{
+                            label: 'Visiteurs',
+                            data: data.length ? data : [0],
+                            borderColor: '#a855f7',
+                            backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { grid: { color: '#222' }, ticks: { color: '#888' } },
+                            y: { grid: { color: '#222' }, ticks: { color: '#888' } }
+                        }
+                    }
+                });
+            });
+        }
+
+        // 2. ACTUALITÉS / ANNONCES
+        document.getElementById("announcement-form").addEventListener("submit", async () => {
+            const title = document.getElementById("announcement-title").value.trim();
+            const content = document.getElementById("announcement-content").value.trim();
+
+            if (!title || !content) return;
+
+            try {
+                await addDoc(collection(db, "announcements"), {
+                    title, content, createdAt: serverTimestamp()
+                });
+                document.getElementById("announcement-title").value = "";
+                document.getElementById("announcement-content").value = "";
+            } catch (e) {
+                console.error("Erreur d'ajout annonce :", e);
+            }
+        });
+
+        function ecouterAnnonces() {
+            const q = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
+            onSnapshot(q, (snapshot) => {
+                const tbody = document.getElementById("announcements-tbody");
+                tbody.innerHTML = "";
+                if (snapshot.empty) {
+                    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#666;">Aucune annonce.</td></tr>`;
+                    return;
+                }
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td style="font-weight:bold;">${data.title}</td>
+                        <td style="color:#888;">${data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('fr-FR') : '-'}</td>
+                        <td><button class="btn btn-danger btn-del-ann" data-id="${docSnap.id}">Supprimer</button></td>
+                    `;
+                    tr.querySelector(".btn-del-ann").addEventListener("click", async () => {
+                        await deleteDoc(doc(db, "announcements", docSnap.id));
+                    });
+                    tbody.appendChild(tr);
+                });
+            });
+        }
+
+        // 3. ROSTER / JOUEURS
         function ecouterRoster() {
             const q = query(collection(db, "roster"), orderBy("createdAt", "asc"));
             onSnapshot(q, (snapshot) => {
                 const tbody = document.getElementById("dashboard-roster-tbody");
                 tbody.innerHTML = "";
 
+                document.getElementById("stat-total-players").textContent = snapshot.size;
+
                 if (snapshot.empty) {
-                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#666;">Aucun joueur trouvé.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#666;">Aucun joueur dans le roster.</td></tr>`;
                     return;
                 }
 
@@ -394,7 +615,7 @@
                         <td>${player.role || '-'}</td>
                         <td style="color:#22c55e;">${player.earnings || '0 €'}</td>
                         <td>
-                            <button class="btn-manage" data-id="${player.id}">Gérer</button>
+                            <button class="btn btn-manage" data-id="${player.id}">Gérer</button>
                         </td>
                     `;
 
@@ -407,7 +628,93 @@
             });
         }
 
-        // 2. Gestionnaires de la Pop-up Modal
+        // 4. ESPACE PRIVE JOUEUR (DOCUMENTS ET MESSAGES)
+        function setupPrivateDocsForm() {
+            document.getElementById("player-doc-form").addEventListener("submit", async () => {
+                const email = document.getElementById("doc-player-email").value.trim().toLowerCase();
+                const docUrl = document.getElementById("doc-player-url").value.trim();
+                const staffMessage = document.getElementById("doc-player-message").value.trim();
+
+                if (!email) return;
+
+                try {
+                    const qPlayer = query(collection(db, "players"), where("email", "==", email));
+                    const querySnap = await getDocs(qPlayer);
+
+                    if (!querySnap.empty) {
+                        const targetDoc = querySnap.docs[0];
+                        await setDoc(doc(db, "players", targetDoc.id), {
+                            documentUrl: docUrl,
+                            staffMessage: staffMessage,
+                            updatedAt: new Date().toISOString()
+                        }, { merge: true });
+                        alert("Données transmises au joueur avec succès !");
+                    } else {
+                        // Si le joueur ne s'est pas encore connecté, on crée une entrée par e-mail
+                        await setDoc(doc(db, "players", "doc_" + Date.now()), {
+                            email: email,
+                            documentUrl: docUrl,
+                            staffMessage: staffMessage,
+                            updatedAt: new Date().toISOString()
+                        }, { merge: true });
+                        alert("Information enregistrée. Le joueur y aura accès dès sa connexion.");
+                    }
+
+                    document.getElementById("doc-player-email").value = "";
+                    document.getElementById("doc-player-url").value = "";
+                    document.getElementById("doc-player-message").value = "";
+                } catch (e) {
+                    console.error("Erreur envoi document :", e);
+                    alert("Erreur lors de l'envoi.");
+                }
+            });
+        }
+
+        // 5. GESTION DU STAFF
+        document.getElementById("staff-form").addEventListener("submit", async () => {
+            const name = document.getElementById("staff-name").value.trim();
+            const role = document.getElementById("staff-role").value.trim();
+
+            if (!name || !role) return;
+
+            try {
+                await addDoc(collection(db, "staff"), { name, role, createdAt: serverTimestamp() });
+                document.getElementById("staff-name").value = "";
+                document.getElementById("staff-role").value = "";
+            } catch (e) {
+                console.error("Erreur ajout staff :", e);
+            }
+        });
+
+        function ecouterStaff() {
+            const q = query(collection(db, "staff"), orderBy("createdAt", "asc"));
+            onSnapshot(q, (snapshot) => {
+                const tbody = document.getElementById("staff-tbody");
+                tbody.innerHTML = "";
+                document.getElementById("stat-total-staff").textContent = snapshot.size;
+
+                if (snapshot.empty) {
+                    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#666;">Aucun membre.</td></tr>`;
+                    return;
+                }
+
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td style="font-weight:bold;">${data.name}</td>
+                        <td style="color:#a855f7;">${data.role}</td>
+                        <td><button class="btn btn-danger btn-del-staff" data-id="${docSnap.id}">Supprimer</button></td>
+                    `;
+                    tr.querySelector(".btn-del-staff").addEventListener("click", async () => {
+                        await deleteDoc(doc(db, "staff", docSnap.id));
+                    });
+                    tbody.appendChild(tr);
+                });
+            });
+        }
+
+        // 6. POPUP MODAL JOUEUR ROSTER
         closeModalBtn.addEventListener("click", () => modalOverlay.classList.remove("active"));
 
         fileInput.addEventListener("change", (e) => {
@@ -445,7 +752,6 @@
             modalOverlay.classList.add("active");
         }
 
-        // 3. Sauvegarder les données mises à jour
         editForm.addEventListener("submit", async () => {
             if (!currentEditingPlayerId) return;
 
@@ -470,7 +776,6 @@
             }
         });
 
-        // 4. Supprimer le joueur
         btnDeletePlayer.addEventListener("click", async () => {
             if (!currentEditingPlayerId) return;
             if (confirm("Voulez-vous vraiment supprimer ce joueur du Roster ?")) {

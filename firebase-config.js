@@ -1,6 +1,3 @@
-// firebase-config.js — Configuration Firebase centralisée
-// ⚠️  Ce fichier doit rester public : la clé Firebase côté client est conçue pour ça.
-//     La vraie sécurité passe par les Firestore Security Rules (côté serveur).
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 
 const firebaseConfig = {

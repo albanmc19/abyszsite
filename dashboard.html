@@ -78,7 +78,7 @@
         .canvas-wrapper {
             position: relative;
             width: 100%;
-            height: 220px;
+            height: 250px;
             background: #0d0d0d;
             border-radius: 8px;
             overflow: hidden;
@@ -197,8 +197,8 @@
         <div class="graph-card">
             <div class="graph-header">
                 <div>
-                    <div class="graph-title">📈 Fréquentation — Évolution Temps Réel & Historique</div>
-                    <div class="graph-subtitle">Construit dynamiquement selon les connexions en direct</div>
+                    <div class="graph-title">📈 Fréquentation — 30 Derniers Jours</div>
+                    <div class="graph-subtitle">Évolution des pics de connectés journaliers sur 1 mois</div>
                 </div>
                 <div class="online-counter-badge">
                     <span class="pulse-dot"></span>
@@ -209,8 +209,8 @@
                 <canvas id="trafficChart"></canvas>
             </div>
             <div class="graph-legend">
-                <span><span class="legend-dot" style="background:#22c55e;"></span> Volume Instantané</span>
-                <span><span class="legend-dot" style="background:#eab308;"></span> Pic / Tendance Haute</span>
+                <span><span class="legend-dot" style="background:#22c55e;"></span> Volume des pics journaliers (aire)</span>
+                <span><span class="legend-dot" style="background:#eab308;"></span> Courbe de tendance 30 jours</span>
             </div>
         </div>
 
@@ -345,13 +345,10 @@
         let listeDocsAnalytics = [];
         const JOURS_HISTORIQUE = 30;
         let historique30j = Array(JOURS_HISTORIQUE).fill(0);
+        let dates30j = []; // Dates formatées JJ/MM pour l'axe horizontal
         let picDuJourCache = 0;
         let picRecordCache = 0;
         let picRecordDateCache = ""; 
-
-        // Tableau en mémoire pour la construction de la courbe en temps réel
-        let realtimePoints = [];
-        const MAX_REALTIME_POINTS = 30; // Nombre de points affichés sur la ligne de temps
 
         function getDateKey(date = new Date()) {
             return date.toISOString().split('T')[0];
@@ -367,15 +364,24 @@
             const map = {};
             docs.forEach(d => { map[d.date] = d.peak || 0; });
 
-            const tableau = [];
+            const tableauValues = [];
+            const tableauDates = [];
             const today = new Date();
+
             for (let i = JOURS_HISTORIQUE - 1; i >= 0; i--) {
                 const d = new Date(today);
                 d.setDate(d.getDate() - i);
                 const key = getDateKey(d);
-                tableau.push(map[key] || 0);
+                tableauValues.push(map[key] || 0);
+
+                // Formatage de la date pour le bas du graphique (ex: 04/07)
+                const dayStr = String(d.getDate()).padStart(2, '0');
+                const monthStr = String(d.getMonth() + 1).padStart(2, '0');
+                tableauDates.push(i === 0 ? "Auj." : `${dayStr}/${monthStr}`);
             }
-            return tableau;
+
+            dates30j = tableauDates;
+            return tableauValues;
         }
 
         function chargerHistorique30Jours() {
@@ -457,57 +463,57 @@
 
             const width = canvas.width;
             const height = canvas.height;
+            const paddingBottom = 30; // Marge pour l'axe des dates
+            const graphHeight = height - paddingBottom;
 
             ctx.clearRect(0, 0, width, height);
 
-            // Grille de fond
+            // Grille horizontale
             ctx.strokeStyle = '#1a1a1a';
             ctx.lineWidth = 1;
-            for (let y = height / 3; y < height; y += height / 3) {
+            for (let y = graphHeight / 3; y < graphHeight; y += graphHeight / 3) {
                 ctx.beginPath();
                 ctx.moveTo(0, y);
                 ctx.lineTo(width, y);
                 ctx.stroke();
             }
 
-            // Utilise les points temps réel enregistrés s'il y en a, sinon l'historique 30j
-            const data = (realtimePoints.length > 1) ? realtimePoints : (historique30j.length ? historique30j : [0]);
+            const data = historique30j;
             const maxVal = Math.max(...data, 5);
             const stepX = width / (data.length - 1 || 1);
 
-            // Dégradé vert (Aire)
-            const greenGradient = ctx.createLinearGradient(0, 0, 0, height);
+            // 1. Aire verte sous le graphique
+            const greenGradient = ctx.createLinearGradient(0, 0, 0, graphHeight);
             greenGradient.addColorStop(0, 'rgba(34, 197, 94, 0.45)');
             greenGradient.addColorStop(1, 'rgba(34, 197, 94, 0.02)');
 
-            // Remplissage sous la courbe
             ctx.beginPath();
-            ctx.moveTo(0, height);
+            ctx.moveTo(0, graphHeight);
             data.forEach((val, i) => {
                 const x = i * stepX;
-                const y = height - (val / maxVal) * (height * 0.65) - 15;
+                const y = graphHeight - (val / maxVal) * (graphHeight * 0.7) - 10;
                 if (i === 0) ctx.lineTo(x, y);
                 else {
                     const prevX = (i - 1) * stepX;
-                    const prevY = height - (data[i - 1] / maxVal) * (height * 0.65) - 15;
+                    const prevY = graphHeight - (data[i - 1] / maxVal) * (graphHeight * 0.7) - 10;
                     const cx = (prevX + x) / 2;
                     ctx.quadraticCurveTo(prevX, prevY, cx, (prevY + y) / 2);
                 }
             });
-            ctx.lineTo(width, height);
+            ctx.lineTo(width, graphHeight);
             ctx.closePath();
             ctx.fillStyle = greenGradient;
             ctx.fill();
 
-            // Tracé ligne Verte (Connectés)
+            // 2. Ligne de tendance verte (Volume des connectés)
             ctx.beginPath();
             data.forEach((val, i) => {
                 const x = i * stepX;
-                const y = height - (val / maxVal) * (height * 0.65) - 15;
+                const y = graphHeight - (val / maxVal) * (graphHeight * 0.7) - 10;
                 if (i === 0) ctx.moveTo(x, y);
                 else {
                     const prevX = (i - 1) * stepX;
-                    const prevY = height - (data[i - 1] / maxVal) * (height * 0.65) - 15;
+                    const prevY = graphHeight - (data[i - 1] / maxVal) * (graphHeight * 0.7) - 10;
                     const cx = (prevX + x) / 2;
                     ctx.quadraticCurveTo(prevX, prevY, cx, (prevY + y) / 2);
                 }
@@ -516,15 +522,15 @@
             ctx.lineWidth = 2;
             ctx.stroke();
 
-            // Tracé ligne Jaune (Tendance haute)
+            // 3. Ligne Jaune (Tendance Haute)
             ctx.beginPath();
             data.forEach((val, i) => {
                 const x = i * stepX;
-                const y = height - (val / maxVal) * (height * 0.8) - 20;
+                const y = graphHeight - (val / maxVal) * (graphHeight * 0.85) - 15;
                 if (i === 0) ctx.moveTo(x, y);
                 else {
                     const prevX = (i - 1) * stepX;
-                    const prevY = height - (data[i - 1] / maxVal) * (height * 0.8) - 20;
+                    const prevY = graphHeight - (data[i - 1] / maxVal) * (graphHeight * 0.85) - 15;
                     const cx = (prevX + x) / 2;
                     ctx.quadraticCurveTo(prevX, prevY, cx, (prevY + y) / 2);
                 }
@@ -535,6 +541,29 @@
             ctx.shadowBlur = 8;
             ctx.stroke();
             ctx.shadowBlur = 0;
+
+            // 4. Points & graduations des dates sur 30 jours (Axe horizontal)
+            ctx.fillStyle = '#666';
+            ctx.font = '10px Inter, sans-serif';
+            ctx.textAlign = 'center';
+
+            const interval = 5; // Affiche 1 date tous les 5 jours pour ne pas surcharger l'écran
+            data.forEach((val, i) => {
+                const x = i * stepX;
+
+                // Dessine des petits points blancs sur chaque valeur journalière
+                ctx.beginPath();
+                const yPoint = graphHeight - (val / maxVal) * (graphHeight * 0.7) - 10;
+                ctx.arc(x, yPoint, 3, 0, Math.PI * 2);
+                ctx.fillStyle = i === data.length - 1 ? '#22c55e' : '#eab308';
+                ctx.fill();
+
+                // Textes des dates sous l'axe
+                if (i % interval === 0 || i === data.length - 1) {
+                    ctx.fillStyle = i === data.length - 1 ? '#22c55e' : '#777';
+                    ctx.fillText(dates30j[i] || '', x, height - 8);
+                }
+            });
         }
 
         setTimeout(resizeCanvas, 100);
@@ -581,16 +610,10 @@
                     graphLiveCountEl.textContent = `${total} connecté(s)`;
                 }
 
-                // Ajout du point courant à l'historique temps réel du graphique
-                realtimePoints.push(total);
-                if (realtimePoints.length > MAX_REALTIME_POINTS) {
-                    realtimePoints.shift();
-                }
-
-                // Mise à jour du pic du jour si supérieur
+                // Si le pic d'aujourd'hui en direct dépasse l'historique enregistré pour aujourd'hui
                 if (historique30j.length) {
-                    const currentPeak = historique30j[historique30j.length - 1];
-                    historique30j[historique30j.length - 1] = Math.max(currentPeak, total);
+                    const lastIndex = historique30j.length - 1;
+                    historique30j[lastIndex] = Math.max(historique30j[lastIndex], total);
                 }
 
                 dessinerGraphique();

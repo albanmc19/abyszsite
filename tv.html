@@ -358,10 +358,15 @@
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     tvData = { ...tvData, ...docSnap.data() };
+                } else {
+                    console.log("Le document tv_config/main n'existe pas encore. Utilisation de la configuration locale par défaut.");
                 }
             } catch (e) {
-                console.error("Erreur Firestore:", e);
-                showToast("Impossible de charger les données Firestore.", "error");
+                console.error("Erreur Firestore à la lecture :", e);
+                // Si l'erreur signale un problème de permissions strictes
+                if (e.code === 'permission-denied') {
+                    showToast("Permission refusée sur Firestore (Vérifiez les règles pour tv_config).", "error");
+                }
             }
             initAppUI();
         }

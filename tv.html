@@ -3,115 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABYSZ TV — En Direct</title>
+    <title>ABYSZ TV — Multi-Stream</title>
+    
     <link rel="icon" type="image/png" href="logo.png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@600;700;900&display=swap" rel="stylesheet">
+    
     <style>
-        body { background: #0a0a0a; color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; text-align: center; }
-        h1 { font-family: 'Orbitron', sans-serif; color: #a855f7; margin-bottom: 5px; }
-        .tv-container { max-width: 900px; margin: 20px auto; background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; padding: 20px; box-shadow: 0 0 30px rgba(168, 85, 247, 0.15); }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: #0a0a0a; color: #ffffff; font-family: 'Inter', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
         
-        /* Status Badge */
-        .status-badge { display: inline-flex; align-items: center; gap: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; padding: 6px 16px; border-radius: 20px; margin-bottom: 15px; }
-        .status-badge.online { background: rgba(239, 68, 68, 0.2); color: #ff4444; border: 1px solid #ff4444; }
-        .status-badge.offline { background: rgba(255, 255, 255, 0.05); color: #888; border: 1px solid #333; }
+        /* Navigation / Entête de retour */
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: #0a0a0a; border-bottom: 1px solid #1a1a1a; }
+        .logo { display: flex; align-items: center; gap: 10px; color: white; font-family: 'Orbitron', sans-serif; font-weight: bold; text-decoration: none; }
+        .back-btn { display: inline-flex; align-items: center; gap: 8px; background: rgba(168, 85, 247, 0.1); border: 1px solid #a855f7; color: #ffffff; text-decoration: none; padding: 8px 18px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: 600; transition: all 0.3s ease; }
+        .back-btn:hover { background: #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); transform: translateX(-3px); }
+
+        .container { max-width: 1100px; width: 100%; margin: 30px auto; padding: 0 20px; flex-grow: 1; text-align: center; }
+        
+        h1 { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; color: #a855f7; text-shadow: 0 0 15px rgba(168, 85, 247, 0.4); margin-bottom: 8px; }
+        .subtitle { color: #aaaaaa; font-size: 0.95rem; margin-bottom: 25px; }
+
+        /* Badge de Statut Live Twitch */
+        .status-badge { display: inline-flex; align-items: center; gap: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; padding: 6px 16px; border-radius: 20px; margin-bottom: 20px; background: rgba(20, 20, 20, 0.8); border: 1px solid #2a2a2a; }
+        .status-badge.online { border-color: #ff4444; color: #ff4444; background: rgba(255, 68, 68, 0.1); }
         .pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: #ff4444; box-shadow: 0 0 10px #ff4444; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
 
-        /* Embed Frame */
-        .player-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; border: 1px solid #2a2a2a; background: #000; }
-        .player-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-        
-        .offline-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #0d0d0d; color: #aaa; font-family: 'Orbitron', sans-serif; }
-        
-        /* Multistream Cards */
-        .platforms-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 25px; }
-        .platform-card { background: #1a1a1a; border: 1px solid #2a2a2a; padding: 15px; border-radius: 12px; text-decoration: none; color: white; transition: transform 0.2s, border-color 0.2s; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; }
-        .platform-card:hover { transform: translateY(-3px); border-color: #a855f7; }
-        .twitch { border-top: 3px solid #9146FF; }
-        .youtube { border-top: 3px solid #FF0000; }
-        .tiktok { border-top: 3px solid #00F2FE; }
+        /* Navigation par Onglets Plateformes */
+        .platform-tabs { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-btn { background: #141414; border: 1px solid #2a2a2a; color: #cccccc; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: 600; transition: all 0.25s ease; display: flex; align-items: center; gap: 8px; }
+        .tab-btn:hover { border-color: #a855f7; color: white; }
+        .tab-btn.active { background: #a855f7; color: white; border-color: #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
+
+        /* Lecteur principal */
+        .tv-wrapper { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; padding: 16px; box-shadow: 0 0 30px rgba(0, 0, 0, 0.6); position: relative; }
+        .player-aspect-ratio { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; background: #000000; }
+        .player-aspect-ratio iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+
+        /* Écran d'attente Hors Ligne Twitch */
+        .offline-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #0d0d0d; color: #888888; font-family: 'Orbitron', sans-serif; z-index: 5; }
+        .offline-placeholder h3 { color: #ffffff; margin-top: 12px; font-size: 1.1rem; }
+
+        /* Cartes d'accès rapide */
+        .links-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-top: 30px; }
+        .link-card { background: rgba(20, 20, 20, 0.8); border: 1px solid #262626; border-radius: 12px; padding: 18px; text-decoration: none; color: white; text-align: left; transition: all 0.3s ease; display: flex; flex-direction: column; gap: 6px; }
+        .link-card:hover { transform: translateY(-4px); border-color: #a855f7; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4); }
+        .link-card-title { font-family: 'Orbitron', sans-serif; font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; justify-content: space-between; }
+        .link-card-sub { font-size: 0.8rem; color: #888888; }
+
+        footer { padding: 25px; text-align: center; border-top: 1px solid #1a1a1a; color: #666666; font-size: 0.85rem; margin-top: 40px; }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8rem; }
+            .container { margin: 15px auto; }
+            .tab-btn { flex: 1 1 auto; justify-content: center; padding: 8px 12px; font-size: 0.75rem; }
+        }
     </style>
 </head>
 <body>
 
-    <h1>📺 ABYSZ TV</h1>
-    <p style="color:#aaa; font-size:0.9rem;">Suivez nos diffusions en direct sur toutes nos plateformes</p>
+    <!-- Barre de Navigation avec Bouton Retour -->
+    <nav>
+        <a href="index.html" class="logo">
+            <img src="logo.png" alt="Logo ABYSZ" width="28" height="28">
+            ABYSZ
+        </a>
+        <a href="index.html" class="back-btn">
+            ⬅️ Retour au site
+        </a>
+    </nav>
 
-    <div class="tv-container">
-        <!-- Statut Dynamique -->
-        <div id="live-status" class="status-badge offline">
-            <span id="status-text">VERIFICATION DU LIVE...</span>
+    <div class="container">
+        <h1>📺 ABYSZ TV</h1>
+        <p class="subtitle">Basculez entre nos flux en direct Twitch, YouTube et TikTok</p>
+
+        <!-- Statut Live Dynamique -->
+        <div id="live-status" class="status-badge">
+            <span id="status-text">🔍 Vérification du direct Twitch...</span>
         </div>
 
-        <!-- Lecteur Twitch / Offline -->
-        <div class="player-wrapper">
-            <div id="offline-screen" class="offline-placeholder">
-                <span style="font-size: 2rem; margin-bottom: 10px;">📡</span>
-                <p>LA CHAÎNE EST ACTUELLEMENT HORS LIGNE</p>
-                <span style="font-size:0.75rem; color:#666;">Abonnez-vous sur nos réseaux pour ne pas rater le prochain stream !</span>
+        <!-- Boutons de sélection du flux -->
+        <div class="platform-tabs">
+            <button class="tab-btn active" onclick="switchStream('twitch')">
+                💜 Twitch
+            </button>
+            <button class="tab-btn" onclick="switchStream('youtube')">
+                🔴 YouTube Live
+            </button>
+            <button class="tab-btn" onclick="switchStream('tiktok')">
+                🎵 TikTok Live
+            </button>
+        </div>
+
+        <!-- Lecteur Principal -->
+        <div class="tv-wrapper">
+            <div class="player-aspect-ratio">
+                
+                <!-- Placeholder Offline Twitch -->
+                <div id="offline-screen" class="offline-placeholder" style="display: none;">
+                    <span style="font-size: 2.5rem;">📡</span>
+                    <h3>LE STREAM TWITCH EST HORS LIGNE</h3>
+                    <p style="font-size: 0.78rem; color: #666; margin-top: 6px;">Consultez la chaîne YouTube ou TikTok si un live y est en cours !</p>
+                </div>
+
+                <!-- Iframe Twitch -->
+                <iframe id="twitch-frame" src="" allowfullscreen></iframe>
+
+                <!-- Iframe YouTube Live -->
+                <iframe id="youtube-frame" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="display: none;"></iframe>
+
+                <!-- Embed TikTok -->
+                <iframe id="tiktok-frame" src="" allowfullscreen style="display: none;"></iframe>
             </div>
-            <iframe 
-                id="twitch-player"
-                src=""
-                allowfullscreen="true">
-            </iframe>
         </div>
 
-        <!-- Liens rapides vers les 3 chaînes inspectées -->
-        <div class="platforms-grid">
-            <a href="https://www.twitch.tv/abysz_o" target="_blank" class="platform-card twitch">
-                💜 Twitch <br><span style="font-size:0.7rem; color:#888;">@abysz_o</span>
+        <!-- Liens Directs -->
+        <div class="links-grid">
+            <a href="https://www.twitch.tv/abysz_o" target="_blank" rel="noopener noreferrer" class="link-card">
+                <div class="link-card-title">Twitch <span>↗</span></div>
+                <div class="link-card-sub">@abysz_o • Suivre le chat Twitch</div>
             </a>
-            <a href="https://www.youtube.com/@Abysz_o" target="_blank" class="platform-card youtube">
-                🔴 YouTube <br><span style="font-size:0.7rem; color:#888;">@Abysz_o</span>
+            <a href="https://www.youtube.com/@Abysz_o" target="_blank" rel="noopener noreferrer" class="link-card">
+                <div class="link-card-title">YouTube <span>↗</span></div>
+                <div class="link-card-sub">@Abysz_o • Rediffusions & Shorts</div>
             </a>
-            <a href="https://www.tiktok.com/@abysz_o" target="_blank" class="platform-card tiktok">
-                🎵 TikTok <br><span style="font-size:0.7rem; color:#888;">@abysz_o</span>
+            <a href="https://www.tiktok.com/@abysz_o" target="_blank" rel="noopener noreferrer" class="link-card">
+                <div class="link-card-title">TikTok <span>↗</span></div>
+                <div class="link-card-sub">@abysz_o • Clips & Lives mobiles</div>
             </a>
         </div>
     </div>
 
+    <footer>
+        <p>© 2026 Abysz Esports • Tous droits réservés</p>
+    </footer>
+
     <script>
         const TWITCH_CHANNEL = "abysz_o";
-        // Détecte le nom de domaine actuel pour autoriser l'embed Twitch
-        const currentDomain = window.location.hostname || "localhost";
+        const YOUTUBE_HANDLE = "@Abysz_o";
+        const TIKTOK_USER = "abysz_o";
 
-        const playerIframe = document.getElementById("twitch-player");
-        const offlineScreen = document.getElementById("offline-screen");
-        const statusBadge = document.getElementById("live-status");
-        const statusText = document.getElementById("status-text");
+        const domain = window.location.hostname || "localhost";
 
-        // Configuration de l'URL du lecteur Twitch
-        playerIframe.src = `https://player.twitch.tv/?channel=${TWITCH_CHANNEL}&parent=${currentDomain}&autoplay=false`;
+        const twitchFrame = document.getElementById('twitch-frame');
+        const youtubeFrame = document.getElementById('youtube-frame');
+        const tiktokFrame = document.getElementById('tiktok-frame');
+        const offlineScreen = document.getElementById('offline-screen');
+        
+        const statusBadge = document.getElementById('live-status');
+        const statusText = document.getElementById('status-text');
 
-        // Verification du statut du stream via l'API publique de statut Twitch
-        async function checkTwitchLiveStatus() {
-            try {
-                // Utilisation du service de verification de live
-                const response = await fetch(`https://decapi.me/twitch/uptime/${TWITCH_CHANNEL}`);
-                const uptimeText = await response.text();
+        // Initialisation des URLs d'intégration
+        twitchFrame.src = `https://player.twitch.tv/?channel=${TWITCH_CHANNEL}&parent=${domain}&autoplay=false`;
+        // Flux en direct YouTube via la chaîne principale
+        youtubeFrame.src = `https://www.youtube.com/embed/live_stream?channel=${YOUTUBE_HANDLE}`;
+        // Module d'intégration TikTok Live
+        tiktokFrame.src = `https://www.tiktok.com/embed/live/@${TIKTOK_USER}`;
 
-                if (uptimeText.includes("offline") || uptimeText.includes("not found")) {
-                    // HORS LIGNE
-                    statusBadge.className = "status-badge offline";
-                    statusText.textContent = "● HORS LIGNE";
-                    offlineScreen.style.display = "flex";
-                } else {
-                    // EN DIRECT !
-                    statusBadge.className = "status-badge online";
-                    statusBadge.innerHTML = `<span class="pulse-dot"></span> EN DIRECT SUR TWITCH (${uptimeText})`;
-                    offlineScreen.style.display = "none";
-                }
-            } catch (err) {
-                console.error("Erreur verification live:", err);
-                statusText.textContent = "TWITCH @ABYSZ_O";
+        let currentPlatform = 'twitch';
+
+        function switchStream(platform) {
+            currentPlatform = platform;
+
+            // Gestion des classes actives sur les onglets
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            // Masquer toutes les frames
+            twitchFrame.style.display = 'none';
+            youtubeFrame.style.display = 'none';
+            tiktokFrame.style.display = 'none';
+            offlineScreen.style.display = 'none';
+
+            if (platform === 'twitch') {
+                twitchFrame.style.display = 'block';
+                checkTwitchStatus();
+            } else if (platform === 'youtube') {
+                youtubeFrame.style.display = 'block';
+                statusBadge.className = "status-badge";
+                statusText.textContent = "🔴 Flux YouTube activé";
+            } else if (platform === 'tiktok') {
+                tiktokFrame.style.display = 'block';
+                statusBadge.className = "status-badge";
+                statusText.textContent = "🎵 Flux TikTok activé";
             }
         }
 
-        // Exécution au chargement + rafraîchissement toutes les 60 secondes
-        checkTwitchLiveStatus();
-        setInterval(checkTwitchLiveStatus, 60000);
+        async function checkTwitchStatus() {
+            try {
+                const res = await fetch(`https://decapi.me/twitch/uptime/${TWITCH_CHANNEL}`);
+                const uptime = await res.text();
+
+                if (uptime.includes("offline") || uptime.includes("not found")) {
+                    statusBadge.className = "status-badge";
+                    statusText.textContent = "● TWITCH HORS LIGNE";
+                    if (currentPlatform === 'twitch') {
+                        offlineScreen.style.display = "flex";
+                    }
+                } else {
+                    statusBadge.className = "status-badge online";
+                    statusBadge.innerHTML = `<span class="pulse-dot"></span> EN DIRECT SUR TWITCH (${uptime})`;
+                    offlineScreen.style.display = "none";
+                }
+            } catch (err) {
+                statusText.textContent = "● TWITCH @ABYSZ_O";
+            }
+        }
+
+        // Vérification au chargement
+        checkTwitchStatus();
+        setInterval(checkTwitchStatus, 60000);
     </script>
 </body>
 </html>

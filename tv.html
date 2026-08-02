@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABYSZ TV — Stream & Éditeur Pro</title>
+    <title>ABYSZ TV — Stream & Élément Éditeur</title>
     
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,7 +31,7 @@
         h1 { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; color: #a855f7; text-shadow: 0 0 15px rgba(168, 85, 247, 0.4); margin-bottom: 6px; }
         .subtitle { color: #aaaaaa; font-size: 0.9rem; }
 
-        /* Badge Live Status */
+        /* Badge Status */
         .status-badge { display: inline-flex; align-items: center; gap: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; padding: 6px 16px; border-radius: 20px; margin-top: 12px; background: #141414; border: 1px solid #2a2a2a; }
         .status-badge.online { border-color: #ff4444; color: #ff4444; background: rgba(255, 68, 68, 0.1); }
         .pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: #ff4444; box-shadow: 0 0 10px #ff4444; animation: pulse 1.5s infinite; }
@@ -50,7 +50,7 @@
         .add-tab-btn { display: none; background: rgba(168, 85, 247, 0.2); border: 1px dashed #a855f7; color: #a855f7; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; font-weight: 600; }
         .admin-active .add-tab-btn { display: inline-block; }
 
-        /* Lecteur principal */
+        /* Player Wrapper */
         .tv-wrapper { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; padding: 16px; box-shadow: 0 0 30px rgba(0, 0, 0, 0.6); position: relative; }
         .player-aspect-ratio { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; background: #000000; }
         .player-aspect-ratio iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
@@ -62,7 +62,7 @@
         .action-btn { display: inline-flex; align-items: center; gap: 8px; background: #a855f7; color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; transition: all 0.3s ease; border: none; cursor: pointer; }
         .action-btn:hover { background: #9333ea; box-shadow: 0 0 20px rgba(168, 85, 247, 0.6); }
 
-        /* Configuration Stream (Admin) */
+        /* Configuration Stream Bar (Admin) */
         .stream-config-bar { display: none; background: #111; border: 1px solid #a855f7; padding: 10px 15px; border-radius: 8px; margin-top: 10px; justify-content: space-between; align-items: center; font-size: 0.85rem; }
         .admin-active .stream-config-bar { display: flex; }
 
@@ -80,7 +80,7 @@
         .video-tag { font-family: 'Orbitron', sans-serif; font-size: 0.65rem; color: #a855f7; text-transform: uppercase; margin-bottom: 6px; display: block; }
         .video-title { font-weight: 600; font-size: 0.9rem; line-height: 1.3; margin-bottom: 8px; }
 
-        /* Contrôles Édition sur chaque carte (Admin) */
+        /* Admin Controls */
         .card-admin-controls { display: none; position: absolute; top: 8px; right: 8px; gap: 6px; z-index: 10; }
         .admin-active .card-admin-controls { display: flex; }
         .ctrl-btn { background: rgba(0, 0, 0, 0.85); border: 1px solid #444; color: white; width: 30px; height: 30px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; transition: all 0.2s; }
@@ -102,7 +102,7 @@
 </head>
 <body id="page-body">
 
-    <!-- Navigation -->
+    <!-- Navbar -->
     <nav>
         <a href="index.html" class="logo">
             <img src="logo.png" alt="Logo ABYSZ" width="28" height="28" onerror="this.style.display='none'">
@@ -125,7 +125,7 @@
             </div>
         </div>
 
-        <!-- Onglets dynamiques -->
+        <!-- Onglets -->
         <div class="platform-tabs" id="tabs-container"></div>
 
         <!-- Lecteur principal -->
@@ -164,7 +164,7 @@
             </div>
         </div>
 
-        <!-- Outil Édition Stream (Uniquement Admin) -->
+        <!-- Admin Configuration Bar -->
         <div class="stream-config-bar">
             <span>⚙️ <b>Paramètres Stream :</b> Chaîne Twitch active = <code id="current-twitch-display" style="color:#a855f7;">abysz_o</code></span>
             <button class="action-btn" style="padding: 5px 12px; font-size: 0.75rem;" onclick="openStreamConfigModal()">Modifier la chaîne Live</button>
@@ -180,7 +180,7 @@
 
     </div>
 
-    <!-- MODAL CONNEXION -->
+    <!-- MODAL AUTH -->
     <div id="auth-modal" class="modal">
         <div class="modal-box">
             <h2>🔑 Connexion Admin</h2>
@@ -200,7 +200,7 @@
         </div>
     </div>
 
-    <!-- MODAL AJOUT / ÉDITION VIDÉO -->
+    <!-- MODAL VIDÉO -->
     <div id="video-modal" class="modal">
         <div class="modal-box">
             <h2 id="video-modal-title">✏️ Édition du Contenu</h2>
@@ -224,7 +224,7 @@
         </div>
     </div>
 
-    <!-- MODAL CONFIG STREAM -->
+    <!-- MODAL STREAM -->
     <div id="stream-config-modal" class="modal">
         <div class="modal-box">
             <h2>🎥 Modifier les Lecteurs Live</h2>
@@ -243,7 +243,7 @@
         <p>© 2026 Abysz Esports • Tous droits réservés</p>
     </footer>
 
-    <!-- Firebase SDKs & Script de synchronisation -->
+    <!-- Firebase Core & Script Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -636,7 +636,7 @@
             if (el) el.scrollIntoView({ behavior: 'smooth' });
         };
 
-        // Lancement au chargement de la page
+        // Démarrage
         loadTVData();
     </script>
 </body>

@@ -106,7 +106,7 @@
     <nav>
         <a href="index.html" class="logo">
             <img src="logo.png" alt="Logo ABYSZ" width="28" height="28" onerror="this.style.display='none'">
-            ABYSZ <span id="admin-indicator" style="display:none; font-size:0.6rem; background:#a855f7; padding:2px 6px; border-radius:4px; margin-left:6px;">ÉDITEUR FIRESTORE ACTIF</span>
+            ABYSZ <span id="admin-indicator" style="display:none; font-size:0.6rem; background:#a855f7; padding:2px 6px; border-radius:4px; margin-left:6px;">MODE ADMIN ACTIF</span>
         </a>
         <div class="nav-right">
             <a href="index.html" class="back-btn">⬅️ Retour au site</a>
@@ -249,7 +249,6 @@
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // CONFIGURATION FIREBASE OFFICIELLE ABYSZ
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
             authDomain: "abyszofficial.firebaseapp.com",
@@ -283,25 +282,27 @@
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     tvData = { ...tvData, ...docSnap.data() };
-                    console.log("Configuration TV chargée depuis Firestore :", tvData);
-                } else {
-                    console.log("Aucun document distant trouvé, utilisation des valeurs par défaut.");
                 }
             } catch (e) {
-                console.error("Erreur lors du chargement Firestore:", e);
+                console.error("Erreur chargement Firestore:", e);
             }
             initAppUI();
         }
 
         async function saveTVDataToFirestore() {
+            if (!isAdminUser) {
+                alert("Action refusée : Vous devez être connecté en tant qu'administrateur.");
+                return;
+            }
+
             try {
-                console.log("Sauvegarde manuelle vers Firestore en cours...", tvData);
+                console.log("Enregistrement en cours vers Firestore...");
                 await setDoc(doc(db, "tv_config", "main"), tvData);
-                console.log("Sauvegarde Firestore réussie !");
+                console.log("Modifications enregistrées avec succès !");
                 initAppUI();
             } catch (e) {
-                console.error("Erreur lors de l'enregistrement Firestore :", e);
-                alert("Erreur de sauvegarde : " + e.message);
+                console.error("Erreur d'écriture Firestore :", e);
+                alert("Échec de l'enregistrement. Vérifiez vos règles de sécurité Firestore.\nDétail : " + e.message);
             }
         }
 
@@ -312,7 +313,7 @@
 
             if (user && user.email.toLowerCase() === "abyszofficial@gmail.com") {
                 isAdminUser = true;
-                authBtn.textContent = `👤 Admin (${user.email.split('@')[0]})`;
+                authBtn.textContent = `👤 Admin`;
                 document.getElementById('page-body').classList.add('admin-active');
                 addVideoBtn.style.display = 'inline-block';
                 adminIndicator.style.display = 'inline-block';
@@ -337,7 +338,7 @@
         }
 
         window.login = async function() {
-            const email = document.getElementById('email-input').value;
+            const email = document.getElementById('email-input').value.trim();
             const pass = document.getElementById('password-input').value;
             try {
                 await signInWithEmailAndPassword(auth, email, pass);
@@ -463,6 +464,7 @@
         }
 
         window.createCustomTab = async function() {
+            if (!isAdminUser) return alert("Action réservée à l'administrateur.");
             const name = prompt("Nom de l'onglet :");
             const url = prompt("Lien de redirection URL :");
             if (name && url) {
@@ -473,6 +475,7 @@
         }
 
         window.deleteCustomTab = async function(index) {
+            if (!isAdminUser) return alert("Action réservée à l'administrateur.");
             if (confirm("Supprimer cet onglet ?")) {
                 tvData.customTabs.splice(index, 1);
                 await saveTVDataToFirestore();
@@ -509,6 +512,7 @@
         }
 
         window.openAddVideoModal = function() {
+            if (!isAdminUser) return alert("Action réservée à l'administrateur.");
             document.getElementById('edit-video-index').value = "-1";
             document.getElementById('video-modal-title').textContent = "➕ Ajouter une carte";
             document.getElementById('video-title-input').value = "";
@@ -518,6 +522,7 @@
         }
 
         window.openEditVideoModal = function(index) {
+            if (!isAdminUser) return alert("Action réservée à l'administrateur.");
             const vid = tvData.customVideos[index];
             document.getElementById('edit-video-index').value = index;
             document.getElementById('video-modal-title').textContent = "✏️ Modifier le contenu";
@@ -528,6 +533,7 @@
         }
 
         window.saveVideoCard = async function() {
+            if (!isAdminUser) return;
             const index = parseInt(document.getElementById('edit-video-index').value);
             const title = document.getElementById('video-title-input').value;
             const tag = document.getElementById('video-tag-input').value;
@@ -551,6 +557,7 @@
         }
 
         window.deleteVideoCard = async function(index) {
+            if (!isAdminUser) return;
             if (confirm("Supprimer cette carte ?")) {
                 tvData.customVideos.splice(index, 1);
                 await saveTVDataToFirestore();
@@ -558,11 +565,13 @@
         }
 
         window.openStreamConfigModal = function() {
+            if (!isAdminUser) return alert("Action réservée à l'administrateur.");
             document.getElementById('twitch-channel-input').value = tvData.twitchChannel;
             document.getElementById('stream-config-modal').style.display = 'flex';
         }
 
         window.saveStreamConfig = async function() {
+            if (!isAdminUser) return;
             const ch = document.getElementById('twitch-channel-input').value.trim();
             if (ch) {
                 tvData.twitchChannel = ch;

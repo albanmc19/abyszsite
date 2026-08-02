@@ -276,7 +276,7 @@
 
         function verifyAdmin() {
             const user = auth.currentUser;
-            if (!user || !user.email || user.email != "abyszofficial@gmail.com") {
+            if (!user || !user.email || user.email !== "abyszofficial@gmail.com") {
                 alert("Erreur de sauvegarde : Vous devez être connecté avec le compte administrateur (abyszofficial@gmail.com).");
                 return false;
             }
@@ -315,7 +315,7 @@
             const adminIndicator = document.getElementById('admin-indicator');
             const pageBody = document.getElementById('page-body');
 
-            if (user && user.email && user.email == "abyszofficial@gmail.com") {
+            if (user && user.email && user.email === "abyszofficial@gmail.com") {
                 if (authBtn) authBtn.textContent = `👤 Admin`;
                 if (pageBody) pageBody.classList.add('admin-active');
                 if (addVideoBtn) addVideoBtn.style.display = 'inline-block';
@@ -338,7 +338,7 @@
                 const modal = document.getElementById('auth-modal');
                 if (modal) modal.style.display = 'flex';
             }
-        }
+        };
 
         window.login = async function() {
             const emailInput = document.getElementById('email-input');
@@ -354,12 +354,12 @@
             } catch (e) {
                 alert("Erreur de connexion : " + e.message);
             }
-        }
+        };
 
         window.closeModal = function(id) {
             const modal = document.getElementById(id);
             if (modal) modal.style.display = 'none';
-        }
+        };
 
         function initAppUI() {
             renderTabs();
@@ -452,7 +452,7 @@
                 if (statusBadge) statusBadge.className = "status-badge";
                 if (statusText) statusText.textContent = "⚡ " + tab.name;
             }
-        }
+        };
 
         async function checkTwitchStatus() {
             const statusBadge = document.getElementById('live-status');
@@ -491,7 +491,7 @@
                 tvData.customTabs.push({ name: name.trim(), url: url.trim() });
                 await saveTVDataToFirestore();
             }
-        }
+        };
 
         window.deleteCustomTab = async function(index) {
             if (!verifyAdmin()) return;
@@ -501,7 +501,7 @@
                     await saveTVDataToFirestore();
                 }
             }
-        }
+        };
 
         function renderVideos() {
             const grid = document.getElementById('video-grid-container');
@@ -548,7 +548,7 @@
             if (tagInput) tagInput.value = "";
             if (urlInput) urlInput.value = "";
             if (modal) modal.style.display = 'flex';
-        }
+        };
 
         window.openEditVideoModal = function(index) {
             if (!verifyAdmin()) return;
@@ -568,7 +568,7 @@
             if (tagInput) tagInput.value = vid.tag || '';
             if (urlInput) urlInput.value = vid.url || '';
             if (modal) modal.style.display = 'flex';
-        }
+        };
 
         window.saveVideoCard = async function() {
             if (!verifyAdmin()) return;
@@ -599,7 +599,7 @@
 
             await saveTVDataToFirestore();
             window.closeModal('video-modal');
-        }
+        };
 
         window.deleteVideoCard = async function(index) {
             if (!verifyAdmin()) return;
@@ -609,7 +609,7 @@
                     await saveTVDataToFirestore();
                 }
             }
-        }
+        };
 
         window.openStreamConfigModal = function() {
             if (!verifyAdmin()) return;
@@ -617,7 +617,7 @@
             const modal = document.getElementById('stream-config-modal');
             if (chInput) chInput.value = tvData.twitchChannel;
             if (modal) modal.style.display = 'flex';
-        }
+        };
 
         window.saveStreamConfig = async function() {
             if (!verifyAdmin()) return;
@@ -629,12 +629,12 @@
                 await saveTVDataToFirestore();
                 window.closeModal('stream-config-modal');
             }
-        }
+        };
 
         window.scrollToSection = function(id) {
             const el = document.getElementById(id);
             if (el) el.scrollIntoView({ behavior: 'smooth' });
-        }
+        };
 
         // Lancement au chargement de la page
         loadTVData();

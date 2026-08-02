@@ -80,7 +80,7 @@
         .video-tag { font-family: 'Orbitron', sans-serif; font-size: 0.65rem; color: #a855f7; text-transform: uppercase; margin-bottom: 6px; display: block; }
         .video-title { font-weight: 600; font-size: 0.9rem; line-height: 1.3; margin-bottom: 8px; }
 
-        /* Contrôles Édition sur chaque carte (Admin) */
+        /* Contrôles Édition sur chaque carte (Admin) */
         .card-admin-controls { display: none; position: absolute; top: 8px; right: 8px; gap: 6px; z-index: 10; }
         .admin-active .card-admin-controls { display: flex; }
         .ctrl-btn { background: rgba(0, 0, 0, 0.85); border: 1px solid #444; color: white; width: 30px; height: 30px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; transition: all 0.2s; }
@@ -106,7 +106,7 @@
     <nav>
         <a href="index.html" class="logo">
             <img src="logo.png" alt="Logo ABYSZ" width="28" height="28" onerror="this.style.display='none'">
-            ABYSZ <span id="admin-indicator" style="display:none; font-size:0.6rem; background:#a855f7; padding:2px 6px; border-radius:4px; margin-left:6px;">ÉDITEUR ACTIF</span>
+            ABYSZ <span id="admin-indicator" style="display:none; font-size:0.6rem; background:#a855f7; padding:2px 6px; border-radius:4px; margin-left:6px;">ÉDITEUR FIRESTORE ACTIF</span>
         </a>
         <div class="nav-right">
             <a href="index.html" class="back-btn">⬅️ Retour au site</a>
@@ -125,10 +125,8 @@
             </div>
         </div>
 
-        <!-- Onglets dynamique avec mode ajout -->
-        <div class="platform-tabs" id="tabs-container">
-            <!-- Injecté dynamiquement par JS -->
-        </div>
+        <!-- Onglets dynamiques -->
+        <div class="platform-tabs" id="tabs-container"></div>
 
         <!-- Lecteur principal -->
         <div class="tv-wrapper">
@@ -178,19 +176,18 @@
             <button class="action-btn" id="add-video-btn" style="display:none; font-size: 0.75rem; padding: 6px 14px;" onclick="openAddVideoModal()">➕ Ajouter un contenu</button>
         </div>
         
-        <div class="video-grid" id="video-grid-container">
-            <!-- Cartes injectées JS -->
-        </div>
+        <div class="video-grid" id="video-grid-container"></div>
 
     </div>
 
     <!-- MODAL CONNEXION -->
     <div id="auth-modal" class="modal">
         <div class="modal-box">
-            <h2>🔑 Connexion Admin / Membre</h2>
+            <h2>🔑 Connexion Admin</h2>
+            <p style="font-size: 0.8rem; color: #88; margin-bottom: 15px; text-align: center;">Connecte-toi avec ton compte administrateur Firebase.</p>
             <div class="form-group">
-                <label>Nom d'utilisateur</label>
-                <input type="text" id="username-input" placeholder="ex: Admin">
+                <label>Email Admin</label>
+                <input type="email" id="email-input" placeholder="abyszofficial@gmail.com">
             </div>
             <div class="form-group">
                 <label>Mot de passe</label>
@@ -246,97 +243,121 @@
         <p>© 2026 Abysz Esports • Tous droits réservés</p>
     </footer>
 
-    <script>
+    <!-- Firebase SDKs (Modulaires v10) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // CONFIGURATION FIREBASE (À adapter si tes clés sont différentes dans ton projet global)
+        const firebaseConfig = {
+            apiKey: "TA_API_KEY",
+            authDomain: "TON_AUTH_DOMAIN",
+            projectId: "TON_PROJECT_ID",
+            storageBucket: "TON_STORAGE_BUCKET",
+            messagingSenderId: "TON_MESSAGING_SENDER_ID",
+            appId: "TON_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
         const domain = window.location.hostname || "localhost";
 
-        // Données modifiables
-        let twitchChannel = localStorage.getItem('abysz_twitch_channel') || "abysz_o";
-        let customTabs = JSON.parse(localStorage.getItem('abysz_custom_tabs')) || [];
-        let customVideos = JSON.parse(localStorage.getItem('abysz_custom_videos')) || [
-            { tag: "YouTube", title: "Chaîne Officielle & Replays YouTube", url: "https://www.youtube.com/@Abysz_o" },
-            { tag: "TikTok", title: "Clips Rapides & Highlights TikTok", url: "https://www.tiktok.com/@abysz_o" },
-            { tag: "Twitch", title: "Rediffusions & VODs des Live Twitch", url: "https://www.twitch.tv/abysz_o/videos" }
-        ];
+        // Données par défaut
+        let tvData = {
+            twitchChannel: "abysz_o",
+            customTabs: [],
+            customVideos: [
+                { tag: "YouTube", title: "Chaîne Officielle & Replays YouTube", url: "https://www.youtube.com/@Abysz_o" },
+                { tag: "TikTok", title: "Clips Rapides & Highlights TikTok", url: "https://www.tiktok.com/@abysz_o" },
+                { tag: "Twitch", title: "Rediffusions & VODs des Live Twitch", url: "https://www.twitch.tv/abysz_o/videos" }
+            ]
+        };
 
-        let currentUser = JSON.parse(localStorage.getItem('abysz_user')) || null;
+        let isAdminUser = false;
 
-        // DOM elements
-        const twitchFrame = document.getElementById('twitch-frame');
-        const twitchOfflineScreen = document.getElementById('twitch-offline-screen');
-        const youtubeOfflineScreen = document.getElementById('youtube-offline-screen');
-        const tiktokScreen = document.getElementById('tiktok-screen');
-        const customEmbedScreen = document.getElementById('custom-embed-screen');
-        const statusBadge = document.getElementById('live-status');
-        const statusText = document.getElementById('status-text');
+        // Charger depuis Firestore au démarrage
+        async function loadTVData() {
+            try {
+                const docRef = doc(db, "tv_config", "main");
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    tvData = docSnap.merge ? { ...tvData, ...docSnap.data() } : docSnap.data();
+                }
+            } catch (e) {
+                console.error("Erreur de chargement Firestore:", e);
+            }
+            initAppUI();
+        }
+
+        // Sauvegarder dans Firestore
+        async function saveTVDataToFirestore() {
+            try {
+                await setDoc(doc(db, "tv_config", "main"), tvData);
+                initAppUI();
+            } catch (e) {
+                alert("Erreur lors de la sauvegarde : " + e.message);
+            }
+        }
 
         // --- AUTHENTIFICATION ---
-        function updateAuthUI() {
+        onAuthStateChanged(auth, (user) => {
             const authBtn = document.getElementById('auth-btn');
             const addVideoBtn = document.getElementById('add-video-btn');
             const adminIndicator = document.getElementById('admin-indicator');
-            
-            if (currentUser) {
-                authBtn.textContent = `👤 ${currentUser.username}`;
-                
-                if (currentUser.role === 'admin') {
-                    document.getElementById('page-body').classList.add('admin-active');
-                    addVideoBtn.style.display = 'inline-block';
-                    adminIndicator.style.display = 'inline-block';
-                } else {
-                    document.getElementById('page-body').classList.remove('admin-active');
-                    addVideoBtn.style.display = 'none';
-                    adminIndicator.style.display = 'none';
-                }
+
+            if (user && user.email.toLowerCase() === "abyszofficial@gmail.com") {
+                isAdminUser = true;
+                authBtn.textContent = `👤 Admin (${user.email.split('@')[0]})`;
+                document.getElementById('page-body').classList.add('admin-active');
+                addVideoBtn.style.display = 'inline-block';
+                adminIndicator.style.display = 'inline-block';
             } else {
-                authBtn.textContent = '👤 Se connecter';
+                isAdminUser = false;
+                authBtn.textContent = user ? `👤 ${user.email}` : '👤 Se connecter';
                 document.getElementById('page-body').classList.remove('admin-active');
                 addVideoBtn.style.display = 'none';
                 adminIndicator.style.display = 'none';
             }
+        });
 
-            document.getElementById('current-twitch-display').textContent = twitchChannel;
-        }
-
-        function handleAuthClick() {
-            if (currentUser) {
-                if (confirm(`Déconnexion de ${currentUser.username} ?`)) {
-                    currentUser = null;
-                    localStorage.removeItem('abysz_user');
-                    updateAuthUI();
-                    renderTabs();
-                    renderVideos();
+        window.handleAuthClick = function() {
+            const user = auth.currentUser;
+            if (user) {
+                if (confirm("Se déconnecter ?")) {
+                    signOut(auth);
                 }
             } else {
                 document.getElementById('auth-modal').style.display = 'flex';
             }
         }
 
-        function login() {
-            const user = document.getElementById('username-input').value;
+        window.login = async function() {
+            const email = document.getElementById('email-input').value;
             const pass = document.getElementById('password-input').value;
-
-            if (user.toLowerCase() === 'admin' && pass === 'abysz2026') {
-                currentUser = { username: 'Admin', role: 'admin' };
-                localStorage.setItem('abysz_user', JSON.stringify(currentUser));
-                updateAuthUI();
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
                 closeModal('auth-modal');
-                renderTabs();
-                renderVideos();
-            } else if (user) {
-                currentUser = { username: user, role: 'user' };
-                localStorage.setItem('abysz_user', JSON.stringify(currentUser));
-                updateAuthUI();
-                closeModal('auth-modal');
-            } else {
-                alert('Veuillez saisir des identifiants valides.');
+            } catch (e) {
+                alert("Erreur de connexion : " + e.message);
             }
         }
 
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; }
 
-        // --- ONGLETS & LECTEUR ---
+        // --- RENDU UI ---
+        function initAppUI() {
+            renderTabs();
+            renderVideos();
+            reloadTwitchPlayer();
+            document.getElementById('current-twitch-display').textContent = tvData.twitchChannel;
+        }
+
         function reloadTwitchPlayer() {
-            twitchFrame.src = `https://player.twitch.tv/?channel=${twitchChannel}&parent=${domain}&autoplay=false`;
+            const twitchFrame = document.getElementById('twitch-frame');
+            twitchFrame.src = `https://player.twitch.tv/?channel=${tvData.twitchChannel}&parent=${domain}&autoplay=false`;
             checkTwitchStatus();
         }
 
@@ -344,7 +365,6 @@
             const container = document.getElementById('tabs-container');
             container.innerHTML = '';
 
-            // Tabs fixes de base
             const baseTabs = [
                 { name: "💜 Twitch Live", action: 'twitch' },
                 { name: "🔴 YouTube Live", action: 'youtube' },
@@ -358,18 +378,18 @@
                 container.appendChild(wrapper);
             });
 
-            // Tabs sur-mesure (avec bouton supprimer admin)
-            customTabs.forEach((tab, index) => {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'tab-wrapper';
-                wrapper.innerHTML = `
-                    <button class="tab-btn" onclick="switchStream('custom', this, ${index})">${tab.name}</button>
-                    <button class="tab-delete-btn" onclick="deleteCustomTab(${index})">✕</button>
-                `;
-                container.appendChild(wrapper);
-            });
+            if (tvData.customTabs) {
+                tvData.customTabs.forEach((tab, index) => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'tab-wrapper';
+                    wrapper.innerHTML = `
+                        <button class="tab-btn" onclick="switchStream('custom', this, ${index})">${tab.name}</button>
+                        <button class="tab-delete-btn" onclick="deleteCustomTab(${index})">✕</button>
+                    `;
+                    container.appendChild(wrapper);
+                });
+            }
 
-            // Bouton + Nouvel Onglet (Admin)
             const addBtn = document.createElement('button');
             addBtn.className = 'add-tab-btn';
             addBtn.textContent = '➕ Ajouter Onglet';
@@ -377,9 +397,17 @@
             container.appendChild(addBtn);
         }
 
-        function switchStream(type, element, customIndex = null) {
+        window.switchStream = function(type, element, customIndex = null) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             if(element) element.classList.add('active');
+
+            const twitchFrame = document.getElementById('twitch-frame');
+            const twitchOfflineScreen = document.getElementById('twitch-offline-screen');
+            const youtubeOfflineScreen = document.getElementById('youtube-offline-screen');
+            const tiktokScreen = document.getElementById('tiktok-screen');
+            const customEmbedScreen = document.getElementById('custom-embed-screen');
+            const statusBadge = document.getElementById('live-status');
+            const statusText = document.getElementById('status-text');
 
             twitchFrame.style.display = 'none';
             twitchOfflineScreen.style.display = 'none';
@@ -397,8 +425,8 @@
                 tiktokScreen.style.display = 'flex';
                 statusBadge.className = "status-badge";
                 statusText.textContent = "🎵 Mode TikTok activé";
-            } else if (type === 'custom' && customTabs[customIndex]) {
-                const tab = customTabs[customIndex];
+            } else if (type === 'custom' && tvData.customTabs[customIndex]) {
+                const tab = tvData.customTabs[customIndex];
                 customEmbedScreen.style.display = 'flex';
                 document.getElementById('custom-tab-title').textContent = tab.name;
                 document.getElementById('custom-tab-link').href = tab.url;
@@ -408,8 +436,13 @@
         }
 
         async function checkTwitchStatus() {
+            const statusBadge = document.getElementById('live-status');
+            const statusText = document.getElementById('status-text');
+            const twitchOfflineScreen = document.getElementById('twitch-offline-screen');
+            const twitchFrame = document.getElementById('twitch-frame');
+
             try {
-                const res = await fetch(`https://decapi.me/twitch/uptime/${twitchChannel}`);
+                const res = await fetch(`https://decapi.me/twitch/uptime/${tvData.twitchChannel}`);
                 const uptime = await res.text();
 
                 if (uptime.includes("offline") || uptime.includes("not found")) {
@@ -423,58 +456,58 @@
                     twitchFrame.style.display = "block";
                 }
             } catch (err) {
-                statusText.textContent = `● CHAÎNE @${twitchChannel.toUpperCase()}`;
+                statusText.textContent = `● CHAÎNE @${tvData.twitchChannel.toUpperCase()}`;
                 twitchOfflineScreen.style.display = "flex";
             }
         }
 
-        function createCustomTab() {
+        window.createCustomTab = async function() {
             const name = prompt("Nom de l'onglet :");
             const url = prompt("Lien de redirection URL :");
             if (name && url) {
-                customTabs.push({ name, url });
-                localStorage.setItem('abysz_custom_tabs', JSON.stringify(customTabs));
-                renderTabs();
+                if (!tvData.customTabs) tvData.customTabs = [];
+                tvData.customTabs.push({ name, url });
+                await saveTVDataToFirestore();
             }
         }
 
-        function deleteCustomTab(index) {
+        window.deleteCustomTab = async function(index) {
             if (confirm("Supprimer cet onglet ?")) {
-                customTabs.splice(index, 1);
-                localStorage.setItem('abysz_custom_tabs', JSON.stringify(customTabs));
-                renderTabs();
+                tvData.customTabs.splice(index, 1);
+                await saveTVDataToFirestore();
             }
         }
 
-        // --- GESTION DES VIDÉOS & CARTES ---
         function renderVideos() {
             const grid = document.getElementById('video-grid-container');
             grid.innerHTML = '';
 
-            customVideos.forEach((vid, index) => {
-                const card = document.createElement('div');
-                card.className = 'video-card';
-                card.innerHTML = `
-                    <div class="card-admin-controls">
-                        <button class="ctrl-btn edit" onclick="openEditVideoModal(${index})" title="Modifier">✏️</button>
-                        <button class="ctrl-btn del" onclick="deleteVideoCard(${index})" title="Supprimer">🗑️</button>
-                    </div>
-                    <a href="${vid.url}" target="_blank" style="text-decoration:none; color:white; display:flex; flex-direction:column; flex-grow:1;">
-                        <div class="video-thumb" style="background: radial-gradient(circle, #1f1f2e 0%, #101018 100%);">
-                            <div class="play-icon">▶</div>
+            if (tvData.customVideos) {
+                tvData.customVideos.forEach((vid, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'video-card';
+                    card.innerHTML = `
+                        <div class="card-admin-controls">
+                            <button class="ctrl-btn edit" onclick="openEditVideoModal(${index})" title="Modifier">✏️</button>
+                            <button class="ctrl-btn del" onclick="deleteVideoCard(${index})" title="Supprimer">🗑️</button>
                         </div>
-                        <div class="video-info">
-                            <span class="video-tag">${vid.tag || 'OFFICIEL'}</span>
-                            <div class="video-title">${vid.title}</div>
-                            <span style="font-size: 0.75rem; color: #a855f7;">Voir la page ↗</span>
-                        </div>
-                    </a>
-                `;
-                grid.appendChild(card);
-            });
+                        <a href="${vid.url}" target="_blank" style="text-decoration:none; color:white; display:flex; flex-direction:column; flex-grow:1;">
+                            <div class="video-thumb" style="background: radial-gradient(circle, #1f1f2e 0%, #101018 100%);">
+                                <div class="play-icon">▶</div>
+                            </div>
+                            <div class="video-info">
+                                <span class="video-tag">${vid.tag || 'OFFICIEL'}</span>
+                                <div class="video-title">${vid.title}</div>
+                                <span style="font-size: 0.75rem; color: #a855f7;">Voir la page ↗</span>
+                            </div>
+                        </a>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
         }
 
-        function openAddVideoModal() {
+        window.openAddVideoModal = function() {
             document.getElementById('edit-video-index').value = "-1";
             document.getElementById('video-modal-title').textContent = "➕ Ajouter une carte";
             document.getElementById('video-title-input').value = "";
@@ -483,8 +516,8 @@
             document.getElementById('video-modal').style.display = 'flex';
         }
 
-        function openEditVideoModal(index) {
-            const vid = customVideos[index];
+        window.openEditVideoModal = function(index) {
+            const vid = tvData.customVideos[index];
             document.getElementById('edit-video-index').value = index;
             document.getElementById('video-modal-title').textContent = "✏️ Modifier le contenu";
             document.getElementById('video-title-input').value = vid.title;
@@ -493,7 +526,7 @@
             document.getElementById('video-modal').style.display = 'flex';
         }
 
-        function saveVideoCard() {
+        window.saveVideoCard = async function() {
             const index = parseInt(document.getElementById('edit-video-index').value);
             const title = document.getElementById('video-title-input').value;
             const tag = document.getElementById('video-tag-input').value;
@@ -504,50 +537,45 @@
                 return;
             }
 
+            if (!tvData.customVideos) tvData.customVideos = [];
+
             if (index === -1) {
-                customVideos.push({ title, tag: tag || 'VIDÉO', url });
+                tvData.customVideos.push({ title, tag: tag || 'VIDÉO', url });
             } else {
-                customVideos[index] = { title, tag: tag || 'VIDÉO', url };
+                tvData.customVideos[index] = { title, tag: tag || 'VIDÉO', url };
             }
 
-            localStorage.setItem('abysz_custom_videos', JSON.stringify(customVideos));
-            renderVideos();
+            await saveTVDataToFirestore();
             closeModal('video-modal');
         }
 
-        function deleteVideoCard(index) {
+        window.deleteVideoCard = async function(index) {
             if (confirm("Supprimer cette carte ?")) {
-                customVideos.splice(index, 1);
-                localStorage.setItem('abysz_custom_videos', JSON.stringify(customVideos));
-                renderVideos();
+                tvData.customVideos.splice(index, 1);
+                await saveTVDataToFirestore();
             }
         }
 
-        function openStreamConfigModal() {
-            document.getElementById('twitch-channel-input').value = twitchChannel;
+        window.openStreamConfigModal = function() {
+            document.getElementById('twitch-channel-input').value = tvData.twitchChannel;
             document.getElementById('stream-config-modal').style.display = 'flex';
         }
 
-        function saveStreamConfig() {
+        window.saveStreamConfig = async function() {
             const ch = document.getElementById('twitch-channel-input').value.trim();
             if (ch) {
-                twitchChannel = ch;
-                localStorage.setItem('abysz_twitch_channel', twitchChannel);
-                reloadTwitchPlayer();
-                updateAuthUI();
+                tvData.twitchChannel = ch;
+                await saveTVDataToFirestore();
                 closeModal('stream-config-modal');
             }
         }
 
-        function scrollToSection(id) {
+        window.scrollToSection = function(id) {
             document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
         }
 
-        // --- Lancement ---
-        updateAuthUI();
-        renderTabs();
-        renderVideos();
-        reloadTwitchPlayer();
+        // Lancement du chargement initial
+        loadTVData();
     </script>
 </body>
 </html>

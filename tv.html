@@ -97,6 +97,40 @@
         .form-group input { width: 100%; background: #0a0a0a; border: 1px solid #333; color: white; padding: 10px; border-radius: 6px; font-size: 0.85rem; }
         .form-group input:focus { border-color: #a855f7; outline: none; }
 
+        /* Toast Notifications */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: #141414;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease forwards;
+            border-left: 4px solid #a855f7;
+        }
+
+        .toast.success { border-left-color: #22c55e; }
+        .toast.error { border-left-color: #ef4444; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
         footer { padding: 30px; text-align: center; border-top: 1px solid #1a1a1a; color: #666; font-size: 0.85rem; margin-top: 50px; }
     </style>
 </head>
@@ -238,6 +272,9 @@
         </div>
     </div>
 
+    <!-- Container Toast -->
+    <div id="toast-container"></div>
+
     <footer>
         <p>© 2026 Abysz Esports • Tous droits réservés</p>
     </footer>
@@ -267,35 +304,49 @@
             twitchChannel: "abysz_o",
             customTabs: [],
             customVideos: [
-                { tag: "YouTube", title: "Trailer Officiel Team ABYSZ", url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" }
+                { tag: "YouTube", title: "Trailer Officiel Team ABYSZ", url: "https://www.youtube.com/watch?v=bf7rcIJ9e1I" }
             ]
         };
 
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icon = type === 'success' ? '✅' : (type === 'error' ? '❌' : 'ℹ️');
+            toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+            
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideIn 0.3s ease reverse forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
         function parseYouTubeEmbed(url) {
             if (!url) return '';
-            let videoId = '';
-            if (url.includes('v=')) {
-                videoId = url.split('v=')[1].split('&')[0];
-            } else if (url.includes('youtu.be/')) {
-                videoId = url.split('youtu.be/')[1].split('?')[0];
-            } else if (url.includes('embed/')) {
-                videoId = url.split('embed/')[1].split('?')[0];
-            }
+            let videoId = extractYouTubeId(url);
             return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1` : url;
         }
 
         function extractYouTubeId(url) {
             if (!url) return null;
-            if (url.includes('v=')) return url.split('v=')[1].split('&')[0];
-            if (url.includes('youtu.be/')) return url.split('youtu.be/')[1].split('?')[0];
-            if (url.includes('embed/')) return url.split('embed/')[1].split('?')[0];
+            let cleanUrl = url.split('?')[0].split('&')[0];
+            if (url.includes('v=')) {
+                const match = url.match(/[?&]v=([^&]+)/);
+                return match ? match[1] : null;
+            }
+            if (cleanUrl.includes('youtu.be/')) return cleanUrl.split('youtu.be/')[1];
+            if (cleanUrl.includes('embed/')) return cleanUrl.split('embed/')[1];
             return null;
         }
 
         function verifyAdmin() {
             const user = auth.currentUser;
             if (!user || !user.email || user.email !== "abyszofficial@gmail.com") {
-                alert("Erreur : Connexion requise avec abyszofficial@gmail.com");
                 return false;
             }
             return true;
@@ -310,18 +361,27 @@
                 }
             } catch (e) {
                 console.error("Erreur Firestore:", e);
+                showToast("Impossible de charger les données Firestore.", "error");
             }
             initAppUI();
         }
 
         async function saveTVDataToFirestore() {
-            if (!verifyAdmin()) return;
+            if (!verifyAdmin()) {
+                showToast("Action refusée : Vous devez être connecté avec l'email Admin.", "error");
+                return;
+            }
             try {
                 await setDoc(doc(db, "tv_config", "main"), tvData);
-                alert("Enregistré sur Firebase !");
+                showToast("Modifications enregistrées sur Firebase !", "success");
                 initAppUI();
             } catch (e) {
-                alert("Erreur de sauvegarde : " + e.message);
+                console.error("Erreur Firestore :", e);
+                if (e.code === 'permission-denied') {
+                    showToast("Erreur Firebase : Permission refusée sur Firestore.", "error");
+                } else {
+                    showToast(`Erreur de sauvegarde : ${e.message}`, "error");
+                }
             }
         }
 
@@ -357,9 +417,10 @@
             const pass = document.getElementById('password-input').value;
             try {
                 await signInWithEmailAndPassword(auth, email, pass);
+                showToast("Connexion réussie !", "success");
                 window.closeModal('auth-modal');
             } catch (e) {
-                alert("Erreur : " + e.message);
+                showToast("Erreur de connexion : " + e.message, "error");
             }
         };
 
@@ -518,7 +579,10 @@
         }
 
         window.createCustomTab = async function() {
-            if (!verifyAdmin()) return;
+            if (!verifyAdmin()) {
+                showToast("Action réservée aux administrateurs.", "error");
+                return;
+            }
             const name = prompt("Nom de l'onglet :");
             const url = prompt("Lien URL :");
             if (name && url) {
@@ -572,7 +636,10 @@
         }
 
         window.openAddVideoModal = function() {
-            if (!verifyAdmin()) return;
+            if (!verifyAdmin()) {
+                showToast("Vous devez être connecté avec le compte Admin.", "error");
+                return;
+            }
             document.getElementById('edit-video-index').value = "-1";
             document.getElementById('video-modal-title').textContent = "➕ Ajouter une vidéo";
             document.getElementById('video-title-input').value = "";
@@ -595,14 +662,17 @@
         };
 
         window.saveVideoCard = async function() {
-            if (!verifyAdmin()) return;
+            if (!verifyAdmin()) {
+                showToast("Action refusée : Compte Admin requis.", "error");
+                return;
+            }
             const index = parseInt(document.getElementById('edit-video-index').value);
             const title = document.getElementById('video-title-input').value.trim();
             const tag = document.getElementById('video-tag-input').value.trim();
             const url = document.getElementById('video-url-input').value.trim();
 
             if (!title || !url) {
-                alert("Indique au moins le titre et le lien de la vidéo !");
+                showToast("Veuillez renseigner un titre et une URL !", "error");
                 return;
             }
 
@@ -614,8 +684,8 @@
                 tvData.customVideos[index] = { title, tag: tag || 'VIDÉO', url };
             }
 
-            await saveTVDataToFirestore();
             window.closeModal('video-modal');
+            await saveTVDataToFirestore();
         };
 
         window.deleteVideoCard = async function(index) {
@@ -637,8 +707,8 @@
             const ch = document.getElementById('twitch-channel-input').value.trim();
             if (ch) {
                 tvData.twitchChannel = ch;
-                await saveTVDataToFirestore();
                 window.closeModal('stream-config-modal');
+                await saveTVDataToFirestore();
             }
         };
 

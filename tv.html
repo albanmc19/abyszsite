@@ -87,14 +87,16 @@
         .video-title { font-weight: 600; font-size: 0.95rem; line-height: 1.4; margin-bottom: 12px; color: #f0f0f5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .video-action-hint { font-size: 0.8rem; color: #a855f7; font-family: 'Orbitron', sans-serif; display: flex; align-items: center; gap: 5px; font-weight: 600; }
 
-        /* Modô Admin Controls sur les cartes */
+        .no-videos-message { grid-column: 1 / -1; text-align: center; padding: 40px 20px; background: #101018; border: 1px dashed #222230; border-radius: 14px; color: #666680; font-family: 'Orbitron', sans-serif; font-size: 0.9rem; }
+
+        /* Controls Admin sur les cartes */
         .card-admin-controls { display: none; position: absolute; top: 10px; right: 10px; gap: 6px; z-index: 10; }
         .admin-active .card-admin-controls { display: flex; }
         .ctrl-btn { background: rgba(10, 10, 15, 0.9); border: 1px solid #3a3a4c; color: white; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; transition: all 0.2s; }
         .ctrl-btn.edit:hover { background: #a855f7; border-color: #a855f7; }
         .ctrl-btn.del:hover { background: #ef4444; border-color: #ef4444; }
 
-        /* Modals (Fenêtres Surgissantes) */
+        /* Modals */
         .modal { display: none; position: fixed; inset: 0; background: rgba(5, 5, 8, 0.85); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
         .modal-box { background: #12121a; border: 1px solid #a855f7; border-radius: 16px; width: 90%; max-width: 450px; padding: 25px; box-shadow: 0 0 40px rgba(168, 85, 247, 0.3); }
         .modal-box h2 { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 1.25rem; margin-bottom: 18px; text-align: center; }
@@ -104,7 +106,7 @@
         .form-group input { width: 100%; background: #08080c; border: 1px solid #222230; color: white; padding: 12px; border-radius: 8px; font-size: 0.9rem; }
         .form-group input:focus { border-color: #a855f7; outline: none; box-shadow: 0 0 10px rgba(168,85,247,0.3); }
 
-        /* Modal Player Vidéo Ultra Propre */
+        /* Modal Player Vidéo Propre */
         .player-modal-box { background: #0d0d14; border: 1px solid #a855f7; border-radius: 18px; width: 92%; max-width: 900px; padding: 20px; box-shadow: 0 0 50px rgba(168, 85, 247, 0.4); position: relative; }
         .player-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .player-modal-title { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: #ffffff; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 15px; }
@@ -202,7 +204,7 @@
 
     </div>
 
-    <!-- MODAL POPUP LECTEUR VIDÉO (PROPRE ET NET) -->
+    <!-- MODAL POPUP LECTEUR VIDÉO -->
     <div id="video-player-modal" class="modal" onclick="closeVideoPlayerModal(event)">
         <div class="player-modal-box" onclick="event.stopPropagation()">
             <div class="player-modal-header">
@@ -301,13 +303,11 @@
 
         const domain = window.location.hostname || "localhost";
 
-        // Configuration par défaut de l'équipe
+        // Structure initiale SANS URL par défaut
         let tvData = {
             twitchChannel: "abysz_o",
             customTabs: [],
-            customVideos: [
-                { tag: "TRAILER", title: "ABYSZ Esport - Official Presentation", url: "https://www.youtube.com/watch?v=bf7rcIJ9e1I" }
-            ]
+            customVideos: [] // Aucune vidéo prédéfinie
         };
 
         function showToast(message, type = 'info') {
@@ -336,7 +336,6 @@
 
         function parseYouTubeEmbed(url) {
             const videoId = extractYouTubeId(url);
-            // Incorpore les paramètres originaux pour masquer l'interface inutile
             return videoId ? `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1` : url;
         }
 
@@ -367,19 +366,18 @@
                 return;
             }
             try {
-                // Conversion propre des données
                 const cleanData = {
                     twitchChannel: String(tvData.twitchChannel),
                     customTabs: tvData.customTabs.map(t => ({ name: String(t.name), url: String(t.url) })),
                     customVideos: tvData.customVideos.map(v => ({ 
                         title: String(v.title || ''), 
-                        tag: String(v.tag || 'VIDÉO'), 
+                        tag: String(v.tag || 'OFFICIEL'), 
                         url: String(v.url || '') 
                     }))
                 };
 
                 await setDoc(doc(db, "tv_config", "main"), cleanData);
-                showToast("Dernière vidéo enregistrée avec succès !", "success");
+                showToast("Base de données mise à jour avec succès !", "success");
                 initAppUI();
             } catch (e) {
                 console.error("Erreur sauvegarde :", e);
@@ -523,7 +521,6 @@
             }
         };
 
-        /* LECTEUR EN FENÊTRE SURGISSANTE (POPUP CLEAN) */
         window.openVideoPlayerModal = function(index) {
             const vid = tvData.customVideos[index];
             if (!vid) return;
@@ -597,36 +594,39 @@
             if (!grid) return;
             grid.innerHTML = '';
 
-            if (tvData.customVideos && Array.isArray(tvData.customVideos)) {
-                tvData.customVideos.forEach((vid, index) => {
-                    const ytId = extractYouTubeId(vid.url);
-                    const bgStyle = ytId 
-                        ? `background-image: url('https://img.youtube.com/vi/${ytId}/hqdefault.jpg');` 
-                        : `background: radial-gradient(circle, #1a1a26 0%, #0d0d14 100%);`;
-
-                    const card = document.createElement('div');
-                    card.className = 'video-card';
-                    card.innerHTML = `
-                        <div class="card-admin-controls">
-                            <button class="ctrl-btn edit" onclick="event.stopPropagation(); openEditVideoModal(${index})" title="Modifier">✏️</button>
-                            <button class="ctrl-btn del" onclick="event.stopPropagation(); deleteVideoCard(${index})" title="Supprimer">🗑️</button>
-                        </div>
-                        <div style="height:100%; display:flex; flex-direction:column;" onclick="openVideoPlayerModal(${index})">
-                            <div class="video-thumb" style="${bgStyle}">
-                                <div class="play-icon">▶</div>
-                            </div>
-                            <div class="video-info">
-                                <div>
-                                    <span class="video-tag">${vid.tag || 'TEAM ABYSZ'}</span>
-                                    <div class="video-title">${vid.title || 'Vidéo Sans Titre'}</div>
-                                </div>
-                                <div class="video-action-hint">Regarder sur le site ➔</div>
-                            </div>
-                        </div>
-                    `;
-                    grid.appendChild(card);
-                });
+            if (!tvData.customVideos || tvData.customVideos.length === 0) {
+                grid.innerHTML = `<div class="no-videos-message">📹 Aucune vidéo enregistrée pour le moment.<br>Connecte-toi en tant qu'administrateur pour en ajouter une.</div>`;
+                return;
             }
+
+            tvData.customVideos.forEach((vid, index) => {
+                const ytId = extractYouTubeId(vid.url);
+                const bgStyle = ytId 
+                    ? `background-image: url('https://img.youtube.com/vi/${ytId}/hqdefault.jpg');` 
+                    : `background: radial-gradient(circle, #1a1a26 0%, #0d0d14 100%);`;
+
+                const card = document.createElement('div');
+                card.className = 'video-card';
+                card.innerHTML = `
+                    <div class="card-admin-controls">
+                        <button class="ctrl-btn edit" onclick="event.stopPropagation(); openEditVideoModal(${index})" title="Modifier">✏️</button>
+                        <button class="ctrl-btn del" onclick="event.stopPropagation(); deleteVideoCard(${index})" title="Supprimer">🗑️</button>
+                    </div>
+                    <div style="height:100%; display:flex; flex-direction:column;" onclick="openVideoPlayerModal(${index})">
+                        <div class="video-thumb" style="${bgStyle}">
+                            <div class="play-icon">▶</div>
+                        </div>
+                        <div class="video-info">
+                            <div>
+                                <span class="video-tag">${vid.tag || 'TEAM ABYSZ'}</span>
+                                <div class="video-title">${vid.title || 'Vidéo Sans Titre'}</div>
+                            </div>
+                            <div class="video-action-hint">Regarder sur le site ➔</div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
         }
 
         window.openAddVideoModal = function() {

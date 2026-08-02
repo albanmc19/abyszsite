@@ -184,7 +184,7 @@
     <div id="auth-modal" class="modal">
         <div class="modal-box">
             <h2>🔑 Connexion Admin</h2>
-            <p style="font-size: 0.8rem; color: #88; margin-bottom: 15px; text-align: center;">Connecte-toi avec ton compte administrateur Firebase.</p>
+            <p style="font-size: 0.8rem; color: #888; margin-bottom: 15px; text-align: center;">Connecte-toi avec ton compte administrateur Firebase.</p>
             <div class="form-group">
                 <label>Email Admin</label>
                 <input type="email" id="email-input" placeholder="abyszofficial@gmail.com">
@@ -249,14 +249,14 @@
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // CONFIGURATION FIREBASE (À adapter si tes clés sont différentes dans ton projet global)
+        // CONFIGURATION FIREBASE OFFICIELLE ABYSZ
         const firebaseConfig = {
-            apiKey: "TA_API_KEY",
-            authDomain: "TON_AUTH_DOMAIN",
-            projectId: "TON_PROJECT_ID",
-            storageBucket: "TON_STORAGE_BUCKET",
-            messagingSenderId: "TON_MESSAGING_SENDER_ID",
-            appId: "TON_APP_ID"
+            apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
+            authDomain: "abyszofficial.firebaseapp.com",
+            projectId: "abyszofficial",
+            storageBucket: "abyszofficial.appspot.com",
+            messagingSenderId: "1023849201948",
+            appId: "1:1023849201948:web:abcdef123456789"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -265,7 +265,6 @@
 
         const domain = window.location.hostname || "localhost";
 
-        // Données par défaut
         let tvData = {
             twitchChannel: "abysz_o",
             customTabs: [],
@@ -278,13 +277,12 @@
 
         let isAdminUser = false;
 
-        // Charger depuis Firestore au démarrage
         async function loadTVData() {
             try {
                 const docRef = doc(db, "tv_config", "main");
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
-                    tvData = docSnap.merge ? { ...tvData, ...docSnap.data() } : docSnap.data();
+                    tvData = { ...tvData, ...docSnap.data() };
                 }
             } catch (e) {
                 console.error("Erreur de chargement Firestore:", e);
@@ -292,7 +290,6 @@
             initAppUI();
         }
 
-        // Sauvegarder dans Firestore
         async function saveTVDataToFirestore() {
             try {
                 await setDoc(doc(db, "tv_config", "main"), tvData);
@@ -302,7 +299,6 @@
             }
         }
 
-        // --- AUTHENTIFICATION ---
         onAuthStateChanged(auth, (user) => {
             const authBtn = document.getElementById('auth-btn');
             const addVideoBtn = document.getElementById('add-video-btn');
@@ -347,7 +343,6 @@
 
         window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; }
 
-        // --- RENDU UI ---
         function initAppUI() {
             renderTabs();
             renderVideos();
@@ -574,7 +569,6 @@
             document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Lancement du chargement initial
         loadTVData();
     </script>
 </body>

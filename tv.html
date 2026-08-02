@@ -279,23 +279,30 @@
 
         async function loadTVData() {
             try {
+                console.log("Chargement de la configuration TV depuis Firestore...");
                 const docRef = doc(db, "tv_config", "main");
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     tvData = { ...tvData, ...docSnap.data() };
+                    console.log("Données chargées avec succès :", tvData);
+                } else {
+                    console.log("Aucun document trouvé, utilisation des valeurs par défaut.");
                 }
             } catch (e) {
-                console.error("Erreur de chargement Firestore:", e);
+                console.error("Erreur critique lors du chargement Firestore:", e);
             }
             initAppUI();
         }
 
         async function saveTVDataToFirestore() {
             try {
+                console.log("Enregistrement en cours vers Firestore...", tvData);
                 await setDoc(doc(db, "tv_config", "main"), tvData);
+                console.log("Enregistrement réussi !");
                 initAppUI();
             } catch (e) {
-                alert("Erreur lors de la sauvegarde : " + e.message);
+                console.error("Erreur détaillée lors de l'enregistrement :", e);
+                alert("Erreur de sauvegarde : " + e.message);
             }
         }
 
@@ -310,12 +317,14 @@
                 document.getElementById('page-body').classList.add('admin-active');
                 addVideoBtn.style.display = 'inline-block';
                 adminIndicator.style.display = 'inline-block';
+                console.log("Mode Administrateur activé pour :", user.email);
             } else {
                 isAdminUser = false;
                 authBtn.textContent = user ? `👤 ${user.email}` : '👤 Se connecter';
                 document.getElementById('page-body').classList.remove('admin-active');
                 addVideoBtn.style.display = 'none';
                 adminIndicator.style.display = 'none';
+                console.log("Mode Visiteur standard actif.");
             }
         });
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABYSZ TV — Stream & Vidéos</title>
+    <title>ABYSZ TV — Directs & Contenu Custom</title>
     
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,16 +14,23 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background-color: #0a0a0a; color: #ffffff; font-family: 'Inter', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
         
-        /* Navigation / Entête de retour */
-        nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: #0a0a0a; border-bottom: 1px solid #1a1a1a; sticky: top; z-index: 100; }
+        /* Navigation */
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: #0a0a0a; border-bottom: 1px solid #1a1a1a; position: sticky; top: 0; z-index: 100; }
+        .nav-left { display: flex; align-items: center; gap: 20px; }
         .logo { display: flex; align-items: center; gap: 10px; color: white; font-family: 'Orbitron', sans-serif; font-weight: bold; text-decoration: none; font-size: 1.1rem; }
-        .back-btn { display: inline-flex; align-items: center; gap: 8px; background: rgba(168, 85, 247, 0.1); border: 1px solid #a855f7; color: #ffffff; text-decoration: none; padding: 8px 18px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: 600; transition: all 0.3s ease; }
+        
+        .nav-right { display: flex; align-items: center; gap: 15px; }
+        .back-btn { display: inline-flex; align-items: center; gap: 8px; background: rgba(168, 85, 247, 0.1); border: 1px solid #a855f7; color: #ffffff; text-decoration: none; padding: 8px 16px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: 600; transition: all 0.3s ease; }
         .back-btn:hover { background: #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); transform: translateX(-3px); }
 
-        .container { max-width: 1100px; width: 100%; margin: 25px auto; padding: 0 20px; flex-grow: 1; }
+        /* Bouton Connexion / Profil */
+        .auth-btn { background: #141414; border: 1px solid #333; color: white; padding: 8px 16px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; }
+        .auth-btn:hover { border-color: #a855f7; color: #a855f7; }
+
+        .container { max-width: 1050px; width: 100%; margin: 25px auto; padding: 0 20px; flex-grow: 1; }
         
         .header-title { text-align: center; margin-bottom: 20px; }
-        h1 { font-family: 'Orbitron', sans-serif; font-size: 2.3rem; color: #a855f7; text-shadow: 0 0 15px rgba(168, 85, 247, 0.4); margin-bottom: 6px; }
+        h1 { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; color: #a855f7; text-shadow: 0 0 15px rgba(168, 85, 247, 0.4); margin-bottom: 6px; }
         .subtitle { color: #aaaaaa; font-size: 0.9rem; }
 
         /* Badge Statut Live */
@@ -32,193 +39,200 @@
         .pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: #ff4444; box-shadow: 0 0 10px #ff4444; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
 
-        /* Sélection de la plateforme */
+        /* Navigation par Onglets */
         .platform-tabs { display: flex; justify-content: center; gap: 10px; margin: 20px 0; flex-wrap: wrap; }
         .tab-btn { background: #141414; border: 1px solid #2a2a2a; color: #cccccc; padding: 10px 18px; border-radius: 10px; cursor: pointer; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; font-weight: 600; transition: all 0.25s ease; }
         .tab-btn:hover { border-color: #a855f7; color: white; }
         .tab-btn.active { background: #a855f7; color: white; border-color: #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
 
-        /* Zone du Lecteur Principal */
+        /* Lecteur principal */
         .tv-wrapper { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; padding: 16px; box-shadow: 0 0 30px rgba(0, 0, 0, 0.6); position: relative; }
         .player-aspect-ratio { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; background: #000000; }
         .player-aspect-ratio iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
 
-        /* Écran Hors Ligne / Redirection TikTok */
         .custom-screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; background: #0d0d0d; color: #ffffff; font-family: 'Orbitron', sans-serif; z-index: 5; }
-        .custom-screen h3 { font-size: 1.3rem; margin-bottom: 10px; }
-        .custom-screen p { font-family: 'Inter', sans-serif; font-size: 0.85rem; color: #888888; max-width: 450px; margin-bottom: 20px; }
+        .custom-screen h3 { font-size: 1.2rem; margin-bottom: 10px; }
+        .custom-screen p { font-family: 'Inter', sans-serif; font-size: 0.85rem; color: #888888; max-width: 450px; margin-bottom: 20px; line-height: 1.4; }
         
-        .action-btn { display: inline-flex; align-items: center; gap: 8px; background: #a855f7; color: white; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; transition: all 0.3s ease; border: none; cursor: pointer; }
+        .action-btn { display: inline-flex; align-items: center; gap: 8px; background: #a855f7; color: white; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; transition: all 0.3s ease; border: none; cursor: pointer; }
         .action-btn:hover { background: #9333ea; box-shadow: 0 0 20px rgba(168, 85, 247, 0.6); transform: translateY(-2px); }
 
-        /* Sections Générales */
-        .section-title { font-family: 'Orbitron', sans-serif; font-size: 1.3rem; color: #ffffff; margin: 40px 0 20px 0; display: flex; align-items: center; gap: 10px; }
+        /* Modals (Auth & Admin) */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-box { background: #141414; border: 1px solid #a855f7; border-radius: 16px; width: 90%; max-width: 420px; padding: 25px; box-shadow: 0 0 30px rgba(168, 85, 247, 0.3); }
+        .modal-box h2 { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 1.3rem; margin-bottom: 15px; text-align: center; }
+        
+        .form-group { margin-bottom: 14px; text-align: left; }
+        .form-group label { display: block; font-size: 0.75rem; color: #aaa; margin-bottom: 4px; font-family: 'Orbitron', sans-serif; }
+        .form-group input, .form-group select { width: 100%; background: #0a0a0a; border: 1px solid #333; color: white; padding: 10px; border-radius: 6px; font-size: 0.85rem; }
+        .form-group input:focus, .form-group select:focus { border-color: #a855f7; outline: none; }
+
+        /* Cartes Vidéos */
+        .section-title { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; color: #ffffff; margin: 35px 0 20px 0; display: flex; align-items: center; gap: 10px; }
         .section-title::after { content: ''; flex-grow: 1; height: 1px; background: #222222; margin-left: 10px; }
 
-        /* Grille Vidéos de la Team */
         .video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
-        .video-card { background: #141414; border: 1px solid #222222; border-radius: 12px; overflow: hidden; transition: all 0.3s ease; text-decoration: none; color: white; }
+        .video-card { background: #141414; border: 1px solid #222222; border-radius: 12px; overflow: hidden; transition: all 0.3s ease; text-decoration: none; color: white; display: flex; flex-direction: column; position: relative; }
         .video-card:hover { transform: translateY(-4px); border-color: #a855f7; box-shadow: 0 8px 25px rgba(0,0,0,0.5); }
-        .video-thumb { width: 100%; aspect-ratio: 16/9; background: #1a1a1a; position: relative; overflow: hidden; }
-        .video-thumb iframe { width: 100%; height: 100%; border: 0; }
-        .video-info { padding: 14px; }
+        .video-thumb { width: 100%; aspect-ratio: 16/9; background-size: cover; background-position: center; position: relative; display: flex; align-items: center; justify-content: center; }
+        .play-icon { width: 45px; height: 45px; background: rgba(0,0,0,0.7); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 1px solid rgba(255,255,255,0.3); }
+        
+        .video-info { padding: 14px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
         .video-tag { font-family: 'Orbitron', sans-serif; font-size: 0.65rem; color: #a855f7; text-transform: uppercase; margin-bottom: 6px; display: block; }
-        .video-title { font-weight: 600; font-size: 0.9rem; line-height: 1.3; }
+        .video-title { font-weight: 600; font-size: 0.9rem; line-height: 1.3; margin-bottom: 8px; }
 
-        /* Grille À Découvrir */
-        .discover-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
-        .discover-card { background: linear-gradient(145deg, #141414, #0f0f0f); border: 1px solid #222; border-radius: 12px; padding: 20px; text-decoration: none; color: white; transition: all 0.3s ease; display: flex; flex-direction: column; justify-content: space-between; }
-        .discover-card:hover { border-color: #a855f7; transform: translateY(-3px); }
-        .discover-icon { font-size: 1.8rem; margin-bottom: 12px; }
-        .discover-name { font-family: 'Orbitron', sans-serif; font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
-        .discover-desc { font-size: 0.8rem; color: #888; }
+        .delete-btn { position: absolute; top: 8px; right: 8px; background: rgba(239, 68, 68, 0.8); border: none; color: white; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; display: none; font-weight: bold; }
+        .admin-active .delete-btn { display: block; }
 
         footer { padding: 30px; text-align: center; border-top: 1px solid #1a1a1a; color: #666; font-size: 0.85rem; margin-top: 50px; }
-
-        @media (max-width: 600px) {
-            h1 { font-size: 1.8rem; }
-            .container { padding: 0 15px; }
-            .tab-btn { flex: 1 1 30%; justify-content: center; }
-        }
     </style>
 </head>
-<body>
+<body id="page-body">
 
-    <!-- Navigation avec Retour -->
+    <!-- Navigation unifiée -->
     <nav>
-        <a href="index.html" class="logo">
-            <img src="logo.png" alt="Logo ABYSZ" width="28" height="28" onerror="this.style.display='none'">
-            ABYSZ
-        </a>
-        <a href="index.html" class="back-btn">
-            ⬅️ Retour au site
-        </a>
+        <div class="nav-left">
+            <a href="index.html" class="logo">
+                <img src="logo.png" alt="Logo ABYSZ" width="28" height="28" onerror="this.style.display='none'">
+                ABYSZ
+            </a>
+        </div>
+        <div class="nav-right">
+            <a href="index.html" class="back-btn">⬅️ Retour au site</a>
+            <button id="auth-btn" class="auth-btn" onclick="handleAuthClick()">👤 Se connecter</button>
+        </div>
     </nav>
 
     <div class="container">
         
         <div class="header-title">
             <h1>📺 ABYSZ TV</h1>
-            <p class="subtitle">Directs, retransmissions et vidéos exclusives de la team</p>
+            <p class="subtitle">Directs, retransmissions et contenus de la team</p>
             
             <div id="live-status" class="status-badge">
-                <span id="status-text">🔍 Vérification des flux...</span>
+                <span id="status-text">🔍 Vérification du direct...</span>
             </div>
         </div>
 
-        <!-- Boutons de plateforme -->
-        <div class="platform-tabs">
-            <button class="tab-btn active" onclick="switchStream('twitch')">💜 Twitch Live</button>
-            <button class="tab-btn" onclick="switchStream('youtube')">🔴 YouTube Live</button>
-            <button class="tab-btn" onclick="switchStream('tiktok')">🎵 TikTok Live</button>
+        <!-- Onglets dynamiques -->
+        <div class="platform-tabs" id="tabs-container">
+            <button class="tab-btn active" onclick="switchStream('twitch', this)">💜 Twitch Live</button>
+            <button class="tab-btn" onclick="switchStream('youtube', this)">🔴 YouTube Live</button>
+            <button class="tab-btn" onclick="switchStream('tiktok', this)">🎵 TikTok Live</button>
         </div>
 
-        <!-- Zone Vidéo / Live -->
+        <!-- Lecteur vidéo principal -->
         <div class="tv-wrapper">
             <div class="player-aspect-ratio">
                 
-                <!-- Screen Twitch Hors Ligne -->
                 <div id="twitch-offline-screen" class="custom-screen" style="display: none;">
-                    <span style="font-size: 2.5rem; margin-bottom: 10px;">📡</span>
+                    <span style="font-size: 2.2rem; margin-bottom: 10px;">📡</span>
                     <h3>LE LIVE TWITCH EST HORS LIGNE</h3>
-                    <p>Découvrez les meilleures vidéos de la team ci-dessous ou rejoignez-nous sur YouTube & TikTok !</p>
-                    <button class="action-btn" onclick="scrollToVideos()">🎬 Voir les vidéos de la team</button>
+                    <p>Découvrez nos réseaux sociaux ou nos meilleures vidéos ci-dessous !</p>
+                    <button class="action-btn" onclick="scrollToSection('team-videos')">🎬 Voir les vidéos</button>
                 </div>
 
-                <!-- Screen Redirection TikTok (Évite l'erreur Embed Blocked) -->
+                <div id="youtube-offline-screen" class="custom-screen" style="display: none;">
+                    <span style="font-size: 2.2rem; margin-bottom: 10px;">🔴</span>
+                    <h3>AUCUN LIVE YOUTUBE EN COURS</h3>
+                    <p>Consultez directement notre chaîne pour voir nos dernières vidéos et shorts postés.</p>
+                    <a href="https://www.youtube.com/@Abysz_o" target="_blank" class="action-btn">Accéder à YouTube ↗</a>
+                </div>
+
                 <div id="tiktok-screen" class="custom-screen" style="display: none;">
-                    <span style="font-size: 2.5rem; margin-bottom: 10px;">🎵</span>
+                    <span style="font-size: 2.2rem; margin-bottom: 10px;">🎵</span>
                     <h3>TIKTOK LIVE @ABYSZ_O</h3>
-                    <p>TikTok ne permet pas l'intégration directe des lives sur un site web externe. Rejoignez le stream en direct directement sur l'application !</p>
-                    <a href="https://www.tiktok.com/@abysz_o/live" target="_blank" rel="noopener noreferrer" class="action-btn">
-                        🔴 Ouvrir TikTok Live ↗
-                    </a>
+                    <p>Rejoignez-nous directement sur l'application TikTok pour suivre la retransmission en direct !</p>
+                    <a href="https://www.tiktok.com/@abysz_o/live" target="_blank" class="action-btn">🔴 Ouvrir TikTok Live ↗</a>
                 </div>
 
-                <!-- Iframe Twitch -->
+                <div id="custom-embed-screen" class="custom-screen" style="display: none;">
+                    <span style="font-size: 2.2rem; margin-bottom: 10px;">⚡</span>
+                    <h3 id="custom-tab-title">ONGLET PERSONNALISÉ</h3>
+                    <p id="custom-tab-desc">Contenu géré par l'administration.</p>
+                    <a id="custom-tab-link" href="#" target="_blank" class="action-btn">Ouvrir le lien ↗</a>
+                </div>
+
                 <iframe id="twitch-frame" src="" allowfullscreen></iframe>
-
-                <!-- Iframe YouTube -->
-                <iframe id="youtube-frame" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="display: none;"></iframe>
-
             </div>
         </div>
 
-        <!-- SECTION 1 : VIDÉOS DE LA TEAM -->
-        <div id="team-videos" class="section-title">🎬 Vidéos & Replays de la Team</div>
-        <div class="video-grid">
+        <!-- Section Vidéos -->
+        <div id="team-videos" class="section-title">🎬 Sélection de la Team</div>
+        <div class="video-grid" id="video-grid-container">
+            <!-- Injecté par JS -->
+        </div>
+
+        <!-- Bouton Admin (Visible seulement si connecté en Admin) -->
+        <div id="admin-actions" style="display: none; margin-top: 25px; text-align: center;">
+            <button class="action-btn" onclick="openAdminModal()">⚙️ Panneau de Gestion TV (Admin)</button>
+        </div>
+
+    </div>
+
+    <!-- MODAL CONNEXION -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-box">
+            <h2>🔑 Connexion</h2>
+            <div class="form-group">
+                <label>Nom d'utilisateur</label>
+                <input type="text" id="username-input" placeholder="ex: Alban">
+            </div>
+            <div class="form-group">
+                <label>Mot de passe</label>
+                <input type="password" id="password-input" placeholder="••••••••">
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="action-btn" style="flex:1;" onclick="login()">Se connecter</button>
+                <button class="action-btn" style="flex:1; background:#333;" onclick="closeAuthModal()">Annuler</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL ADMIN TV -->
+    <div id="admin-panel" class="modal">
+        <div class="modal-box">
+            <h2>⚙️ Gestion ABYSZ TV</h2>
             
-            <!-- Vidéo YouTube 1 -->
-            <div class="video-card">
-                <div class="video-thumb">
-                    <!-- Remplace ID_VIDEO par un vrai ID YouTube si tu le souhaites -->
-                    <iframe src="https://www.youtube.com/embed/videoseries?list=PL_ABYSZ_PLAYLIST" title="YouTube Video" allowfullscreen></iframe>
+            <div class="form-group">
+                <label>Type d'ajout :</label>
+                <select id="admin-add-type" onchange="toggleAdminForm()">
+                    <option value="tab">Nouvel Onglet de Navigation</option>
+                    <option value="video">Nouvelle Carte Vidéo / Lien</option>
+                </select>
+            </div>
+
+            <div id="form-tab">
+                <div class="form-group">
+                    <label>Nom de l'onglet :</label>
+                    <input type="text" id="tab-name" placeholder="ex: 🏆 Box Fight Cup">
                 </div>
-                <div class="video-info">
-                    <span class="video-tag">YouTube • VOD</span>
-                    <div class="video-title">Dernier Best Of Competitive Fortnite & Clips Team ABYSZ</div>
+                <div class="form-group">
+                    <label>Lien de destination :</label>
+                    <input type="text" id="tab-url" placeholder="https://...">
                 </div>
             </div>
 
-            <!-- Vidéo YouTube 2 -->
-            <div class="video-card">
-                <div class="video-thumb">
-                    <iframe src="https://www.youtube.com/embed?listType=user_uploads&list=Abysz_o" title="Dernier upload YouTube" allowfullscreen></iframe>
+            <div id="form-video" style="display: none;">
+                <div class="form-group">
+                    <label>Titre de la vidéo :</label>
+                    <input type="text" id="video-title-input" placeholder="ex: Best of Competitive Fortnite">
                 </div>
-                <div class="video-info">
-                    <span class="video-tag">YouTube • Récent</span>
-                    <div class="video-title">Dernières vidéos postées sur la chaîne officielle @Abysz_o</div>
+                <div class="form-group">
+                    <label>Tag :</label>
+                    <input type="text" id="video-tag-input" placeholder="FORTNITE">
+                </div>
+                <div class="form-group">
+                    <label>Lien de la vidéo :</label>
+                    <input type="text" id="video-url-input" placeholder="https://youtube.com/...">
                 </div>
             </div>
 
-            <!-- Carte TikTok Highlights -->
-            <a href="https://www.tiktok.com/@abysz_o" target="_blank" class="video-card" style="display: flex; flex-direction: column; justify-content: center; padding: 25px; text-align: center; background: radial-gradient(circle, #1f1f2e 0%, #141414 100%);">
-                <span style="font-size: 2.5rem; margin-bottom: 10px;">🎵</span>
-                <span class="video-tag" style="color: #00f2fe;">TikTok • Shorts</span>
-                <div class="video-title" style="margin-bottom: 15px;">Regarder les meilleurs Shorts & Clips rapides sur TikTok</div>
-                <span class="action-btn" style="align-self: center; font-size: 0.8rem; padding: 8px 16px;">Voir sur TikTok ↗</span>
-            </a>
-
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="action-btn" style="flex:1;" onclick="saveAdminData()">Enregistrer</button>
+                <button class="action-btn" style="flex:1; background:#333;" onclick="closeAdminModal()">Annuler</button>
+            </div>
         </div>
-
-        <!-- SECTION 2 : À DÉCOUVRIR -->
-        <div class="section-title">✨ À Découvrir</div>
-        <div class="discover-grid">
-            
-            <a href="https://www.twitch.tv/abysz_o" target="_blank" class="discover-card">
-                <div class="discover-icon">💜</div>
-                <div>
-                    <div class="discover-name">Chaîne Twitch</div>
-                    <div class="discover-desc">Abonnez-vous pour recevoir les notifications dès qu'un live démarre.</div>
-                </div>
-            </a>
-
-            <a href="https://www.youtube.com/@Abysz_o" target="_blank" class="discover-card">
-                <div class="discover-icon">🔴</div>
-                <div>
-                    <div class="discover-name">YouTube Officiel</div>
-                    <div class="discover-desc">Retrouvez les VODs, concepts créatifs et shorts exclusifs.</div>
-                </div>
-            </a>
-
-            <a href="https://www.tiktok.com/@abysz_o" target="_blank" class="discover-card">
-                <div class="discover-icon">🎵</div>
-                <div>
-                    <div class="discover-name">TikTok Team</div>
-                    <div class="discover-desc">Découvrez les highlights de nos joueurs et les moments drôles.</div>
-                </div>
-            </a>
-
-            <div class="discover-card" style="border-color: #a855f7;">
-                <div class="discover-icon">🏆</div>
-                <div>
-                    <div class="discover-name">Abysz Esports</div>
-                    <div class="discover-desc">Suivez les performances de l'équipe sur les tournois compétitifs.</div>
-                </div>
-            </div>
-
-        </div>
-
     </div>
 
     <footer>
@@ -227,47 +241,122 @@
 
     <script>
         const TWITCH_CHANNEL = "abysz_o";
-        const YOUTUBE_HANDLE = "@Abysz_o";
         const domain = window.location.hostname || "localhost";
 
+        // Éléments DOM
         const twitchFrame = document.getElementById('twitch-frame');
-        const youtubeFrame = document.getElementById('youtube-frame');
         const twitchOfflineScreen = document.getElementById('twitch-offline-screen');
+        const youtubeOfflineScreen = document.getElementById('youtube-offline-screen');
         const tiktokScreen = document.getElementById('tiktok-screen');
-        
+        const customEmbedScreen = document.getElementById('custom-embed-screen');
         const statusBadge = document.getElementById('live-status');
         const statusText = document.getElementById('status-text');
 
-        // Initialisation de l'iframe Twitch & YouTube
+        // Données dynamiques
+        const defaultVideos = [
+            { id: 1, tag: "YouTube", title: "Chaîne Officielle & Replays YouTube", url: "https://www.youtube.com/@Abysz_o", color: "#a855f7" },
+            { id: 2, tag: "TikTok", title: "Clips Rapides & Highlights TikTok", url: "https://www.tiktok.com/@abysz_o", color: "#00f2fe" },
+            { id: 3, tag: "Twitch", title: "Rediffusions & VODs des Live Twitch", url: "https://www.twitch.tv/abysz_o/videos", color: "#9146ff" }
+        ];
+
+        let customTabs = JSON.parse(localStorage.getItem('abysz_custom_tabs')) || [];
+        let customVideos = JSON.parse(localStorage.getItem('abysz_custom_videos')) || defaultVideos;
+        let currentUser = JSON.parse(localStorage.getItem('abysz_user')) || null;
+
         twitchFrame.src = `https://player.twitch.tv/?channel=${TWITCH_CHANNEL}&parent=${domain}&autoplay=false`;
-        youtubeFrame.src = `https://www.youtube.com/embed/live_stream?channel=${YOUTUBE_HANDLE}`;
 
-        let currentPlatform = 'twitch';
+        // --- GESTION DES UTILISATEURS / CONNEXION ---
+        function updateAuthUI() {
+            const authBtn = document.getElementById('auth-btn');
+            const adminActions = document.getElementById('admin-actions');
+            
+            if (currentUser) {
+                authBtn.textContent = `👤 ${currentUser.username}`;
+                authBtn.onclick = logout;
+                
+                if (currentUser.role === 'admin') {
+                    adminActions.style.display = 'block';
+                    document.getElementById('page-body').classList.add('admin-active');
+                } else {
+                    adminActions.style.display = 'none';
+                    document.getElementById('page-body').classList.remove('admin-active');
+                }
+            } else {
+                authBtn.textContent = '👤 Se connecter';
+                authBtn.onclick = openAuthModal;
+                adminActions.style.display = 'none';
+                document.getElementById('page-body').classList.remove('admin-active');
+            }
+        }
 
-        function switchStream(platform) {
-            currentPlatform = platform;
+        function handleAuthClick() {
+            if (currentUser) {
+                if (confirm(`Déconnexion de ${currentUser.username} ?`)) {
+                    logout();
+                }
+            } else {
+                openAuthModal();
+            }
+        }
 
-            // Mise à jour des classes active
+        function openAuthModal() { document.getElementById('auth-modal').style.display = 'flex'; }
+        function closeAuthModal() { document.getElementById('auth-modal').style.display = 'none'; }
+
+        function login() {
+            const user = document.getElementById('username-input').value;
+            const pass = document.getElementById('password-input').value;
+
+            if (user.toLowerCase() === 'admin' && pass === 'abysz2026') {
+                currentUser = { username: 'Admin', role: 'admin' };
+                localStorage.setItem('abysz_user', JSON.stringify(currentUser));
+                updateAuthUI();
+                closeAuthModal();
+                renderVideos();
+            } else if (user) {
+                currentUser = { username: user, role: 'user' };
+                localStorage.setItem('abysz_user', JSON.stringify(currentUser));
+                updateAuthUI();
+                closeAuthModal();
+            } else {
+                alert('Veuillez entrer vos identifiants.');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('abysz_user');
+            updateAuthUI();
+            renderVideos();
+        }
+
+        // --- LECTEUR & FLUX ---
+        function switchStream(platform, element, customData = null) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+            if(element) element.classList.add('active');
 
-            // Cacher tous les écrans/frames
             twitchFrame.style.display = 'none';
-            youtubeFrame.style.display = 'none';
             twitchOfflineScreen.style.display = 'none';
+            youtubeOfflineScreen.style.display = 'none';
             tiktokScreen.style.display = 'none';
+            customEmbedScreen.style.display = 'none';
 
             if (platform === 'twitch') {
-                twitchFrame.style.display = 'block';
                 checkTwitchStatus();
             } else if (platform === 'youtube') {
-                youtubeFrame.style.display = 'block';
+                youtubeOfflineScreen.style.display = 'flex';
                 statusBadge.className = "status-badge";
-                statusText.textContent = "🔴 Lecteur YouTube sélectionné";
+                statusText.textContent = "🔴 Mode YouTube activé";
             } else if (platform === 'tiktok') {
                 tiktokScreen.style.display = 'flex';
                 statusBadge.className = "status-badge";
-                statusText.textContent = "🎵 Redirection TikTok Live";
+                statusText.textContent = "🎵 Mode TikTok activé";
+            } else if (platform === 'custom' && customData) {
+                customEmbedScreen.style.display = 'flex';
+                document.getElementById('custom-tab-title').textContent = customData.name;
+                document.getElementById('custom-tab-desc').textContent = "Espace personnalisé géré par la team.";
+                document.getElementById('custom-tab-link').href = customData.url;
+                statusBadge.className = "status-badge";
+                statusText.textContent = "⚡ " + customData.name;
             }
         }
 
@@ -279,30 +368,109 @@
                 if (uptime.includes("offline") || uptime.includes("not found")) {
                     statusBadge.className = "status-badge";
                     statusText.textContent = "● TWITCH HORS LIGNE";
-                    if (currentPlatform === 'twitch') {
-                        twitchOfflineScreen.style.display = "flex";
-                        twitchFrame.style.display = "none";
-                    }
+                    twitchOfflineScreen.style.display = "flex";
                 } else {
                     statusBadge.className = "status-badge online";
                     statusBadge.innerHTML = `<span class="pulse-dot"></span> EN DIRECT SUR TWITCH (${uptime})`;
-                    if (currentPlatform === 'twitch') {
-                        twitchOfflineScreen.style.display = "none";
-                        twitchFrame.style.display = "block";
-                    }
+                    twitchOfflineScreen.style.display = "none";
+                    twitchFrame.style.display = "block";
                 }
             } catch (err) {
                 statusText.textContent = "● CHAÎNE @ABYSZ_O";
+                twitchOfflineScreen.style.display = "flex";
             }
         }
 
-        function scrollToVideos() {
-            document.getElementById('team-videos').scrollIntoView({ behavior: 'smooth' });
+        // --- GESTION DU CONTENU (ADMIN) ---
+        function renderTabs() {
+            const container = document.getElementById('tabs-container');
+            container.innerHTML = `
+                <button class="tab-btn active" onclick="switchStream('twitch', this)">💜 Twitch Live</button>
+                <button class="tab-btn" onclick="switchStream('youtube', this)">🔴 YouTube Live</button>
+                <button class="tab-btn" onclick="switchStream('tiktok', this)">🎵 TikTok Live</button>
+            `;
+            customTabs.forEach((tab) => {
+                const btn = document.createElement('button');
+                btn.className = 'tab-btn';
+                btn.textContent = tab.name;
+                btn.onclick = () => switchStream('custom', btn, tab);
+                container.appendChild(btn);
+            });
         }
 
-        // Exécution au chargement
+        function renderVideos() {
+            const grid = document.getElementById('video-grid-container');
+            grid.innerHTML = '';
+            customVideos.forEach((vid, index) => {
+                const card = document.createElement('a');
+                card.href = vid.url;
+                card.target = '_blank';
+                card.className = 'video-card';
+                card.innerHTML = `
+                    <button class="delete-btn" onclick="deleteVideo(event, ${index})">✕</button>
+                    <div class="video-thumb" style="background: radial-gradient(circle, #1f1f2e 0%, #101018 100%);">
+                        <div class="play-icon">▶</div>
+                    </div>
+                    <div class="video-info">
+                        <span class="video-tag" style="color: ${vid.color || '#a855f7'};">${vid.tag}</span>
+                        <div class="video-title">${vid.title}</div>
+                        <span style="font-size: 0.75rem; color: #a855f7;">Ouvrir le lien ↗</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function openAdminModal() { document.getElementById('admin-panel').style.display = 'flex'; }
+        function closeAdminModal() { document.getElementById('admin-panel').style.display = 'none'; }
+        
+        function toggleAdminForm() {
+            const type = document.getElementById('admin-add-type').value;
+            document.getElementById('form-tab').style.display = type === 'tab' ? 'block' : 'none';
+            document.getElementById('form-video').style.display = type === 'video' ? 'block' : 'none';
+        }
+
+        function saveAdminData() {
+            const type = document.getElementById('admin-add-type').value;
+            if (type === 'tab') {
+                const name = document.getElementById('tab-name').value;
+                const url = document.getElementById('tab-url').value;
+                if (name && url) {
+                    customTabs.push({ name, url });
+                    localStorage.setItem('abysz_custom_tabs', JSON.stringify(customTabs));
+                    renderTabs();
+                }
+            } else {
+                const title = document.getElementById('video-title-input').value;
+                const tag = document.getElementById('video-tag-input').value;
+                const url = document.getElementById('video-url-input').value;
+                if (title && url) {
+                    customVideos.push({ id: Date.now(), title, tag: tag || 'OFFICIEL', url, color: '#a855f7' });
+                    localStorage.setItem('abysz_custom_videos', JSON.stringify(customVideos));
+                    renderVideos();
+                }
+            }
+            closeAdminModal();
+        }
+
+        function deleteVideo(e, index) {
+            e.preventDefault();
+            if (confirm("Supprimer ce lien ?")) {
+                customVideos.splice(index, 1);
+                localStorage.setItem('abysz_custom_videos', JSON.stringify(customVideos));
+                renderVideos();
+            }
+        }
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Initialisation
+        updateAuthUI();
+        renderTabs();
+        renderVideos();
         checkTwitchStatus();
-        setInterval(checkTwitchStatus, 60000);
     </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABYSZ TV — Directs & Contenu Custom</title>
+    <title>ABYSZ TV — Stream & Éditeur Pro</title>
     
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,15 +16,13 @@
         
         /* Navigation */
         nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: #0a0a0a; border-bottom: 1px solid #1a1a1a; position: sticky; top: 0; z-index: 100; }
-        .nav-left { display: flex; align-items: center; gap: 20px; }
         .logo { display: flex; align-items: center; gap: 10px; color: white; font-family: 'Orbitron', sans-serif; font-weight: bold; text-decoration: none; font-size: 1.1rem; }
         
-        .nav-right { display: flex; align-items: center; gap: 15px; }
+        .nav-right { display: flex; align-items: center; gap: 12px; }
         .back-btn { display: inline-flex; align-items: center; gap: 8px; background: rgba(168, 85, 247, 0.1); border: 1px solid #a855f7; color: #ffffff; text-decoration: none; padding: 8px 16px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: 600; transition: all 0.3s ease; }
         .back-btn:hover { background: #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); transform: translateX(-3px); }
 
-        /* Bouton Connexion / Profil */
-        .auth-btn { background: #141414; border: 1px solid #333; color: white; padding: 8px 16px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; }
+        .auth-btn { background: #141414; border: 1px solid #333; color: white; padding: 8px 16px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; cursor: pointer; transition: all 0.3s ease; }
         .auth-btn:hover { border-color: #a855f7; color: #a855f7; }
 
         .container { max-width: 1050px; width: 100%; margin: 25px auto; padding: 0 20px; flex-grow: 1; }
@@ -33,17 +31,24 @@
         h1 { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; color: #a855f7; text-shadow: 0 0 15px rgba(168, 85, 247, 0.4); margin-bottom: 6px; }
         .subtitle { color: #aaaaaa; font-size: 0.9rem; }
 
-        /* Badge Statut Live */
+        /* Badge Live Status */
         .status-badge { display: inline-flex; align-items: center; gap: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; padding: 6px 16px; border-radius: 20px; margin-top: 12px; background: #141414; border: 1px solid #2a2a2a; }
         .status-badge.online { border-color: #ff4444; color: #ff4444; background: rgba(255, 68, 68, 0.1); }
         .pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: #ff4444; box-shadow: 0 0 10px #ff4444; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
 
-        /* Navigation par Onglets */
+        /* Onglets Dynamiques */
         .platform-tabs { display: flex; justify-content: center; gap: 10px; margin: 20px 0; flex-wrap: wrap; }
+        .tab-wrapper { position: relative; display: inline-flex; align-items: center; }
         .tab-btn { background: #141414; border: 1px solid #2a2a2a; color: #cccccc; padding: 10px 18px; border-radius: 10px; cursor: pointer; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; font-weight: 600; transition: all 0.25s ease; }
         .tab-btn:hover { border-color: #a855f7; color: white; }
         .tab-btn.active { background: #a855f7; color: white; border-color: #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
+
+        .tab-delete-btn { display: none; position: absolute; top: -6px; right: -6px; background: #ef4444; color: white; border: none; width: 20px; height: 20px; border-radius: 50%; cursor: pointer; font-size: 0.7rem; font-weight: bold; z-index: 10; }
+        .admin-active .tab-delete-btn { display: block; }
+
+        .add-tab-btn { display: none; background: rgba(168, 85, 247, 0.2); border: 1px dashed #a855f7; color: #a855f7; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; font-weight: 600; }
+        .admin-active .add-tab-btn { display: inline-block; }
 
         /* Lecteur principal */
         .tv-wrapper { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; padding: 16px; box-shadow: 0 0 30px rgba(0, 0, 0, 0.6); position: relative; }
@@ -54,22 +59,16 @@
         .custom-screen h3 { font-size: 1.2rem; margin-bottom: 10px; }
         .custom-screen p { font-family: 'Inter', sans-serif; font-size: 0.85rem; color: #888888; max-width: 450px; margin-bottom: 20px; line-height: 1.4; }
         
-        .action-btn { display: inline-flex; align-items: center; gap: 8px; background: #a855f7; color: white; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; transition: all 0.3s ease; border: none; cursor: pointer; }
-        .action-btn:hover { background: #9333ea; box-shadow: 0 0 20px rgba(168, 85, 247, 0.6); transform: translateY(-2px); }
+        .action-btn { display: inline-flex; align-items: center; gap: 8px; background: #a855f7; color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; transition: all 0.3s ease; border: none; cursor: pointer; }
+        .action-btn:hover { background: #9333ea; box-shadow: 0 0 20px rgba(168, 85, 247, 0.6); }
 
-        /* Modals (Auth & Admin) */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .modal-box { background: #141414; border: 1px solid #a855f7; border-radius: 16px; width: 90%; max-width: 420px; padding: 25px; box-shadow: 0 0 30px rgba(168, 85, 247, 0.3); }
-        .modal-box h2 { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 1.3rem; margin-bottom: 15px; text-align: center; }
-        
-        .form-group { margin-bottom: 14px; text-align: left; }
-        .form-group label { display: block; font-size: 0.75rem; color: #aaa; margin-bottom: 4px; font-family: 'Orbitron', sans-serif; }
-        .form-group input, .form-group select { width: 100%; background: #0a0a0a; border: 1px solid #333; color: white; padding: 10px; border-radius: 6px; font-size: 0.85rem; }
-        .form-group input:focus, .form-group select:focus { border-color: #a855f7; outline: none; }
+        /* Configuration Stream (Admin) */
+        .stream-config-bar { display: none; background: #111; border: 1px solid #a855f7; padding: 10px 15px; border-radius: 8px; margin-top: 10px; justify-content: space-between; align-items: center; font-size: 0.85rem; }
+        .admin-active .stream-config-bar { display: flex; }
 
-        /* Cartes Vidéos */
-        .section-title { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; color: #ffffff; margin: 35px 0 20px 0; display: flex; align-items: center; gap: 10px; }
-        .section-title::after { content: ''; flex-grow: 1; height: 1px; background: #222222; margin-left: 10px; }
+        /* Grid Vidéos */
+        .section-title { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; color: #ffffff; margin: 35px 0 20px 0; display: flex; align-items: center; justify-content: space-between; }
+        .section-title::after { content: ''; flex-grow: 1; height: 1px; background: #222222; margin-left: 15px; }
 
         .video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
         .video-card { background: #141414; border: 1px solid #222222; border-radius: 12px; overflow: hidden; transition: all 0.3s ease; text-decoration: none; color: white; display: flex; flex-direction: column; position: relative; }
@@ -81,22 +80,34 @@
         .video-tag { font-family: 'Orbitron', sans-serif; font-size: 0.65rem; color: #a855f7; text-transform: uppercase; margin-bottom: 6px; display: block; }
         .video-title { font-weight: 600; font-size: 0.9rem; line-height: 1.3; margin-bottom: 8px; }
 
-        .delete-btn { position: absolute; top: 8px; right: 8px; background: rgba(239, 68, 68, 0.8); border: none; color: white; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; display: none; font-weight: bold; }
-        .admin-active .delete-btn { display: block; }
+        /* Contrôles Édition sur chaque carte (Admin) */
+        .card-admin-controls { display: none; position: absolute; top: 8px; right: 8px; gap: 6px; z-index: 10; }
+        .admin-active .card-admin-controls { display: flex; }
+        .ctrl-btn { background: rgba(0, 0, 0, 0.85); border: 1px solid #444; color: white; width: 30px; height: 30px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; transition: all 0.2s; }
+        .ctrl-btn.edit:hover { background: #a855f7; border-color: #a855f7; }
+        .ctrl-btn.del:hover { background: #ef4444; border-color: #ef4444; }
+
+        /* Modals */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-box { background: #141414; border: 1px solid #a855f7; border-radius: 16px; width: 90%; max-width: 450px; padding: 25px; box-shadow: 0 0 30px rgba(168, 85, 247, 0.3); }
+        .modal-box h2 { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 1.2rem; margin-bottom: 15px; text-align: center; }
+        
+        .form-group { margin-bottom: 14px; text-align: left; }
+        .form-group label { display: block; font-size: 0.75rem; color: #aaa; margin-bottom: 4px; font-family: 'Orbitron', sans-serif; }
+        .form-group input { width: 100%; background: #0a0a0a; border: 1px solid #333; color: white; padding: 10px; border-radius: 6px; font-size: 0.85rem; }
+        .form-group input:focus { border-color: #a855f7; outline: none; }
 
         footer { padding: 30px; text-align: center; border-top: 1px solid #1a1a1a; color: #666; font-size: 0.85rem; margin-top: 50px; }
     </style>
 </head>
 <body id="page-body">
 
-    <!-- Navigation unifiée -->
+    <!-- Navigation -->
     <nav>
-        <div class="nav-left">
-            <a href="index.html" class="logo">
-                <img src="logo.png" alt="Logo ABYSZ" width="28" height="28" onerror="this.style.display='none'">
-                ABYSZ
-            </a>
-        </div>
+        <a href="index.html" class="logo">
+            <img src="logo.png" alt="Logo ABYSZ" width="28" height="28" onerror="this.style.display='none'">
+            ABYSZ <span id="admin-indicator" style="display:none; font-size:0.6rem; background:#a855f7; padding:2px 6px; border-radius:4px; margin-left:6px;">ÉDITEUR ACTIF</span>
+        </a>
         <div class="nav-right">
             <a href="index.html" class="back-btn">⬅️ Retour au site</a>
             <button id="auth-btn" class="auth-btn" onclick="handleAuthClick()">👤 Se connecter</button>
@@ -107,65 +118,68 @@
         
         <div class="header-title">
             <h1>📺 ABYSZ TV</h1>
-            <p class="subtitle">Directs, retransmissions et contenus de la team</p>
+            <p class="subtitle">Directs, retransmissions et vidéos officielles de la team</p>
             
             <div id="live-status" class="status-badge">
                 <span id="status-text">🔍 Vérification du direct...</span>
             </div>
         </div>
 
-        <!-- Onglets dynamiques -->
+        <!-- Onglets dynamique avec mode ajout -->
         <div class="platform-tabs" id="tabs-container">
-            <button class="tab-btn active" onclick="switchStream('twitch', this)">💜 Twitch Live</button>
-            <button class="tab-btn" onclick="switchStream('youtube', this)">🔴 YouTube Live</button>
-            <button class="tab-btn" onclick="switchStream('tiktok', this)">🎵 TikTok Live</button>
+            <!-- Injecté dynamiquement par JS -->
         </div>
 
-        <!-- Lecteur vidéo principal -->
+        <!-- Lecteur principal -->
         <div class="tv-wrapper">
             <div class="player-aspect-ratio">
                 
                 <div id="twitch-offline-screen" class="custom-screen" style="display: none;">
                     <span style="font-size: 2.2rem; margin-bottom: 10px;">📡</span>
                     <h3>LE LIVE TWITCH EST HORS LIGNE</h3>
-                    <p>Découvrez nos réseaux sociaux ou nos meilleures vidéos ci-dessous !</p>
+                    <p>Découvrez nos contenus ou parcourez nos meilleures vidéos ci-dessous !</p>
                     <button class="action-btn" onclick="scrollToSection('team-videos')">🎬 Voir les vidéos</button>
                 </div>
 
                 <div id="youtube-offline-screen" class="custom-screen" style="display: none;">
                     <span style="font-size: 2.2rem; margin-bottom: 10px;">🔴</span>
                     <h3>AUCUN LIVE YOUTUBE EN COURS</h3>
-                    <p>Consultez directement notre chaîne pour voir nos dernières vidéos et shorts postés.</p>
-                    <a href="https://www.youtube.com/@Abysz_o" target="_blank" class="action-btn">Accéder à YouTube ↗</a>
+                    <p>Consultez la chaîne YouTube officielle pour suivre la publication de nos vidéos.</p>
+                    <a id="yt-channel-link" href="https://www.youtube.com/@Abysz_o" target="_blank" class="action-btn">Accéder à YouTube ↗</a>
                 </div>
 
                 <div id="tiktok-screen" class="custom-screen" style="display: none;">
                     <span style="font-size: 2.2rem; margin-bottom: 10px;">🎵</span>
                     <h3>TIKTOK LIVE @ABYSZ_O</h3>
-                    <p>Rejoignez-nous directement sur l'application TikTok pour suivre la retransmission en direct !</p>
-                    <a href="https://www.tiktok.com/@abysz_o/live" target="_blank" class="action-btn">🔴 Ouvrir TikTok Live ↗</a>
+                    <p>Rejoignez-nous directement sur l'application TikTok pour vivre le direct sans coupure !</p>
+                    <a id="tiktok-live-link" href="https://www.tiktok.com/@abysz_o/live" target="_blank" class="action-btn">🔴 Ouvrir TikTok Live ↗</a>
                 </div>
 
                 <div id="custom-embed-screen" class="custom-screen" style="display: none;">
                     <span style="font-size: 2.2rem; margin-bottom: 10px;">⚡</span>
                     <h3 id="custom-tab-title">ONGLET PERSONNALISÉ</h3>
-                    <p id="custom-tab-desc">Contenu géré par l'administration.</p>
-                    <a id="custom-tab-link" href="#" target="_blank" class="action-btn">Ouvrir le lien ↗</a>
+                    <p id="custom-tab-desc">Lien vers le contenu sélectionné.</p>
+                    <a id="custom-tab-link" href="#" target="_blank" class="action-btn">Ouvrir la page ↗</a>
                 </div>
 
                 <iframe id="twitch-frame" src="" allowfullscreen></iframe>
             </div>
         </div>
 
-        <!-- Section Vidéos -->
-        <div id="team-videos" class="section-title">🎬 Sélection de la Team</div>
-        <div class="video-grid" id="video-grid-container">
-            <!-- Injecté par JS -->
+        <!-- Outil Édition Stream (Uniquement Admin) -->
+        <div class="stream-config-bar">
+            <span>⚙️ <b>Paramètres Stream :</b> Chaîne Twitch active = <code id="current-twitch-display" style="color:#a855f7;">abysz_o</code></span>
+            <button class="action-btn" style="padding: 5px 12px; font-size: 0.75rem;" onclick="openStreamConfigModal()">Modifier la chaîne Live</button>
         </div>
 
-        <!-- Bouton Admin (Visible seulement si connecté en Admin) -->
-        <div id="admin-actions" style="display: none; margin-top: 25px; text-align: center;">
-            <button class="action-btn" onclick="openAdminModal()">⚙️ Panneau de Gestion TV (Admin)</button>
+        <!-- Section Vidéos -->
+        <div id="team-videos" class="section-title">
+            <span>🎬 Contenus & Liens de la Team</span>
+            <button class="action-btn" id="add-video-btn" style="display:none; font-size: 0.75rem; padding: 6px 14px;" onclick="openAddVideoModal()">➕ Ajouter un contenu</button>
+        </div>
+        
+        <div class="video-grid" id="video-grid-container">
+            <!-- Cartes injectées JS -->
         </div>
 
     </div>
@@ -173,10 +187,10 @@
     <!-- MODAL CONNEXION -->
     <div id="auth-modal" class="modal">
         <div class="modal-box">
-            <h2>🔑 Connexion</h2>
+            <h2>🔑 Connexion Admin / Membre</h2>
             <div class="form-group">
                 <label>Nom d'utilisateur</label>
-                <input type="text" id="username-input" placeholder="ex: Alban">
+                <input type="text" id="username-input" placeholder="ex: Admin">
             </div>
             <div class="form-group">
                 <label>Mot de passe</label>
@@ -184,53 +198,46 @@
             </div>
             <div style="display: flex; gap: 10px; margin-top: 20px;">
                 <button class="action-btn" style="flex:1;" onclick="login()">Se connecter</button>
-                <button class="action-btn" style="flex:1; background:#333;" onclick="closeAuthModal()">Annuler</button>
+                <button class="action-btn" style="flex:1; background:#333;" onclick="closeModal('auth-modal')">Annuler</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL ADMIN TV -->
-    <div id="admin-panel" class="modal">
+    <!-- MODAL AJOUT / ÉDITION VIDÉO -->
+    <div id="video-modal" class="modal">
         <div class="modal-box">
-            <h2>⚙️ Gestion ABYSZ TV</h2>
-            
+            <h2 id="video-modal-title">✏️ Édition du Contenu</h2>
+            <input type="hidden" id="edit-video-index" value="-1">
             <div class="form-group">
-                <label>Type d'ajout :</label>
-                <select id="admin-add-type" onchange="toggleAdminForm()">
-                    <option value="tab">Nouvel Onglet de Navigation</option>
-                    <option value="video">Nouvelle Carte Vidéo / Lien</option>
-                </select>
+                <label>Titre de la carte</label>
+                <input type="text" id="video-title-input" placeholder="ex: Replay Fortnite Finales">
             </div>
-
-            <div id="form-tab">
-                <div class="form-group">
-                    <label>Nom de l'onglet :</label>
-                    <input type="text" id="tab-name" placeholder="ex: 🏆 Box Fight Cup">
-                </div>
-                <div class="form-group">
-                    <label>Lien de destination :</label>
-                    <input type="text" id="tab-url" placeholder="https://...">
-                </div>
+            <div class="form-group">
+                <label>Tag / Plateforme</label>
+                <input type="text" id="video-tag-input" placeholder="YOUTUBE, TIKTOK, FORTNITE...">
             </div>
-
-            <div id="form-video" style="display: none;">
-                <div class="form-group">
-                    <label>Titre de la vidéo :</label>
-                    <input type="text" id="video-title-input" placeholder="ex: Best of Competitive Fortnite">
-                </div>
-                <div class="form-group">
-                    <label>Tag :</label>
-                    <input type="text" id="video-tag-input" placeholder="FORTNITE">
-                </div>
-                <div class="form-group">
-                    <label>Lien de la vidéo :</label>
-                    <input type="text" id="video-url-input" placeholder="https://youtube.com/...">
-                </div>
+            <div class="form-group">
+                <label>Lien URL de la vidéo ou chaîne</label>
+                <input type="text" id="video-url-input" placeholder="https://...">
             </div>
-
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="action-btn" style="flex:1;" onclick="saveAdminData()">Enregistrer</button>
-                <button class="action-btn" style="flex:1; background:#333;" onclick="closeAdminModal()">Annuler</button>
+                <button class="action-btn" style="flex:1;" onclick="saveVideoCard()">Enregistrer</button>
+                <button class="action-btn" style="flex:1; background:#333;" onclick="closeModal('video-modal')">Annuler</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIG STREAM -->
+    <div id="stream-config-modal" class="modal">
+        <div class="modal-box">
+            <h2>🎥 Modifier les Lecteurs Live</h2>
+            <div class="form-group">
+                <label>Nom de chaîne Twitch (Username)</label>
+                <input type="text" id="twitch-channel-input" placeholder="abysz_o">
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="action-btn" style="flex:1;" onclick="saveStreamConfig()">Mettre à jour</button>
+                <button class="action-btn" style="flex:1; background:#333;" onclick="closeModal('stream-config-modal')">Annuler</button>
             </div>
         </div>
     </div>
@@ -240,10 +247,20 @@
     </footer>
 
     <script>
-        const TWITCH_CHANNEL = "abysz_o";
         const domain = window.location.hostname || "localhost";
 
-        // Éléments DOM
+        // Données modifiables
+        let twitchChannel = localStorage.getItem('abysz_twitch_channel') || "abysz_o";
+        let customTabs = JSON.parse(localStorage.getItem('abysz_custom_tabs')) || [];
+        let customVideos = JSON.parse(localStorage.getItem('abysz_custom_videos')) || [
+            { tag: "YouTube", title: "Chaîne Officielle & Replays YouTube", url: "https://www.youtube.com/@Abysz_o" },
+            { tag: "TikTok", title: "Clips Rapides & Highlights TikTok", url: "https://www.tiktok.com/@abysz_o" },
+            { tag: "Twitch", title: "Rediffusions & VODs des Live Twitch", url: "https://www.twitch.tv/abysz_o/videos" }
+        ];
+
+        let currentUser = JSON.parse(localStorage.getItem('abysz_user')) || null;
+
+        // DOM elements
         const twitchFrame = document.getElementById('twitch-frame');
         const twitchOfflineScreen = document.getElementById('twitch-offline-screen');
         const youtubeOfflineScreen = document.getElementById('youtube-offline-screen');
@@ -252,55 +269,47 @@
         const statusBadge = document.getElementById('live-status');
         const statusText = document.getElementById('status-text');
 
-        // Données dynamiques
-        const defaultVideos = [
-            { id: 1, tag: "YouTube", title: "Chaîne Officielle & Replays YouTube", url: "https://www.youtube.com/@Abysz_o", color: "#a855f7" },
-            { id: 2, tag: "TikTok", title: "Clips Rapides & Highlights TikTok", url: "https://www.tiktok.com/@abysz_o", color: "#00f2fe" },
-            { id: 3, tag: "Twitch", title: "Rediffusions & VODs des Live Twitch", url: "https://www.twitch.tv/abysz_o/videos", color: "#9146ff" }
-        ];
-
-        let customTabs = JSON.parse(localStorage.getItem('abysz_custom_tabs')) || [];
-        let customVideos = JSON.parse(localStorage.getItem('abysz_custom_videos')) || defaultVideos;
-        let currentUser = JSON.parse(localStorage.getItem('abysz_user')) || null;
-
-        twitchFrame.src = `https://player.twitch.tv/?channel=${TWITCH_CHANNEL}&parent=${domain}&autoplay=false`;
-
-        // --- GESTION DES UTILISATEURS / CONNEXION ---
+        // --- AUTHENTIFICATION ---
         function updateAuthUI() {
             const authBtn = document.getElementById('auth-btn');
-            const adminActions = document.getElementById('admin-actions');
+            const addVideoBtn = document.getElementById('add-video-btn');
+            const adminIndicator = document.getElementById('admin-indicator');
             
             if (currentUser) {
                 authBtn.textContent = `👤 ${currentUser.username}`;
-                authBtn.onclick = logout;
                 
                 if (currentUser.role === 'admin') {
-                    adminActions.style.display = 'block';
                     document.getElementById('page-body').classList.add('admin-active');
+                    addVideoBtn.style.display = 'inline-block';
+                    adminIndicator.style.display = 'inline-block';
                 } else {
-                    adminActions.style.display = 'none';
                     document.getElementById('page-body').classList.remove('admin-active');
+                    addVideoBtn.style.display = 'none';
+                    adminIndicator.style.display = 'none';
                 }
             } else {
                 authBtn.textContent = '👤 Se connecter';
-                authBtn.onclick = openAuthModal;
-                adminActions.style.display = 'none';
                 document.getElementById('page-body').classList.remove('admin-active');
+                addVideoBtn.style.display = 'none';
+                adminIndicator.style.display = 'none';
             }
+
+            document.getElementById('current-twitch-display').textContent = twitchChannel;
         }
 
         function handleAuthClick() {
             if (currentUser) {
                 if (confirm(`Déconnexion de ${currentUser.username} ?`)) {
-                    logout();
+                    currentUser = null;
+                    localStorage.removeItem('abysz_user');
+                    updateAuthUI();
+                    renderTabs();
+                    renderVideos();
                 }
             } else {
-                openAuthModal();
+                document.getElementById('auth-modal').style.display = 'flex';
             }
         }
-
-        function openAuthModal() { document.getElementById('auth-modal').style.display = 'flex'; }
-        function closeAuthModal() { document.getElementById('auth-modal').style.display = 'none'; }
 
         function login() {
             const user = document.getElementById('username-input').value;
@@ -310,27 +319,65 @@
                 currentUser = { username: 'Admin', role: 'admin' };
                 localStorage.setItem('abysz_user', JSON.stringify(currentUser));
                 updateAuthUI();
-                closeAuthModal();
+                closeModal('auth-modal');
+                renderTabs();
                 renderVideos();
             } else if (user) {
                 currentUser = { username: user, role: 'user' };
                 localStorage.setItem('abysz_user', JSON.stringify(currentUser));
                 updateAuthUI();
-                closeAuthModal();
+                closeModal('auth-modal');
             } else {
-                alert('Veuillez entrer vos identifiants.');
+                alert('Veuillez saisir des identifiants valides.');
             }
         }
 
-        function logout() {
-            currentUser = null;
-            localStorage.removeItem('abysz_user');
-            updateAuthUI();
-            renderVideos();
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        // --- ONGLETS & LECTEUR ---
+        function reloadTwitchPlayer() {
+            twitchFrame.src = `https://player.twitch.tv/?channel=${twitchChannel}&parent=${domain}&autoplay=false`;
+            checkTwitchStatus();
         }
 
-        // --- LECTEUR & FLUX ---
-        function switchStream(platform, element, customData = null) {
+        function renderTabs() {
+            const container = document.getElementById('tabs-container');
+            container.innerHTML = '';
+
+            // Tabs fixes de base
+            const baseTabs = [
+                { name: "💜 Twitch Live", action: 'twitch' },
+                { name: "🔴 YouTube Live", action: 'youtube' },
+                { name: "🎵 TikTok Live", action: 'tiktok' }
+            ];
+
+            baseTabs.forEach((tab, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'tab-wrapper';
+                wrapper.innerHTML = `<button class="tab-btn ${index === 0 ? 'active' : ''}" onclick="switchStream('${tab.action}', this)">${tab.name}</button>`;
+                container.appendChild(wrapper);
+            });
+
+            // Tabs sur-mesure (avec bouton supprimer admin)
+            customTabs.forEach((tab, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'tab-wrapper';
+                wrapper.innerHTML = `
+                    <button class="tab-btn" onclick="switchStream('custom', this, ${index})">${tab.name}</button>
+                    <button class="tab-delete-btn" onclick="deleteCustomTab(${index})">✕</button>
+                `;
+                container.appendChild(wrapper);
+            });
+
+            // Bouton + Nouvel Onglet (Admin)
+            const addBtn = document.createElement('button');
+            addBtn.className = 'add-tab-btn';
+            addBtn.textContent = '➕ Ajouter Onglet';
+            addBtn.onclick = createCustomTab;
+            container.appendChild(addBtn);
+        }
+
+        function switchStream(type, element, customIndex = null) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             if(element) element.classList.add('active');
 
@@ -340,29 +387,29 @@
             tiktokScreen.style.display = 'none';
             customEmbedScreen.style.display = 'none';
 
-            if (platform === 'twitch') {
+            if (type === 'twitch') {
                 checkTwitchStatus();
-            } else if (platform === 'youtube') {
+            } else if (type === 'youtube') {
                 youtubeOfflineScreen.style.display = 'flex';
                 statusBadge.className = "status-badge";
                 statusText.textContent = "🔴 Mode YouTube activé";
-            } else if (platform === 'tiktok') {
+            } else if (type === 'tiktok') {
                 tiktokScreen.style.display = 'flex';
                 statusBadge.className = "status-badge";
                 statusText.textContent = "🎵 Mode TikTok activé";
-            } else if (platform === 'custom' && customData) {
+            } else if (type === 'custom' && customTabs[customIndex]) {
+                const tab = customTabs[customIndex];
                 customEmbedScreen.style.display = 'flex';
-                document.getElementById('custom-tab-title').textContent = customData.name;
-                document.getElementById('custom-tab-desc').textContent = "Espace personnalisé géré par la team.";
-                document.getElementById('custom-tab-link').href = customData.url;
+                document.getElementById('custom-tab-title').textContent = tab.name;
+                document.getElementById('custom-tab-link').href = tab.url;
                 statusBadge.className = "status-badge";
-                statusText.textContent = "⚡ " + customData.name;
+                statusText.textContent = "⚡ " + tab.name;
             }
         }
 
         async function checkTwitchStatus() {
             try {
-                const res = await fetch(`https://decapi.me/twitch/uptime/${TWITCH_CHANNEL}`);
+                const res = await fetch(`https://decapi.me/twitch/uptime/${twitchChannel}`);
                 const uptime = await res.text();
 
                 if (uptime.includes("offline") || uptime.includes("not found")) {
@@ -376,89 +423,119 @@
                     twitchFrame.style.display = "block";
                 }
             } catch (err) {
-                statusText.textContent = "● CHAÎNE @ABYSZ_O";
+                statusText.textContent = `● CHAÎNE @${twitchChannel.toUpperCase()}`;
                 twitchOfflineScreen.style.display = "flex";
             }
         }
 
-        // --- GESTION DU CONTENU (ADMIN) ---
-        function renderTabs() {
-            const container = document.getElementById('tabs-container');
-            container.innerHTML = `
-                <button class="tab-btn active" onclick="switchStream('twitch', this)">💜 Twitch Live</button>
-                <button class="tab-btn" onclick="switchStream('youtube', this)">🔴 YouTube Live</button>
-                <button class="tab-btn" onclick="switchStream('tiktok', this)">🎵 TikTok Live</button>
-            `;
-            customTabs.forEach((tab) => {
-                const btn = document.createElement('button');
-                btn.className = 'tab-btn';
-                btn.textContent = tab.name;
-                btn.onclick = () => switchStream('custom', btn, tab);
-                container.appendChild(btn);
-            });
+        function createCustomTab() {
+            const name = prompt("Nom de l'onglet :");
+            const url = prompt("Lien de redirection URL :");
+            if (name && url) {
+                customTabs.push({ name, url });
+                localStorage.setItem('abysz_custom_tabs', JSON.stringify(customTabs));
+                renderTabs();
+            }
         }
 
+        function deleteCustomTab(index) {
+            if (confirm("Supprimer cet onglet ?")) {
+                customTabs.splice(index, 1);
+                localStorage.setItem('abysz_custom_tabs', JSON.stringify(customTabs));
+                renderTabs();
+            }
+        }
+
+        // --- GESTION DES VIDÉOS & CARTES ---
         function renderVideos() {
             const grid = document.getElementById('video-grid-container');
             grid.innerHTML = '';
+
             customVideos.forEach((vid, index) => {
-                const card = document.createElement('a');
-                card.href = vid.url;
-                card.target = '_blank';
+                const card = document.createElement('div');
                 card.className = 'video-card';
                 card.innerHTML = `
-                    <button class="delete-btn" onclick="deleteVideo(event, ${index})">✕</button>
-                    <div class="video-thumb" style="background: radial-gradient(circle, #1f1f2e 0%, #101018 100%);">
-                        <div class="play-icon">▶</div>
+                    <div class="card-admin-controls">
+                        <button class="ctrl-btn edit" onclick="openEditVideoModal(${index})" title="Modifier">✏️</button>
+                        <button class="ctrl-btn del" onclick="deleteVideoCard(${index})" title="Supprimer">🗑️</button>
                     </div>
-                    <div class="video-info">
-                        <span class="video-tag" style="color: ${vid.color || '#a855f7'};">${vid.tag}</span>
-                        <div class="video-title">${vid.title}</div>
-                        <span style="font-size: 0.75rem; color: #a855f7;">Ouvrir le lien ↗</span>
-                    </div>
+                    <a href="${vid.url}" target="_blank" style="text-decoration:none; color:white; display:flex; flex-direction:column; flex-grow:1;">
+                        <div class="video-thumb" style="background: radial-gradient(circle, #1f1f2e 0%, #101018 100%);">
+                            <div class="play-icon">▶</div>
+                        </div>
+                        <div class="video-info">
+                            <span class="video-tag">${vid.tag || 'OFFICIEL'}</span>
+                            <div class="video-title">${vid.title}</div>
+                            <span style="font-size: 0.75rem; color: #a855f7;">Voir la page ↗</span>
+                        </div>
+                    </a>
                 `;
                 grid.appendChild(card);
             });
         }
 
-        function openAdminModal() { document.getElementById('admin-panel').style.display = 'flex'; }
-        function closeAdminModal() { document.getElementById('admin-panel').style.display = 'none'; }
-        
-        function toggleAdminForm() {
-            const type = document.getElementById('admin-add-type').value;
-            document.getElementById('form-tab').style.display = type === 'tab' ? 'block' : 'none';
-            document.getElementById('form-video').style.display = type === 'video' ? 'block' : 'none';
+        function openAddVideoModal() {
+            document.getElementById('edit-video-index').value = "-1";
+            document.getElementById('video-modal-title').textContent = "➕ Ajouter une carte";
+            document.getElementById('video-title-input').value = "";
+            document.getElementById('video-tag-input').value = "";
+            document.getElementById('video-url-input').value = "";
+            document.getElementById('video-modal').style.display = 'flex';
         }
 
-        function saveAdminData() {
-            const type = document.getElementById('admin-add-type').value;
-            if (type === 'tab') {
-                const name = document.getElementById('tab-name').value;
-                const url = document.getElementById('tab-url').value;
-                if (name && url) {
-                    customTabs.push({ name, url });
-                    localStorage.setItem('abysz_custom_tabs', JSON.stringify(customTabs));
-                    renderTabs();
-                }
-            } else {
-                const title = document.getElementById('video-title-input').value;
-                const tag = document.getElementById('video-tag-input').value;
-                const url = document.getElementById('video-url-input').value;
-                if (title && url) {
-                    customVideos.push({ id: Date.now(), title, tag: tag || 'OFFICIEL', url, color: '#a855f7' });
-                    localStorage.setItem('abysz_custom_videos', JSON.stringify(customVideos));
-                    renderVideos();
-                }
+        function openEditVideoModal(index) {
+            const vid = customVideos[index];
+            document.getElementById('edit-video-index').value = index;
+            document.getElementById('video-modal-title').textContent = "✏️ Modifier le contenu";
+            document.getElementById('video-title-input').value = vid.title;
+            document.getElementById('video-tag-input').value = vid.tag;
+            document.getElementById('video-url-input').value = vid.url;
+            document.getElementById('video-modal').style.display = 'flex';
+        }
+
+        function saveVideoCard() {
+            const index = parseInt(document.getElementById('edit-video-index').value);
+            const title = document.getElementById('video-title-input').value;
+            const tag = document.getElementById('video-tag-input').value;
+            const url = document.getElementById('video-url-input').value;
+
+            if (!title || !url) {
+                alert("Veuillez remplir au moins le titre et le lien.");
+                return;
             }
-            closeAdminModal();
+
+            if (index === -1) {
+                customVideos.push({ title, tag: tag || 'VIDÉO', url });
+            } else {
+                customVideos[index] = { title, tag: tag || 'VIDÉO', url };
+            }
+
+            localStorage.setItem('abysz_custom_videos', JSON.stringify(customVideos));
+            renderVideos();
+            closeModal('video-modal');
         }
 
-        function deleteVideo(e, index) {
-            e.preventDefault();
-            if (confirm("Supprimer ce lien ?")) {
+        function deleteVideoCard(index) {
+            if (confirm("Supprimer cette carte ?")) {
                 customVideos.splice(index, 1);
                 localStorage.setItem('abysz_custom_videos', JSON.stringify(customVideos));
                 renderVideos();
+            }
+        }
+
+        function openStreamConfigModal() {
+            document.getElementById('twitch-channel-input').value = twitchChannel;
+            document.getElementById('stream-config-modal').style.display = 'flex';
+        }
+
+        function saveStreamConfig() {
+            const ch = document.getElementById('twitch-channel-input').value.trim();
+            if (ch) {
+                twitchChannel = ch;
+                localStorage.setItem('abysz_twitch_channel', twitchChannel);
+                reloadTwitchPlayer();
+                updateAuthUI();
+                closeModal('stream-config-modal');
             }
         }
 
@@ -466,11 +543,11 @@
             document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Initialisation
+        // --- Lancement ---
         updateAuthUI();
         renderTabs();
         renderVideos();
-        checkTwitchStatus();
+        reloadTwitchPlayer();
     </script>
 </body>
 </html>

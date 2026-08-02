@@ -274,7 +274,15 @@
             ]
         };
 
-        let isAdminUser = false;
+        // Vérification dynamique et infaillible du statut admin connecté
+        function verifyAdmin() {
+            const user = auth.currentUser;
+            if (!user || !user.email || user.email.toLowerCase() !== "abyszofficial@gmail.com") {
+                alert("Action refusée : Vous devez être connecté en tant qu'administrateur (abyszofficial@gmail.com).");
+                return false;
+            }
+            return true;
+        }
 
         async function loadTVData() {
             try {
@@ -290,10 +298,7 @@
         }
 
         async function saveTVDataToFirestore() {
-            if (!isAdminUser) {
-                alert("Action refusée : Vous devez être connecté en tant qu'administrateur.");
-                return;
-            }
+            if (!verifyAdmin()) return;
 
             try {
                 console.log("Enregistrement en cours vers Firestore...");
@@ -302,7 +307,7 @@
                 initAppUI();
             } catch (e) {
                 console.error("Erreur d'écriture Firestore :", e);
-                alert("Échec de l'enregistrement. Vérifiez vos règles de sécurité Firestore.\nDétail : " + e.message);
+                alert("Échec de l'enregistrement.\nDétail : " + e.message);
             }
         }
 
@@ -310,19 +315,18 @@
             const authBtn = document.getElementById('auth-btn');
             const addVideoBtn = document.getElementById('add-video-btn');
             const adminIndicator = document.getElementById('admin-indicator');
+            const pageBody = document.getElementById('page-body');
 
-            if (user && user.email.toLowerCase() === "abyszofficial@gmail.com") {
-                isAdminUser = true;
-                authBtn.textContent = `👤 Admin`;
-                document.getElementById('page-body').classList.add('admin-active');
-                addVideoBtn.style.display = 'inline-block';
-                adminIndicator.style.display = 'inline-block';
+            if (user && user.email && user.email.toLowerCase() === "abyszofficial@gmail.com") {
+                if (authBtn) authBtn.textContent = `👤 Admin`;
+                if (pageBody) pageBody.classList.add('admin-active');
+                if (addVideoBtn) addVideoBtn.style.display = 'inline-block';
+                if (adminIndicator) adminIndicator.style.display = 'inline-block';
             } else {
-                isAdminUser = false;
-                authBtn.textContent = user ? `👤 ${user.email}` : '👤 Se connecter';
-                document.getElementById('page-body').classList.remove('admin-active');
-                addVideoBtn.style.display = 'none';
-                adminIndicator.style.display = 'none';
+                if (authBtn) authBtn.textContent = user ? `👤 ${user.email}` : '👤 Se connecter';
+                if (pageBody) pageBody.classList.remove('admin-active');
+                if (addVideoBtn) addVideoBtn.style.display = 'none';
+                if (adminIndicator) adminIndicator.style.display = 'none';
             }
         });
 
@@ -333,38 +337,50 @@
                     signOut(auth);
                 }
             } else {
-                document.getElementById('auth-modal').style.display = 'flex';
+                const modal = document.getElementById('auth-modal');
+                if (modal) modal.style.display = 'flex';
             }
         }
 
         window.login = async function() {
-            const email = document.getElementById('email-input').value.trim();
-            const pass = document.getElementById('password-input').value;
+            const emailInput = document.getElementById('email-input');
+            const passInput = document.getElementById('password-input');
+            if (!emailInput || !passInput) return;
+
+            const email = emailInput.value.trim();
+            const pass = passInput.value;
             try {
                 await signInWithEmailAndPassword(auth, email, pass);
-                closeModal('auth-modal');
+                window.closeModal('auth-modal');
             } catch (e) {
                 alert("Erreur de connexion : " + e.message);
             }
         }
 
-        window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; }
+        window.closeModal = function(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.style.display = 'none';
+        }
 
         function initAppUI() {
             renderTabs();
             renderVideos();
             reloadTwitchPlayer();
-            document.getElementById('current-twitch-display').textContent = tvData.twitchChannel;
+            const twitchDisplay = document.getElementById('current-twitch-display');
+            if (twitchDisplay) twitchDisplay.textContent = tvData.twitchChannel;
         }
 
         function reloadTwitchPlayer() {
             const twitchFrame = document.getElementById('twitch-frame');
-            twitchFrame.src = `https://player.twitch.tv/?channel=${tvData.twitchChannel}&parent=${domain}&autoplay=false`;
+            if (twitchFrame) {
+                twitchFrame.src = `https://player.twitch.tv/?channel=${tvData.twitchChannel}&parent=${domain}&autoplay=false`;
+            }
             checkTwitchStatus();
         }
 
         function renderTabs() {
             const container = document.getElementById('tabs-container');
+            if (!container) return;
             container.innerHTML = '';
 
             const baseTabs = [
@@ -380,7 +396,7 @@
                 container.appendChild(wrapper);
             });
 
-            if (tvData.customTabs) {
+            if (tvData.customTabs && Array.isArray(tvData.customTabs)) {
                 tvData.customTabs.forEach((tab, index) => {
                     const wrapper = document.createElement('div');
                     wrapper.className = 'tab-wrapper';
@@ -395,13 +411,13 @@
             const addBtn = document.createElement('button');
             addBtn.className = 'add-tab-btn';
             addBtn.textContent = '➕ Ajouter Onglet';
-            addBtn.onclick = createCustomTab;
+            addBtn.onclick = window.createCustomTab;
             container.appendChild(addBtn);
         }
 
         window.switchStream = function(type, element, customIndex = null) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            if(element) element.classList.add('active');
+            if (element) element.classList.add('active');
 
             const twitchFrame = document.getElementById('twitch-frame');
             const twitchOfflineScreen = document.getElementById('twitch-offline-screen');
@@ -411,29 +427,31 @@
             const statusBadge = document.getElementById('live-status');
             const statusText = document.getElementById('status-text');
 
-            twitchFrame.style.display = 'none';
-            twitchOfflineScreen.style.display = 'none';
-            youtubeOfflineScreen.style.display = 'none';
-            tiktokScreen.style.display = 'none';
-            customEmbedScreen.style.display = 'none';
+            if (twitchFrame) twitchFrame.style.display = 'none';
+            if (twitchOfflineScreen) twitchOfflineScreen.style.display = 'none';
+            if (youtubeOfflineScreen) youtubeOfflineScreen.style.display = 'none';
+            if (tiktokScreen) tiktokScreen.style.display = 'none';
+            if (customEmbedScreen) customEmbedScreen.style.display = 'none';
 
             if (type === 'twitch') {
                 checkTwitchStatus();
             } else if (type === 'youtube') {
-                youtubeOfflineScreen.style.display = 'flex';
-                statusBadge.className = "status-badge";
-                statusText.textContent = "🔴 Mode YouTube activé";
+                if (youtubeOfflineScreen) youtubeOfflineScreen.style.display = 'flex';
+                if (statusBadge) statusBadge.className = "status-badge";
+                if (statusText) statusText.textContent = "🔴 Mode YouTube activé";
             } else if (type === 'tiktok') {
-                tiktokScreen.style.display = 'flex';
-                statusBadge.className = "status-badge";
-                statusText.textContent = "🎵 Mode TikTok activé";
-            } else if (type === 'custom' && tvData.customTabs[customIndex]) {
+                if (tiktokScreen) tiktokScreen.style.display = 'flex';
+                if (statusBadge) statusBadge.className = "status-badge";
+                if (statusText) statusText.textContent = "🎵 Mode TikTok activé";
+            } else if (type === 'custom' && tvData.customTabs && tvData.customTabs[customIndex]) {
                 const tab = tvData.customTabs[customIndex];
-                customEmbedScreen.style.display = 'flex';
-                document.getElementById('custom-tab-title').textContent = tab.name;
-                document.getElementById('custom-tab-link').href = tab.url;
-                statusBadge.className = "status-badge";
-                statusText.textContent = "⚡ " + tab.name;
+                if (customEmbedScreen) customEmbedScreen.style.display = 'flex';
+                const customTitle = document.getElementById('custom-tab-title');
+                const customLink = document.getElementById('custom-tab-link');
+                if (customTitle) customTitle.textContent = tab.name;
+                if (customLink) customLink.href = tab.url;
+                if (statusBadge) statusBadge.className = "status-badge";
+                if (statusText) statusText.textContent = "⚡ " + tab.name;
             }
         }
 
@@ -448,45 +466,50 @@
                 const uptime = await res.text();
 
                 if (uptime.includes("offline") || uptime.includes("not found")) {
-                    statusBadge.className = "status-badge";
-                    statusText.textContent = "● TWITCH HORS LIGNE";
-                    twitchOfflineScreen.style.display = "flex";
+                    if (statusBadge) statusBadge.className = "status-badge";
+                    if (statusText) statusText.textContent = "● TWITCH HORS LIGNE";
+                    if (twitchOfflineScreen) twitchOfflineScreen.style.display = "flex";
                 } else {
-                    statusBadge.className = "status-badge online";
-                    statusBadge.innerHTML = `<span class="pulse-dot"></span> EN DIRECT SUR TWITCH (${uptime})`;
-                    twitchOfflineScreen.style.display = "none";
-                    twitchFrame.style.display = "block";
+                    if (statusBadge) {
+                        statusBadge.className = "status-badge online";
+                        statusBadge.innerHTML = `<span class="pulse-dot"></span> EN DIRECT SUR TWITCH (${uptime})`;
+                    }
+                    if (twitchOfflineScreen) twitchOfflineScreen.style.display = "none";
+                    if (twitchFrame) twitchFrame.style.display = "block";
                 }
             } catch (err) {
-                statusText.textContent = `● CHAÎNE @${tvData.twitchChannel.toUpperCase()}`;
-                twitchOfflineScreen.style.display = "flex";
+                if (statusText) statusText.textContent = `● CHAÎNE @${tvData.twitchChannel.toUpperCase()}`;
+                if (twitchOfflineScreen) twitchOfflineScreen.style.display = "flex";
             }
         }
 
         window.createCustomTab = async function() {
-            if (!isAdminUser) return alert("Action réservée à l'administrateur.");
+            if (!verifyAdmin()) return;
             const name = prompt("Nom de l'onglet :");
             const url = prompt("Lien de redirection URL :");
             if (name && url) {
                 if (!tvData.customTabs) tvData.customTabs = [];
-                tvData.customTabs.push({ name, url });
+                tvData.customTabs.push({ name: name.trim(), url: url.trim() });
                 await saveTVDataToFirestore();
             }
         }
 
         window.deleteCustomTab = async function(index) {
-            if (!isAdminUser) return alert("Action réservée à l'administrateur.");
+            if (!verifyAdmin()) return;
             if (confirm("Supprimer cet onglet ?")) {
-                tvData.customTabs.splice(index, 1);
-                await saveTVDataToFirestore();
+                if (tvData.customTabs && tvData.customTabs[index]) {
+                    tvData.customTabs.splice(index, 1);
+                    await saveTVDataToFirestore();
+                }
             }
         }
 
         function renderVideos() {
             const grid = document.getElementById('video-grid-container');
+            if (!grid) return;
             grid.innerHTML = '';
 
-            if (tvData.customVideos) {
+            if (tvData.customVideos && Array.isArray(tvData.customVideos)) {
                 tvData.customVideos.forEach((vid, index) => {
                     const card = document.createElement('div');
                     card.className = 'video-card';
@@ -495,13 +518,13 @@
                             <button class="ctrl-btn edit" onclick="openEditVideoModal(${index})" title="Modifier">✏️</button>
                             <button class="ctrl-btn del" onclick="deleteVideoCard(${index})" title="Supprimer">🗑️</button>
                         </div>
-                        <a href="${vid.url}" target="_blank" style="text-decoration:none; color:white; display:flex; flex-direction:column; flex-grow:1;">
+                        <a href="${vid.url || '#'}" target="_blank" style="text-decoration:none; color:white; display:flex; flex-direction:column; flex-grow:1;">
                             <div class="video-thumb" style="background: radial-gradient(circle, #1f1f2e 0%, #101018 100%);">
                                 <div class="play-icon">▶</div>
                             </div>
                             <div class="video-info">
                                 <span class="video-tag">${vid.tag || 'OFFICIEL'}</span>
-                                <div class="video-title">${vid.title}</div>
+                                <div class="video-title">${vid.title || ''}</div>
                                 <span style="font-size: 0.75rem; color: #a855f7;">Voir la page ↗</span>
                             </div>
                         </a>
@@ -512,32 +535,55 @@
         }
 
         window.openAddVideoModal = function() {
-            if (!isAdminUser) return alert("Action réservée à l'administrateur.");
-            document.getElementById('edit-video-index').value = "-1";
-            document.getElementById('video-modal-title').textContent = "➕ Ajouter une carte";
-            document.getElementById('video-title-input').value = "";
-            document.getElementById('video-tag-input').value = "";
-            document.getElementById('video-url-input').value = "";
-            document.getElementById('video-modal').style.display = 'flex';
+            if (!verifyAdmin()) return;
+            const editIndex = document.getElementById('edit-video-index');
+            const modalTitle = document.getElementById('video-modal-title');
+            const titleInput = document.getElementById('video-title-input');
+            const tagInput = document.getElementById('video-tag-input');
+            const urlInput = document.getElementById('video-url-input');
+            const modal = document.getElementById('video-modal');
+
+            if (editIndex) editIndex.value = "-1";
+            if (modalTitle) modalTitle.textContent = "➕ Ajouter une carte";
+            if (titleInput) titleInput.value = "";
+            if (tagInput) tagInput.value = "";
+            if (urlInput) urlInput.value = "";
+            if (modal) modal.style.display = 'flex';
         }
 
         window.openEditVideoModal = function(index) {
-            if (!isAdminUser) return alert("Action réservée à l'administrateur.");
+            if (!verifyAdmin()) return;
             const vid = tvData.customVideos[index];
-            document.getElementById('edit-video-index').value = index;
-            document.getElementById('video-modal-title').textContent = "✏️ Modifier le contenu";
-            document.getElementById('video-title-input').value = vid.title;
-            document.getElementById('video-tag-input').value = vid.tag;
-            document.getElementById('video-url-input').value = vid.url;
-            document.getElementById('video-modal').style.display = 'flex';
+            if (!vid) return;
+
+            const editIndex = document.getElementById('edit-video-index');
+            const modalTitle = document.getElementById('video-modal-title');
+            const titleInput = document.getElementById('video-title-input');
+            const tagInput = document.getElementById('video-tag-input');
+            const urlInput = document.getElementById('video-url-input');
+            const modal = document.getElementById('video-modal');
+
+            if (editIndex) editIndex.value = index;
+            if (modalTitle) modalTitle.textContent = "✏️ Modifier le contenu";
+            if (titleInput) titleInput.value = vid.title || '';
+            if (tagInput) tagInput.value = vid.tag || '';
+            if (urlInput) urlInput.value = vid.url || '';
+            if (modal) modal.style.display = 'flex';
         }
 
         window.saveVideoCard = async function() {
-            if (!isAdminUser) return;
-            const index = parseInt(document.getElementById('edit-video-index').value);
-            const title = document.getElementById('video-title-input').value;
-            const tag = document.getElementById('video-tag-input').value;
-            const url = document.getElementById('video-url-input').value;
+            if (!verifyAdmin()) return;
+            const editIndex = document.getElementById('edit-video-index');
+            const titleInput = document.getElementById('video-title-input');
+            const tagInput = document.getElementById('video-tag-input');
+            const urlInput = document.getElementById('video-url-input');
+
+            if (!editIndex || !titleInput || !urlInput) return;
+
+            const index = parseInt(editIndex.value);
+            const title = titleInput.value.trim();
+            const tag = tagInput ? tagInput.value.trim() : '';
+            const url = urlInput.value.trim();
 
             if (!title || !url) {
                 alert("Veuillez remplir au moins le titre et le lien.");
@@ -553,35 +599,42 @@
             }
 
             await saveTVDataToFirestore();
-            closeModal('video-modal');
+            window.closeModal('video-modal');
         }
 
         window.deleteVideoCard = async function(index) {
-            if (!isAdminUser) return;
+            if (!verifyAdmin()) return;
             if (confirm("Supprimer cette carte ?")) {
-                tvData.customVideos.splice(index, 1);
-                await saveTVDataToFirestore();
+                if (tvData.customVideos && tvData.customVideos[index]) {
+                    tvData.customVideos.splice(index, 1);
+                    await saveTVDataToFirestore();
+                }
             }
         }
 
         window.openStreamConfigModal = function() {
-            if (!isAdminUser) return alert("Action réservée à l'administrateur.");
-            document.getElementById('twitch-channel-input').value = tvData.twitchChannel;
-            document.getElementById('stream-config-modal').style.display = 'flex';
+            if (!verifyAdmin()) return;
+            const chInput = document.getElementById('twitch-channel-input');
+            const modal = document.getElementById('stream-config-modal');
+            if (chInput) chInput.value = tvData.twitchChannel;
+            if (modal) modal.style.display = 'flex';
         }
 
         window.saveStreamConfig = async function() {
-            if (!isAdminUser) return;
-            const ch = document.getElementById('twitch-channel-input').value.trim();
+            if (!verifyAdmin()) return;
+            const chInput = document.getElementById('twitch-channel-input');
+            if (!chInput) return;
+            const ch = chInput.value.trim();
             if (ch) {
                 tvData.twitchChannel = ch;
                 await saveTVDataToFirestore();
-                closeModal('stream-config-modal');
+                window.closeModal('stream-config-modal');
             }
         }
 
         window.scrollToSection = function(id) {
-            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+            const el = document.getElementById(id);
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
         }
 
         loadTVData();

@@ -243,7 +243,7 @@
         <p>© 2026 Abysz Esports • Tous droits réservés</p>
     </footer>
 
-    <!-- Firebase SDKs (Modulaires v10) -->
+    <!-- Firebase SDKs & Script de synchronisation -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -274,11 +274,10 @@
             ]
         };
 
-        // Vérification dynamique et infaillible du statut admin connecté
         function verifyAdmin() {
             const user = auth.currentUser;
-            if (!user || !user.email || user.email.toLowerCase() !== "abyszofficial@gmail.com") {
-                alert("Action refusée : Vous devez être connecté en tant qu'administrateur (abyszofficial@gmail.com).");
+            if (!user || !user.email || user.email != "abyszofficial@gmail.com") {
+                alert("Erreur de sauvegarde : Vous devez être connecté avec le compte administrateur (abyszofficial@gmail.com).");
                 return false;
             }
             return true;
@@ -292,7 +291,7 @@
                     tvData = { ...tvData, ...docSnap.data() };
                 }
             } catch (e) {
-                console.error("Erreur chargement Firestore:", e);
+                console.error("Erreur de chargement Firestore:", e);
             }
             initAppUI();
         }
@@ -301,13 +300,12 @@
             if (!verifyAdmin()) return;
 
             try {
-                console.log("Enregistrement en cours vers Firestore...");
                 await setDoc(doc(db, "tv_config", "main"), tvData);
-                console.log("Modifications enregistrées avec succès !");
+                alert("Modifications enregistrées avec succès !");
                 initAppUI();
             } catch (e) {
                 console.error("Erreur d'écriture Firestore :", e);
-                alert("Échec de l'enregistrement.\nDétail : " + e.message);
+                alert("Erreur lors de l'enregistrement : " + e.message);
             }
         }
 
@@ -317,7 +315,7 @@
             const adminIndicator = document.getElementById('admin-indicator');
             const pageBody = document.getElementById('page-body');
 
-            if (user && user.email && user.email.toLowerCase() === "abyszofficial@gmail.com") {
+            if (user && user.email && user.email == "abyszofficial@gmail.com") {
                 if (authBtn) authBtn.textContent = `👤 Admin`;
                 if (pageBody) pageBody.classList.add('admin-active');
                 if (addVideoBtn) addVideoBtn.style.display = 'inline-block';
@@ -352,6 +350,7 @@
             try {
                 await signInWithEmailAndPassword(auth, email, pass);
                 window.closeModal('auth-modal');
+                alert("Connexion admin réussie !");
             } catch (e) {
                 alert("Erreur de connexion : " + e.message);
             }
@@ -637,6 +636,7 @@
             if (el) el.scrollIntoView({ behavior: 'smooth' });
         }
 
+        // Lancement au chargement de la page
         loadTVData();
     </script>
 </body>

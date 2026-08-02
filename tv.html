@@ -97,6 +97,13 @@
         .form-group input { width: 100%; background: #0a0a0a; border: 1px solid #333; color: white; padding: 10px; border-radius: 6px; font-size: 0.85rem; }
         .form-group input:focus { border-color: #a855f7; outline: none; }
 
+        /* Pop-up Player Vidéo */
+        .player-modal-box { background: #141414; border: 1px solid #a855f7; border-radius: 16px; width: 90%; max-width: 850px; padding: 20px; box-shadow: 0 0 40px rgba(168, 85, 247, 0.4); position: relative; }
+        .player-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .player-modal-title { font-family: 'Orbitron', sans-serif; font-size: 1rem; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 15px; }
+        .close-player-btn { background: #ef4444; border: none; color: white; width: 32px; height: 32px; border-radius: 50%; font-size: 1rem; font-weight: bold; cursor: pointer; transition: all 0.2s ease; flex-shrink: 0; }
+        .close-player-btn:hover { background: #dc2626; transform: scale(1.1); }
+
         /* Toast Notifications */
         #toast-container {
             position: fixed;
@@ -176,7 +183,7 @@
                 <div id="youtube-offline-screen" class="custom-screen" style="display: none;">
                     <span style="font-size: 2.2rem; margin-bottom: 10px;">🔴</span>
                     <h3>AUCUN LIVE YOUTUBE EN COURS</h3>
-                    <p>Sélectionnez une vidéo ci-dessous pour la regarder directement ici !</p>
+                    <p>Sélectionnez une vidéo ci-dessous pour la regarder !</p>
                 </div>
 
                 <div id="tiktok-screen" class="custom-screen" style="display: none;">
@@ -211,6 +218,19 @@
         
         <div class="video-grid" id="video-grid-container"></div>
 
+    </div>
+
+    <!-- MODAL POPUP LECTEUR VIDÉO -->
+    <div id="video-player-modal" class="modal" onclick="closeVideoPlayerModal(event)">
+        <div class="player-modal-box" onclick="event.stopPropagation()">
+            <div class="player-modal-header">
+                <span class="player-modal-title" id="popup-video-title">Titre de la vidéo</span>
+                <button class="close-player-btn" onclick="closeVideoPlayerModal()">✕</button>
+            </div>
+            <div class="player-aspect-ratio">
+                <iframe id="popup-player-frame" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            </div>
+        </div>
     </div>
 
     <!-- MODAL AUTH -->
@@ -359,13 +379,12 @@
                 if (docSnap.exists()) {
                     tvData = { ...tvData, ...docSnap.data() };
                 } else {
-                    console.log("Le document tv_config/main n'existe pas encore. Utilisation de la configuration locale par défaut.");
+                    console.log("Le document tv_config/main n'existe pas encore. Configuration locale utilisée.");
                 }
             } catch (e) {
-                console.error("Erreur Firestore à la lecture :", e);
-                // Si l'erreur signale un problème de permissions strictes
+                console.error("Erreur Firestore :", e);
                 if (e.code === 'permission-denied') {
-                    showToast("Permission refusée sur Firestore (Vérifiez les règles pour tv_config).", "error");
+                    showToast("Permission refusée sur Firestore.", "error");
                 }
             }
             initAppUI();
@@ -526,33 +545,27 @@
             }
         };
 
-        window.playVideoInTV = function(index) {
+        /* POP-UP LECTEUR VIDÉO */
+        window.openVideoPlayerModal = function(index) {
             const vid = tvData.customVideos[index];
             if (!vid) return;
 
-            const mainFrame = document.getElementById('main-player-frame');
-            const twitchOfflineScreen = document.getElementById('twitch-offline-screen');
-            const youtubeOfflineScreen = document.getElementById('youtube-offline-screen');
-            const tiktokScreen = document.getElementById('tiktok-screen');
-            const customEmbedScreen = document.getElementById('custom-embed-screen');
-            const statusBadge = document.getElementById('live-status');
-            const statusText = document.getElementById('status-text');
+            const modal = document.getElementById('video-player-modal');
+            const frame = document.getElementById('popup-player-frame');
+            const title = document.getElementById('popup-video-title');
 
-            if (twitchOfflineScreen) twitchOfflineScreen.style.display = 'none';
-            if (youtubeOfflineScreen) youtubeOfflineScreen.style.display = 'none';
-            if (tiktokScreen) tiktokScreen.style.display = 'none';
-            if (customEmbedScreen) customEmbedScreen.style.display = 'none';
+            if (title) title.textContent = vid.title || 'Vidéo';
+            if (frame) frame.src = parseYouTubeEmbed(vid.url);
+            if (modal) modal.style.display = 'flex';
+        };
 
-            const embedUrl = parseYouTubeEmbed(vid.url);
-            if (mainFrame) {
-                mainFrame.style.display = 'block';
-                mainFrame.src = embedUrl;
-            }
-
-            if (statusBadge) statusBadge.className = "status-badge online";
-            if (statusText) statusText.textContent = "▶ LECTURE : " + vid.title;
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.closeVideoPlayerModal = function(e) {
+            if (e && e.target !== e.currentTarget) return;
+            const modal = document.getElementById('video-player-modal');
+            const frame = document.getElementById('popup-player-frame');
+            
+            if (frame) frame.src = ''; // Arrive le son/vidéo à la fermeture
+            if (modal) modal.style.display = 'none';
         };
 
         async function checkTwitchStatus() {
@@ -624,14 +637,14 @@
                             <button class="ctrl-btn edit" onclick="event.stopPropagation(); openEditVideoModal(${index})" title="Modifier">✏️</button>
                             <button class="ctrl-btn del" onclick="event.stopPropagation(); deleteVideoCard(${index})" title="Supprimer">🗑️</button>
                         </div>
-                        <div onclick="playVideoInTV(${index})">
+                        <div onclick="openVideoPlayerModal(${index})">
                             <div class="video-thumb" style="${bgStyle}">
                                 <div class="play-icon">▶</div>
                             </div>
                             <div class="video-info">
                                 <span class="video-tag">${vid.tag || 'VIDÉO'}</span>
                                 <div class="video-title">${vid.title || ''}</div>
-                                <span style="font-size: 0.75rem; color: #a855f7;">Lancer dans le lecteur ➔</span>
+                                <span style="font-size: 0.75rem; color: #a855f7;">Regarder la vidéo ➔</span>
                             </div>
                         </div>
                     `;

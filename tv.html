@@ -70,11 +70,12 @@
         .section-title { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; color: #ffffff; margin: 35px 0 20px 0; display: flex; align-items: center; justify-content: space-between; }
         .section-title::after { content: ''; flex-grow: 1; height: 1px; background: #222222; margin-left: 15px; }
 
-        .video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
         .video-card { background: #141414; border: 1px solid #222222; border-radius: 12px; overflow: hidden; transition: all 0.3s ease; color: white; display: flex; flex-direction: column; position: relative; cursor: pointer; }
         .video-card:hover { transform: translateY(-4px); border-color: #a855f7; box-shadow: 0 8px 25px rgba(168, 85, 247, 0.2); }
         .video-thumb { width: 100%; aspect-ratio: 16/9; background-size: cover; background-position: center; position: relative; display: flex; align-items: center; justify-content: center; }
-        .play-icon { width: 45px; height: 45px; background: rgba(168, 85, 247, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 1px solid rgba(255,255,255,0.5); box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
+        .play-icon { width: 45px; height: 45px; background: rgba(168, 85, 247, 0.85); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 1px solid rgba(255,255,255,0.5); box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); transition: transform 0.2s; }
+        .video-card:hover .play-icon { transform: scale(1.15); }
         
         .video-info { padding: 14px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
         .video-tag { font-family: 'Orbitron', sans-serif; font-size: 0.65rem; color: #a855f7; text-transform: uppercase; margin-bottom: 6px; display: block; }
@@ -162,14 +163,14 @@
             <p class="subtitle">Directs, retransmissions et vidéos officielles de la team</p>
             
             <div id="live-status" class="status-badge">
-                <span id="status-text">🔍 Vérification du direct...</span>
+                <span id="status-text">🔍 Chargement...</span>
             </div>
         </div>
 
         <!-- Onglets -->
         <div class="platform-tabs" id="tabs-container"></div>
 
-        <!-- Lecteur principal -->
+        <!-- Lecteur principal Live -->
         <div class="tv-wrapper">
             <div class="player-aspect-ratio">
                 
@@ -183,13 +184,13 @@
                 <div id="youtube-offline-screen" class="custom-screen" style="display: none;">
                     <span style="font-size: 2.2rem; margin-bottom: 10px;">🔴</span>
                     <h3>AUCUN LIVE YOUTUBE EN COURS</h3>
-                    <p>Sélectionnez une vidéo ci-dessous pour la regarder !</p>
+                    <p>Sélectionnez une vidéo ci-dessous pour la regarder dans la pop-up !</p>
                 </div>
 
                 <div id="tiktok-screen" class="custom-screen" style="display: none;">
                     <span style="font-size: 2.2rem; margin-bottom: 10px;">🎵</span>
                     <h3>TIKTOK LIVE @ABYSZ_O</h3>
-                    <p>Rejoignez-nous directement sur l'application TikTok pour vivre le direct sans coupure !</p>
+                    <p>Rejoignez-nous directement sur TikTok pour suivre le direct !</p>
                     <a id="tiktok-live-link" href="https://www.tiktok.com/@abysz_o/live" target="_blank" class="action-btn">🔴 Ouvrir TikTok Live ↗</a>
                 </div>
 
@@ -253,7 +254,7 @@
         </div>
     </div>
 
-    <!-- MODAL VIDÉO -->
+    <!-- MODAL AJOUT / EDIT VIDÉO -->
     <div id="video-modal" class="modal">
         <div class="modal-box">
             <h2 id="video-modal-title">✏️ Édition du Contenu</h2>
@@ -267,7 +268,7 @@
                 <input type="text" id="video-tag-input" placeholder="YOUTUBE, FORTNITE, BEST-OF...">
             </div>
             <div class="form-group">
-                <label>Lien de la vidéo (YouTube URL / Share / Embed)</label>
+                <label>Lien YouTube</label>
                 <input type="text" id="video-url-input" placeholder="https://www.youtube.com/watch?v=XXXXXX">
             </div>
             <div style="display: flex; gap: 10px; margin-top: 20px;">
@@ -346,12 +347,6 @@
             }, 4000);
         }
 
-        function parseYouTubeEmbed(url) {
-            if (!url) return '';
-            let videoId = extractYouTubeId(url);
-            return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1` : url;
-        }
-
         function extractYouTubeId(url) {
             if (!url) return null;
             let cleanUrl = url.split('?')[0].split('&')[0];
@@ -362,6 +357,12 @@
             if (cleanUrl.includes('youtu.be/')) return cleanUrl.split('youtu.be/')[1];
             if (cleanUrl.includes('embed/')) return cleanUrl.split('embed/')[1];
             return null;
+        }
+
+        function parseYouTubeEmbed(url) {
+            if (!url) return '';
+            let videoId = extractYouTubeId(url);
+            return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1` : url;
         }
 
         function verifyAdmin() {
@@ -378,11 +379,9 @@
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     tvData = { ...tvData, ...docSnap.data() };
-                } else {
-                    console.log("Le document tv_config/main n'existe pas encore. Configuration locale utilisée.");
                 }
             } catch (e) {
-                console.error("Erreur Firestore :", e);
+                console.error("Erreur lecture Firestore :", e);
                 if (e.code === 'permission-denied') {
                     showToast("Permission refusée sur Firestore.", "error");
                 }
@@ -392,19 +391,19 @@
 
         async function saveTVDataToFirestore() {
             if (!verifyAdmin()) {
-                showToast("Action refusée : Vous devez être connecté avec l'email Admin.", "error");
+                showToast("Action refusée : Compte Admin obligatoire.", "error");
                 return;
             }
             try {
                 await setDoc(doc(db, "tv_config", "main"), tvData);
-                showToast("Modifications enregistrées sur Firebase !", "success");
+                showToast("Vidéos et données enregistrées sur Firebase !", "success");
                 initAppUI();
             } catch (e) {
-                console.error("Erreur Firestore :", e);
+                console.error("Erreur sauvegarde Firestore :", e);
                 if (e.code === 'permission-denied') {
-                    showToast("Erreur Firebase : Permission refusée sur Firestore.", "error");
+                    showToast("Erreur Firebase : Bloqué par les règles Firestore.", "error");
                 } else {
-                    showToast(`Erreur de sauvegarde : ${e.message}`, "error");
+                    showToast(`Erreur : ${e.message}`, "error");
                 }
             }
         }
@@ -564,7 +563,7 @@
             const modal = document.getElementById('video-player-modal');
             const frame = document.getElementById('popup-player-frame');
             
-            if (frame) frame.src = ''; // Arrive le son/vidéo à la fermeture
+            if (frame) frame.src = ''; // Arrête le son/vidéo à la fermeture
             if (modal) modal.style.display = 'none';
         };
 

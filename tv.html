@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABYSZ TV — Stream & Élément Éditeur</title>
+    <title>ABYSZ TV — Stream & Vidéos</title>
     
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -62,7 +62,7 @@
         .action-btn { display: inline-flex; align-items: center; gap: 8px; background: #a855f7; color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; transition: all 0.3s ease; border: none; cursor: pointer; }
         .action-btn:hover { background: #9333ea; box-shadow: 0 0 20px rgba(168, 85, 247, 0.6); }
 
-        /* Configuration Stream Bar (Admin) */
+        /* Admin Bar */
         .stream-config-bar { display: none; background: #111; border: 1px solid #a855f7; padding: 10px 15px; border-radius: 8px; margin-top: 10px; justify-content: space-between; align-items: center; font-size: 0.85rem; }
         .admin-active .stream-config-bar { display: flex; }
 
@@ -71,10 +71,10 @@
         .section-title::after { content: ''; flex-grow: 1; height: 1px; background: #222222; margin-left: 15px; }
 
         .video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
-        .video-card { background: #141414; border: 1px solid #222222; border-radius: 12px; overflow: hidden; transition: all 0.3s ease; text-decoration: none; color: white; display: flex; flex-direction: column; position: relative; }
-        .video-card:hover { transform: translateY(-4px); border-color: #a855f7; box-shadow: 0 8px 25px rgba(0,0,0,0.5); }
+        .video-card { background: #141414; border: 1px solid #222222; border-radius: 12px; overflow: hidden; transition: all 0.3s ease; color: white; display: flex; flex-direction: column; position: relative; cursor: pointer; }
+        .video-card:hover { transform: translateY(-4px); border-color: #a855f7; box-shadow: 0 8px 25px rgba(168, 85, 247, 0.2); }
         .video-thumb { width: 100%; aspect-ratio: 16/9; background-size: cover; background-position: center; position: relative; display: flex; align-items: center; justify-content: center; }
-        .play-icon { width: 45px; height: 45px; background: rgba(0,0,0,0.7); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 1px solid rgba(255,255,255,0.3); }
+        .play-icon { width: 45px; height: 45px; background: rgba(168, 85, 247, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 1px solid rgba(255,255,255,0.5); box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
         
         .video-info { padding: 14px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
         .video-tag { font-family: 'Orbitron', sans-serif; font-size: 0.65rem; color: #a855f7; text-transform: uppercase; margin-bottom: 6px; display: block; }
@@ -142,8 +142,7 @@
                 <div id="youtube-offline-screen" class="custom-screen" style="display: none;">
                     <span style="font-size: 2.2rem; margin-bottom: 10px;">🔴</span>
                     <h3>AUCUN LIVE YOUTUBE EN COURS</h3>
-                    <p>Consultez la chaîne YouTube officielle pour suivre la publication de nos vidéos.</p>
-                    <a id="yt-channel-link" href="https://www.youtube.com/@Abysz_o" target="_blank" class="action-btn">Accéder à YouTube ↗</a>
+                    <p>Sélectionnez une vidéo ci-dessous pour la regarder directement ici !</p>
                 </div>
 
                 <div id="tiktok-screen" class="custom-screen" style="display: none;">
@@ -160,11 +159,11 @@
                     <a id="custom-tab-link" href="#" target="_blank" class="action-btn">Ouvrir la page ↗</a>
                 </div>
 
-                <iframe id="twitch-frame" src="" allowfullscreen></iframe>
+                <iframe id="main-player-frame" src="" allowfullscreen></iframe>
             </div>
         </div>
 
-        <!-- Admin Configuration Bar -->
+        <!-- Admin Bar -->
         <div class="stream-config-bar">
             <span>⚙️ <b>Paramètres Stream :</b> Chaîne Twitch active = <code id="current-twitch-display" style="color:#a855f7;">abysz_o</code></span>
             <button class="action-btn" style="padding: 5px 12px; font-size: 0.75rem;" onclick="openStreamConfigModal()">Modifier la chaîne Live</button>
@@ -173,7 +172,7 @@
         <!-- Section Vidéos -->
         <div id="team-videos" class="section-title">
             <span>🎬 Contenus & Liens de la Team</span>
-            <button class="action-btn" id="add-video-btn" style="display:none; font-size: 0.75rem; padding: 6px 14px;" onclick="openAddVideoModal()">➕ Ajouter un contenu</button>
+            <button class="action-btn" id="add-video-btn" style="display:none; font-size: 0.75rem; padding: 6px 14px;" onclick="openAddVideoModal()">➕ Ajouter une vidéo</button>
         </div>
         
         <div class="video-grid" id="video-grid-container"></div>
@@ -206,16 +205,16 @@
             <h2 id="video-modal-title">✏️ Édition du Contenu</h2>
             <input type="hidden" id="edit-video-index" value="-1">
             <div class="form-group">
-                <label>Titre de la carte</label>
-                <input type="text" id="video-title-input" placeholder="ex: Replay Fortnite Finales">
+                <label>Titre de la vidéo</label>
+                <input type="text" id="video-title-input" placeholder="ex: Highlights Fortnite Finales">
             </div>
             <div class="form-group">
-                <label>Tag / Plateforme</label>
-                <input type="text" id="video-tag-input" placeholder="YOUTUBE, TIKTOK, FORTNITE...">
+                <label>Tag / Catégorie</label>
+                <input type="text" id="video-tag-input" placeholder="YOUTUBE, FORTNITE, BEST-OF...">
             </div>
             <div class="form-group">
-                <label>Lien URL de la vidéo ou chaîne</label>
-                <input type="text" id="video-url-input" placeholder="https://...">
+                <label>Lien de la vidéo (YouTube URL / Share / Embed)</label>
+                <input type="text" id="video-url-input" placeholder="https://www.youtube.com/watch?v=XXXXXX">
             </div>
             <div style="display: flex; gap: 10px; margin-top: 20px;">
                 <button class="action-btn" style="flex:1;" onclick="saveVideoCard()">Enregistrer</button>
@@ -227,9 +226,9 @@
     <!-- MODAL STREAM -->
     <div id="stream-config-modal" class="modal">
         <div class="modal-box">
-            <h2>🎥 Modifier les Lecteurs Live</h2>
+            <h2>🎥 Modifier le Live Twitch</h2>
             <div class="form-group">
-                <label>Nom de chaîne Twitch (Username)</label>
+                <label>Nom d'utilisateur Twitch</label>
                 <input type="text" id="twitch-channel-input" placeholder="abysz_o">
             </div>
             <div style="display: flex; gap: 10px; margin-top: 20px;">
@@ -243,7 +242,7 @@
         <p>© 2026 Abysz Esports • Tous droits réservés</p>
     </footer>
 
-    <!-- Firebase Core & Script Logic -->
+    <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -268,16 +267,35 @@
             twitchChannel: "abysz_o",
             customTabs: [],
             customVideos: [
-                { tag: "YouTube", title: "Chaîne Officielle & Replays YouTube", url: "https://www.youtube.com/@Abysz_o" },
-                { tag: "TikTok", title: "Clips Rapides & Highlights TikTok", url: "https://www.tiktok.com/@abysz_o" },
-                { tag: "Twitch", title: "Rediffusions & VODs des Live Twitch", url: "https://www.twitch.tv/abysz_o/videos" }
+                { tag: "YouTube", title: "Trailer Officiel Team ABYSZ", url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" }
             ]
         };
+
+        function parseYouTubeEmbed(url) {
+            if (!url) return '';
+            let videoId = '';
+            if (url.includes('v=')) {
+                videoId = url.split('v=')[1].split('&')[0];
+            } else if (url.includes('youtu.be/')) {
+                videoId = url.split('youtu.be/')[1].split('?')[0];
+            } else if (url.includes('embed/')) {
+                videoId = url.split('embed/')[1].split('?')[0];
+            }
+            return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1` : url;
+        }
+
+        function extractYouTubeId(url) {
+            if (!url) return null;
+            if (url.includes('v=')) return url.split('v=')[1].split('&')[0];
+            if (url.includes('youtu.be/')) return url.split('youtu.be/')[1].split('?')[0];
+            if (url.includes('embed/')) return url.split('embed/')[1].split('?')[0];
+            return null;
+        }
 
         function verifyAdmin() {
             const user = auth.currentUser;
             if (!user || !user.email || user.email !== "abyszofficial@gmail.com") {
-                alert("Erreur de sauvegarde : Vous devez être connecté avec le compte administrateur (abyszofficial@gmail.com).");
+                alert("Erreur : Connexion requise avec abyszofficial@gmail.com");
                 return false;
             }
             return true;
@@ -291,21 +309,19 @@
                     tvData = { ...tvData, ...docSnap.data() };
                 }
             } catch (e) {
-                console.error("Erreur de chargement Firestore:", e);
+                console.error("Erreur Firestore:", e);
             }
             initAppUI();
         }
 
         async function saveTVDataToFirestore() {
             if (!verifyAdmin()) return;
-
             try {
                 await setDoc(doc(db, "tv_config", "main"), tvData);
-                alert("Modifications enregistrées avec succès !");
+                alert("Enregistré sur Firebase !");
                 initAppUI();
             } catch (e) {
-                console.error("Erreur d'écriture Firestore :", e);
-                alert("Erreur lors de l'enregistrement : " + e.message);
+                alert("Erreur de sauvegarde : " + e.message);
             }
         }
 
@@ -315,7 +331,7 @@
             const adminIndicator = document.getElementById('admin-indicator');
             const pageBody = document.getElementById('page-body');
 
-            if (user && user.email && user.email === "abyszofficial@gmail.com") {
+            if (user && user.email === "abyszofficial@gmail.com") {
                 if (authBtn) authBtn.textContent = `👤 Admin`;
                 if (pageBody) pageBody.classList.add('admin-active');
                 if (addVideoBtn) addVideoBtn.style.display = 'inline-block';
@@ -329,30 +345,21 @@
         });
 
         window.handleAuthClick = function() {
-            const user = auth.currentUser;
-            if (user) {
-                if (confirm("Se déconnecter ?")) {
-                    signOut(auth);
-                }
+            if (auth.currentUser) {
+                if (confirm("Se déconnecter ?")) signOut(auth);
             } else {
-                const modal = document.getElementById('auth-modal');
-                if (modal) modal.style.display = 'flex';
+                document.getElementById('auth-modal').style.display = 'flex';
             }
         };
 
         window.login = async function() {
-            const emailInput = document.getElementById('email-input');
-            const passInput = document.getElementById('password-input');
-            if (!emailInput || !passInput) return;
-
-            const email = emailInput.value.trim();
-            const pass = passInput.value;
+            const email = document.getElementById('email-input').value.trim();
+            const pass = document.getElementById('password-input').value;
             try {
                 await signInWithEmailAndPassword(auth, email, pass);
                 window.closeModal('auth-modal');
-                alert("Connexion admin réussie !");
             } catch (e) {
-                alert("Erreur de connexion : " + e.message);
+                alert("Erreur : " + e.message);
             }
         };
 
@@ -370,9 +377,10 @@
         }
 
         function reloadTwitchPlayer() {
-            const twitchFrame = document.getElementById('twitch-frame');
-            if (twitchFrame) {
-                twitchFrame.src = `https://player.twitch.tv/?channel=${tvData.twitchChannel}&parent=${domain}&autoplay=false`;
+            const mainFrame = document.getElementById('main-player-frame');
+            if (mainFrame) {
+                mainFrame.style.display = 'block';
+                mainFrame.src = `https://player.twitch.tv/?channel=${tvData.twitchChannel}&parent=${domain}&autoplay=false`;
             }
             checkTwitchStatus();
         }
@@ -418,7 +426,7 @@
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             if (element) element.classList.add('active');
 
-            const twitchFrame = document.getElementById('twitch-frame');
+            const mainFrame = document.getElementById('main-player-frame');
             const twitchOfflineScreen = document.getElementById('twitch-offline-screen');
             const youtubeOfflineScreen = document.getElementById('youtube-offline-screen');
             const tiktokScreen = document.getElementById('tiktok-screen');
@@ -426,39 +434,66 @@
             const statusBadge = document.getElementById('live-status');
             const statusText = document.getElementById('status-text');
 
-            if (twitchFrame) twitchFrame.style.display = 'none';
+            if (mainFrame) mainFrame.style.display = 'none';
             if (twitchOfflineScreen) twitchOfflineScreen.style.display = 'none';
             if (youtubeOfflineScreen) youtubeOfflineScreen.style.display = 'none';
             if (tiktokScreen) tiktokScreen.style.display = 'none';
             if (customEmbedScreen) customEmbedScreen.style.display = 'none';
 
             if (type === 'twitch') {
-                checkTwitchStatus();
+                reloadTwitchPlayer();
             } else if (type === 'youtube') {
                 if (youtubeOfflineScreen) youtubeOfflineScreen.style.display = 'flex';
                 if (statusBadge) statusBadge.className = "status-badge";
-                if (statusText) statusText.textContent = "🔴 Mode YouTube activé";
+                if (statusText) statusText.textContent = "🔴 Mode YouTube";
             } else if (type === 'tiktok') {
                 if (tiktokScreen) tiktokScreen.style.display = 'flex';
                 if (statusBadge) statusBadge.className = "status-badge";
-                if (statusText) statusText.textContent = "🎵 Mode TikTok activé";
+                if (statusText) statusText.textContent = "🎵 Mode TikTok";
             } else if (type === 'custom' && tvData.customTabs && tvData.customTabs[customIndex]) {
                 const tab = tvData.customTabs[customIndex];
                 if (customEmbedScreen) customEmbedScreen.style.display = 'flex';
-                const customTitle = document.getElementById('custom-tab-title');
-                const customLink = document.getElementById('custom-tab-link');
-                if (customTitle) customTitle.textContent = tab.name;
-                if (customLink) customLink.href = tab.url;
+                document.getElementById('custom-tab-title').textContent = tab.name;
+                document.getElementById('custom-tab-link').href = tab.url;
                 if (statusBadge) statusBadge.className = "status-badge";
                 if (statusText) statusText.textContent = "⚡ " + tab.name;
             }
+        };
+
+        window.playVideoInTV = function(index) {
+            const vid = tvData.customVideos[index];
+            if (!vid) return;
+
+            const mainFrame = document.getElementById('main-player-frame');
+            const twitchOfflineScreen = document.getElementById('twitch-offline-screen');
+            const youtubeOfflineScreen = document.getElementById('youtube-offline-screen');
+            const tiktokScreen = document.getElementById('tiktok-screen');
+            const customEmbedScreen = document.getElementById('custom-embed-screen');
+            const statusBadge = document.getElementById('live-status');
+            const statusText = document.getElementById('status-text');
+
+            if (twitchOfflineScreen) twitchOfflineScreen.style.display = 'none';
+            if (youtubeOfflineScreen) youtubeOfflineScreen.style.display = 'none';
+            if (tiktokScreen) tiktokScreen.style.display = 'none';
+            if (customEmbedScreen) customEmbedScreen.style.display = 'none';
+
+            const embedUrl = parseYouTubeEmbed(vid.url);
+            if (mainFrame) {
+                mainFrame.style.display = 'block';
+                mainFrame.src = embedUrl;
+            }
+
+            if (statusBadge) statusBadge.className = "status-badge online";
+            if (statusText) statusText.textContent = "▶ LECTURE : " + vid.title;
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
         async function checkTwitchStatus() {
             const statusBadge = document.getElementById('live-status');
             const statusText = document.getElementById('status-text');
             const twitchOfflineScreen = document.getElementById('twitch-offline-screen');
-            const twitchFrame = document.getElementById('twitch-frame');
+            const mainFrame = document.getElementById('main-player-frame');
 
             try {
                 const res = await fetch(`https://decapi.me/twitch/uptime/${tvData.twitchChannel}`);
@@ -468,24 +503,24 @@
                     if (statusBadge) statusBadge.className = "status-badge";
                     if (statusText) statusText.textContent = "● TWITCH HORS LIGNE";
                     if (twitchOfflineScreen) twitchOfflineScreen.style.display = "flex";
+                    if (mainFrame) mainFrame.style.display = "none";
                 } else {
                     if (statusBadge) {
                         statusBadge.className = "status-badge online";
-                        statusBadge.innerHTML = `<span class="pulse-dot"></span> EN DIRECT SUR TWITCH (${uptime})`;
+                        statusBadge.innerHTML = `<span class="pulse-dot"></span> EN DIRECT (${uptime})`;
                     }
                     if (twitchOfflineScreen) twitchOfflineScreen.style.display = "none";
-                    if (twitchFrame) twitchFrame.style.display = "block";
+                    if (mainFrame) mainFrame.style.display = "block";
                 }
             } catch (err) {
                 if (statusText) statusText.textContent = `● CHAÎNE @${tvData.twitchChannel.toUpperCase()}`;
-                if (twitchOfflineScreen) twitchOfflineScreen.style.display = "flex";
             }
         }
 
         window.createCustomTab = async function() {
             if (!verifyAdmin()) return;
             const name = prompt("Nom de l'onglet :");
-            const url = prompt("Lien de redirection URL :");
+            const url = prompt("Lien URL :");
             if (name && url) {
                 if (!tvData.customTabs) tvData.customTabs = [];
                 tvData.customTabs.push({ name: name.trim(), url: url.trim() });
@@ -496,10 +531,8 @@
         window.deleteCustomTab = async function(index) {
             if (!verifyAdmin()) return;
             if (confirm("Supprimer cet onglet ?")) {
-                if (tvData.customTabs && tvData.customTabs[index]) {
-                    tvData.customTabs.splice(index, 1);
-                    await saveTVDataToFirestore();
-                }
+                tvData.customTabs.splice(index, 1);
+                await saveTVDataToFirestore();
             }
         };
 
@@ -510,23 +543,28 @@
 
             if (tvData.customVideos && Array.isArray(tvData.customVideos)) {
                 tvData.customVideos.forEach((vid, index) => {
+                    const ytId = extractYouTubeId(vid.url);
+                    const bgStyle = ytId 
+                        ? `background-image: url('https://img.youtube.com/vi/${ytId}/hqdefault.jpg');` 
+                        : `background: radial-gradient(circle, #1f1f2e 0%, #101018 100%);`;
+
                     const card = document.createElement('div');
                     card.className = 'video-card';
                     card.innerHTML = `
                         <div class="card-admin-controls">
-                            <button class="ctrl-btn edit" onclick="openEditVideoModal(${index})" title="Modifier">✏️</button>
-                            <button class="ctrl-btn del" onclick="deleteVideoCard(${index})" title="Supprimer">🗑️</button>
+                            <button class="ctrl-btn edit" onclick="event.stopPropagation(); openEditVideoModal(${index})" title="Modifier">✏️</button>
+                            <button class="ctrl-btn del" onclick="event.stopPropagation(); deleteVideoCard(${index})" title="Supprimer">🗑️</button>
                         </div>
-                        <a href="${vid.url || '#'}" target="_blank" style="text-decoration:none; color:white; display:flex; flex-direction:column; flex-grow:1;">
-                            <div class="video-thumb" style="background: radial-gradient(circle, #1f1f2e 0%, #101018 100%);">
+                        <div onclick="playVideoInTV(${index})">
+                            <div class="video-thumb" style="${bgStyle}">
                                 <div class="play-icon">▶</div>
                             </div>
                             <div class="video-info">
-                                <span class="video-tag">${vid.tag || 'OFFICIEL'}</span>
+                                <span class="video-tag">${vid.tag || 'VIDÉO'}</span>
                                 <div class="video-title">${vid.title || ''}</div>
-                                <span style="font-size: 0.75rem; color: #a855f7;">Voir la page ↗</span>
+                                <span style="font-size: 0.75rem; color: #a855f7;">Lancer dans le lecteur ➔</span>
                             </div>
-                        </a>
+                        </div>
                     `;
                     grid.appendChild(card);
                 });
@@ -535,19 +573,12 @@
 
         window.openAddVideoModal = function() {
             if (!verifyAdmin()) return;
-            const editIndex = document.getElementById('edit-video-index');
-            const modalTitle = document.getElementById('video-modal-title');
-            const titleInput = document.getElementById('video-title-input');
-            const tagInput = document.getElementById('video-tag-input');
-            const urlInput = document.getElementById('video-url-input');
-            const modal = document.getElementById('video-modal');
-
-            if (editIndex) editIndex.value = "-1";
-            if (modalTitle) modalTitle.textContent = "➕ Ajouter une carte";
-            if (titleInput) titleInput.value = "";
-            if (tagInput) tagInput.value = "";
-            if (urlInput) urlInput.value = "";
-            if (modal) modal.style.display = 'flex';
+            document.getElementById('edit-video-index').value = "-1";
+            document.getElementById('video-modal-title').textContent = "➕ Ajouter une vidéo";
+            document.getElementById('video-title-input').value = "";
+            document.getElementById('video-tag-input').value = "";
+            document.getElementById('video-url-input').value = "";
+            document.getElementById('video-modal').style.display = 'flex';
         };
 
         window.openEditVideoModal = function(index) {
@@ -555,37 +586,23 @@
             const vid = tvData.customVideos[index];
             if (!vid) return;
 
-            const editIndex = document.getElementById('edit-video-index');
-            const modalTitle = document.getElementById('video-modal-title');
-            const titleInput = document.getElementById('video-title-input');
-            const tagInput = document.getElementById('video-tag-input');
-            const urlInput = document.getElementById('video-url-input');
-            const modal = document.getElementById('video-modal');
-
-            if (editIndex) editIndex.value = index;
-            if (modalTitle) modalTitle.textContent = "✏️ Modifier le contenu";
-            if (titleInput) titleInput.value = vid.title || '';
-            if (tagInput) tagInput.value = vid.tag || '';
-            if (urlInput) urlInput.value = vid.url || '';
-            if (modal) modal.style.display = 'flex';
+            document.getElementById('edit-video-index').value = index;
+            document.getElementById('video-modal-title').textContent = "✏️ Modifier la vidéo";
+            document.getElementById('video-title-input').value = vid.title || '';
+            document.getElementById('video-tag-input').value = vid.tag || '';
+            document.getElementById('video-url-input').value = vid.url || '';
+            document.getElementById('video-modal').style.display = 'flex';
         };
 
         window.saveVideoCard = async function() {
             if (!verifyAdmin()) return;
-            const editIndex = document.getElementById('edit-video-index');
-            const titleInput = document.getElementById('video-title-input');
-            const tagInput = document.getElementById('video-tag-input');
-            const urlInput = document.getElementById('video-url-input');
-
-            if (!editIndex || !titleInput || !urlInput) return;
-
-            const index = parseInt(editIndex.value);
-            const title = titleInput.value.trim();
-            const tag = tagInput ? tagInput.value.trim() : '';
-            const url = urlInput.value.trim();
+            const index = parseInt(document.getElementById('edit-video-index').value);
+            const title = document.getElementById('video-title-input').value.trim();
+            const tag = document.getElementById('video-tag-input').value.trim();
+            const url = document.getElementById('video-url-input').value.trim();
 
             if (!title || !url) {
-                alert("Veuillez remplir au moins le titre et le lien.");
+                alert("Indique au moins le titre et le lien de la vidéo !");
                 return;
             }
 
@@ -603,27 +620,21 @@
 
         window.deleteVideoCard = async function(index) {
             if (!verifyAdmin()) return;
-            if (confirm("Supprimer cette carte ?")) {
-                if (tvData.customVideos && tvData.customVideos[index]) {
-                    tvData.customVideos.splice(index, 1);
-                    await saveTVDataToFirestore();
-                }
+            if (confirm("Supprimer cette vidéo ?")) {
+                tvData.customVideos.splice(index, 1);
+                await saveTVDataToFirestore();
             }
         };
 
         window.openStreamConfigModal = function() {
             if (!verifyAdmin()) return;
-            const chInput = document.getElementById('twitch-channel-input');
-            const modal = document.getElementById('stream-config-modal');
-            if (chInput) chInput.value = tvData.twitchChannel;
-            if (modal) modal.style.display = 'flex';
+            document.getElementById('twitch-channel-input').value = tvData.twitchChannel;
+            document.getElementById('stream-config-modal').style.display = 'flex';
         };
 
         window.saveStreamConfig = async function() {
             if (!verifyAdmin()) return;
-            const chInput = document.getElementById('twitch-channel-input');
-            if (!chInput) return;
-            const ch = chInput.value.trim();
+            const ch = document.getElementById('twitch-channel-input').value.trim();
             if (ch) {
                 tvData.twitchChannel = ch;
                 await saveTVDataToFirestore();
@@ -636,7 +647,6 @@
             if (el) el.scrollIntoView({ behavior: 'smooth' });
         };
 
-        // Démarrage
         loadTVData();
     </script>
 </body>

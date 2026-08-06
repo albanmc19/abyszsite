@@ -4,21 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Abysz Esports</title>
-    
+    <meta name="description" content="Découvrez Abysz Esports : actualités, rosters, compétitions de jeux vidéo, boutique officielle et communauté Discord. Rejoignez la légende !">
+    <meta name="keywords" content="esports, gaming, abysz, compétition gaming, roster esports, tournois">
+
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1494144032841410"
-     crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1494144032841410" crossorigin="anonymous"></script>
    
     <style>
         html { scroll-behavior: smooth; scrollbar-gutter: stable; }
         body { background-color: #0a0a0a; color: #ffffff; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
         .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); will-change: transform, opacity; }
         .reveal-visible { opacity: 1; transform: translateY(0); }
+
+        /* Conteneur pub AdSense */
+        .adsense-container {
+            max-width: 1000px;
+            margin: 30px auto;
+            text-align: center;
+            padding: 10px;
+        }
     </style>
 
     <script type="module">
@@ -163,6 +171,10 @@
         .btn { transition: transform 0.2s ease, box-shadow 0.3s ease; display: inline-block; text-decoration: none; background: #a855f7; color: white; padding: 12px 28px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-weight: bold; }
         .btn:hover { transform: translateY(-3px); box-shadow: 0 0 20px rgba(168, 85, 247, 0.6); background: #b975ff; }
         
+        /* Section À propos (pour AdSense SEO) */
+        .about-section { max-width: 1000px; margin: 0 auto; padding: 40px 20px 10px 20px; line-height: 1.7; color: #ccc; }
+        .about-section h2 { font-family: 'Orbitron', sans-serif; color: #fff; font-size: 1.8rem; margin-bottom: 15px; }
+
         .section-header { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 25px; }
         .title-area { display: flex; align-items: center; gap: 12px; }
         .title-area h2 { font-family: 'Orbitron', sans-serif; font-size: 1.6rem; margin: 0; letter-spacing: 0.5px; }
@@ -384,7 +396,10 @@
         .loading-text { color: #666; font-style: italic; text-align: center; padding: 40px 0; width: 100%; grid-column: 1 / -1; }
         .nav-dashboard-link a { color: #22c55e !important; font-weight: bold; text-decoration: none; }
         
-        footer { padding: 30px; text-align: center; border-top: 1px solid #1a1a1a; color: #666; font-size: 0.9rem; }
+        footer { padding: 35px 20px; text-align: center; border-top: 1px solid #1a1a1a; color: #888; font-size: 0.85rem; }
+        footer .footer-links { margin-bottom: 12px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        footer .footer-links a { color: #aaa; text-decoration: none; transition: color 0.2s; }
+        footer .footer-links a:hover { color: #a855f7; }
 
         @media (max-width: 768px) {
             .carousel-wrapper { padding: 0 45px; }
@@ -459,6 +474,25 @@
         <a href="roster.html" class="btn">Découvrir le roster</a>
     </section>
 
+    <section class="about-section reveal">
+        <h2>À Propos d'Abysz Esports</h2>
+        <p>
+            Bienvenue sur la plateforme officielle d'<strong>Abysz Esports</strong>. Structure esport passionnée et ambitieuse, nous réunissons des joueurs de haut niveau, une équipe encadrante dédiée et une communauté passionnée de gaming. Suivez nos matchs en direct, découvrez nos rosters officiels et rejoignez l'aventure compétitive dès aujourd'hui.
+        </p>
+    </section>
+
+    <div class="adsense-container">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-1494144032841410"
+             data-ad-slot="AUTO"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div>
+
     <section id="annonces" class="announcements-container reveal">
         <div class="section-header">
             <div class="title-area">
@@ -507,6 +541,11 @@
     </section>
  
     <footer>
+        <div class="footer-links">
+            <a href="mentions-legales.html">Mentions Légales</a> • 
+            <a href="politique-confidentialite.html">Politique de Confidentialité</a> • 
+            <a href="cookies.html">Cookies</a>
+        </div>
         <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
     </footer>
  

@@ -55,7 +55,7 @@
             return path.split('/').pop();
         }
 
-        // Écoute en temps réel de la collection Firebase
+        // Écoute en temps réel de la collection Firebase Maintenance
         onSnapshot(doc(db, "system", "maintenance"), (snap) => {
             if (snap.exists()) {
                 const data = snap.data();
@@ -171,9 +171,12 @@
         .btn { transition: transform 0.2s ease, box-shadow 0.3s ease; display: inline-block; text-decoration: none; background: #a855f7; color: white; padding: 12px 28px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-weight: bold; }
         .btn:hover { transform: translateY(-3px); box-shadow: 0 0 20px rgba(168, 85, 247, 0.6); background: #b975ff; }
         
-        /* Section À propos (pour AdSense SEO) */
+        /* Section À propos */
         .about-section { max-width: 1000px; margin: 0 auto; padding: 40px 20px 10px 20px; line-height: 1.7; color: #ccc; }
         .about-section h2 { font-family: 'Orbitron', sans-serif; color: #fff; font-size: 1.8rem; margin-bottom: 15px; }
+
+        .edit-home-btn { background: #3b82f6; border: none; color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-family: 'Orbitron', sans-serif; font-weight: bold; cursor: pointer; transition: all 0.2s ease; margin-left: 10px; }
+        .edit-home-btn:hover { background: #2563eb; transform: scale(1.05); }
 
         .section-header { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 25px; }
         .title-area { display: flex; align-items: center; gap: 12px; }
@@ -469,14 +472,17 @@
     </nav>
 
     <section id="accueil" class="hero" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url('./baniere.png');">
-        <h1>ABYSZ</h1>
-        <p class="slogan">The beginning of every legend</p>
+        <h1 id="hero-title">ABYSZ</h1>
+        <p class="slogan" id="hero-slogan">The beginning of every legend</p>
         <a href="roster.html" class="btn">Découvrir le roster</a>
     </section>
 
     <section class="about-section reveal">
-        <h2>À Propos d'Abysz Esports</h2>
-        <p>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <h2 id="about-title">À Propos d'Abysz Esports</h2>
+            <button class="edit-home-btn hidden" id="quick-edit-home-btn" title="Modifier les textes">✏️ Modifier les textes</button>
+        </div>
+        <p id="about-text">
             Bienvenue sur la plateforme officielle d'<strong>Abysz Esports</strong>. Structure esport passionnée et ambitieuse, nous réunissons des joueurs de haut niveau, une équipe encadrante dédiée et une communauté passionnée de gaming. Suivez nos matchs en direct, découvrez nos rosters officiels et rejoignez l'aventure compétitive dès aujourd'hui.
         </p>
     </section>
@@ -573,6 +579,29 @@
                 <div class="admin-header-actions">
                     <span id="user-display-email" style="color:#a855f7; font-weight:600; font-size: 0.85rem; font-family: 'Inter', sans-serif;"></span>
                     <button id="logout-btn" style="background:none; border:none; color:#ff4444; cursor:pointer; font-weight: 600; font-family: 'Orbitron', sans-serif; font-size:0.85rem;">Déconnexion</button>
+                </div>
+
+                <div id="form-hometexts-wrapper" class="hidden">
+                    <h3>Modifier les Textes de l'Accueil</h3>
+                    <form id="hometexts-form">
+                        <div class="input-group">
+                            <label for="home-hero-title">Titre Principal (Hero)</label>
+                            <input type="text" id="home-hero-title" placeholder="Ex: ABYSZ" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="home-hero-slogan">Slogan (Hero)</label>
+                            <input type="text" id="home-hero-slogan" placeholder="Ex: The beginning of every legend" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="home-about-title">Titre section "À Propos"</label>
+                            <input type="text" id="home-about-title" placeholder="Ex: À Propos d'Abysz Esports" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="home-about-text">Texte section "À Propos"</label>
+                            <textarea id="home-about-text" rows="5" placeholder="Description de la structure..." required></textarea>
+                        </div>
+                        <button type="submit" class="form-btn" id="publish-hometexts-btn">Enregistrer les textes</button>
+                    </form>
                 </div>
 
                 <div id="form-annonce-wrapper">
@@ -712,7 +741,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         import { getDatabase, ref, onValue, onDisconnect, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
         const firebaseConfig = {
@@ -729,6 +758,17 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         const rtdb = getDatabase(app);
+
+        // --- ÉCOUTE EN TEMPS RÉEL DES TEXTES DE LA PAGE D'ACCUEIL ---
+        onSnapshot(doc(db, "site_content", "home"), (snap) => {
+            if (snap.exists()) {
+                const data = snap.data();
+                if (data.heroTitle) document.getElementById("hero-title").textContent = data.heroTitle;
+                if (data.heroSlogan) document.getElementById("hero-slogan").textContent = data.heroSlogan;
+                if (data.aboutTitle) document.getElementById("about-title").textContent = data.aboutTitle;
+                if (data.aboutText) document.getElementById("about-text").innerHTML = data.aboutText;
+            }
+        });
 
         // --- GESTION DES VISITEURS EN TEMPS RÉEL ---
         const connectedRef = ref(rtdb, ".info/connected");
@@ -768,12 +808,15 @@
         const adminGateBtn = document.getElementById('admin-gate-btn');
         const quickAddBtn = document.getElementById('quick-add-btn');
         const quickAddPartnerBtn = document.getElementById('quick-add-partner-btn');
+        const quickEditHomeBtn = document.getElementById('quick-edit-home-btn');
         const closeModalBtn = document.getElementById('close-modal-btn');
         const loginForm = document.getElementById('login-form');
         const announcementForm = document.getElementById('announcement-form');
         const partnerForm = document.getElementById('partner-form');
+        const hometextsForm = document.getElementById('hometexts-form');
         const formAnnonceWrapper = document.getElementById('form-annonce-wrapper');
         const formPartnerWrapper = document.getElementById('form-partner-wrapper');
+        const formHomeTextsWrapper = document.getElementById('form-hometexts-wrapper');
         const loginStep = document.getElementById('admin-login-step');
         const panelStep = document.getElementById('admin-panel-step');
         const loginError = document.getElementById('login-error');
@@ -894,6 +937,7 @@
                 if (isUserAdmin) {
                     if (quickAddBtn) quickAddBtn.classList.remove('hidden');
                     if (quickAddPartnerBtn) quickAddPartnerBtn.classList.remove('hidden');
+                    if (quickEditHomeBtn) quickEditHomeBtn.classList.remove('hidden');
                     if (navDashboard) navDashboard.classList.remove('hidden');
                 }
 
@@ -907,6 +951,7 @@
                 
                 if (quickAddBtn) quickAddBtn.classList.add('hidden');
                 if (quickAddPartnerBtn) quickAddPartnerBtn.classList.add('hidden');
+                if (quickEditHomeBtn) quickEditHomeBtn.classList.add('hidden');
                 if (navEspaceJoueur) navEspaceJoueur.classList.add('hidden');
                 if (navDashboard) navDashboard.classList.add('hidden');
 
@@ -945,6 +990,7 @@
             } else {
                 formAnnonceWrapper.classList.remove('hidden');
                 formPartnerWrapper.classList.add('hidden');
+                formHomeTextsWrapper.classList.add('hidden');
                 modal.classList.add('active');
             }
         };
@@ -956,6 +1002,7 @@
                 document.getElementById("panel-form-title").textContent = "Publier une annonce";
                 formAnnonceWrapper.classList.remove('hidden');
                 formPartnerWrapper.classList.add('hidden');
+                formHomeTextsWrapper.classList.add('hidden');
                 modal.classList.add('active');
             };
         }
@@ -969,12 +1016,49 @@
                 document.getElementById("partner-form-title").textContent = "Ajouter un Partenaire";
                 formAnnonceWrapper.classList.add('hidden');
                 formPartnerWrapper.classList.remove('hidden');
+                formHomeTextsWrapper.classList.add('hidden');
+                modal.classList.add('active');
+            };
+        }
+
+        if (quickEditHomeBtn) {
+            quickEditHomeBtn.onclick = () => {
+                document.getElementById("home-hero-title").value = document.getElementById("hero-title").textContent.trim();
+                document.getElementById("home-hero-slogan").value = document.getElementById("hero-slogan").textContent.trim();
+                document.getElementById("home-about-title").value = document.getElementById("about-title").textContent.trim();
+                document.getElementById("home-about-text").value = document.getElementById("about-text").innerHTML.trim();
+
+                formAnnonceWrapper.classList.add('hidden');
+                formPartnerWrapper.classList.add('hidden');
+                formHomeTextsWrapper.classList.remove('hidden');
                 modal.classList.add('active');
             };
         }
 
         closeModalBtn.onclick = () => modal.classList.remove('active');
         window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
+
+        // SOUMISSION DE LA MODIFICATION DES TEXTES DE L'ACCUEIL
+        hometextsForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!isUserAdmin) return alert("Droits insuffisants.");
+
+            const payload = {
+                heroTitle: document.getElementById("home-hero-title").value,
+                heroSlogan: document.getElementById("home-hero-slogan").value,
+                aboutTitle: document.getElementById("home-about-title").value,
+                aboutText: document.getElementById("home-about-text").value,
+                updatedAt: Date.now()
+            };
+
+            try {
+                await setDoc(doc(db, "site_content", "home"), payload, { merge: true });
+                modal.classList.remove('active');
+                alert("Textes de la page d'accueil mis à jour !");
+            } catch (err) {
+                alert("Erreur lors de l'enregistrement : " + err.message);
+            }
+        });
 
         announcementForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1196,6 +1280,7 @@
                         document.getElementById("panel-form-title").textContent = "Éditer l'annonce";
                         formAnnonceWrapper.classList.remove('hidden');
                         formPartnerWrapper.classList.add('hidden');
+                        formHomeTextsWrapper.classList.add('hidden');
                         modal.classList.add('active');
                     };
                 });
@@ -1285,6 +1370,7 @@
                         document.getElementById("partner-form-title").textContent = "Éditer le Partenaire";
                         formAnnonceWrapper.classList.add('hidden');
                         formPartnerWrapper.classList.remove('hidden');
+                        formHomeTextsWrapper.classList.add('hidden');
                         modal.classList.add('active');
                     };
                 });

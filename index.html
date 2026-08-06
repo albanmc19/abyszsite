@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Abysz Esports</title>
-    <meta name="description" content="Découvrez Abysz Esports : actualités, rosters, compétitions de jeux vidéo, boutique officielle et communauté Discord. Rejoignez la légende !">
-    <meta name="keywords" content="esports, gaming, abysz, compétition gaming, roster esports, tournois">
+    <meta name="description" content="Decouvrez Abysz Esports : actualites, rosters, competitions de jeux video, boutique officielle et communaute Discord. Rejoignez la legende !">
+    <meta name="keywords" content="esports, gaming, abysz, competition gaming, roster esports, tournois">
 
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -46,7 +46,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Extraction précise du nom de fichier sous GitHub Pages
         function getCurrentFileName() {
             let path = window.location.pathname.toLowerCase();
             if (path.endsWith('/') || path.endsWith('/abyszsite')) {
@@ -55,7 +54,6 @@
             return path.split('/').pop();
         }
 
-        // Écoute en temps réel de la collection Firebase
         onSnapshot(doc(db, "system", "maintenance"), (snap) => {
             if (snap.exists()) {
                 const data = snap.data();
@@ -67,7 +65,7 @@
                         <head>
                             <meta charset="UTF-8">
                             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                            <title>🚧 Site en Maintenance — ABYSZ</title>
+                            <title>Site en Maintenance - ABYSZ</title>
                             <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
                             <style>
                                 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -108,8 +106,8 @@
                         </head>
                         <body>
                             <div class="maint-card">
-                                <h1>🚧 SITE EN MAINTENANCE</h1>
-                                <p>${data.message || 'Le site est actuellement sous mise à jour. Nous revenons très vite !'}</p>
+                                <h1>SITE EN MAINTENANCE</h1>
+                                <p>${data.message || 'Le site est actuellement sous mise a jour. Nous revenons tres vite !'}</p>
                             </div>
                         </body>
                     `;
@@ -171,7 +169,6 @@
         .btn { transition: transform 0.2s ease, box-shadow 0.3s ease; display: inline-block; text-decoration: none; background: #a855f7; color: white; padding: 12px 28px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-weight: bold; }
         .btn:hover { transform: translateY(-3px); box-shadow: 0 0 20px rgba(168, 85, 247, 0.6); background: #b975ff; }
         
-        /* Section À propos (pour AdSense SEO) */
         .about-section { max-width: 1000px; margin: 0 auto; padding: 40px 20px 10px 20px; line-height: 1.7; color: #ccc; }
         .about-section h2 { font-family: 'Orbitron', sans-serif; color: #fff; font-size: 1.8rem; margin-bottom: 15px; }
 
@@ -450,7 +447,7 @@
         </button>
         <ul id="nav-links-list">
             <li><a href="index.html">Accueil</a></li>
-            <li><a href="tv.html" style="color: #a855f7; font-weight: bold;">📺 ABYSZ TV</a></li>
+            <li><a href="tv.html" style="color: #a855f7; font-weight: bold;">ABYSZ TV</a></li>
             <li><a href="roster.html">Roster</a></li>
             <li><a href="staffabysz.html">Staff</a></li>
             <li><a href="boutique.html">Boutique</a></li>
@@ -462,20 +459,20 @@
                 </div>
             </li>
             <li id="nav-espace-joueur" class="hidden"><a href="espace-joueur.html" style="color: #a855f7; font-weight: bold;">Mon Espace</a></li>
-            <li id="nav-dashboard" class="nav-dashboard-link hidden"><a href="dashboard.html">📊 Dashboard</a></li>
+            <li id="nav-dashboard" class="nav-dashboard-link hidden"><a href="dashboard.html">Dashboard</a></li>
         </ul>
     </nav>
 
     <section id="accueil" class="hero" style="background: linear-gradient(180deg, rgba(10,10,10,0.85) 0%, rgba(10,10,10,1) 100%), url('banner.jpg') no-repeat center center/cover;">
         <h1>BIENVENUE CHEZ ABYSZ</h1>
-        <p class="slogan">Compétition, Passion et Communauté Esport.</p>
+        <p class="slogan">Competition, Passion et Communaute Esport.</p>
         <a href="#rejoindre-commu" class="btn">REJOINDRE L'AVENTURE</a>
     </section>
 
     <section class="about-section reveal">
-        <h2>À Propos d'Abysz Esports</h2>
+        <h2>A Propos d'Abysz Esports</h2>
         <p>
-            <strong>Abysz Esports</strong> est une structure engagée dans le développement du jeu vidéo compétitif et de sa communauté. Nous regroupons des équipes performantes sur différents titres majeurs, tout en animant un espace d'échange ouvert à tous les passionnés d'esport. Suivez nos actualités, découvrez nos rosters officiels et rejoignez notre serveur Discord pour participer à nos événements !
+            <strong>Abysz Esports</strong> est une structure engagee dans le developpement du jeu video competitif et de sa communaute. Nous regroupons des equipes performantes sur differents titres majeurs, tout en animant un espace d'echange ouvert a tous les passionnes d'esport. Suivez nos actualites, decouvrez nos rosters officiels et rejoignez notre serveur Discord pour participer a nos evenements !
         </p>
     </section>
 
@@ -492,20 +489,20 @@
     <section class="announcements-container reveal">
         <div class="section-header">
             <div class="title-area">
-                <h2>DERNIÈRES ANNONCES</h2>
+                <h2>DERNIERES ANNONCES</h2>
                 <button class="add-btn hidden" id="open-annonce-modal-btn" title="Ajouter une annonce">+</button>
             </div>
-            <button class="admin-gate-btn" id="admin-gate-btn">🔒 Admin Mode</button>
+            <button class="admin-gate-btn" id="admin-gate-btn">Admin Mode</button>
         </div>
 
         <div class="carousel-wrapper">
-            <button class="carousel-btn prev" id="carousel-prev-btn">‹</button>
+            <button class="carousel-btn prev" id="carousel-prev-btn">&lsaquo;</button>
             <div class="carousel-track-container">
                 <div class="carousel-track" id="announcements-track">
                     <div class="loading-text">Chargement des annonces...</div>
                 </div>
             </div>
-            <button class="carousel-btn next" id="carousel-next-btn">›</button>
+            <button class="carousel-btn next" id="carousel-next-btn">&rsaquo;</button>
         </div>
         <div class="carousel-dots" id="carousel-dots"></div>
     </section>
@@ -548,11 +545,13 @@
 
     <footer>
         <div class="footer-links">
-            <a href="mentions-legales.html">Mentions Légales</a>
-            <span>•</span>
-            <a href="politique-confidentialite.html">Politique de Confidentialité</a>
+            <a href="mentions-legales.html">Mentions Legales</a>
+            <span>&bull;</span>
+            <a href="politique-confidentialite.html">Politique de Confidentialite</a>
+            <span>&bull;</span>
+            <a href="cookies.html">Gestion des Cookies</a>
         </div>
-        <p>&copy; 2026 ABYSZ Esports. Tous droits réservés.</p>
+        <p>&copy; 2026 ABYSZ Esports. Tous droits reserves.</p>
     </footer>
 
 </body>

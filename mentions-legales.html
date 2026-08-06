@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentions Légales — Abysz Esports</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            background-color: #0a0a0a;
+            color: #e0e0e0;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.7;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: #0a0a0a;
+            border-bottom: 1px solid #1a1a1a;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 1.1rem;
+        }
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+            margin: 0;
+            padding: 0;
+            align-items: center;
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: white;
+            transition: color 0.3s ease;
+            font-size: 0.95rem;
+        }
+        nav ul li a:hover {
+            color: #a855f7;
+        }
+
+        /* En-tête */
+        .page-header {
+            text-align: center;
+            padding: 60px 20px 40px 20px;
+            background: linear-gradient(180deg, rgba(168, 85, 247, 0.1) 0%, rgba(10, 10, 10, 1) 100%);
+            border-bottom: 1px solid #1a1a1a;
+        }
+        .page-header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            color: #ffffff;
+            margin: 0 0 10px 0;
+            text-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+        }
+        .page-header p {
+            color: #888;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        /* Conteneur principal */
+        .legal-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .legal-section {
+            background: #141414;
+            border: 1px solid #262626;
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .legal-section h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.25rem;
+            color: #a855f7;
+            margin-top: 0;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 10px;
+        }
+
+        .legal-section p {
+            margin: 0 0 12px 0;
+            color: #cccccc;
+            font-size: 0.95rem;
+        }
+
+        .legal-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .legal-section ul {
+            margin: 10px 0;
+            padding-left: 20px;
+            color: #ccc;
+        }
+
+        .legal-section li {
+            margin-bottom: 8px;
+        }
+
+        .highlight-box {
+            background: rgba(168, 85, 247, 0.08);
+            border-left: 4px solid #a855f7;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin: 15px 0;
+            font-size: 0.9rem;
+            color: #d1d5db;
+        }
+
+        /* Footer */
+        footer {
+            padding: 35px 20px;
+            text-align: center;
+            border-top: 1px solid #1a1a1a;
+            color: #888;
+            font-size: 0.85rem;
+            margin-top: 60px;
+        }
+        footer .footer-links {
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        footer .footer-links a {
+            color: #aaa;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        footer .footer-links a:hover {
+            color: #a855f7;
+        }
+
+        @media (max-width: 600px) {
+            .page-header h1 { font-size: 1.7rem; }
+            .legal-section { padding: 20px; }
+            nav { flex-direction: column; gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">
+            <img src="logo.png" alt="Logo ABYSZ" width="28" height="28">
+            ABYSZ
+        </a>
+        <ul>
+            <li><a href="index.html">← Retour à l'accueil</a></li>
+        </ul>
+    </nav>
+
+    <header class="page-header">
+        <h1>Mentions Légales</h1>
+        <p>Conformément aux dispositions de la Loi n° 2004-575 du 21 juin 2004 pour la Confiance dans l'Économie Numérique (L.C.E.N.)</p>
+    </header>
+
+    <main class="legal-container">
+
+        <section class="legal-section">
+            <h2>1. Éditeur du site</h2>
+            <p>Le présent site web est édité et géré par :</p>
+            <div class="highlight-box">
+                <strong>Nom de l'organisation :</strong> Abysz Esports<br>
+                <strong>Nature :</strong> Organisation Esports / Communauté Gaming<br>
+                <strong>Responsable de la publication :</strong> Direction Abysz Esports<br>
+                <strong>E-mail de contact :</strong> abyszofficial@gmail.com
+            </div>
+        </section>
+
+        <section class="legal-section">
+            <h2>2. Hébergement du site</h2>
+            <p>Le site est hébergé par :</p>
+            <ul>
+                <li><strong>Hébergement des fichiers :</strong> GitHub Pages (GitHub Inc., 88 Colin P Kelly Jr St, San Francisco, CA 94107, USA).</li>
+                <li><strong>Services de base de données :</strong> Google Firebase (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irlande).</li>
+            </ul>
+        </section>
+
+        <section class="legal-section">
+            <h2>3. Propriété intellectuelle</h2>
+            <p>L'ensemble des contenus présents sur le site <strong>Abysz Esports</strong> (logos, graphismes, textes, médias, visuels) sont protégés par les droits de propriété intellectuelle.</p>
+            <p>Toute reproduction ou redistribution partielle ou totale sans autorisation écrite préalable d'Abysz Esports est strictement interdite.</p>
+        </section>
+
+        <section class="legal-section">
+            <h2>4. Affichage publicitaire (Google AdSense)</h2>
+            <p>Ce site intègre des annonces fournies par la régie publicitaire <strong>Google AdSense</strong>.</p>
+            <p>Des cookies tiers peuvent être déposés par Google afin de diffuser des annonces pertinentes basées sur la navigation des utilisateurs.</p>
+        </section>
+
+        <section class="legal-section">
+            <h2>5. Limitation de responsabilité</h2>
+            <p>Abysz Esports ne peut être tenu responsable des erreurs techniques, interruptions de service ou des contenus publiés sur les plateformes externes liées (Discord, Twitter/X, Twitch, YouTube).</p>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="footer-links">
+            <a href="index.html">Accueil</a> • 
+            <a href="mentions-legales.html" style="color: #a855f7;">Mentions Légales</a>
+        </div>
+        <p>© 2026 Abysz Esports • Contact : abyszofficial@gmail.com</p>
+    </footer>
+
+</body>
+</html>

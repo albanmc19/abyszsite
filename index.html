@@ -146,6 +146,7 @@
         .btn:hover { transform: translateY(-3px); box-shadow: 0 0 20px rgba(168, 85, 247, 0.6); background: #b975ff; }
 
         /* Bouton "Rejoindre" Animé & Attractif */
+        nav ul li a.btn-animated-join::after { display: none !important; }
         .btn-animated-join {
             position: relative;
             background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
@@ -532,8 +533,7 @@
             </li>
             <li><a href="boutique.html">Boutique</a></li>
             <li><a href="#annonces">Actualités</a></li>
-            <li><a href="#partenaires">Partenaires</a></li>
-            <li><a href="#rejoindre-commu">Rejoindre</a></li>
+            <li><a href="#rejoindre-commu" class="btn-animated-join" style="padding: 8px 20px; font-size: 0.82rem;">🚀 Rejoindre</a></li>
             <li>
                 <div class="online-counter-badge">
                     <span class="pulse-dot"></span>
@@ -586,26 +586,12 @@
 
     <section class="analytics-container reveal">
         <div class="graph-card">
-            <div class="graph-header">
+            <div class="graph-header" style="margin-bottom: 0;">
                 <div class="graph-title">Activité & Fréquentation du Site</div>
                 <div class="online-counter-badge">
                     <span class="pulse-dot"></span>
                     <span id="graph-live-count">1 connecté(s)</span>
                 </div>
-            </div>
-            <div class="canvas-wrapper">
-                <svg viewBox="0 0 800 200" preserveAspectRatio="none" style="width: 100%; height: 100%;">
-                    <defs>
-                        <linearGradient id="greenGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stop-color="#22c55e" stop-opacity="0.4"/>
-                            <stop offset="100%" stop-color="#22c55e" stop-opacity="0.0"/>
-                        </linearGradient>
-                    </defs>
-                    <line x1="0" y1="50" x2="800" y2="50" stroke="#1f1f1f" stroke-width="1"/>
-                    <line x1="0" y1="120" x2="800" y2="120" stroke="#1f1f1f" stroke-width="1"/>
-                    <path d="M 0,110 C 60,110 50,85 100,85 C 130,85 130,115 160,125 C 220,145 230,165 300,165 C 370,165 390,140 400,135 L 410,142 C 430,140 440,130 460,110 L 480,95 L 490,115 C 550,110 600,80 670,80 C 730,80 770,100 800,105 L 800,200 L 0,200 Z" fill="url(#greenGrad)" />
-                    <path d="M 0,110 C 60,110 50,85 100,85 C 130,85 130,115 160,125 C 220,145 230,165 300,165 C 370,165 390,140 400,135 L 410,142 C 430,140 440,130 460,110 L 480,95 L 490,115 C 550,110 600,80 670,80 C 730,80 770,100 800,105" fill="none" stroke="#22c55e" stroke-width="2.5" />
-                </svg>
             </div>
         </div>
     </section>

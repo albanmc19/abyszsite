@@ -492,6 +492,58 @@
             box-shadow: 0 6px 15px var(--partner-glow, rgba(168, 85, 247, 0.4));
         }
 
+        /* Style Section Personnalisée Admin */
+        .custom-section-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 50px 20px;
+            border-top: 1px solid #1a1a1a;
+        }
+
+        .custom-card {
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid #2a2a2a;
+            border-radius: 16px;
+            padding: 30px;
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .custom-card-img {
+            max-width: 45%;
+            width: 100%;
+            max-height: 350px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid #333;
+        }
+
+        .custom-card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .custom-card-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.6rem;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .custom-card-content p {
+            color: #cccccc;
+            font-size: 0.98rem;
+            line-height: 1.6;
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
         .discord-widget-wrapper { display: inline-flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; background: #141414; padding: 10px 20px; border-radius: 12px; border: 1px solid #2a2a2a; margin-top: 15px; }
         .discord-online-counter { display: inline-flex; align-items: center; gap: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: 600; color: #ccc; background: #0a0a0a; padding: 10px 16px; border-radius: 8px; border: 1px solid #1a1a1a; white-space: nowrap; }
         .online-dot { width: 8px; height: 8px; background-color: #23a55a; border-radius: 50%; box-shadow: 0 0 8px #23a55a; display: inline-block; flex-shrink: 0; }
@@ -551,6 +603,8 @@
             .input-row { flex-direction: column; gap: 0; }
             .modal-content { padding: 25px 15px; border-radius: 12px; }
             .partners-grid { grid-template-columns: 1fr; }
+            .custom-card { flex-direction: column; text-align: center; }
+            .custom-card-img { max-width: 100%; }
             .discord-widget-wrapper { flex-direction: column; width: 100%; box-sizing: border-box; }
             .discord-online-counter { width: 100%; justify-content: center; box-sizing: border-box; }
             .discord-widget-wrapper .btn { width: 100%; box-sizing: border-box; }
@@ -656,6 +710,22 @@
             <p class="loading-text">Chargement des partenaires...</p>
         </div>
     </section>
+
+    <!-- NOUVELLE SECTION PERSONNALISÉE ADMIN (Placée entre Partenaires et Rejoindre) -->
+    <section id="custom-section" class="custom-section-container reveal">
+        <div class="section-header">
+            <div class="title-area">
+                <h2 id="custom-section-title">À la Une</h2>
+                <button class="edit-home-btn hidden" id="quick-edit-custom-btn" title="Modifier cette section">✏️ Modifier la section</button>
+            </div>
+        </div>
+        <div class="custom-card">
+            <img src="" id="custom-section-img" class="custom-card-img hidden" alt="Illustration">
+            <div class="custom-card-content">
+                <p id="custom-section-text">Chargement des informations...</p>
+            </div>
+        </div>
+    </section>
  
     <section id="rejoindre-commu" class="reveal" style="padding: 60px 20px; text-align: center;">
         <h2>REJOINDRE LA COMMUNAUTÉ</h2>
@@ -725,6 +795,31 @@
                             <textarea id="home-about-text" rows="5" placeholder="Description de la structure..." required></textarea>
                         </div>
                         <button type="submit" class="form-btn" id="publish-hometexts-btn">Enregistrer les textes</button>
+                    </form>
+                </div>
+
+                <!-- FORMULAIRE EDITION NOUVELLE SECTION -->
+                <div id="form-customsection-wrapper" class="hidden">
+                    <h3>Modifier la Section Personnalisée</h3>
+                    <form id="customsection-form">
+                        <div class="input-group">
+                            <label for="custom-title-input">Titre de la section</label>
+                            <input type="text" id="custom-title-input" placeholder="Ex: Focus de la semaine / Actualité" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="custom-file-input">Téléverser une Image (PNG / JPG)</label>
+                            <div class="upload-wrapper">
+                                <input type="file" id="custom-file-input" accept="image/*">
+                                <span class="upload-status" id="custom-upload-status"></span>
+                            </div>
+                            <label for="custom-img-url-input" style="margin-top: 10px;">Ou copier le Lien / URL de l'image</label>
+                            <input type="url" id="custom-img-url-input" placeholder="https://lien-vers-image.png">
+                        </div>
+                        <div class="input-group">
+                            <label for="custom-text-input">Texte de la section</label>
+                            <textarea id="custom-text-input" rows="5" placeholder="Écrivez votre texte de présentation ici..." required></textarea>
+                        </div>
+                        <button type="submit" class="form-btn" id="publish-customsection-btn">Enregistrer la section</button>
                     </form>
                 </div>
 
@@ -894,6 +989,29 @@
             }
         });
 
+        // --- ÉCOUTE EN TEMPS RÉEL DE LA SECTION PERSONNALISÉE ---
+        onSnapshot(doc(db, "site_content", "custom_section"), (snap) => {
+            const sectionTitle = document.getElementById("custom-section-title");
+            const sectionText = document.getElementById("custom-section-text");
+            const sectionImg = document.getElementById("custom-section-img");
+
+            if (snap.exists()) {
+                const data = snap.data();
+                if (data.title) sectionTitle.textContent = data.title;
+                if (data.text) sectionText.textContent = data.text;
+                if (data.imageUrl) {
+                    sectionImg.src = data.imageUrl;
+                    sectionImg.classList.remove("hidden");
+                } else {
+                    sectionImg.classList.add("hidden");
+                }
+            } else {
+                sectionTitle.textContent = "À la Une";
+                sectionText.textContent = "Bienvenue dans cette nouvelle section ! Vous pouvez la personnaliser depuis le panneau d'administration.";
+                sectionImg.classList.add("hidden");
+            }
+        });
+
         // --- GESTION DES VISITEURS EN TEMPS RÉEL ---
         const connectedRef = ref(rtdb, ".info/connected");
         const onlineUsersRef = ref(rtdb, "online_users");
@@ -933,14 +1051,19 @@
         const quickAddBtn = document.getElementById('quick-add-btn');
         const quickAddPartnerBtn = document.getElementById('quick-add-partner-btn');
         const quickEditHomeBtn = document.getElementById('quick-edit-home-btn');
+        const quickEditCustomBtn = document.getElementById('quick-edit-custom-btn');
         const closeModalBtn = document.getElementById('close-modal-btn');
         const loginForm = document.getElementById('login-form');
         const announcementForm = document.getElementById('announcement-form');
         const partnerForm = document.getElementById('partner-form');
         const hometextsForm = document.getElementById('hometexts-form');
+        const customsectionForm = document.getElementById('customsection-form');
+        
         const formAnnonceWrapper = document.getElementById('form-annonce-wrapper');
         const formPartnerWrapper = document.getElementById('form-partner-wrapper');
         const formHomeTextsWrapper = document.getElementById('form-hometexts-wrapper');
+        const formCustomSectionWrapper = document.getElementById('form-customsection-wrapper');
+
         const loginStep = document.getElementById('admin-login-step');
         const panelStep = document.getElementById('admin-panel-step');
         const loginError = document.getElementById('login-error');
@@ -957,6 +1080,10 @@
         const partnerLogoFileInput = document.getElementById('partner-logo-file');
         const partnerLogoUrlInput = document.getElementById('partner-logo-url');
         const partnerUploadStatus = document.getElementById('partner-upload-status');
+
+        const customFileInput = document.getElementById('custom-file-input');
+        const customImgUrlInput = document.getElementById('custom-img-url-input');
+        const customUploadStatus = document.getElementById('custom-upload-status');
 
         const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
         const navLinksList = document.getElementById('nav-links-list');
@@ -1007,6 +1134,39 @@
                 } catch (err) {
                     partnerUploadStatus.textContent = "❌ Erreur de réseau lors de l'upload.";
                     partnerUploadStatus.style.color = "#ff4444";
+                }
+            });
+        }
+
+        if (customFileInput) {
+            customFileInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                customUploadStatus.textContent = "⏳ Envoi de l'image en cours...";
+                customUploadStatus.style.color = "#a855f7";
+
+                const formData = new FormData();
+                formData.append('image', file);
+
+                try {
+                    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await res.json();
+                    if (data.success) {
+                        customImgUrlInput.value = data.data.url;
+                        customUploadStatus.textContent = "✅ Image importée avec succès !";
+                        customUploadStatus.style.color = "#10b981";
+                    } else {
+                        customUploadStatus.textContent = "❌ Échec de l'envoi de l'image.";
+                        customUploadStatus.style.color = "#ff4444";
+                    }
+                } catch (err) {
+                    customUploadStatus.textContent = "❌ Erreur de réseau lors de l'upload.";
+                    customUploadStatus.style.color = "#ff4444";
                 }
             });
         }
@@ -1062,6 +1222,7 @@
                     if (quickAddBtn) quickAddBtn.classList.remove('hidden');
                     if (quickAddPartnerBtn) quickAddPartnerBtn.classList.remove('hidden');
                     if (quickEditHomeBtn) quickEditHomeBtn.classList.remove('hidden');
+                    if (quickEditCustomBtn) quickEditCustomBtn.classList.remove('hidden');
                     if (navDashboard) navDashboard.classList.remove('hidden');
                 }
 
@@ -1076,6 +1237,7 @@
                 if (quickAddBtn) quickAddBtn.classList.add('hidden');
                 if (quickAddPartnerBtn) quickAddPartnerBtn.classList.add('hidden');
                 if (quickEditHomeBtn) quickEditHomeBtn.classList.add('hidden');
+                if (quickEditCustomBtn) quickEditCustomBtn.classList.add('hidden');
                 if (navEspaceJoueur) navEspaceJoueur.classList.add('hidden');
                 if (navDashboard) navDashboard.classList.add('hidden');
 
@@ -1115,6 +1277,7 @@
                 formAnnonceWrapper.classList.remove('hidden');
                 formPartnerWrapper.classList.add('hidden');
                 formHomeTextsWrapper.classList.add('hidden');
+                formCustomSectionWrapper.classList.add('hidden');
                 modal.classList.add('active');
             }
         };
@@ -1127,6 +1290,7 @@
                 formAnnonceWrapper.classList.remove('hidden');
                 formPartnerWrapper.classList.add('hidden');
                 formHomeTextsWrapper.classList.add('hidden');
+                formCustomSectionWrapper.classList.add('hidden');
                 modal.classList.add('active');
             };
         }
@@ -1141,6 +1305,7 @@
                 formAnnonceWrapper.classList.add('hidden');
                 formPartnerWrapper.classList.remove('hidden');
                 formHomeTextsWrapper.classList.add('hidden');
+                formCustomSectionWrapper.classList.add('hidden');
                 modal.classList.add('active');
             };
         }
@@ -1155,12 +1320,51 @@
                 formAnnonceWrapper.classList.add('hidden');
                 formPartnerWrapper.classList.add('hidden');
                 formHomeTextsWrapper.classList.remove('hidden');
+                formCustomSectionWrapper.classList.add('hidden');
+                modal.classList.add('active');
+            };
+        }
+
+        if (quickEditCustomBtn) {
+            quickEditCustomBtn.onclick = () => {
+                document.getElementById("custom-title-input").value = document.getElementById("custom-section-title").textContent.trim();
+                document.getElementById("custom-text-input").value = document.getElementById("custom-section-text").textContent.trim();
+                
+                const currentImg = document.getElementById("custom-section-img");
+                document.getElementById("custom-img-url-input").value = currentImg.classList.contains("hidden") ? "" : currentImg.src;
+                if (customUploadStatus) customUploadStatus.textContent = "";
+
+                formAnnonceWrapper.classList.add('hidden');
+                formPartnerWrapper.classList.add('hidden');
+                formHomeTextsWrapper.classList.add('hidden');
+                formCustomSectionWrapper.classList.remove('hidden');
                 modal.classList.add('active');
             };
         }
 
         closeModalBtn.onclick = () => modal.classList.remove('active');
         window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
+
+        // SOUMISSION DE LA MODIFICATION DE LA SECTION PERSONNALISÉE
+        customsectionForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!isUserAdmin) return alert("Droits insuffisants.");
+
+            const payload = {
+                title: document.getElementById("custom-title-input").value,
+                text: document.getElementById("custom-text-input").value,
+                imageUrl: document.getElementById("custom-img-url-input").value,
+                updatedAt: Date.now()
+            };
+
+            try {
+                await setDoc(doc(db, "site_content", "custom_section"), payload, { merge: true });
+                modal.classList.remove('active');
+                alert("Section mise à jour !");
+            } catch (err) {
+                alert("Erreur lors de l'enregistrement : " + err.message);
+            }
+        });
 
         // SOUMISSION DE LA MODIFICATION DES TEXTES DE L'ACCUEIL
         hometextsForm.addEventListener('submit', async (e) => {
@@ -1405,6 +1609,7 @@
                         formAnnonceWrapper.classList.remove('hidden');
                         formPartnerWrapper.classList.add('hidden');
                         formHomeTextsWrapper.classList.add('hidden');
+                        formCustomSectionWrapper.classList.add('hidden');
                         modal.classList.add('active');
                     };
                 });
@@ -1495,6 +1700,7 @@
                         formAnnonceWrapper.classList.add('hidden');
                         formPartnerWrapper.classList.remove('hidden');
                         formHomeTextsWrapper.classList.add('hidden');
+                        formCustomSectionWrapper.classList.add('hidden');
                         modal.classList.add('active');
                     };
                 });

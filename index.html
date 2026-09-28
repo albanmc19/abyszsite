@@ -372,42 +372,84 @@
         .like-btn.liked .like-heart { transform: scale(1.2); }
 
         /* SECTION PLANNING DE LA SEMAINE */
-        .planning-section-container {
+        .weekly-planning-container {
             max-width: 1000px;
-            margin: 50px auto;
-            padding: 0 20px;
+            margin: 0 auto;
+            padding: 50px 20px;
+            border-top: 1px solid #1a1a1a;
             scroll-margin-top: 80px;
         }
-        .planning-card {
+        .weekly-planning-card {
             background: rgba(20, 20, 20, 0.85);
             border: 1px solid #2a2a2a;
             border-radius: 16px;
             padding: 30px;
-            text-align: center;
+            position: relative;
             backdrop-filter: blur(10px);
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
-        .planning-card h2 {
+        .weekly-planning-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .weekly-planning-title {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             color: #ffffff;
-            margin: 0 0 15px 0;
+            margin: 0;
         }
-        .planning-card p {
-            color: #cccccc;
-            font-size: 1rem;
-            line-height: 1.6;
-            margin-bottom: 20px;
+        .weekly-views-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            color: #a855f7;
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 600;
         }
-        .planning-img {
-            max-width: 100%;
-            height: auto;
+        .weekly-planning-img {
+            width: 100%;
+            max-height: 480px;
+            object-fit: cover;
             border-radius: 12px;
             border: 1px solid #333;
         }
+        .weekly-planning-desc {
+            color: #cccccc;
+            font-size: 0.98rem;
+            line-height: 1.6;
+            margin: 0;
+            white-space: pre-wrap;
+        }
+        .weekly-planning-btn {
+            align-self: flex-start;
+            background: linear-gradient(135deg, #a855f7, #7e22ce);
+            color: white;
+            text-decoration: none;
+            padding: 10px 22px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            transition: all 0.25s ease;
+        }
+        .weekly-planning-btn:hover {
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+            transform: translateY(-2px);
+        }
 
         /* Lightbox */
-        .announcement-img, .custom-card-img, .planning-img { cursor: zoom-in; }
+        .announcement-img, .custom-card-img, .weekly-planning-img { cursor: zoom-in; }
         .img-lightbox {
             position: fixed; inset: 0; z-index: 3000;
             background: rgba(0, 0, 0, 0.92);
@@ -724,7 +766,7 @@
             <li><a href="index.html">Accueil</a></li>
             <li><a href="tv.html" class="abysz-tv-badge"><span class="live-dot-tv"></span><span>📺 ABYSZ TV</span></a></li>
             <li><a href="roster.html">Roster</a></li>
-            <li><a href="#planning-section">Planning</a></li>
+            <li><a href="#planning-semaine">Planning</a></li>
             <li><a href="boutique.html">Boutique</a></li>
             <li><a href="#rejoindre-commu" class="btn-animated-join">🚀 Rejoindre</a></li>
             <li>
@@ -759,7 +801,6 @@
              style="display:block"
              data-ad-client="ca-pub-1494144032841410"
              data-ad-slot="AUTO"
-             data-ad-format="auto"
              data-full-width-responsive="true"></ins>
         <script>
              (adsbygoogle = window.adsbygoogle || []).push({});
@@ -788,11 +829,24 @@
     </section>
 
     <!-- SECTION PLANNING DE LA SEMAINE -->
-    <section id="planning-section" class="planning-section-container reveal">
-        <div class="planning-card">
-            <h2>Planning de la Semaine</h2>
-            <p>Retrouvez le programme officiel de nos matchs, entraînements et événements à venir.</p>
-            <img src="./planning.png" alt="Planning de la semaine" class="planning-img">
+    <section id="planning-semaine" class="weekly-planning-container reveal">
+        <div class="section-header">
+            <div class="title-area">
+                <h2>Planning de la Semaine</h2>
+                <button class="edit-home-btn hidden" id="quick-edit-weekly-btn" title="Gérer le planning">✏️ Modifier le planning</button>
+            </div>
+        </div>
+        <div class="weekly-planning-card" id="weekly-planning-card">
+            <div class="weekly-planning-header">
+                <h3 class="weekly-planning-title" id="weekly-title">Chargement du planning...</h3>
+                <div class="weekly-views-badge">
+                    <span>👁️</span>
+                    <span id="weekly-views-count">0 vues</span>
+                </div>
+            </div>
+            <p class="weekly-planning-desc" id="weekly-desc">Veuillez patienter...</p>
+            <img src="" id="weekly-img" class="weekly-planning-img hidden" alt="Planning de la semaine">
+            <a href="#" id="weekly-btn" target="_blank" rel="noopener noreferrer" class="weekly-planning-btn hidden">📅 Voir en direct</a>
         </div>
     </section>
 
@@ -892,6 +946,38 @@
                             <textarea id="home-about-text" rows="5" placeholder="Description de la structure..." required></textarea>
                         </div>
                         <button type="submit" class="form-btn" id="publish-hometexts-btn">Enregistrer les textes</button>
+                    </form>
+                </div>
+
+                <div id="form-weekly-wrapper" class="hidden">
+                    <h3>Modifier le Planning de la Semaine</h3>
+                    <form id="weekly-form">
+                        <div class="input-group">
+                            <label for="weekly-title-input">Titre du Planning</label>
+                            <input type="text" id="weekly-title-input" placeholder="Ex: Planning de la Semaine" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="weekly-file-input">Téléverser l'Image du Planning</label>
+                            <div class="upload-wrapper">
+                                <input type="file" id="weekly-file-input" accept="image/*">
+                                <span class="upload-status" id="weekly-upload-status"></span>
+                            </div>
+                            <label for="weekly-img-url-input" style="margin-top: 10px;">Ou copier le Lien / URL de l'image</label>
+                            <input type="url" id="weekly-img-url-input" placeholder="https://lien-vers-image.png">
+                        </div>
+                        <div class="input-group">
+                            <label for="weekly-link-input">Lien d'Action / Twitch (Optionnel)</label>
+                            <input type="url" id="weekly-link-input" placeholder="https://twitch.tv/abysz_o">
+                        </div>
+                        <div class="input-group">
+                            <label for="weekly-btn-label-input">Texte du Bouton (Optionnel)</label>
+                            <input type="text" id="weekly-btn-label-input" placeholder="Ex: Voir en direct sur Twitch">
+                        </div>
+                        <div class="input-group">
+                            <label for="weekly-desc-input">Description / Notes de la semaine</label>
+                            <textarea id="weekly-desc-input" rows="4" placeholder="Matchs importants, compétitions, horaires de la semaine..."></textarea>
+                        </div>
+                        <button type="submit" class="form-btn" id="publish-weekly-btn">Enregistrer le Planning</button>
                     </form>
                 </div>
 
@@ -1056,7 +1142,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, setDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, setDoc, runTransaction, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         import { getDatabase, ref, onValue, onDisconnect, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
         const firebaseConfig = {
@@ -1115,6 +1201,54 @@
             }
         });
 
+        // --- INCRÉMENTATION DES VUES DE LE SEMAINE ---
+        function registerWeeklyPlanningView() {
+            if (!sessionStorage.getItem("abysz_viewed_weekly_planning")) {
+                sessionStorage.setItem("abysz_viewed_weekly_planning", "true");
+                const docRef = doc(db, "site_content", "weekly_planning");
+                setDoc(docRef, { views: increment(1) }, { merge: true }).catch(err => console.error("Erreur increment vues :", err));
+            }
+        }
+
+        // --- ÉCOUTE DU PLANNING DE LA SEMAINE ---
+        onSnapshot(doc(db, "site_content", "weekly_planning"), (snap) => {
+            const titleEl = document.getElementById("weekly-title");
+            const descEl = document.getElementById("weekly-desc");
+            const imgEl = document.getElementById("weekly-img");
+            const btnEl = document.getElementById("weekly-btn");
+            const viewsEl = document.getElementById("weekly-views-count");
+
+            if (snap.exists()) {
+                const data = snap.data();
+                registerWeeklyPlanningView();
+
+                titleEl.textContent = data.title || "Planning de la Semaine";
+                descEl.textContent = data.description || "Consultez le planning compétitif et événementiel de la semaine.";
+                viewsEl.textContent = `${data.views || 0} vue${(data.views || 0) > 1 ? 's' : ''}`;
+
+                if (data.imageUrl) {
+                    imgEl.src = data.imageUrl;
+                    imgEl.classList.remove("hidden");
+                } else {
+                    imgEl.classList.add("hidden");
+                }
+
+                if (data.link) {
+                    btnEl.href = data.link;
+                    btnEl.textContent = data.btnLabel || "📅 Voir en direct";
+                    btnEl.classList.remove("hidden");
+                } else {
+                    btnEl.classList.add("hidden");
+                }
+            } else {
+                titleEl.textContent = "Planning de la Semaine";
+                descEl.textContent = "Aucun planning actuellement configuré. Restez connectés !";
+                viewsEl.textContent = "0 vue";
+                imgEl.classList.add("hidden");
+                btnEl.classList.add("hidden");
+            }
+        });
+
         // --- VISITEURS EN LIGNE TEMPS RÉEL ---
         const connectedRef = ref(rtdb, ".info/connected");
         const onlineUsersRef = ref(rtdb, "online_users");
@@ -1146,17 +1280,20 @@
         const adminGateBtn = document.getElementById('admin-gate-btn');
         const quickAddBtn = document.getElementById('quick-add-btn');
         const quickAddPartnerBtn = document.getElementById('quick-add-partner-btn');
+        const quickEditWeeklyBtn = document.getElementById('quick-edit-weekly-btn');
         const quickEditHomeBtn = document.getElementById('quick-edit-home-btn');
         const quickEditCustomBtn = document.getElementById('quick-edit-custom-btn');
         const closeModalBtn = document.getElementById('close-modal-btn');
         const loginForm = document.getElementById('login-form');
         const announcementForm = document.getElementById('announcement-form');
         const partnerForm = document.getElementById('partner-form');
+        const weeklyForm = document.getElementById('weekly-form');
         const hometextsForm = document.getElementById('hometexts-form');
         const customsectionForm = document.getElementById('customsection-form');
         
         const formAnnonceWrapper = document.getElementById('form-annonce-wrapper');
         const formPartnerWrapper = document.getElementById('form-partner-wrapper');
+        const formWeeklyWrapper = document.getElementById('form-weekly-wrapper');
         const formHomeTextsWrapper = document.getElementById('form-hometexts-wrapper');
         const formCustomSectionWrapper = document.getElementById('form-customsection-wrapper');
 
@@ -1176,6 +1313,10 @@
         const partnerLogoFileInput = document.getElementById('partner-logo-file');
         const partnerLogoUrlInput = document.getElementById('partner-logo-url');
         const partnerUploadStatus = document.getElementById('partner-upload-status');
+
+        const weeklyFileInput = document.getElementById('weekly-file-input');
+        const weeklyImgUrlInput = document.getElementById('weekly-img-url-input');
+        const weeklyUploadStatus = document.getElementById('weekly-upload-status');
 
         const customFileInput = document.getElementById('custom-file-input');
         const customImgUrlInput = document.getElementById('custom-img-url-input');
@@ -1230,6 +1371,39 @@
                 } catch (err) {
                     partnerUploadStatus.textContent = "❌ Erreur de réseau lors de l'upload.";
                     partnerUploadStatus.style.color = "#ff4444";
+                }
+            });
+        }
+
+        if (weeklyFileInput) {
+            weeklyFileInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                weeklyUploadStatus.textContent = "⏳ Envoi du planning en cours...";
+                weeklyUploadStatus.style.color = "#a855f7";
+
+                const formData = new FormData();
+                formData.append('image', file);
+
+                try {
+                    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await res.json();
+                    if (data.success) {
+                        weeklyImgUrlInput.value = data.data.url;
+                        weeklyUploadStatus.textContent = "✅ Image du planning importée !";
+                        weeklyUploadStatus.style.color = "#10b981";
+                    } else {
+                        weeklyUploadStatus.textContent = "❌ Échec de l'envoi de l'image.";
+                        weeklyUploadStatus.style.color = "#ff4444";
+                    }
+                } catch (err) {
+                    weeklyUploadStatus.textContent = "❌ Erreur de réseau lors de l'upload.";
+                    weeklyUploadStatus.style.color = "#ff4444";
                 }
             });
         }
@@ -1317,6 +1491,7 @@
                 if (isUserAdmin) {
                     if (quickAddBtn) quickAddBtn.classList.remove('hidden');
                     if (quickAddPartnerBtn) quickAddPartnerBtn.classList.remove('hidden');
+                    if (quickEditWeeklyBtn) quickEditWeeklyBtn.classList.remove('hidden');
                     if (quickEditHomeBtn) quickEditHomeBtn.classList.remove('hidden');
                     if (quickEditCustomBtn) quickEditCustomBtn.classList.remove('hidden');
                     if (navDashboard) navDashboard.classList.remove('hidden');
@@ -1332,6 +1507,7 @@
                 
                 if (quickAddBtn) quickAddBtn.classList.add('hidden');
                 if (quickAddPartnerBtn) quickAddPartnerBtn.classList.add('hidden');
+                if (quickEditWeeklyBtn) quickEditWeeklyBtn.classList.add('hidden');
                 if (quickEditHomeBtn) quickEditHomeBtn.classList.add('hidden');
                 if (quickEditCustomBtn) quickEditCustomBtn.classList.add('hidden');
                 if (navEspaceJoueur) navEspaceJoueur.classList.add('hidden');
@@ -1372,6 +1548,7 @@
             } else {
                 formAnnonceWrapper.classList.remove('hidden');
                 formPartnerWrapper.classList.add('hidden');
+                formWeeklyWrapper.classList.add('hidden');
                 formHomeTextsWrapper.classList.add('hidden');
                 formCustomSectionWrapper.classList.add('hidden');
                 modal.classList.add('active');
@@ -1385,6 +1562,7 @@
                 document.getElementById("panel-form-title").textContent = "Publier une annonce";
                 formAnnonceWrapper.classList.remove('hidden');
                 formPartnerWrapper.classList.add('hidden');
+                formWeeklyWrapper.classList.add('hidden');
                 formHomeTextsWrapper.classList.add('hidden');
                 formCustomSectionWrapper.classList.add('hidden');
                 modal.classList.add('active');
@@ -1400,6 +1578,30 @@
                 document.getElementById("partner-form-title").textContent = "Ajouter un Partenaire";
                 formAnnonceWrapper.classList.add('hidden');
                 formPartnerWrapper.classList.remove('hidden');
+                formWeeklyWrapper.classList.add('hidden');
+                formHomeTextsWrapper.classList.add('hidden');
+                formCustomSectionWrapper.classList.add('hidden');
+                modal.classList.add('active');
+            };
+        }
+
+        if (quickEditWeeklyBtn) {
+            quickEditWeeklyBtn.onclick = () => {
+                document.getElementById("weekly-title-input").value = document.getElementById("weekly-title").textContent.trim();
+                document.getElementById("weekly-desc-input").value = document.getElementById("weekly-desc").textContent.trim();
+                
+                const currentImg = document.getElementById("weekly-img");
+                document.getElementById("weekly-img-url-input").value = currentImg.classList.contains("hidden") ? "" : currentImg.src;
+
+                const currentBtn = document.getElementById("weekly-btn");
+                document.getElementById("weekly-link-input").value = currentBtn.classList.contains("hidden") ? "" : currentBtn.href;
+                document.getElementById("weekly-btn-label-input").value = currentBtn.classList.contains("hidden") ? "📅 Voir en direct" : currentBtn.textContent;
+                
+                if (weeklyUploadStatus) weeklyUploadStatus.textContent = "";
+
+                formAnnonceWrapper.classList.add('hidden');
+                formPartnerWrapper.classList.add('hidden');
+                formWeeklyWrapper.classList.remove('hidden');
                 formHomeTextsWrapper.classList.add('hidden');
                 formCustomSectionWrapper.classList.add('hidden');
                 modal.classList.add('active');
@@ -1415,6 +1617,7 @@
 
                 formAnnonceWrapper.classList.add('hidden');
                 formPartnerWrapper.classList.add('hidden');
+                formWeeklyWrapper.classList.add('hidden');
                 formHomeTextsWrapper.classList.remove('hidden');
                 formCustomSectionWrapper.classList.add('hidden');
                 modal.classList.add('active');
@@ -1432,6 +1635,7 @@
 
                 formAnnonceWrapper.classList.add('hidden');
                 formPartnerWrapper.classList.add('hidden');
+                formWeeklyWrapper.classList.add('hidden');
                 formHomeTextsWrapper.classList.add('hidden');
                 formCustomSectionWrapper.classList.remove('hidden');
                 modal.classList.add('active');
@@ -1440,6 +1644,28 @@
 
         closeModalBtn.onclick = () => modal.classList.remove('active');
         window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
+
+        weeklyForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!isUserAdmin) return alert("Droits insuffisants.");
+
+            const payload = {
+                title: document.getElementById("weekly-title-input").value,
+                description: document.getElementById("weekly-desc-input").value,
+                imageUrl: document.getElementById("weekly-img-url-input").value,
+                link: document.getElementById("weekly-link-input").value,
+                btnLabel: document.getElementById("weekly-btn-label-input").value || "📅 Voir en direct",
+                updatedAt: Date.now()
+            };
+
+            try {
+                await setDoc(doc(db, "site_content", "weekly_planning"), payload, { merge: true });
+                modal.classList.remove('active');
+                alert("Planning de la semaine mis à jour !");
+            } catch (err) {
+                alert("Erreur d'enregistrement : " + err.message);
+            }
+        });
 
         customsectionForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1754,6 +1980,7 @@
                         document.getElementById("panel-form-title").textContent = "Éditer l'annonce";
                         formAnnonceWrapper.classList.remove('hidden');
                         formPartnerWrapper.classList.add('hidden');
+                        formWeeklyWrapper.classList.add('hidden');
                         formHomeTextsWrapper.classList.add('hidden');
                         formCustomSectionWrapper.classList.add('hidden');
                         modal.classList.add('active');
@@ -1845,6 +2072,7 @@
                         document.getElementById("partner-form-title").textContent = "Éditer le Partenaire";
                         formAnnonceWrapper.classList.add('hidden');
                         formPartnerWrapper.classList.remove('hidden');
+                        formWeeklyWrapper.classList.add('hidden');
                         formHomeTextsWrapper.classList.add('hidden');
                         formCustomSectionWrapper.classList.add('hidden');
                         modal.classList.add('active');
@@ -1880,7 +2108,7 @@
         }
 
         document.addEventListener('click', (e) => {
-            const img = e.target.closest('.announcement-img, .custom-card-img, .planning-img');
+            const img = e.target.closest('.announcement-img, .custom-card-img, .weekly-planning-img');
             if (img && img.src && !img.classList.contains('hidden')) {
                 openLightbox(img.src, img.alt);
             }

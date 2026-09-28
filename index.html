@@ -175,7 +175,7 @@
         }
 
         .abysz-tv-badge::after {
-            display: none !important; /* Annule l'effet de soulignement classique nav */
+            display: none !important;
         }
 
         .abysz-tv-badge:hover {
@@ -231,7 +231,6 @@
         }
 
         nav ul li a.btn-animated-join::after { display: none !important; }
-        /* Bouton "Rejoindre" Animé & Attractif */
         .btn-animated-join {
             position: relative;
             background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
@@ -345,10 +344,43 @@
         .announcement-img { max-width: 100%; max-height: 350px; object-fit: cover; border-radius: 8px; border: 1px solid #2a2a2a; margin-top: 4px; width: 100%; }
         .announcement-action-btn { background: #a855f7; color: white; text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: bold; padding: 10px 20px; border-radius: 6px; align-self: flex-start; transition: all 0.2s ease; margin-top: 4px; text-align: center; }
         .announcement-action-btn:hover { background: #b975ff; box-shadow: 0 0 10px rgba(168, 85, 247, 0.4); }
-        .announcement-date { font-size: 0.8rem; color: #777; margin-top: 4px; }
+        .announcement-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; flex-wrap: wrap; gap: 10px; }
+        .announcement-date { font-size: 0.8rem; color: #777; }
 
-        /* Lightbox (zoom image à la une et annonces) */
-        .announcement-img, .custom-card-img { cursor: zoom-in; }
+        /* BOUTON LIKE ANNONCE */
+        .like-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #dddddd;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+            user-select: none;
+        }
+        .like-btn:hover {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: #ef4444;
+            color: #ef4444;
+            transform: translateY(-2px);
+        }
+        .like-btn.liked {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+            color: #ef4444;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
+        }
+        .like-heart { font-size: 0.95rem; transition: transform 0.2s ease; }
+        .like-btn.liked .like-heart { transform: scale(1.2); }
+
+        /* Lightbox (zoom image) */
+        .announcement-img, .custom-card-img, .planning-img { cursor: zoom-in; }
         .img-lightbox {
             position: fixed; inset: 0; z-index: 3000;
             background: rgba(0, 0, 0, 0.92);
@@ -382,6 +414,73 @@
         .edit-btn:hover { background: #2563eb; }
         .delete-btn { background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: background 0.2s; }
         .delete-btn:hover { background: #cc3333; }
+
+        /* SECTION PLANNINGS & CALENDRIER (NOUVEAU) */
+        .plannings-container { max-width: 1100px; margin: 0 auto; padding: 50px 20px; border-top: 1px solid #1a1a1a; }
+        .plannings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; margin-top: 10px; }
+        .planning-card {
+            background: rgba(20, 20, 20, 0.85);
+            border: 1px solid #262626;
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            position: relative;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        .planning-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(168, 85, 247, 0.5);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 15px rgba(168, 85, 247, 0.2);
+        }
+        .planning-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .planning-game-tag {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.72rem;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(168, 85, 247, 0.15);
+            color: #a855f7;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            text-transform: uppercase;
+        }
+        .planning-views-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            color: #999;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 4px 10px;
+            border-radius: 12px;
+            border: 1px solid #2a2a2a;
+        }
+        .planning-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.25rem;
+            color: #fff;
+            margin: 0;
+        }
+        .planning-desc { color: #ccc; font-size: 0.9rem; line-height: 1.5; margin: 0; white-space: pre-wrap; }
+        .planning-img { width: 100%; max-height: 220px; object-fit: cover; border-radius: 10px; border: 1px solid #2a2a2a; }
+        .planning-link {
+            background: linear-gradient(135deg, #a855f7, #7e22ce);
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            transition: all 0.2s ease;
+            margin-top: auto;
+        }
+        .planning-link:hover { opacity: 0.9; box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
 
         .partners-container { max-width: 1100px; margin: 0 auto; padding: 50px 20px; border-top: 1px solid #1a1a1a; }
         .partners-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; margin-top: 10px; }
@@ -632,7 +731,7 @@
             .card-actions { position: absolute; top: 12px; right: 12px; width: auto; justify-content: flex-end; gap: 6px; }
             .input-row { flex-direction: column; gap: 0; }
             .modal-content { padding: 25px 15px; border-radius: 12px; }
-            .partners-grid { grid-template-columns: 1fr; }
+            .partners-grid, .plannings-grid { grid-template-columns: 1fr; }
             .custom-card { flex-direction: column; text-align: center; }
             .custom-card-img { max-width: 100%; }
             .discord-widget-wrapper { flex-direction: column; width: 100%; box-sizing: border-box; }
@@ -666,6 +765,7 @@
             <li><a href="index.html">Accueil</a></li>
             <li><a href="tv.html" class="abysz-tv-badge"><span class="live-dot-tv"></span><span>📺 ABYSZ TV</span></a></li>
             <li><a href="roster.html">Roster</a></li>
+            <li><a href="#plannings">Plannings</a></li>
             <li><a href="boutique.html">Boutique</a></li>
             <li><a href="#rejoindre-commu" class="btn-animated-join">🚀 Rejoindre</a></li>
             <li>
@@ -728,6 +828,20 @@
         <div class="carousel-dots" id="carousel-dots"></div>
     </section>
 
+    <!-- NOUVELLE SECTION PLANNINGS AVEC COMPTEUR DE VUES -->
+    <section id="plannings" class="plannings-container reveal">
+        <div class="section-header">
+            <div class="title-area">
+                <h2>Plannings & Calendrier</h2>
+                <button class="add-btn hidden" id="quick-add-planning-btn" title="Ajouter un planning">+</button>
+            </div>
+        </div>
+        
+        <div class="plannings-grid" id="plannings-feed">
+            <p class="loading-text">Chargement des plannings...</p>
+        </div>
+    </section>
+
     <section id="partenaires" class="partners-container reveal">
         <div class="section-header">
             <div class="title-area">
@@ -741,7 +855,6 @@
         </div>
     </section>
 
-    <!-- NOUVELLE SECTION PERSONNALISÉE ADMIN (Placée entre Partenaires et Rejoindre) -->
     <section id="custom-section" class="custom-section-container reveal">
         <div class="section-header">
             <div class="title-area">
@@ -828,7 +941,6 @@
                     </form>
                 </div>
 
-                <!-- FORMULAIRE EDITION NOUVELLE SECTION -->
                 <div id="form-customsection-wrapper" class="hidden">
                     <h3>Modifier la Section Personnalisée</h3>
                     <form id="customsection-form">
@@ -904,6 +1016,47 @@
                         </div>
 
                         <button type="submit" class="form-btn" id="publish-btn">Enregistrer l'annonce</button>
+                    </form>
+                </div>
+
+                <!-- FORMULAIRE EDITION PLANNING (NOUVEAU) -->
+                <div id="form-planning-wrapper" class="hidden">
+                    <h3 id="planning-form-title">Gestion du Planning</h3>
+                    <form id="planning-form">
+                        <input type="hidden" id="planning-id" value="">
+                        
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label for="planning-title">Titre du Planning / Semaine</label>
+                                <input type="text" id="planning-title" placeholder="Ex: Planning de la Semaine #12" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="planning-game">Catégorie / Jeu</label>
+                                <input type="text" id="planning-game" placeholder="Ex: Fortnite / Stream / Global" required>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="planning-img-file">Téléverser l'Image du Planning</label>
+                            <div class="upload-wrapper">
+                                <input type="file" id="planning-img-file" accept="image/*">
+                                <span class="upload-status" id="planning-upload-status"></span>
+                            </div>
+                            <label for="planning-img-url" style="margin-top: 10px;">Ou Lien / URL de l'image</label>
+                            <input type="url" id="planning-img-url" placeholder="https://lien-image.png">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="planning-link">Lien d'Action / Twitch / Agenda (Optionnel)</label>
+                            <input type="url" id="planning-link" placeholder="https://twitch.tv/abysz_o">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="planning-desc">Description / Détails</label>
+                            <textarea id="planning-desc" rows="3" placeholder="Présentation des événements ou matchs prévus..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="form-btn" id="publish-planning-btn">Enregistrer le planning</button>
                     </form>
                 </div>
 
@@ -990,7 +1143,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, setDoc, runTransaction, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         import { getDatabase, ref, onValue, onDisconnect, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
         const firebaseConfig = {
@@ -1080,17 +1233,20 @@
         const adminGateBtn = document.getElementById('admin-gate-btn');
         const quickAddBtn = document.getElementById('quick-add-btn');
         const quickAddPartnerBtn = document.getElementById('quick-add-partner-btn');
+        const quickAddPlanningBtn = document.getElementById('quick-add-planning-btn');
         const quickEditHomeBtn = document.getElementById('quick-edit-home-btn');
         const quickEditCustomBtn = document.getElementById('quick-edit-custom-btn');
         const closeModalBtn = document.getElementById('close-modal-btn');
         const loginForm = document.getElementById('login-form');
         const announcementForm = document.getElementById('announcement-form');
         const partnerForm = document.getElementById('partner-form');
+        const planningForm = document.getElementById('planning-form');
         const hometextsForm = document.getElementById('hometexts-form');
         const customsectionForm = document.getElementById('customsection-form');
         
         const formAnnonceWrapper = document.getElementById('form-annonce-wrapper');
         const formPartnerWrapper = document.getElementById('form-partner-wrapper');
+        const formPlanningWrapper = document.getElementById('form-planning-wrapper');
         const formHomeTextsWrapper = document.getElementById('form-hometexts-wrapper');
         const formCustomSectionWrapper = document.getElementById('form-customsection-wrapper');
 
@@ -1101,6 +1257,7 @@
         const logoutBtn = document.getElementById('logout-btn');
         const feed = document.getElementById("announcements-feed");
         const partnersFeed = document.getElementById("partners-feed");
+        const planningsFeed = document.getElementById("plannings-feed");
         const dotsContainer = document.getElementById("carousel-dots");
         const prevBtn = document.getElementById("prev-slide");
         const nextBtn = document.getElementById("next-slide");
@@ -1110,6 +1267,10 @@
         const partnerLogoFileInput = document.getElementById('partner-logo-file');
         const partnerLogoUrlInput = document.getElementById('partner-logo-url');
         const partnerUploadStatus = document.getElementById('partner-upload-status');
+
+        const planningImgFileInput = document.getElementById('planning-img-file');
+        const planningImgUrlInput = document.getElementById('planning-img-url');
+        const planningUploadStatus = document.getElementById('planning-upload-status');
 
         const customFileInput = document.getElementById('custom-file-input');
         const customImgUrlInput = document.getElementById('custom-img-url-input');
@@ -1129,6 +1290,7 @@
         let isUserAdmin = false;
         let announcementsData = {};
         let partnersData = {};
+        let planningsData = {};
         let currentSlide = 0;
         let totalSlides = 0;
         let autoSlideTimer = null;
@@ -1164,6 +1326,39 @@
                 } catch (err) {
                     partnerUploadStatus.textContent = "❌ Erreur de réseau lors de l'upload.";
                     partnerUploadStatus.style.color = "#ff4444";
+                }
+            });
+        }
+
+        if (planningImgFileInput) {
+            planningImgFileInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                planningUploadStatus.textContent = "⏳ Envoi du planning en cours...";
+                planningUploadStatus.style.color = "#a855f7";
+
+                const formData = new FormData();
+                formData.append('image', file);
+
+                try {
+                    const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await res.json();
+                    if (data.success) {
+                        planningImgUrlInput.value = data.data.url;
+                        planningUploadStatus.textContent = "✅ Image importée avec succès !";
+                        planningUploadStatus.style.color = "#10b981";
+                    } else {
+                        planningUploadStatus.textContent = "❌ Échec de l'envoi de l'image.";
+                        planningUploadStatus.style.color = "#ff4444";
+                    }
+                } catch (err) {
+                    planningUploadStatus.textContent = "❌ Erreur de réseau lors de l'upload.";
+                    planningUploadStatus.style.color = "#ff4444";
                 }
             });
         }
@@ -1251,6 +1446,7 @@
                 if (isUserAdmin) {
                     if (quickAddBtn) quickAddBtn.classList.remove('hidden');
                     if (quickAddPartnerBtn) quickAddPartnerBtn.classList.remove('hidden');
+                    if (quickAddPlanningBtn) quickAddPlanningBtn.classList.remove('hidden');
                     if (quickEditHomeBtn) quickEditHomeBtn.classList.remove('hidden');
                     if (quickEditCustomBtn) quickEditCustomBtn.classList.remove('hidden');
                     if (navDashboard) navDashboard.classList.remove('hidden');
@@ -1266,6 +1462,7 @@
                 
                 if (quickAddBtn) quickAddBtn.classList.add('hidden');
                 if (quickAddPartnerBtn) quickAddPartnerBtn.classList.add('hidden');
+                if (quickAddPlanningBtn) quickAddPlanningBtn.classList.add('hidden');
                 if (quickEditHomeBtn) quickEditHomeBtn.classList.add('hidden');
                 if (quickEditCustomBtn) quickEditCustomBtn.classList.add('hidden');
                 if (navEspaceJoueur) navEspaceJoueur.classList.add('hidden');
@@ -1306,6 +1503,7 @@
             } else {
                 formAnnonceWrapper.classList.remove('hidden');
                 formPartnerWrapper.classList.add('hidden');
+                formPlanningWrapper.classList.add('hidden');
                 formHomeTextsWrapper.classList.add('hidden');
                 formCustomSectionWrapper.classList.add('hidden');
                 modal.classList.add('active');
@@ -1319,6 +1517,7 @@
                 document.getElementById("panel-form-title").textContent = "Publier une annonce";
                 formAnnonceWrapper.classList.remove('hidden');
                 formPartnerWrapper.classList.add('hidden');
+                formPlanningWrapper.classList.add('hidden');
                 formHomeTextsWrapper.classList.add('hidden');
                 formCustomSectionWrapper.classList.add('hidden');
                 modal.classList.add('active');
@@ -1334,6 +1533,22 @@
                 document.getElementById("partner-form-title").textContent = "Ajouter un Partenaire";
                 formAnnonceWrapper.classList.add('hidden');
                 formPartnerWrapper.classList.remove('hidden');
+                formPlanningWrapper.classList.add('hidden');
+                formHomeTextsWrapper.classList.add('hidden');
+                formCustomSectionWrapper.classList.add('hidden');
+                modal.classList.add('active');
+            };
+        }
+
+        if (quickAddPlanningBtn) {
+            quickAddPlanningBtn.onclick = () => {
+                document.getElementById("planning-id").value = "";
+                planningForm.reset();
+                if (planningUploadStatus) planningUploadStatus.textContent = "";
+                document.getElementById("planning-form-title").textContent = "Ajouter un Planning";
+                formAnnonceWrapper.classList.add('hidden');
+                formPartnerWrapper.classList.add('hidden');
+                formPlanningWrapper.classList.remove('hidden');
                 formHomeTextsWrapper.classList.add('hidden');
                 formCustomSectionWrapper.classList.add('hidden');
                 modal.classList.add('active');
@@ -1349,6 +1564,7 @@
 
                 formAnnonceWrapper.classList.add('hidden');
                 formPartnerWrapper.classList.add('hidden');
+                formPlanningWrapper.classList.add('hidden');
                 formHomeTextsWrapper.classList.remove('hidden');
                 formCustomSectionWrapper.classList.add('hidden');
                 modal.classList.add('active');
@@ -1366,6 +1582,7 @@
 
                 formAnnonceWrapper.classList.add('hidden');
                 formPartnerWrapper.classList.add('hidden');
+                formPlanningWrapper.classList.add('hidden');
                 formHomeTextsWrapper.classList.add('hidden');
                 formCustomSectionWrapper.classList.remove('hidden');
                 modal.classList.add('active');
@@ -1375,7 +1592,6 @@
         closeModalBtn.onclick = () => modal.classList.remove('active');
         window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
 
-        // SOUMISSION DE LA MODIFICATION DE LA SECTION PERSONNALISÉE
         customsectionForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!isUserAdmin) return alert("Droits insuffisants.");
@@ -1396,7 +1612,6 @@
             }
         });
 
-        // SOUMISSION DE LA MODIFICATION DES TEXTES DE L'ACCUEIL
         hometextsForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!isUserAdmin) return alert("Droits insuffisants.");
@@ -1433,14 +1648,16 @@
                 btnText: document.getElementById("annonce-btn-text").value,
                 btnLink: document.getElementById("annonce-btn-link").value,
                 content: document.getElementById("annonce-content").value,
-                expiresAt: expiresVal ? new Date(expiresVal).getTime() : null,
-                createdAt: Date.now()
+                expiresAt: expiresVal ? new Date(expiresVal).getTime() : null
             };
 
             try {
                 if (annonceId) {
                     await updateDoc(doc(db, "announcements", annonceId), payload);
                 } else {
+                    payload.createdAt = Date.now();
+                    payload.likes = 0;
+                    payload.likedBy = [];
                     await addDoc(collection(db, "announcements"), payload);
                 }
                 modal.classList.remove('active');
@@ -1482,6 +1699,77 @@
                 alert("Erreur enregistrement partenaire : " + err.message);
             }
         });
+
+        // SOUMISSION FORMULAIRE PLANNING
+        planningForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!isUserAdmin) return alert("Droits insuffisants.");
+
+            const planningId = document.getElementById("planning-id").value;
+            
+            const payload = {
+                title: document.getElementById("planning-title").value,
+                game: document.getElementById("planning-game").value,
+                imageUrl: document.getElementById("planning-img-url").value,
+                link: document.getElementById("planning-link").value,
+                description: document.getElementById("planning-desc").value,
+            };
+
+            try {
+                if (planningId) {
+                    await updateDoc(doc(db, "plannings", planningId), payload);
+                } else {
+                    payload.createdAt = Date.now();
+                    payload.views = 0;
+                    await addDoc(collection(db, "plannings"), payload);
+                }
+                modal.classList.remove('active');
+                planningForm.reset();
+            } catch (err) {
+                alert("Erreur enregistrement planning : " + err.message);
+            }
+        });
+
+        // --- FONCTION DE GESTION DES LIKES UNIQUES SUR LES ANNONCES ---
+        async function handleAnnonceLike(annId) {
+            const docRef = doc(db, "announcements", annId);
+            try {
+                await runTransaction(db, async (transaction) => {
+                    const annDoc = await transaction.get(docRef);
+                    if (!annDoc.exists()) return;
+
+                    const data = annDoc.data();
+                    let likedBy = data.likedBy || [];
+                    let currentLikes = data.likes || 0;
+
+                    const index = likedBy.indexOf(visitorId);
+                    if (index === -1) {
+                        likedBy.push(visitorId);
+                        currentLikes += 1;
+                    } else {
+                        likedBy.splice(index, 1);
+                        currentLikes = Math.max(0, currentLikes - 1);
+                    }
+
+                    transaction.update(docRef, {
+                        likes: currentLikes,
+                        likedBy: likedBy
+                    });
+                });
+            } catch (err) {
+                console.error("Erreur gestion du Like :", err);
+            }
+        }
+
+        // --- FONCTION DE COMPTAGE DES VUES COMPTEUR SUR PLANNINGS ---
+        function registerPlanningView(planningId) {
+            const viewedKey = `abysz_viewed_planning_${planningId}`;
+            if (!sessionStorage.getItem(viewedKey)) {
+                sessionStorage.setItem(viewedKey, "true");
+                const docRef = doc(db, "plannings", planningId);
+                updateDoc(docRef, { views: increment(1) }).catch(err => console.error("Erreur incrément vue :", err));
+            }
+        }
 
         function updateCarouselPosition() {
             feed.style.transform = `translateX(-${currentSlide * 100}%)`;
@@ -1567,6 +1855,10 @@
                     case 'evenement': categoryLabel = 'Événement'; categoryBadgeClass = 'badge-evenement'; break;
                 }
 
+                const likedByList = ann.likedBy || [];
+                const isLiked = likedByList.includes(visitorId);
+                const likesCount = ann.likes || 0;
+
                 let adminActionsHtml = '';
                 if (isUserAdmin) {
                     adminActionsHtml = `
@@ -1587,7 +1879,14 @@
                     <p>${ann.content}</p>
                     ${ann.imageUrl ? `<img src="${ann.imageUrl}" class="announcement-img" alt="${ann.title}">` : ''}
                     ${(ann.btnText && ann.btnLink) ? `<a href="${ann.btnLink}" target="_blank" rel="noopener noreferrer" class="announcement-action-btn">${ann.btnText}</a>` : ''}
-                    <span class="announcement-date">Publié le ${formattedDate}</span>
+                    
+                    <div class="announcement-footer">
+                        <span class="announcement-date">Publié le ${formattedDate}</span>
+                        <button class="like-btn ${isLiked ? 'liked' : ''}" data-id="${ann.id}">
+                            <span class="like-heart">${isLiked ? '❤️' : '🤍'}</span>
+                            <span class="like-count">${likesCount}</span>
+                        </button>
+                    </div>
                 `;
 
                 feed.appendChild(card);
@@ -1600,6 +1899,15 @@
                     startAutoSlide();
                 };
                 dotsContainer.appendChild(dot);
+            });
+
+            // Écouteur des clics sur les boutons de like
+            feed.querySelectorAll('.like-btn').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    const id = btn.getAttribute('data-id');
+                    handleAnnonceLike(id);
+                };
             });
 
             if (isUserAdmin) {
@@ -1638,6 +1946,7 @@
                         document.getElementById("panel-form-title").textContent = "Éditer l'annonce";
                         formAnnonceWrapper.classList.remove('hidden');
                         formPartnerWrapper.classList.add('hidden');
+                        formPlanningWrapper.classList.add('hidden');
                         formHomeTextsWrapper.classList.add('hidden');
                         formCustomSectionWrapper.classList.add('hidden');
                         modal.classList.add('active');
@@ -1647,6 +1956,88 @@
 
             updateCarouselPosition();
             startAutoSlide();
+        });
+
+        // --- ÉCOUTE DE LA COLLECTION PLANNINGS ---
+        const qPlannings = query(collection(db, "plannings"), orderBy("createdAt", "desc"));
+        onSnapshot(qPlannings, (snapshot) => {
+            planningsFeed.innerHTML = "";
+            planningsData = {};
+
+            if (snapshot.empty) {
+                planningsFeed.innerHTML = '<p class="loading-text">Aucun planning disponible pour le moment.</p>';
+                return;
+            }
+
+            snapshot.forEach((docSnap) => {
+                const plan = docSnap.data();
+                planningsData[docSnap.id] = plan;
+
+                // Comptage automatique d'une vue unique par session
+                registerPlanningView(docSnap.id);
+
+                const card = document.createElement("div");
+                card.className = "planning-card";
+
+                let adminActionsHtml = '';
+                if (isUserAdmin) {
+                    adminActionsHtml = `
+                        <div class="card-actions">
+                            <button class="edit-btn edit-planning-btn" data-id="${docSnap.id}">✏️</button>
+                            <button class="delete-btn delete-planning-btn" data-id="${docSnap.id}">🗑️</button>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    ${adminActionsHtml}
+                    <div class="planning-header">
+                        <span class="planning-game-tag">${plan.game || 'E-sport'}</span>
+                        <div class="planning-views-badge">👁️ ${plan.views || 0} vues</div>
+                    </div>
+                    <h3 class="planning-title">${plan.title}</h3>
+                    <p class="planning-desc">${plan.description}</p>
+                    ${plan.imageUrl ? `<img src="${plan.imageUrl}" class="planning-img" alt="${plan.title}">` : ''}
+                    ${plan.link ? `<a href="${plan.link}" target="_blank" rel="noopener noreferrer" class="planning-link">📅 Suivre le Planning</a>` : ''}
+                `;
+
+                planningsFeed.appendChild(card);
+            });
+
+            if (isUserAdmin) {
+                planningsFeed.querySelectorAll('.delete-planning-btn').forEach(btn => {
+                    btn.onclick = async (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        if (confirm("Voulez-vous supprimer ce planning ?")) {
+                            await deleteDoc(doc(db, "plannings", id));
+                        }
+                    };
+                });
+
+                planningsFeed.querySelectorAll('.edit-planning-btn').forEach(btn => {
+                    btn.onclick = (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        const plan = planningsData[id];
+                        if (!plan) return;
+
+                        document.getElementById("planning-id").value = id;
+                        document.getElementById("planning-title").value = plan.title || "";
+                        document.getElementById("planning-game").value = plan.game || "";
+                        document.getElementById("planning-img-url").value = plan.imageUrl || "";
+                        document.getElementById("planning-link").value = plan.link || "";
+                        document.getElementById("planning-desc").value = plan.description || "";
+                        if (planningUploadStatus) planningUploadStatus.textContent = "";
+
+                        document.getElementById("planning-form-title").textContent = "Éditer le Planning";
+                        formAnnonceWrapper.classList.add('hidden');
+                        formPartnerWrapper.classList.add('hidden');
+                        formPlanningWrapper.classList.remove('hidden');
+                        formHomeTextsWrapper.classList.add('hidden');
+                        formCustomSectionWrapper.classList.add('hidden');
+                        modal.classList.add('active');
+                    };
+                });
+            }
         });
 
         const qPartners = query(collection(db, "partners"), orderBy("createdAt", "desc"));
@@ -1729,6 +2120,7 @@
                         document.getElementById("partner-form-title").textContent = "Éditer le Partenaire";
                         formAnnonceWrapper.classList.add('hidden');
                         formPartnerWrapper.classList.remove('hidden');
+                        formPlanningWrapper.classList.add('hidden');
                         formHomeTextsWrapper.classList.add('hidden');
                         formCustomSectionWrapper.classList.add('hidden');
                         modal.classList.add('active');
@@ -1748,7 +2140,7 @@
 
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-        // Lightbox : zoom sur les images des annonces et de la section A la une
+        // Lightbox : zoom sur les images
         const imgLightbox = document.getElementById('img-lightbox');
         const imgLightboxImg = document.getElementById('img-lightbox-img');
 
@@ -1765,7 +2157,7 @@
         }
 
         document.addEventListener('click', (e) => {
-            const img = e.target.closest('.announcement-img, .custom-card-img');
+            const img = e.target.closest('.announcement-img, .custom-card-img, .planning-img');
             if (img && img.src && !img.classList.contains('hidden')) {
                 openLightbox(img.src, img.alt);
             }

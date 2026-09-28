@@ -20,7 +20,6 @@
         .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); will-change: transform, opacity; }
         .reveal-visible { opacity: 1; transform: translateY(0); }
 
-        /* Conteneur pub AdSense */
         .adsense-container {
             max-width: 1000px;
             margin: 30px auto;
@@ -340,7 +339,7 @@
         .announcement-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; flex-wrap: wrap; gap: 10px; }
         .announcement-date { font-size: 0.8rem; color: #777; }
 
-        /* BOUTON LIKE ANNONCE (1 UNIQUE PAR PERSONNE) */
+        /* BOUTON LIKE ANNONCE */
         .like-btn {
             display: inline-flex;
             align-items: center;
@@ -372,7 +371,7 @@
         .like-heart { font-size: 0.95rem; transition: transform 0.2s ease; }
         .like-btn.liked .like-heart { transform: scale(1.2); }
 
-        /* SECTION PLANNING DE LA SEMAINE UNIQUE AVEC COMPTEUR DE VUES */
+        /* SECTION PLANNING DE LA SEMAINE */
         .weekly-planning-container {
             max-width: 1000px;
             margin: 0 auto;
@@ -448,7 +447,7 @@
             transform: translateY(-2px);
         }
 
-        /* Lightbox (zoom image) */
+        /* Lightbox */
         .announcement-img, .custom-card-img, .weekly-planning-img { cursor: zoom-in; }
         .img-lightbox {
             position: fixed; inset: 0; z-index: 3000;
@@ -829,7 +828,7 @@
         <div class="carousel-dots" id="carousel-dots"></div>
     </section>
 
-    <!-- SECTION UNIQUE : PLANNING DE LA SEMAINE AVEC COMPTEUR DE VUES -->
+    <!-- SECTION UNIQUE : PLANNING DE LA SEMAINE -->
     <section id="planning-semaine" class="weekly-planning-container reveal">
         <div class="section-header">
             <div class="title-area">
@@ -950,7 +949,6 @@
                     </form>
                 </div>
 
-                <!-- FORMULAIRE ÉDITION DU PLANNING DE LA SEMAINE -->
                 <div id="form-weekly-wrapper" class="hidden">
                     <h3>Modifier le Planning de la Semaine</h3>
                     <form id="weekly-form">
@@ -1162,7 +1160,14 @@
         const db = getFirestore(app);
         const rtdb = getDatabase(app);
 
-        // --- ÉCOUTE EN TEMPS RÉEL DES TEXTES D'ACCUEIL ---
+        // --- VISITEUR UNIQUE POUR LIKES ET VUES ---
+        let visitorId = localStorage.getItem("abysz_visitor_id");
+        if (!visitorId) {
+            visitorId = "usr_" + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
+            localStorage.setItem("abysz_visitor_id", visitorId);
+        }
+
+        // --- ÉCOUTE DES TEXTES DE L'ACCUEIL ---
         onSnapshot(doc(db, "site_content", "home"), (snap) => {
             if (snap.exists()) {
                 const data = snap.data();
@@ -1173,7 +1178,7 @@
             }
         });
 
-        // --- ÉCOUTE EN TEMPS RÉEL DE LA SECTION PERSONNALISÉE ---
+        // --- ÉCOUTE DE LA SECTION PERSONNALISÉE ---
         onSnapshot(doc(db, "site_content", "custom_section"), (snap) => {
             const sectionTitle = document.getElementById("custom-section-title");
             const sectionText = document.getElementById("custom-section-text");
@@ -1196,15 +1201,16 @@
             }
         });
 
-        // --- ÉCOUTE EN TEMPS RÉEL DU PLANNING DE LA SEMAINE ET INCRÉMENTATION DES VUES ---
+        // --- INCRÉMENTATION DES VUES POUR TOUT VISITEUR ---
         function registerWeeklyPlanningView() {
             if (!sessionStorage.getItem("abysz_viewed_weekly_planning")) {
                 sessionStorage.setItem("abysz_viewed_weekly_planning", "true");
                 const docRef = doc(db, "site_content", "weekly_planning");
-                updateDoc(docRef, { views: increment(1) }).catch(err => console.error("Erreur increment vues :", err));
+                setDoc(docRef, { views: increment(1) }, { merge: true }).catch(err => console.error("Erreur increment vues :", err));
             }
         }
 
+        // --- ÉCOUTE DU PLANNING DE LA SEMAINE ---
         onSnapshot(doc(db, "site_content", "weekly_planning"), (snap) => {
             const titleEl = document.getElementById("weekly-title");
             const descEl = document.getElementById("weekly-desc");
@@ -1214,6 +1220,8 @@
 
             if (snap.exists()) {
                 const data = snap.data();
+                
+                // Compter la vue quel que soit l'utilisateur
                 registerWeeklyPlanningView();
 
                 titleEl.textContent = data.title || "Planning de la Semaine";
@@ -1243,16 +1251,10 @@
             }
         });
 
-        // --- GESTION DES VISITEURS EN TEMPS RÉEL ---
+        // --- VISITEURS EN LIGNE TEMPS RÉEL ---
         const connectedRef = ref(rtdb, ".info/connected");
         const onlineUsersRef = ref(rtdb, "online_users");
         const siteOnlineCountElement = document.getElementById("site-online-count");
-
-        let visitorId = localStorage.getItem("abysz_visitor_id");
-        if (!visitorId) {
-            visitorId = "usr_" + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
-            localStorage.setItem("abysz_visitor_id", visitorId);
-        }
 
         const tabSessionId = "session_" + Math.random().toString(36).substring(2, 9);
         const currentTabRef = ref(rtdb, `online_users/${visitorId}/${tabSessionId}`);
@@ -1775,7 +1777,7 @@
             }
         });
 
-        // --- GESTION DU LIKE UNIQUE PAR ANNONCE ---
+        // --- GESTION DES LIKES SUR LES ANNONCES ---
         async function handleAnnonceLike(annId) {
             const docRef = doc(db, "announcements", annId);
             try {
@@ -1784,8 +1786,8 @@
                     if (!annDoc.exists()) return;
 
                     const data = annDoc.data();
-                    let likedBy = data.likedBy || [];
-                    let currentLikes = data.likes || 0;
+                    let likedBy = Array.isArray(data.likedBy) ? data.likedBy : [];
+                    let currentLikes = typeof data.likes === 'number' ? data.likes : 0;
 
                     const index = likedBy.indexOf(visitorId);
                     if (index === -1) {
@@ -1890,9 +1892,9 @@
                     case 'evenement': categoryLabel = 'Événement'; categoryBadgeClass = 'badge-evenement'; break;
                 }
 
-                const likedByList = ann.likedBy || [];
+                const likedByList = Array.isArray(ann.likedBy) ? ann.likedBy : [];
                 const isLiked = likedByList.includes(visitorId);
-                const likesCount = ann.likes || 0;
+                const likesCount = typeof ann.likes === 'number' ? ann.likes : 0;
 
                 let adminActionsHtml = '';
                 if (isUserAdmin) {
@@ -2092,7 +2094,6 @@
 
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-        // Lightbox : zoom sur les images
         const imgLightbox = document.getElementById('img-lightbox');
         const imgLightboxImg = document.getElementById('img-lightbox-img');
 

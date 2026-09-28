@@ -46,7 +46,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Extraction précise du nom de fichier sous GitHub Pages
         function getCurrentFileName() {
             let path = window.location.pathname.toLowerCase();
             if (path.endsWith('/') || path.endsWith('/abyszsite')) {
@@ -55,7 +54,6 @@
             return path.split('/').pop();
         }
 
-        // Écoute en temps réel de la collection Firebase Maintenance
         onSnapshot(doc(db, "system", "maintenance"), (snap) => {
             if (snap.exists()) {
                 const data = snap.data();
@@ -119,7 +117,6 @@
     </script>
         
     <style>
-        /* Navigation Base */
         nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; position: relative; z-index: 1000; background: #0a0a0a; border-bottom: 1px solid #1a1a1a; }
         nav ul { display: flex; list-style: none; gap: 20px; margin: 0; padding: 0; align-items: center; }
         nav ul li a { position: relative; transition: color 0.3s ease; text-decoration: none; color: white; }
@@ -153,7 +150,6 @@
             transform: translateY(-1px);
         }
 
-        /* Lien ABYSZ TV Moderne & Attractif */
         .abysz-tv-badge {
             display: inline-flex;
             align-items: center;
@@ -174,9 +170,7 @@
             overflow: hidden;
         }
 
-        .abysz-tv-badge::after {
-            display: none !important;
-        }
+        .abysz-tv-badge::after { display: none !important; }
 
         .abysz-tv-badge:hover {
             background: linear-gradient(135deg, #9146FF, #a855f7);
@@ -294,7 +288,6 @@
         .btn { transition: transform 0.2s ease, box-shadow 0.3s ease; display: inline-block; text-decoration: none; background: #a855f7; color: white; padding: 12px 28px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-weight: bold; }
         .btn:hover { transform: translateY(-3px); box-shadow: 0 0 20px rgba(168, 85, 247, 0.6); background: #b975ff; }
         
-        /* Section À propos */
         .about-section { max-width: 1000px; margin: 0 auto; padding: 40px 20px 10px 20px; line-height: 1.7; color: #ccc; }
         .about-section h2 { font-family: 'Orbitron', sans-serif; color: #fff; font-size: 1.8rem; margin-bottom: 15px; }
 
@@ -347,7 +340,7 @@
         .announcement-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; flex-wrap: wrap; gap: 10px; }
         .announcement-date { font-size: 0.8rem; color: #777; }
 
-        /* BOUTON LIKE ANNONCE */
+        /* BOUTON LIKE ANNONCE (1 UNIQUE PAR PERSONNE) */
         .like-btn {
             display: inline-flex;
             align-items: center;
@@ -379,8 +372,84 @@
         .like-heart { font-size: 0.95rem; transition: transform 0.2s ease; }
         .like-btn.liked .like-heart { transform: scale(1.2); }
 
+        /* SECTION PLANNING DE LA SEMAINE UNIQUE AVEC COMPTEUR DE VUES */
+        .weekly-planning-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 50px 20px;
+            border-top: 1px solid #1a1a1a;
+        }
+        .weekly-planning-card {
+            background: rgba(20, 20, 20, 0.85);
+            border: 1px solid #2a2a2a;
+            border-radius: 16px;
+            padding: 30px;
+            position: relative;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .weekly-planning-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .weekly-planning-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: #ffffff;
+            margin: 0;
+        }
+        .weekly-views-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            color: #a855f7;
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .weekly-planning-img {
+            width: 100%;
+            max-height: 480px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid #333;
+        }
+        .weekly-planning-desc {
+            color: #cccccc;
+            font-size: 0.98rem;
+            line-height: 1.6;
+            margin: 0;
+            white-space: pre-wrap;
+        }
+        .weekly-planning-btn {
+            align-self: flex-start;
+            background: linear-gradient(135deg, #a855f7, #7e22ce);
+            color: white;
+            text-decoration: none;
+            padding: 10px 22px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            transition: all 0.25s ease;
+        }
+        .weekly-planning-btn:hover {
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+            transform: translateY(-2px);
+        }
+
         /* Lightbox (zoom image) */
-        .announcement-img, .custom-card-img, .planning-img { cursor: zoom-in; }
+        .announcement-img, .custom-card-img, .weekly-planning-img { cursor: zoom-in; }
         .img-lightbox {
             position: fixed; inset: 0; z-index: 3000;
             background: rgba(0, 0, 0, 0.92);
@@ -414,73 +483,6 @@
         .edit-btn:hover { background: #2563eb; }
         .delete-btn { background: #ff4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: background 0.2s; }
         .delete-btn:hover { background: #cc3333; }
-
-        /* SECTION PLANNINGS & CALENDRIER (NOUVEAU) */
-        .plannings-container { max-width: 1100px; margin: 0 auto; padding: 50px 20px; border-top: 1px solid #1a1a1a; }
-        .plannings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; margin-top: 10px; }
-        .planning-card {
-            background: rgba(20, 20, 20, 0.85);
-            border: 1px solid #262626;
-            border-radius: 16px;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            position: relative;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-        .planning-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(168, 85, 247, 0.5);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 15px rgba(168, 85, 247, 0.2);
-        }
-        .planning-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-        .planning-game-tag {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.72rem;
-            font-weight: bold;
-            padding: 4px 10px;
-            border-radius: 20px;
-            background: rgba(168, 85, 247, 0.15);
-            color: #a855f7;
-            border: 1px solid rgba(168, 85, 247, 0.3);
-            text-transform: uppercase;
-        }
-        .planning-views-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.75rem;
-            color: #999;
-            background: rgba(255, 255, 255, 0.04);
-            padding: 4px 10px;
-            border-radius: 12px;
-            border: 1px solid #2a2a2a;
-        }
-        .planning-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.25rem;
-            color: #fff;
-            margin: 0;
-        }
-        .planning-desc { color: #ccc; font-size: 0.9rem; line-height: 1.5; margin: 0; white-space: pre-wrap; }
-        .planning-img { width: 100%; max-height: 220px; object-fit: cover; border-radius: 10px; border: 1px solid #2a2a2a; }
-        .planning-link {
-            background: linear-gradient(135deg, #a855f7, #7e22ce);
-            color: white;
-            text-decoration: none;
-            text-align: center;
-            padding: 10px;
-            border-radius: 8px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.8rem;
-            font-weight: 700;
-            transition: all 0.2s ease;
-            margin-top: auto;
-        }
-        .planning-link:hover { opacity: 0.9; box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
 
         .partners-container { max-width: 1100px; margin: 0 auto; padding: 50px 20px; border-top: 1px solid #1a1a1a; }
         .partners-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; margin-top: 10px; }
@@ -621,7 +623,6 @@
             box-shadow: 0 6px 15px var(--partner-glow, rgba(168, 85, 247, 0.4));
         }
 
-        /* Style Section Personnalisée Admin */
         .custom-section-container {
             max-width: 1100px;
             margin: 0 auto;
@@ -731,7 +732,7 @@
             .card-actions { position: absolute; top: 12px; right: 12px; width: auto; justify-content: flex-end; gap: 6px; }
             .input-row { flex-direction: column; gap: 0; }
             .modal-content { padding: 25px 15px; border-radius: 12px; }
-            .partners-grid, .plannings-grid { grid-template-columns: 1fr; }
+            .partners-grid { grid-template-columns: 1fr; }
             .custom-card { flex-direction: column; text-align: center; }
             .custom-card-img { max-width: 100%; }
             .discord-widget-wrapper { flex-direction: column; width: 100%; box-sizing: border-box; }
@@ -765,7 +766,7 @@
             <li><a href="index.html">Accueil</a></li>
             <li><a href="tv.html" class="abysz-tv-badge"><span class="live-dot-tv"></span><span>📺 ABYSZ TV</span></a></li>
             <li><a href="roster.html">Roster</a></li>
-            <li><a href="#plannings">Plannings</a></li>
+            <li><a href="#planning-semaine">Planning</a></li>
             <li><a href="boutique.html">Boutique</a></li>
             <li><a href="#rejoindre-commu" class="btn-animated-join">🚀 Rejoindre</a></li>
             <li>
@@ -828,17 +829,25 @@
         <div class="carousel-dots" id="carousel-dots"></div>
     </section>
 
-    <!-- NOUVELLE SECTION PLANNINGS AVEC COMPTEUR DE VUES -->
-    <section id="plannings" class="plannings-container reveal">
+    <!-- SECTION UNIQUE : PLANNING DE LA SEMAINE AVEC COMPTEUR DE VUES -->
+    <section id="planning-semaine" class="weekly-planning-container reveal">
         <div class="section-header">
             <div class="title-area">
-                <h2>Plannings & Calendrier</h2>
-                <button class="add-btn hidden" id="quick-add-planning-btn" title="Ajouter un planning">+</button>
+                <h2>Planning de la Semaine</h2>
+                <button class="edit-home-btn hidden" id="quick-edit-weekly-btn" title="Gérer le planning">✏️ Modifier le planning</button>
             </div>
         </div>
-        
-        <div class="plannings-grid" id="plannings-feed">
-            <p class="loading-text">Chargement des plannings...</p>
+        <div class="weekly-planning-card" id="weekly-planning-card">
+            <div class="weekly-planning-header">
+                <h3 class="weekly-planning-title" id="weekly-title">Chargement du planning...</h3>
+                <div class="weekly-views-badge">
+                    <span>👁️</span>
+                    <span id="weekly-views-count">0 vues</span>
+                </div>
+            </div>
+            <p class="weekly-planning-desc" id="weekly-desc">Veuillez patienter...</p>
+            <img src="" id="weekly-img" class="weekly-planning-img hidden" alt="Planning de la semaine">
+            <a href="#" id="weekly-btn" target="_blank" rel="noopener noreferrer" class="weekly-planning-btn hidden">📅 Voir en direct</a>
         </div>
     </section>
 
@@ -941,6 +950,39 @@
                     </form>
                 </div>
 
+                <!-- FORMULAIRE ÉDITION DU PLANNING DE LA SEMAINE -->
+                <div id="form-weekly-wrapper" class="hidden">
+                    <h3>Modifier le Planning de la Semaine</h3>
+                    <form id="weekly-form">
+                        <div class="input-group">
+                            <label for="weekly-title-input">Titre du Planning</label>
+                            <input type="text" id="weekly-title-input" placeholder="Ex: Planning de la Semaine du 12 au 18" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="weekly-file-input">Téléverser l'Image du Planning</label>
+                            <div class="upload-wrapper">
+                                <input type="file" id="weekly-file-input" accept="image/*">
+                                <span class="upload-status" id="weekly-upload-status"></span>
+                            </div>
+                            <label for="weekly-img-url-input" style="margin-top: 10px;">Ou copier le Lien / URL de l'image</label>
+                            <input type="url" id="weekly-img-url-input" placeholder="https://lien-vers-image.png">
+                        </div>
+                        <div class="input-group">
+                            <label for="weekly-link-input">Lien d'Action / Twitch (Optionnel)</label>
+                            <input type="url" id="weekly-link-input" placeholder="https://twitch.tv/abysz_o">
+                        </div>
+                        <div class="input-group">
+                            <label for="weekly-btn-label-input">Texte du Bouton (Optionnel)</label>
+                            <input type="text" id="weekly-btn-label-input" placeholder="Ex: Suivre en direct sur Twitch">
+                        </div>
+                        <div class="input-group">
+                            <label for="weekly-desc-input">Description / Notes de la semaine</label>
+                            <textarea id="weekly-desc-input" rows="4" placeholder="Matchs importants, compétitions, horaires de la semaine..."></textarea>
+                        </div>
+                        <button type="submit" class="form-btn" id="publish-weekly-btn">Enregistrer le Planning</button>
+                    </form>
+                </div>
+
                 <div id="form-customsection-wrapper" class="hidden">
                     <h3>Modifier la Section Personnalisée</h3>
                     <form id="customsection-form">
@@ -1016,47 +1058,6 @@
                         </div>
 
                         <button type="submit" class="form-btn" id="publish-btn">Enregistrer l'annonce</button>
-                    </form>
-                </div>
-
-                <!-- FORMULAIRE EDITION PLANNING (NOUVEAU) -->
-                <div id="form-planning-wrapper" class="hidden">
-                    <h3 id="planning-form-title">Gestion du Planning</h3>
-                    <form id="planning-form">
-                        <input type="hidden" id="planning-id" value="">
-                        
-                        <div class="input-row">
-                            <div class="input-group">
-                                <label for="planning-title">Titre du Planning / Semaine</label>
-                                <input type="text" id="planning-title" placeholder="Ex: Planning de la Semaine #12" required>
-                            </div>
-                            <div class="input-group">
-                                <label for="planning-game">Catégorie / Jeu</label>
-                                <input type="text" id="planning-game" placeholder="Ex: Fortnite / Stream / Global" required>
-                            </div>
-                        </div>
-
-                        <div class="input-group">
-                            <label for="planning-img-file">Téléverser l'Image du Planning</label>
-                            <div class="upload-wrapper">
-                                <input type="file" id="planning-img-file" accept="image/*">
-                                <span class="upload-status" id="planning-upload-status"></span>
-                            </div>
-                            <label for="planning-img-url" style="margin-top: 10px;">Ou Lien / URL de l'image</label>
-                            <input type="url" id="planning-img-url" placeholder="https://lien-image.png">
-                        </div>
-
-                        <div class="input-group">
-                            <label for="planning-link">Lien d'Action / Twitch / Agenda (Optionnel)</label>
-                            <input type="url" id="planning-link" placeholder="https://twitch.tv/abysz_o">
-                        </div>
-
-                        <div class="input-group">
-                            <label for="planning-desc">Description / Détails</label>
-                            <textarea id="planning-desc" rows="3" placeholder="Présentation des événements ou matchs prévus..." required></textarea>
-                        </div>
-
-                        <button type="submit" class="form-btn" id="publish-planning-btn">Enregistrer le planning</button>
                     </form>
                 </div>
 
@@ -1161,7 +1162,7 @@
         const db = getFirestore(app);
         const rtdb = getDatabase(app);
 
-        // --- ÉCOUTE EN TEMPS RÉEL DES TEXTES DE LA PAGE D'ACCUEIL ---
+        // --- ÉCOUTE EN TEMPS RÉEL DES TEXTES D'ACCUEIL ---
         onSnapshot(doc(db, "site_content", "home"), (snap) => {
             if (snap.exists()) {
                 const data = snap.data();
@@ -1192,6 +1193,53 @@
                 sectionTitle.textContent = "À la Une";
                 sectionText.textContent = "Bienvenue dans cette nouvelle section ! Vous pouvez la personnaliser depuis le panneau d'administration.";
                 sectionImg.classList.add("hidden");
+            }
+        });
+
+        // --- ÉCOUTE EN TEMPS RÉEL DU PLANNING DE LA SEMAINE ET INCRÉMENTATION DES VUES ---
+        function registerWeeklyPlanningView() {
+            if (!sessionStorage.getItem("abysz_viewed_weekly_planning")) {
+                sessionStorage.setItem("abysz_viewed_weekly_planning", "true");
+                const docRef = doc(db, "site_content", "weekly_planning");
+                updateDoc(docRef, { views: increment(1) }).catch(err => console.error("Erreur increment vues :", err));
+            }
+        }
+
+        onSnapshot(doc(db, "site_content", "weekly_planning"), (snap) => {
+            const titleEl = document.getElementById("weekly-title");
+            const descEl = document.getElementById("weekly-desc");
+            const imgEl = document.getElementById("weekly-img");
+            const btnEl = document.getElementById("weekly-btn");
+            const viewsEl = document.getElementById("weekly-views-count");
+
+            if (snap.exists()) {
+                const data = snap.data();
+                registerWeeklyPlanningView();
+
+                titleEl.textContent = data.title || "Planning de la Semaine";
+                descEl.textContent = data.description || "Consultez le planning compétitif et événementiel de la semaine.";
+                viewsEl.textContent = `${data.views || 0} vue${(data.views || 0) > 1 ? 's' : ''}`;
+
+                if (data.imageUrl) {
+                    imgEl.src = data.imageUrl;
+                    imgEl.classList.remove("hidden");
+                } else {
+                    imgEl.classList.add("hidden");
+                }
+
+                if (data.link) {
+                    btnEl.href = data.link;
+                    btnEl.textContent = data.btnLabel || "📅 Voir en direct";
+                    btnEl.classList.remove("hidden");
+                } else {
+                    btnEl.classList.add("hidden");
+                }
+            } else {
+                titleEl.textContent = "Planning de la Semaine";
+                descEl.textContent = "Aucun planning actuellement configuré. Restez connectés !";
+                viewsEl.textContent = "0 vue";
+                imgEl.classList.add("hidden");
+                btnEl.classList.add("hidden");
             }
         });
 
@@ -1228,25 +1276,24 @@
             }
         });
 
-        // Éléments HTML
         const modal = document.getElementById('admin-modal');
         const adminGateBtn = document.getElementById('admin-gate-btn');
         const quickAddBtn = document.getElementById('quick-add-btn');
         const quickAddPartnerBtn = document.getElementById('quick-add-partner-btn');
-        const quickAddPlanningBtn = document.getElementById('quick-add-planning-btn');
+        const quickEditWeeklyBtn = document.getElementById('quick-edit-weekly-btn');
         const quickEditHomeBtn = document.getElementById('quick-edit-home-btn');
         const quickEditCustomBtn = document.getElementById('quick-edit-custom-btn');
         const closeModalBtn = document.getElementById('close-modal-btn');
         const loginForm = document.getElementById('login-form');
         const announcementForm = document.getElementById('announcement-form');
         const partnerForm = document.getElementById('partner-form');
-        const planningForm = document.getElementById('planning-form');
+        const weeklyForm = document.getElementById('weekly-form');
         const hometextsForm = document.getElementById('hometexts-form');
         const customsectionForm = document.getElementById('customsection-form');
         
         const formAnnonceWrapper = document.getElementById('form-annonce-wrapper');
         const formPartnerWrapper = document.getElementById('form-partner-wrapper');
-        const formPlanningWrapper = document.getElementById('form-planning-wrapper');
+        const formWeeklyWrapper = document.getElementById('form-weekly-wrapper');
         const formHomeTextsWrapper = document.getElementById('form-hometexts-wrapper');
         const formCustomSectionWrapper = document.getElementById('form-customsection-wrapper');
 
@@ -1257,7 +1304,6 @@
         const logoutBtn = document.getElementById('logout-btn');
         const feed = document.getElementById("announcements-feed");
         const partnersFeed = document.getElementById("partners-feed");
-        const planningsFeed = document.getElementById("plannings-feed");
         const dotsContainer = document.getElementById("carousel-dots");
         const prevBtn = document.getElementById("prev-slide");
         const nextBtn = document.getElementById("next-slide");
@@ -1268,9 +1314,9 @@
         const partnerLogoUrlInput = document.getElementById('partner-logo-url');
         const partnerUploadStatus = document.getElementById('partner-upload-status');
 
-        const planningImgFileInput = document.getElementById('planning-img-file');
-        const planningImgUrlInput = document.getElementById('planning-img-url');
-        const planningUploadStatus = document.getElementById('planning-upload-status');
+        const weeklyFileInput = document.getElementById('weekly-file-input');
+        const weeklyImgUrlInput = document.getElementById('weekly-img-url-input');
+        const weeklyUploadStatus = document.getElementById('weekly-upload-status');
 
         const customFileInput = document.getElementById('custom-file-input');
         const customImgUrlInput = document.getElementById('custom-img-url-input');
@@ -1290,7 +1336,6 @@
         let isUserAdmin = false;
         let announcementsData = {};
         let partnersData = {};
-        let planningsData = {};
         let currentSlide = 0;
         let totalSlides = 0;
         let autoSlideTimer = null;
@@ -1330,13 +1375,13 @@
             });
         }
 
-        if (planningImgFileInput) {
-            planningImgFileInput.addEventListener('change', async (e) => {
+        if (weeklyFileInput) {
+            weeklyFileInput.addEventListener('change', async (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
 
-                planningUploadStatus.textContent = "⏳ Envoi du planning en cours...";
-                planningUploadStatus.style.color = "#a855f7";
+                weeklyUploadStatus.textContent = "⏳ Envoi du planning en cours...";
+                weeklyUploadStatus.style.color = "#a855f7";
 
                 const formData = new FormData();
                 formData.append('image', file);
@@ -1349,16 +1394,16 @@
 
                     const data = await res.json();
                     if (data.success) {
-                        planningImgUrlInput.value = data.data.url;
-                        planningUploadStatus.textContent = "✅ Image importée avec succès !";
-                        planningUploadStatus.style.color = "#10b981";
+                        weeklyImgUrlInput.value = data.data.url;
+                        weeklyUploadStatus.textContent = "✅ Image du planning importée !";
+                        weeklyUploadStatus.style.color = "#10b981";
                     } else {
-                        planningUploadStatus.textContent = "❌ Échec de l'envoi de l'image.";
-                        planningUploadStatus.style.color = "#ff4444";
+                        weeklyUploadStatus.textContent = "❌ Échec de l'envoi de l'image.";
+                        weeklyUploadStatus.style.color = "#ff4444";
                     }
                 } catch (err) {
-                    planningUploadStatus.textContent = "❌ Erreur de réseau lors de l'upload.";
-                    planningUploadStatus.style.color = "#ff4444";
+                    weeklyUploadStatus.textContent = "❌ Erreur de réseau lors de l'upload.";
+                    weeklyUploadStatus.style.color = "#ff4444";
                 }
             });
         }
@@ -1446,7 +1491,7 @@
                 if (isUserAdmin) {
                     if (quickAddBtn) quickAddBtn.classList.remove('hidden');
                     if (quickAddPartnerBtn) quickAddPartnerBtn.classList.remove('hidden');
-                    if (quickAddPlanningBtn) quickAddPlanningBtn.classList.remove('hidden');
+                    if (quickEditWeeklyBtn) quickEditWeeklyBtn.classList.remove('hidden');
                     if (quickEditHomeBtn) quickEditHomeBtn.classList.remove('hidden');
                     if (quickEditCustomBtn) quickEditCustomBtn.classList.remove('hidden');
                     if (navDashboard) navDashboard.classList.remove('hidden');
@@ -1462,7 +1507,7 @@
                 
                 if (quickAddBtn) quickAddBtn.classList.add('hidden');
                 if (quickAddPartnerBtn) quickAddPartnerBtn.classList.add('hidden');
-                if (quickAddPlanningBtn) quickAddPlanningBtn.classList.add('hidden');
+                if (quickEditWeeklyBtn) quickEditWeeklyBtn.classList.add('hidden');
                 if (quickEditHomeBtn) quickEditHomeBtn.classList.add('hidden');
                 if (quickEditCustomBtn) quickEditCustomBtn.classList.add('hidden');
                 if (navEspaceJoueur) navEspaceJoueur.classList.add('hidden');
@@ -1503,7 +1548,7 @@
             } else {
                 formAnnonceWrapper.classList.remove('hidden');
                 formPartnerWrapper.classList.add('hidden');
-                formPlanningWrapper.classList.add('hidden');
+                formWeeklyWrapper.classList.add('hidden');
                 formHomeTextsWrapper.classList.add('hidden');
                 formCustomSectionWrapper.classList.add('hidden');
                 modal.classList.add('active');
@@ -1517,7 +1562,7 @@
                 document.getElementById("panel-form-title").textContent = "Publier une annonce";
                 formAnnonceWrapper.classList.remove('hidden');
                 formPartnerWrapper.classList.add('hidden');
-                formPlanningWrapper.classList.add('hidden');
+                formWeeklyWrapper.classList.add('hidden');
                 formHomeTextsWrapper.classList.add('hidden');
                 formCustomSectionWrapper.classList.add('hidden');
                 modal.classList.add('active');
@@ -1533,22 +1578,30 @@
                 document.getElementById("partner-form-title").textContent = "Ajouter un Partenaire";
                 formAnnonceWrapper.classList.add('hidden');
                 formPartnerWrapper.classList.remove('hidden');
-                formPlanningWrapper.classList.add('hidden');
+                formWeeklyWrapper.classList.add('hidden');
                 formHomeTextsWrapper.classList.add('hidden');
                 formCustomSectionWrapper.classList.add('hidden');
                 modal.classList.add('active');
             };
         }
 
-        if (quickAddPlanningBtn) {
-            quickAddPlanningBtn.onclick = () => {
-                document.getElementById("planning-id").value = "";
-                planningForm.reset();
-                if (planningUploadStatus) planningUploadStatus.textContent = "";
-                document.getElementById("planning-form-title").textContent = "Ajouter un Planning";
+        if (quickEditWeeklyBtn) {
+            quickEditWeeklyBtn.onclick = () => {
+                document.getElementById("weekly-title-input").value = document.getElementById("weekly-title").textContent.trim();
+                document.getElementById("weekly-desc-input").value = document.getElementById("weekly-desc").textContent.trim();
+                
+                const currentImg = document.getElementById("weekly-img");
+                document.getElementById("weekly-img-url-input").value = currentImg.classList.contains("hidden") ? "" : currentImg.src;
+
+                const currentBtn = document.getElementById("weekly-btn");
+                document.getElementById("weekly-link-input").value = currentBtn.classList.contains("hidden") ? "" : currentBtn.href;
+                document.getElementById("weekly-btn-label-input").value = currentBtn.classList.contains("hidden") ? "📅 Voir en direct" : currentBtn.textContent;
+                
+                if (weeklyUploadStatus) weeklyUploadStatus.textContent = "";
+
                 formAnnonceWrapper.classList.add('hidden');
                 formPartnerWrapper.classList.add('hidden');
-                formPlanningWrapper.classList.remove('hidden');
+                formWeeklyWrapper.classList.remove('hidden');
                 formHomeTextsWrapper.classList.add('hidden');
                 formCustomSectionWrapper.classList.add('hidden');
                 modal.classList.add('active');
@@ -1564,7 +1617,7 @@
 
                 formAnnonceWrapper.classList.add('hidden');
                 formPartnerWrapper.classList.add('hidden');
-                formPlanningWrapper.classList.add('hidden');
+                formWeeklyWrapper.classList.add('hidden');
                 formHomeTextsWrapper.classList.remove('hidden');
                 formCustomSectionWrapper.classList.add('hidden');
                 modal.classList.add('active');
@@ -1582,7 +1635,7 @@
 
                 formAnnonceWrapper.classList.add('hidden');
                 formPartnerWrapper.classList.add('hidden');
-                formPlanningWrapper.classList.add('hidden');
+                formWeeklyWrapper.classList.add('hidden');
                 formHomeTextsWrapper.classList.add('hidden');
                 formCustomSectionWrapper.classList.remove('hidden');
                 modal.classList.add('active');
@@ -1591,6 +1644,28 @@
 
         closeModalBtn.onclick = () => modal.classList.remove('active');
         window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
+
+        weeklyForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!isUserAdmin) return alert("Droits insuffisants.");
+
+            const payload = {
+                title: document.getElementById("weekly-title-input").value,
+                description: document.getElementById("weekly-desc-input").value,
+                imageUrl: document.getElementById("weekly-img-url-input").value,
+                link: document.getElementById("weekly-link-input").value,
+                btnLabel: document.getElementById("weekly-btn-label-input").value || "📅 Voir en direct",
+                updatedAt: Date.now()
+            };
+
+            try {
+                await setDoc(doc(db, "site_content", "weekly_planning"), payload, { merge: true });
+                modal.classList.remove('active');
+                alert("Planning de la semaine mis à jour !");
+            } catch (err) {
+                alert("Erreur d'enregistrement : " + err.message);
+            }
+        });
 
         customsectionForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1700,37 +1775,7 @@
             }
         });
 
-        // SOUMISSION FORMULAIRE PLANNING
-        planningForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!isUserAdmin) return alert("Droits insuffisants.");
-
-            const planningId = document.getElementById("planning-id").value;
-            
-            const payload = {
-                title: document.getElementById("planning-title").value,
-                game: document.getElementById("planning-game").value,
-                imageUrl: document.getElementById("planning-img-url").value,
-                link: document.getElementById("planning-link").value,
-                description: document.getElementById("planning-desc").value,
-            };
-
-            try {
-                if (planningId) {
-                    await updateDoc(doc(db, "plannings", planningId), payload);
-                } else {
-                    payload.createdAt = Date.now();
-                    payload.views = 0;
-                    await addDoc(collection(db, "plannings"), payload);
-                }
-                modal.classList.remove('active');
-                planningForm.reset();
-            } catch (err) {
-                alert("Erreur enregistrement planning : " + err.message);
-            }
-        });
-
-        // --- FONCTION DE GESTION DES LIKES UNIQUES SUR LES ANNONCES ---
+        // --- GESTION DU LIKE UNIQUE PAR ANNONCE ---
         async function handleAnnonceLike(annId) {
             const docRef = doc(db, "announcements", annId);
             try {
@@ -1758,16 +1803,6 @@
                 });
             } catch (err) {
                 console.error("Erreur gestion du Like :", err);
-            }
-        }
-
-        // --- FONCTION DE COMPTAGE DES VUES COMPTEUR SUR PLANNINGS ---
-        function registerPlanningView(planningId) {
-            const viewedKey = `abysz_viewed_planning_${planningId}`;
-            if (!sessionStorage.getItem(viewedKey)) {
-                sessionStorage.setItem(viewedKey, "true");
-                const docRef = doc(db, "plannings", planningId);
-                updateDoc(docRef, { views: increment(1) }).catch(err => console.error("Erreur incrément vue :", err));
             }
         }
 
@@ -1901,7 +1936,6 @@
                 dotsContainer.appendChild(dot);
             });
 
-            // Écouteur des clics sur les boutons de like
             feed.querySelectorAll('.like-btn').forEach(btn => {
                 btn.onclick = (e) => {
                     e.stopPropagation();
@@ -1946,7 +1980,7 @@
                         document.getElementById("panel-form-title").textContent = "Éditer l'annonce";
                         formAnnonceWrapper.classList.remove('hidden');
                         formPartnerWrapper.classList.add('hidden');
-                        formPlanningWrapper.classList.add('hidden');
+                        formWeeklyWrapper.classList.add('hidden');
                         formHomeTextsWrapper.classList.add('hidden');
                         formCustomSectionWrapper.classList.add('hidden');
                         modal.classList.add('active');
@@ -1956,88 +1990,6 @@
 
             updateCarouselPosition();
             startAutoSlide();
-        });
-
-        // --- ÉCOUTE DE LA COLLECTION PLANNINGS ---
-        const qPlannings = query(collection(db, "plannings"), orderBy("createdAt", "desc"));
-        onSnapshot(qPlannings, (snapshot) => {
-            planningsFeed.innerHTML = "";
-            planningsData = {};
-
-            if (snapshot.empty) {
-                planningsFeed.innerHTML = '<p class="loading-text">Aucun planning disponible pour le moment.</p>';
-                return;
-            }
-
-            snapshot.forEach((docSnap) => {
-                const plan = docSnap.data();
-                planningsData[docSnap.id] = plan;
-
-                // Comptage automatique d'une vue unique par session
-                registerPlanningView(docSnap.id);
-
-                const card = document.createElement("div");
-                card.className = "planning-card";
-
-                let adminActionsHtml = '';
-                if (isUserAdmin) {
-                    adminActionsHtml = `
-                        <div class="card-actions">
-                            <button class="edit-btn edit-planning-btn" data-id="${docSnap.id}">✏️</button>
-                            <button class="delete-btn delete-planning-btn" data-id="${docSnap.id}">🗑️</button>
-                        </div>
-                    `;
-                }
-
-                card.innerHTML = `
-                    ${adminActionsHtml}
-                    <div class="planning-header">
-                        <span class="planning-game-tag">${plan.game || 'E-sport'}</span>
-                        <div class="planning-views-badge">👁️ ${plan.views || 0} vues</div>
-                    </div>
-                    <h3 class="planning-title">${plan.title}</h3>
-                    <p class="planning-desc">${plan.description}</p>
-                    ${plan.imageUrl ? `<img src="${plan.imageUrl}" class="planning-img" alt="${plan.title}">` : ''}
-                    ${plan.link ? `<a href="${plan.link}" target="_blank" rel="noopener noreferrer" class="planning-link">📅 Suivre le Planning</a>` : ''}
-                `;
-
-                planningsFeed.appendChild(card);
-            });
-
-            if (isUserAdmin) {
-                planningsFeed.querySelectorAll('.delete-planning-btn').forEach(btn => {
-                    btn.onclick = async (e) => {
-                        const id = e.target.getAttribute('data-id');
-                        if (confirm("Voulez-vous supprimer ce planning ?")) {
-                            await deleteDoc(doc(db, "plannings", id));
-                        }
-                    };
-                });
-
-                planningsFeed.querySelectorAll('.edit-planning-btn').forEach(btn => {
-                    btn.onclick = (e) => {
-                        const id = e.target.getAttribute('data-id');
-                        const plan = planningsData[id];
-                        if (!plan) return;
-
-                        document.getElementById("planning-id").value = id;
-                        document.getElementById("planning-title").value = plan.title || "";
-                        document.getElementById("planning-game").value = plan.game || "";
-                        document.getElementById("planning-img-url").value = plan.imageUrl || "";
-                        document.getElementById("planning-link").value = plan.link || "";
-                        document.getElementById("planning-desc").value = plan.description || "";
-                        if (planningUploadStatus) planningUploadStatus.textContent = "";
-
-                        document.getElementById("planning-form-title").textContent = "Éditer le Planning";
-                        formAnnonceWrapper.classList.add('hidden');
-                        formPartnerWrapper.classList.add('hidden');
-                        formPlanningWrapper.classList.remove('hidden');
-                        formHomeTextsWrapper.classList.add('hidden');
-                        formCustomSectionWrapper.classList.add('hidden');
-                        modal.classList.add('active');
-                    };
-                });
-            }
         });
 
         const qPartners = query(collection(db, "partners"), orderBy("createdAt", "desc"));
@@ -2120,7 +2072,7 @@
                         document.getElementById("partner-form-title").textContent = "Éditer le Partenaire";
                         formAnnonceWrapper.classList.add('hidden');
                         formPartnerWrapper.classList.remove('hidden');
-                        formPlanningWrapper.classList.add('hidden');
+                        formWeeklyWrapper.classList.add('hidden');
                         formHomeTextsWrapper.classList.add('hidden');
                         formCustomSectionWrapper.classList.add('hidden');
                         modal.classList.add('active');
@@ -2157,7 +2109,7 @@
         }
 
         document.addEventListener('click', (e) => {
-            const img = e.target.closest('.announcement-img, .custom-card-img, .planning-img');
+            const img = e.target.closest('.announcement-img, .custom-card-img, .weekly-planning-img');
             if (img && img.src && !img.classList.contains('hidden')) {
                 openLightbox(img.src, img.alt);
             }

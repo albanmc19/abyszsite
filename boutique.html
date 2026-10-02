@@ -31,13 +31,13 @@
         .product-desc { color: #777; font-size: 0.85rem; font-family: 'Inter', sans-serif; line-height: 1.5; margin-bottom: 20px; }
         
         .product-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
-        .product-price { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 1.4rem; font-weight: bold; }
+        .product-price { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 1.2rem; font-weight: bold; }
         
         .add-to-cart-btn { background: transparent; border: 1px solid #a855f7; color: #a855f7; padding: 10px 20px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: all 0.2s ease; }
         .add-to-cart-btn:hover { background: #a855f7; color: #fff; box-shadow: 0 0 10px rgba(168, 85, 247, 0.4); }
 
         /* Badge "Nouveau" */
-        .product-badge { position: absolute; top: 15px; left: 15px; background: #22c55e; color: #fff; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: bold; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; z-index: 2; }
+        .product-badge { position: absolute; top: 15px; left: 15px; background: #22c55e; color: #fff; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: bold; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; z-index: 2; box-shadow: 0 0 10px rgba(34, 197, 94, 0.4); }
 
         /* ── STYLES POP-UP (MODAL) ── */
         .modal-overlay {
@@ -70,16 +70,7 @@
         }
         .close-modal-btn:hover { color: #fff; }
         .modal-header { font-family: 'Orbitron', sans-serif; color: #fff; font-size: 1.4rem; margin-bottom: 15px; }
-        .modal-body { font-family: 'Inter', sans-serif; color: #ccc; font-size: 0.95rem; margin-bottom: 25px; }
-        
-        .modal-select-group { margin-bottom: 20px; }
-        .modal-select-group label { display: block; margin-bottom: 8px; color: #aaa; font-size: 0.85rem; }
-        .modal-select {
-            width: 100%; background: #0a0a0a; border: 1px solid #333; color: #fff;
-            padding: 10px 15px; border-radius: 8px; font-family: 'Inter', sans-serif;
-            outline: none; transition: border-color 0.2s;
-        }
-        .modal-select:focus { border-color: #a855f7; }
+        .modal-body { font-family: 'Inter', sans-serif; color: #ccc; font-size: 0.95rem; margin-bottom: 25px; line-height: 1.6; }
 
         .modal-confirm-btn {
             width: 100%; background: #a855f7; border: none; color: #fff;
@@ -123,11 +114,11 @@
             <div class="product-card">
                 <div class="product-badge">Nouveau</div>
                 <div class="product-img-box">
-                    <img src="maillot.png" alt="Maillot Pro ABYSZ" class="product-img" onerror="this.src='logo.png'">
+                    <img src="maillot.png" alt="Maillot Legacy 2026 ABYSZ" class="product-img" onerror="this.src='logo.png'">
                 </div>
                 <div class="product-info">
                     <div>
-                        <h3 class="product-title">Maillot Pro 2026</h3>
+                        <h3 class="product-title">Maillot Legacy 2026</h3>
                         <p class="product-desc">Le maillot officiel porté par nos joueurs pros lors des FNCS et événements officiels. Tissu respirant haut de gamme.</p>
                     </div>
                     <div class="product-footer">
@@ -139,7 +130,7 @@
 
             <!-- TAPIS DE SOURIS -->
             <div class="product-card">
-                <div class="product-badge">YOKO Esports</div>
+                <div class="product-badge">Nouveau</div>
                 <div class="product-img-box">
                     <img src="tdsabz.png" alt="Tapis de souris ABYSZ" class="product-img" onerror="this.src='logo.png'">
                 </div>
@@ -149,7 +140,7 @@
                         <p class="product-desc">Tapis de souris gaming haute précision aux couleurs d'ABYSZ. Glisse fluide, base antidérapante et bords cousus ultra-résistants.</p>
                     </div>
                     <div class="product-footer">
-                        <span class="product-price">34.99 €</span>
+                        <span class="product-price">Dès 19.00 €</span>
                         <button class="add-to-cart-btn" onclick="openOrderModal('Tapis de Souris ABYSZ', 'https://yokoesport.fr/equipes/abysz-esport')">Acheter</button>
                     </div>
                 </div>
@@ -162,19 +153,11 @@
     <div class="modal-overlay" id="orderModal">
         <div class="modal-card">
             <button class="close-modal-btn" onclick="closeOrderModal()">&times;</button>
-            <div class="modal-header" id="modalProductTitle">Commander le Tapis</div>
+            <div class="modal-header" id="modalProductTitle">Commander le Tapis de Souris ABYSZ</div>
             <div class="modal-body">
-                Vous allez être redirigé vers notre partenaire officiel <strong>YOKO Esports</strong> pour sélectionner la taille et finaliser le paiement en toute sécurité.
-                <br><br>
-                <div class="modal-select-group">
-                    <label for="productSize">Sélectionner un modèle / taille :</label>
-                    <select id="productSize" class="modal-select">
-                        <option value="xl">Taille XL (900x400mm) - Recommandé</option>
-                        <option value="l">Taille L (450x400mm)</option>
-                    </select>
-                </div>
+                Vous allez être redirigé vers la boutique officielle de notre partenaire <strong>YOKO Esports</strong> pour choisir votre taille/modèle et procéder au paiement sécurisé.
             </div>
-            <button class="modal-confirm-btn" id="confirmOrderBtn">Finaliser sur YOKO Esports</button>
+            <button class="modal-confirm-btn" id="confirmOrderBtn">Commander sur YOKO Esports</button>
         </div>
     </div>
 

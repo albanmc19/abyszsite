@@ -50,12 +50,30 @@
         .roster-card .num { font-size: 1.5rem; color: #fff; font-weight: bold; }
         .roster-card .label { color: #666; font-size: 0.75rem; text-transform: uppercase; }
         
-        .db-table-wrapper { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; overflow: hidden; }
-        .db-table { width: 100%; border-collapse: collapse; font-family: 'Inter', sans-serif; text-align: left; }
-        .db-table th { background: #0a0a0a; color: #a855f7; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; padding: 16px; letter-spacing: 1px; border-bottom: 2px solid #2a2a2a; }
-        .db-table td { padding: 14px 16px; color: #ccc; border-bottom: 1px solid #1a1a1a; vertical-align: middle; }
-        .db-table tr:hover td { background: rgba(168, 85, 247, 0.02); }
-        
+        .db-table-wrapper { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .db-table { width: 100%; min-width: 640px; border-collapse: collapse; font-family: 'Inter', sans-serif; text-align: left; table-layout: auto; }
+        .db-table th { background: #0a0a0a; color: #a855f7; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; padding: 14px 16px; letter-spacing: 1px; border-bottom: 2px solid #2a2a2a; white-space: nowrap; text-transform: uppercase; }
+        .db-table td { padding: 12px 16px; color: #ccc; border-bottom: 1px solid #1a1a1a; vertical-align: middle; font-size: 0.9rem; }
+        .db-table tbody tr:nth-child(even) td { background: rgba(255, 255, 255, 0.015); }
+        .db-table tbody tr:hover td { background: rgba(168, 85, 247, 0.07); }
+        .db-table tbody tr:last-child td { border-bottom: none; }
+        .db-table td:first-child { color: #fff; font-weight: 600; }
+        .db-table td.nowrap, .db-table th:last-child, .db-table td:last-child { white-space: nowrap; }
+        .db-table td:last-child, .db-table th:last-child { text-align: right; }
+        .team-badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; font-family: 'Orbitron', sans-serif; letter-spacing: 0.5px; border: 1px solid; white-space: nowrap; }
+        .team-main { color: #a855f7; border-color: rgba(168,85,247,.5); background: rgba(168,85,247,.12); }
+        .team-academy { color: #22c55e; border-color: rgba(34,197,94,.5); background: rgba(34,197,94,.12); }
+        .team-cdf { color: #eab308; border-color: rgba(234,179,8,.5); background: rgba(234,179,8,.12); }
+        .team-other { color: #aaa; border-color: #333; background: #1a1a1a; }
+        .action-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+        .breakdown-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .breakdown-grid .graph-card { margin-bottom: 0; }
+        .bar-row { margin-top: 14px; font-family: 'Inter', sans-serif; font-size: 0.82rem; color: #ccc; }
+        .bar-row .bar-top { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .bar-track { height: 8px; background: #151515; border-radius: 6px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, #a855f7, #22c55e); transition: width .5s ease; }
+        .bar-empty { color: #555; font-size: 0.8rem; margin-top: 14px; font-style: italic; }
         .action-btn { background: #a855f7; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: bold; font-family: 'Inter', sans-serif; transition: background 0.2s; text-decoration: none; }
         .action-btn:hover { background: #b975ff; }
         .hidden { display: none !important; }
@@ -108,7 +126,7 @@
         <a href="roster.html" class="btn">Retour au Roster pour se connecter</a>
     </div>
 
-    <main id="dashboard-content" style="padding-top: 140px;" class="dashboard-wrapper">
+    <main id="dashboard-content" style="padding-top: 140px;" class="dashboard-wrapper hidden">
         <h1 class="main-title">📊 Tableau de Bord des Données Récoltées</h1>
 
         <div class="stats-grid">
@@ -136,6 +154,14 @@
             <div class="stat-card">
                 <div id="conversion-rate" class="num" style="color: #a855f7;">0%</div>
                 <div class="label">Conversion</div>
+            <div class="stat-card">
+                <div id="today-visits" class="num">0</div>
+                <div class="label">Visites Aujourd'hui</div>
+            </div>
+            <div class="stat-card">
+                <div id="today-uniques" class="num">0</div>
+                <div class="label">Visiteurs Uniques Aujourd'hui</div>
+            </div>
             </div>
         </div>
 
@@ -160,6 +186,20 @@
             <div class="graph-legend">
                 <span><span class="legend-dot" style="background:#22c55e;"></span> Volume des pics journaliers (aire)</span>
                 <span><span class="legend-dot" style="background:#eab308;"></span> Courbe de tendance 30 jours</span>
+            </div>
+        </div>
+
+        <div class="section-title">📡 Détail en direct</div>
+        <div class="breakdown-grid">
+            <div class="graph-card">
+                <div class="graph-title">Visiteurs par page</div>
+                <div class="graph-subtitle">Où se trouvent les connectés en ce moment</div>
+                <div id="bars-pages"></div>
+            </div>
+            <div class="graph-card">
+                <div class="graph-title">Appareils</div>
+                <div class="graph-subtitle">Mobile / ordinateur (connectés maintenant)</div>
+                <div id="bars-devices"></div>
             </div>
         </div>
 
@@ -305,7 +345,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, query, orderBy, onSnapshot, getDocs, deleteDoc, doc, getDoc, where, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+        import { getDatabase, ref, onValue, get, query as rtdbQuery, orderByKey, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -355,8 +395,68 @@
         let picRecordCache = 0;
         let picRecordDateCache = ""; 
 
+        // ===== Présence temps réel (même logique que le site) =====
+        const HEARTBEAT_MS = 25000;   // le visiteur "bat" toutes les 25 s
+        const STALE_MS     = 75000;   // sans battement depuis 75 s => considéré parti (fantôme)
+
+        // Calcule les stats "en ligne" à partir du noeud online_users (visiteurs uniques, pas onglets)
+        function computeOnline(val, now) {
+            const byPage = {};
+            const byDevice = { mobile: 0, desktop: 0 };
+            let total = 0;
+            for (const sessions of Object.values(val || {})) {
+                if (!sessions || typeof sessions !== "object") continue;
+                let best = null, alive = false;
+                for (const s of Object.values(sessions)) {
+                    if (s && typeof s === "object") {
+                        if (typeof s.lastSeen === "number" && now - s.lastSeen > STALE_MS) continue;
+                        alive = true;
+                        if (!best || (s.lastSeen || 0) > (best.lastSeen || 0)) best = s;
+                    } else {
+                        alive = true; // ancien format (valeur "true") : on le compte
+                    }
+                }
+                if (!alive) continue;
+                total++;
+                const page = (best && best.page) || "inconnu";
+                byPage[page] = (byPage[page] || 0) + 1;
+                byDevice[best && best.device === "mobile" ? "mobile" : "desktop"]++;
+            }
+            return { total, byPage, byDevice };
+        }
+
+
+        // Écoute live : cb({ total, byPage: {index: 3, boutique: 2}, byDevice: {mobile: 2, desktop: 3} })
+        function watchOnline(rtdb, cb) {
+            let serverOffset = 0, lastVal = {};
+            const emit = () => cb(computeOnline(lastVal, Date.now() + serverOffset));
+            onValue(ref(rtdb, ".info/serverTimeOffset"), (s) => { serverOffset = s.val() || 0; emit(); });
+            onValue(ref(rtdb, "online_users"), (s) => { lastVal = s.val() || {}; emit(); });
+            setInterval(emit, 15000);
+        }
+
+        // Historique : renvoie [{ date, visits, uniqueVisitors, peakOnline, pages, devices }, …] (du plus ancien au plus récent)
+        async function getDailyStats(rtdb, days = 30) {
+            const snap = await get(rtdbQuery(ref(rtdb, "stats/daily"), orderByKey(), limitToLast(days)));
+            const out = [];
+            snap.forEach((child) => {
+                const v = child.val() || {};
+                out.push({
+                    date: child.key,
+                    visits: v.visits || 0,
+                    uniqueVisitors: v.uniqueVisitors || 0,
+                    peakOnline: v.peakOnline || 0,
+                    pages: v.pages || {},
+                    devices: v.devices || {}
+                });
+            });
+            return out;
+        }
+
+
+        // Date au fuseau de Paris (même clé que celle écrite par le site dans stats/daily)
         function getDateKey(date = new Date()) {
-            return date.toISOString().split('T')[0];
+            return date.toLocaleDateString('sv-SE', { timeZone: 'Europe/Paris' });
         }
 
         function getCutoffKey() {
@@ -365,59 +465,62 @@
             return getDateKey(d);
         }
 
-        function construireTableau30Jours(docs) {
-            const map = {};
-            docs.forEach(d => { map[d.date] = d.peak || 0; });
+        let fsPeaks = {};     // ancien historique Firestore (traffic_history)
+        let rtdbDaily = {};   // nouvelles stats Realtime Database (stats/daily)
+        let totalLive = 0;
+        let recordLoaded = false;
 
-            const tableauValues = [];
-            const tableauDates = [];
+        // Fusionne les deux sources (on garde le plus grand pic de chaque jour)
+        function reconstruireHistorique() {
+            const values = [], dates = [];
             const today = new Date();
-
             for (let i = JOURS_HISTORIQUE - 1; i >= 0; i--) {
                 const d = new Date(today);
                 d.setDate(d.getDate() - i);
                 const key = getDateKey(d);
-                tableauValues.push(map[key] || 0);
-
-                const dayStr = String(d.getDate()).padStart(2, '0');
-                const monthStr = String(d.getMonth() + 1).padStart(2, '0');
-                tableauDates.push(i === 0 ? `Auj. (${dayStr}/${monthStr})` : `${dayStr}/${monthStr}`);
+                let v = Math.max(fsPeaks[key] || 0, (rtdbDaily[key] && rtdbDaily[key].peakOnline) || 0);
+                if (i === 0) v = Math.max(v, totalLive);
+                values.push(v);
+                const [, mm, dd] = key.split('-');
+                dates.push(i === 0 ? `Auj. (${dd}/${mm})` : `${dd}/${mm}`);
             }
-
-            dates30j = tableauDates;
-            return tableauValues;
+            historique30j = values;
+            dates30j = dates;
+            dessinerGraphique();
         }
 
         function chargerHistorique30Jours() {
-            const cutoff = getCutoffKey();
-            const q = query(collection(db, "traffic_history"), where("date", ">=", cutoff), orderBy("date", "asc"));
-
+            const q = query(collection(db, "traffic_history"), where("date", ">=", getCutoffKey()), orderBy("date", "asc"));
             onSnapshot(q, (snapshot) => {
-                const docs = [];
-                snapshot.forEach(d => docs.push(d.data()));
-                historique30j = construireTableau30Jours(docs);
-
-                const todayKey = getDateKey();
-                const todayDoc = docs.find(d => d.date === todayKey);
-                picDuJourCache = todayDoc ? (todayDoc.peak || 0) : 0;
-
-                dessinerGraphique();
+                fsPeaks = {};
+                snapshot.forEach(d => { const x = d.data(); fsPeaks[x.date] = x.peak || 0; });
+                reconstruireHistorique();
             }, (err) => {
-                console.warn("Index en création pour traffic_history ou permission manquante :", err);
+                console.warn("Historique Firestore indisponible :", err);
             });
         }
 
-        async function enregistrerPicDuJour(count) {
-            if (count <= picDuJourCache) return;
-            picDuJourCache = count;
-            const todayKey = getDateKey();
+        function afficherStatsDuJour() {
+            const t = rtdbDaily[getDateKey()] || {};
+            const v = document.getElementById('today-visits');
+            const u = document.getElementById('today-uniques');
+            if (v) v.textContent = t.visits || 0;
+            if (u) u.textContent = t.uniqueVisitors || 0;
+        }
+
+        async function rafraichirStatsQuotidiennes() {
             try {
-                await setDoc(doc(db, "traffic_history", todayKey), {
-                    date: todayKey,
-                    peak: count,
-                    updatedAt: Date.now()
-                }, { merge: true });
-            } catch (e) { console.error("Erreur historique :", e); }
+                const days = await getDailyStats(rtdb, JOURS_HISTORIQUE);
+                rtdbDaily = {};
+                let best = null;
+                days.forEach(d => {
+                    rtdbDaily[d.date] = d;
+                    if (!best || d.peakOnline > best.peakOnline) best = d;
+                });
+                if (best && best.peakOnline > 0) mettreAJourPicRecord(best.peakOnline, best.date);
+                reconstruireHistorique();
+                afficherStatsDuJour();
+            } catch (e) { console.warn("Stats quotidiennes indisponibles :", e); }
         }
 
         async function chargerPicRecord() {
@@ -429,13 +532,14 @@
                     picRecordDateCache = data.peakOnlineDate || "";
                     afficherPicRecord();
                 }
+                recordLoaded = true; // on n'écrit jamais le record avant de connaître l'ancien
             } catch (e) { console.error("Erreur pic record :", e); }
         }
 
-        async function mettreAJourPicRecord(count) {
-            if (count <= picRecordCache) return;
+        async function mettreAJourPicRecord(count, dateKey = getDateKey()) {
+            if (!recordLoaded || count <= picRecordCache) return;
             picRecordCache = count;
-            picRecordDateCache = getDateKey();
+            picRecordDateCache = dateKey;
             afficherPicRecord();
             try {
                 await setDoc(doc(db, "stats", "records"), {
@@ -451,6 +555,43 @@
             if (recordPeakDateEl) {
                 recordPeakDateEl.textContent = picRecordDateCache ? `Atteint le ${picRecordDateCache}` : "";
             }
+        }
+
+        // ===== Barres de répartition =====
+        const PAGE_LABELS = { index: "Accueil", roster: "Roster", boutique: "Boutique", tv: "ABYSZ TV", "espace-joueur": "Espace joueur", staffabysz: "Staff", dashboard: "Dashboard", inconnu: "Autre" };
+
+        function dessinerBarres(containerId, entries, total) {
+            const box = document.getElementById(containerId);
+            if (!box) return;
+            box.innerHTML = "";
+            if (!entries.length || total === 0) {
+                const p = document.createElement('div');
+                p.className = 'bar-empty';
+                p.textContent = "Aucun visiteur en ligne pour le moment";
+                box.appendChild(p);
+                return;
+            }
+            entries.forEach(([label, count]) => {
+                const pct = Math.round((count / total) * 100);
+                const row = document.createElement('div'); row.className = 'bar-row';
+                const top = document.createElement('div'); top.className = 'bar-top';
+                const l = document.createElement('span'); l.textContent = label;
+                const c = document.createElement('span'); c.textContent = `${count} (${pct}%)`;
+                top.appendChild(l); top.appendChild(c);
+                const track = document.createElement('div'); track.className = 'bar-track';
+                const fill = document.createElement('div'); fill.className = 'bar-fill'; fill.style.width = pct + '%';
+                track.appendChild(fill);
+                row.appendChild(top); row.appendChild(track);
+                box.appendChild(row);
+            });
+        }
+
+        function afficherRepartition(info) {
+            const pages = Object.entries(info.byPage)
+                .map(([k, n]) => [PAGE_LABELS[k] || k, n])
+                .sort((a, b) => b[1] - a[1]);
+            dessinerBarres('bars-pages', pages, info.total);
+            dessinerBarres('bars-devices', [["📱 Mobile", info.byDevice.mobile], ["🖥️ Ordinateur", info.byDevice.desktop]].filter(e => e[1] > 0), info.total);
         }
 
         const canvas = document.getElementById('trafficChart');
@@ -613,16 +754,20 @@
 
         setTimeout(resizeCanvas, 100);
 
+        let dashboardStarted = false;
         onAuthStateChanged(auth, (user) => {
             if (user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
                 if(accessDeniedSec) accessDeniedSec.classList.add('hidden');
                 if(dashboardContentSec) dashboardContentSec.classList.remove('hidden');
                 
+                if (dashboardStarted) return;
+                dashboardStarted = true;
                 lancerTraqueTempsReel();
                 chargerDonneesDashboard();
                 ecouterCollectionAnalytics();
                 chargerHistorique30Jours();
-                chargerPicRecord();
+                chargerPicRecord().then(rafraichirStatsQuotidiennes);
+                setInterval(rafraichirStatsQuotidiennes, 60000);
                 setupPlayerEditing(); 
                 setupMaintenanceSystem();
                 
@@ -635,35 +780,13 @@
         });
 
         function lancerTraqueTempsReel() {
-            const onlineUsersRef = ref(rtdb, "online_users");
-
-            onValue(onlineUsersRef, (snapshot) => {
-                let total = 0;
-                const val = snapshot.val();
-
-                if (val !== null && val !== undefined) {
-                    if (typeof val === 'object') {
-                        total = Object.keys(val).length;
-                    } else if (typeof val === 'number') {
-                        total = val;
-                    }
-                }
-
-                if (liveOnlineNum) {
-                    liveOnlineNum.innerHTML = `<span class="live-indicator"></span>${total}`;
-                }
-                if (graphLiveCountEl) {
-                    graphLiveCountEl.textContent = `${total} connecté(s)`;
-                }
-
-                if (historique30j.length) {
-                    const lastIndex = historique30j.length - 1;
-                    historique30j[lastIndex] = Math.max(historique30j[lastIndex], total);
-                }
-
-                dessinerGraphique();
-                enregistrerPicDuJour(total);
-                mettreAJourPicRecord(total);
+            watchOnline(rtdb, (info) => {
+                totalLive = info.total;
+                if (liveOnlineNum) liveOnlineNum.innerHTML = `<span class="live-indicator"></span>${info.total}`;
+                if (graphLiveCountEl) graphLiveCountEl.textContent = `${info.total} connecté(s)`;
+                reconstruireHistorique();
+                mettreAJourPicRecord(info.total);
+                afficherRepartition(info);
             });
         }
 
@@ -717,6 +840,9 @@
                 if(!playersRows) return;
                 playersRows.innerHTML = "";
                 let mCount = 0, aCount = 0, cCount = 0;
+                if (snapshot.empty) {
+                    playersRows.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#666;font-style:italic;padding:30px;">Aucun joueur enregistré</td></tr>';
+                }
                 snapshot.forEach((docSnap) => {
                     const player = docSnap.data();
                     if (player.team === "main") mCount++; 
@@ -730,7 +856,12 @@
                     tr.appendChild(tdPseudo);
 
                     const tdTeam = document.createElement('td');
-                    tdTeam.textContent = player.team || '-';
+                    const TEAM_LABELS = { main: ['Principale', 'team-main'], academy: ['Académie', 'team-academy'], cdf: ['Centre de formation', 'team-cdf'] };
+                    const tInfo = TEAM_LABELS[player.team] || [player.team || '-', 'team-other'];
+                    const badge = document.createElement('span');
+                    badge.className = 'team-badge ' + tInfo[1];
+                    badge.textContent = tInfo[0];
+                    tdTeam.appendChild(badge);
                     tr.appendChild(tdTeam);
 
                     const tdRole = document.createElement('td');
@@ -738,6 +869,7 @@
                     tr.appendChild(tdRole);
 
                     const tdEarnings = document.createElement('td');
+                    tdEarnings.className = 'nowrap';
                     tdEarnings.textContent = player.earnings || '0';
                     tr.appendChild(tdEarnings);
 
@@ -746,6 +878,7 @@
                     btn.className = 'action-btn';
                     btn.textContent = 'Gérer';
                     const emailSafe = player.email || '';
+                    if (!emailSafe) { btn.disabled = true; btn.title = "Aucun e-mail enregistré pour ce joueur"; }
                     btn.addEventListener('click', () => {
                         const emailInput = document.getElementById('search-player-email');
                         if (emailInput) { emailInput.value = emailSafe; }

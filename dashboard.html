@@ -31,7 +31,6 @@
         .pulse-dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; animation: pulse-live 1.8s infinite; flex-shrink: 0; }
         @keyframes pulse-live { 0% { transform: scale(0.95); opacity: 0.8; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(0.95); opacity: 0.8; } }
         .canvas-wrapper { position: relative; width: 100%; height: 250px; background: #0d0d0d; border-radius: 8px; overflow: hidden; border: 1px solid #1f1f1f; }
-        canvas#trafficChart { width: 100%; height: 100%; display: block; cursor: crosshair; }
         .graph-tooltip { position: absolute; display: none; pointer-events: none; background: rgba(10, 10, 10, 0.95); border: 1px solid #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.3); border-radius: 8px; padding: 8px 12px; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; color: #fff; z-index: 10; transform: translate(-50%, -120%); white-space: nowrap; }
         .graph-tooltip .tt-date { color: #888; font-size: 0.65rem; margin-bottom: 2px; font-family: 'Inter', sans-serif; }
         .graph-tooltip .tt-val { color: #22c55e; font-weight: bold; font-size: 0.9rem; }
@@ -99,6 +98,31 @@
         input:checked + .slider { background-color: #ff4444; }
         input:checked + .slider:before { transform: translateX(24px); }
 
+        /* ===== Historique ===== */
+        .hist-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .seg { display: inline-flex; background: #050505; border: 1px solid #222; border-radius: 8px; overflow: hidden; }
+        .seg-btn { background: transparent; color: #888; border: none; padding: 8px 14px; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: background .2s, color .2s; }
+        .seg-btn:hover:not(.active) { color: #fff; background: #151515; }
+        .seg-btn.active { background: #a855f7; color: #fff; }
+        .csv-btn { border: 1px solid #222; border-radius: 8px; background: #050505; }
+        .hist-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }
+        .kpi { background: #0d0d0d; border: 1px solid #1f1f1f; border-radius: 10px; padding: 12px 14px; }
+        .kpi .k-num { font-family: 'Orbitron', sans-serif; font-size: 1.3rem; color: #fff; font-weight: 700; }
+        .kpi .k-label { color: #666; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; font-family: 'Inter', sans-serif; }
+        .kpi .k-delta { font-size: 0.72rem; margin-top: 4px; font-family: 'Inter', sans-serif; color: #666; min-height: 1em; }
+        .k-delta.up { color: #22c55e; } .k-delta.down { color: #ff4444; }
+        .chart-box { position: relative; height: 340px; width: 100%; }
+        .chart-msg { color: #666; font-style: italic; text-align: center; padding: 60px 10px; font-family: 'Inter', sans-serif; }
+        .hist-table-wrapper { max-height: 380px; overflow: auto; }
+        .hist-table { min-width: 760px; }
+        .hist-table th { position: sticky; top: 0; z-index: 1; }
+        .hist-table tbody tr { cursor: pointer; }
+        .hist-table tbody tr.row-selected td { background: rgba(168, 85, 247, 0.18); }
+        .day-detail-head { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+        .day-mini { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+        .day-mini .kpi { min-width: 120px; }
+        @media (max-width: 900px) { .chart-box { height: 270px; } .hist-controls { width: 100%; } }
+
         @media (max-width: 900px) {
             .filter-container { flex-direction: column; align-items: stretch; }
             .search-row { flex-direction: column; align-items: stretch; }
@@ -106,6 +130,7 @@
             .graph-header { flex-direction: column; align-items: flex-start; }
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -165,30 +190,6 @@
             </div>
         </div>
 
-        <div class="graph-card">
-            <div class="graph-header">
-                <div>
-                    <div class="graph-title">📈 Fréquentation — 30 Derniers Jours</div>
-                    <div class="graph-subtitle">Survolez un point pour voir le pic exact de joueurs</div>
-                </div>
-                <div class="online-counter-badge">
-                    <span class="pulse-dot"></span>
-                    <span id="graph-live-count">0 connecté(s)</span>
-                </div>
-            </div>
-            <div class="canvas-wrapper" id="canvas-container">
-                <canvas id="trafficChart"></canvas>
-                <div id="chart-tooltip" class="graph-tooltip">
-                    <div class="tt-date" id="tt-date">--/--</div>
-                    <div class="tt-val" id="tt-val">0 joueur(s)</div>
-                </div>
-            </div>
-            <div class="graph-legend">
-                <span><span class="legend-dot" style="background:#22c55e;"></span> Volume des pics journaliers (aire)</span>
-                <span><span class="legend-dot" style="background:#eab308;"></span> Courbe de tendance 30 jours</span>
-            </div>
-        </div>
-
         <div class="section-title">📡 Détail en direct</div>
         <div class="breakdown-grid">
             <div class="graph-card">
@@ -201,6 +202,63 @@
                 <div class="graph-subtitle">Mobile / ordinateur (connectés maintenant)</div>
                 <div id="bars-devices"></div>
             </div>
+        </div>
+
+        <div class="section-title">📈 Historique de fréquentation</div>
+        <div class="graph-card">
+            <div class="graph-header">
+                <div>
+                    <div class="graph-title">Évolution du trafic</div>
+                    <div class="graph-subtitle" id="hist-subtitle">Cliquez sur un jour (graphique ou tableau) pour voir son détail</div>
+                </div>
+                <div class="hist-controls">
+                    <div class="seg" id="range-seg">
+                        <button type="button" class="seg-btn" data-range="7">7 J</button>
+                        <button type="button" class="seg-btn active" data-range="30">30 J</button>
+                        <button type="button" class="seg-btn" data-range="90">90 J</button>
+                        <button type="button" class="seg-btn" data-range="365">1 AN</button>
+                    </div>
+                    <button type="button" class="seg-btn csv-btn" id="btn-export-csv">⬇ CSV</button>
+                </div>
+            </div>
+
+            <div class="hist-kpis">
+                <div class="kpi"><div class="k-num" id="kpi-visits">0</div><div class="k-label">Visites</div><div class="k-delta" id="kpi-visits-delta"></div></div>
+                <div class="kpi"><div class="k-num" id="kpi-uniques">0</div><div class="k-label">Visiteurs uniques (cumul/jour)</div></div>
+                <div class="kpi"><div class="k-num" id="kpi-avg">0</div><div class="k-label">Visites / jour (moy.)</div></div>
+                <div class="kpi"><div class="k-num" id="kpi-best">0</div><div class="k-label">Meilleur jour</div><div class="k-delta" id="kpi-best-date"></div></div>
+                <div class="kpi"><div class="k-num" id="kpi-peak">0</div><div class="k-label">Pic de connectés</div></div>
+            </div>
+
+            <div class="chart-box" id="hist-chart-box"><canvas id="histChart"></canvas></div>
+            <div class="chart-msg hidden" id="hist-empty">Pas encore de données sur cette période.</div>
+        </div>
+
+        <div class="graph-card" id="day-detail-card">
+            <div class="day-detail-head">
+                <div>
+                    <div class="graph-title" id="day-title">Détail du jour</div>
+                    <div class="graph-subtitle">Répartition des visites de la journée sélectionnée</div>
+                </div>
+                <div class="day-mini">
+                    <div class="kpi"><div class="k-num" id="day-visits">0</div><div class="k-label">Visites</div></div>
+                    <div class="kpi"><div class="k-num" id="day-uniques">0</div><div class="k-label">Uniques</div></div>
+                    <div class="kpi"><div class="k-num" id="day-peak">0</div><div class="k-label">Pic connectés</div></div>
+                </div>
+            </div>
+            <div class="breakdown-grid">
+                <div><div class="graph-subtitle">Visites par page</div><div id="day-bars-pages"></div></div>
+                <div><div class="graph-subtitle">Appareils</div><div id="day-bars-devices"></div></div>
+            </div>
+        </div>
+
+        <div class="db-table-wrapper hist-table-wrapper" style="margin-bottom: 30px;">
+            <table class="db-table hist-table">
+                <thead>
+                    <tr><th>Date</th><th>Visites</th><th>Uniques</th><th>Pic connectés</th><th>Mobile</th><th>Ordinateur</th><th>Page n°1</th></tr>
+                </thead>
+                <tbody id="hist-rows"></tbody>
+            </table>
         </div>
 
         <div class="filter-container">
@@ -382,15 +440,9 @@
         const recordPeakDateEl = document.getElementById('record-peak-date');
         const graphLiveCountEl = document.getElementById('graph-live-count');
 
-        const tooltip = document.getElementById('chart-tooltip');
-        const ttDate = document.getElementById('tt-date');
-        const ttVal = document.getElementById('tt-val');
-
         let listeDocsAnalytics = [];
         const JOURS_HISTORIQUE = 30;
-        let historique30j = Array(JOURS_HISTORIQUE).fill(0);
-        let dates30j = []; 
-        let pointsPositions = []; 
+        const HISTORY_FETCH_DAYS = 365;
         let picDuJourCache = 0;
         let picRecordCache = 0;
         let picRecordDateCache = ""; 
@@ -461,7 +513,7 @@
 
         function getCutoffKey() {
             const d = new Date();
-            d.setDate(d.getDate() - (JOURS_HISTORIQUE - 1));
+            d.setDate(d.getDate() - (HISTORY_FETCH_DAYS - 1));
             return getDateKey(d);
         }
 
@@ -470,31 +522,12 @@
         let totalLive = 0;
         let recordLoaded = false;
 
-        // Fusionne les deux sources (on garde le plus grand pic de chaque jour)
-        function reconstruireHistorique() {
-            const values = [], dates = [];
-            const today = new Date();
-            for (let i = JOURS_HISTORIQUE - 1; i >= 0; i--) {
-                const d = new Date(today);
-                d.setDate(d.getDate() - i);
-                const key = getDateKey(d);
-                let v = Math.max(fsPeaks[key] || 0, (rtdbDaily[key] && rtdbDaily[key].peakOnline) || 0);
-                if (i === 0) v = Math.max(v, totalLive);
-                values.push(v);
-                const [, mm, dd] = key.split('-');
-                dates.push(i === 0 ? `Auj. (${dd}/${mm})` : `${dd}/${mm}`);
-            }
-            historique30j = values;
-            dates30j = dates;
-            dessinerGraphique();
-        }
-
         function chargerHistorique30Jours() {
             const q = query(collection(db, "traffic_history"), where("date", ">=", getCutoffKey()), orderBy("date", "asc"));
             onSnapshot(q, (snapshot) => {
                 fsPeaks = {};
                 snapshot.forEach(d => { const x = d.data(); fsPeaks[x.date] = x.peak || 0; });
-                reconstruireHistorique();
+                renderHistorique();
             }, (err) => {
                 console.warn("Historique Firestore indisponible :", err);
             });
@@ -510,7 +543,7 @@
 
         async function rafraichirStatsQuotidiennes() {
             try {
-                const days = await getDailyStats(rtdb, JOURS_HISTORIQUE);
+                const days = await getDailyStats(rtdb, HISTORY_FETCH_DAYS);
                 rtdbDaily = {};
                 let best = null;
                 days.forEach(d => {
@@ -518,7 +551,7 @@
                     if (!best || d.peakOnline > best.peakOnline) best = d;
                 });
                 if (best && best.peakOnline > 0) mettreAJourPicRecord(best.peakOnline, best.date);
-                reconstruireHistorique();
+                renderHistorique();
                 afficherStatsDuJour();
             } catch (e) { console.warn("Stats quotidiennes indisponibles :", e); }
         }
@@ -560,14 +593,14 @@
         // ===== Barres de répartition =====
         const PAGE_LABELS = { index: "Accueil", roster: "Roster", boutique: "Boutique", tv: "ABYSZ TV", "espace-joueur": "Espace joueur", staffabysz: "Staff", dashboard: "Dashboard", inconnu: "Autre" };
 
-        function dessinerBarres(containerId, entries, total) {
+        function dessinerBarres(containerId, entries, total, emptyMsg = "Aucun visiteur en ligne pour le moment") {
             const box = document.getElementById(containerId);
             if (!box) return;
             box.innerHTML = "";
             if (!entries.length || total === 0) {
                 const p = document.createElement('div');
                 p.className = 'bar-empty';
-                p.textContent = "Aucun visiteur en ligne pour le moment";
+                p.textContent = emptyMsg;
                 box.appendChild(p);
                 return;
             }
@@ -594,165 +627,212 @@
             dessinerBarres('bars-devices', [["📱 Mobile", info.byDevice.mobile], ["🖥️ Ordinateur", info.byDevice.desktop]].filter(e => e[1] > 0), info.total);
         }
 
-        const canvas = document.getElementById('trafficChart');
-        const ctx = canvas ? canvas.getContext('2d') : null;
+        // ===== HISTORIQUE (Chart.js) =====
+        let rangeDays = 30;
+        let histKeys = [];
+        let histChart = null;
+        let selectedDay = getDateKey();
+        let livePeakRendered = 0;
 
-        function resizeCanvas() {
-            if (!canvas) return;
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-            dessinerGraphique();
-        }
-        window.addEventListener('resize', resizeCanvas);
+        const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+        const fmtShort = (k) => { const [, m, d] = k.split('-'); return `${d}/${m}`; };
+        const fmtAxis = (k) => { const [y, m, d] = k.split('-'); return rangeDays >= 365 ? `${d}/${m}/${y.slice(2)}` : `${d}/${m}`; };
+        const fmtLong = (k) => new Date(k + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        const fmtRow = (k) => new Date(k + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'short', day: '2-digit', month: '2-digit' });
 
-        function dessinerGraphique(hoverIndex = -1) {
-            if (!ctx || !canvas) return;
-
-            const width = canvas.width;
-            const height = canvas.height;
-            const paddingBottom = 30;
-            const graphHeight = height - paddingBottom;
-
-            ctx.clearRect(0, 0, width, height);
-            pointsPositions = [];
-
-            ctx.strokeStyle = '#1a1a1a';
-            ctx.lineWidth = 1;
-            for (let y = graphHeight / 3; y < graphHeight; y += graphHeight / 3) {
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(width, y);
-                ctx.stroke();
-            }
-
-            const data = historique30j;
-            const maxVal = Math.max(...data, 5);
-            const stepX = width / (data.length - 1 || 1);
-
-            const greenGradient = ctx.createLinearGradient(0, 0, 0, graphHeight);
-            greenGradient.addColorStop(0, 'rgba(34, 197, 94, 0.45)');
-            greenGradient.addColorStop(1, 'rgba(34, 197, 94, 0.02)');
-
-            ctx.beginPath();
-            ctx.moveTo(0, graphHeight);
-            data.forEach((val, i) => {
-                const x = i * stepX;
-                const y = graphHeight - (val / maxVal) * (graphHeight * 0.7) - 10;
-                if (i === 0) ctx.lineTo(x, y);
-                else {
-                    const prevX = (i - 1) * stepX;
-                    const prevY = graphHeight - (data[i - 1] / maxVal) * (graphHeight * 0.7) - 10;
-                    const cx = (prevX + x) / 2;
-                    ctx.quadraticCurveTo(prevX, prevY, cx, (prevY + y) / 2);
-                }
-            });
-            ctx.lineTo(width, graphHeight);
-            ctx.closePath();
-            ctx.fillStyle = greenGradient;
-            ctx.fill();
-
-            ctx.beginPath();
-            data.forEach((val, i) => {
-                const x = i * stepX;
-                const y = graphHeight - (val / maxVal) * (graphHeight * 0.7) - 10;
-                if (i === 0) ctx.moveTo(x, y);
-                else {
-                    const prevX = (i - 1) * stepX;
-                    const prevY = graphHeight - (data[i - 1] / maxVal) * (graphHeight * 0.7) - 10;
-                    const cx = (prevX + x) / 2;
-                    ctx.quadraticCurveTo(prevX, prevY, cx, (prevY + y) / 2);
-                }
-            });
-            ctx.strokeStyle = 'rgba(34, 197, 94, 0.9)';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            ctx.beginPath();
-            data.forEach((val, i) => {
-                const x = i * stepX;
-                const y = graphHeight - (val / maxVal) * (graphHeight * 0.85) - 15;
-                if (i === 0) ctx.moveTo(x, y);
-                else {
-                    const prevX = (i - 1) * stepX;
-                    const prevY = graphHeight - (data[i - 1] / maxVal) * (graphHeight * 0.85) - 15;
-                    const cx = (prevX + x) / 2;
-                    ctx.quadraticCurveTo(prevX, prevY, cx, (prevY + y) / 2);
-                }
-            });
-            ctx.strokeStyle = '#eab308';
-            ctx.lineWidth = 2.5;
-            ctx.shadowColor = '#eab308';
-            ctx.shadowBlur = 8;
-            ctx.stroke();
-            ctx.shadowBlur = 0;
-
-            const interval = 5;
-            data.forEach((val, i) => {
-                const x = i * stepX;
-                const yPoint = graphHeight - (val / maxVal) * (graphHeight * 0.7) - 10;
-                pointsPositions.push({ x, y: yPoint, val, date: dates30j[i] });
-
-                const isHovered = (i === hoverIndex);
-
-                ctx.beginPath();
-                ctx.arc(x, yPoint, isHovered ? 6 : 3, 0, Math.PI * 2);
-                ctx.fillStyle = isHovered ? '#ffffff' : (i === data.length - 1 ? '#22c55e' : '#eab308');
-                ctx.fill();
-
-                if (isHovered) {
-                    ctx.strokeStyle = '#a855f7';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-                }
-
-                if (i % interval === 0 || i === data.length - 1) {
-                    ctx.fillStyle = i === data.length - 1 ? '#22c55e' : '#777';
-                    ctx.font = '10px Inter, sans-serif';
-                    ctx.textAlign = 'center';
-                    ctx.fillText(dates30j[i] || '', x, height - 8);
-                }
-            });
+        // Données d'un jour = RTDB (stats/daily) + ancien historique Firestore pour le pic
+        function dayData(key) {
+            const r = rtdbDaily[key] || {};
+            let peak = Math.max(r.peakOnline || 0, fsPeaks[key] || 0);
+            if (key === getDateKey()) peak = Math.max(peak, totalLive);
+            return { visits: r.visits || 0, uniques: r.uniqueVisitors || 0, peak, pages: r.pages || {}, devices: r.devices || {} };
         }
 
-        if (canvas) {
-            canvas.addEventListener('mousemove', (e) => {
-                const rect = canvas.getBoundingClientRect();
-                const mouseX = e.clientX - rect.left;
-                
-                let minDistance = Infinity;
-                let closestIndex = -1;
+        // Liste de n clés AAAA-MM-JJ finissant aujourd'hui (calcul en UTC : insensible à l'heure d'été)
+        function keysFor(n) {
+            const [y, m, d] = getDateKey().split('-').map(Number);
+            const base = Date.UTC(y, m - 1, d);
+            const out = [];
+            for (let i = n - 1; i >= 0; i--) out.push(new Date(base - i * 86400000).toISOString().slice(0, 10));
+            return out;
+        }
 
-                pointsPositions.forEach((pt, idx) => {
-                    const dist = Math.abs(pt.x - mouseX);
-                    if (dist < minDistance) {
-                        minDistance = dist;
-                        closestIndex = idx;
+        function creerGraphique() {
+            const el = document.getElementById('histChart');
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = '#888';
+            histChart = new Chart(el, {
+                data: {
+                    labels: [],
+                    datasets: [
+                        { type: 'bar', label: 'Visites', data: [], yAxisID: 'y', order: 3, borderRadius: 4,
+                          backgroundColor: (c) => histKeys[c.dataIndex] === selectedDay ? '#c084fc' : 'rgba(168, 85, 247, 0.55)' },
+                        { type: 'line', label: 'Visiteurs uniques', data: [], yAxisID: 'y', order: 2, borderColor: '#22c55e',
+                          backgroundColor: 'rgba(34, 197, 94, 0.12)', fill: true, tension: 0.35, borderWidth: 2, pointHoverRadius: 5 },
+                        { type: 'line', label: 'Pic de connectés', data: [], yAxisID: 'y1', order: 1, borderColor: '#eab308',
+                          tension: 0.35, borderWidth: 2.5, pointHoverRadius: 5 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    onClick: (evt, _els, chart) => {
+                        const pts = chart.getElementsAtEventForMode(evt, 'index', { intersect: false }, true);
+                        if (pts.length) selectDay(histKeys[pts[0].index]);
+                    },
+                    plugins: {
+                        legend: { labels: { usePointStyle: true, boxWidth: 8, color: '#aaa' } },
+                        tooltip: {
+                            backgroundColor: 'rgba(10, 10, 10, 0.95)', borderColor: '#a855f7', borderWidth: 1,
+                            padding: 10, titleColor: '#fff', bodyColor: '#ddd', boxPadding: 4,
+                            callbacks: {
+                                title: (items) => fmtLong(histKeys[items[0].dataIndex]),
+                                label: (c) => ` ${c.dataset.label} : ${c.parsed.y}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { maxTicksLimit: 10, autoSkip: true, color: '#777' } },
+                        y: { beginAtZero: true, grid: { color: '#1a1a1a' }, ticks: { precision: 0, color: '#777' },
+                             title: { display: true, text: 'Visites / uniques', color: '#666', font: { size: 10 } } },
+                        y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false },
+                              ticks: { precision: 0, color: '#eab308' },
+                              title: { display: true, text: 'Pic connectés', color: '#eab308', font: { size: 10 } } }
                     }
-                });
-
-                if (closestIndex !== -1 && minDistance < 25) {
-                    const pt = pointsPositions[closestIndex];
-                    ttDate.textContent = `Jour: ${pt.date}`;
-                    ttVal.textContent = `${pt.val} connecté(s) max`;
-
-                    tooltip.style.left = `${pt.x}px`;
-                    tooltip.style.top = `${pt.y}px`;
-                    tooltip.style.display = 'block';
-
-                    dessinerGraphique(closestIndex);
-                } else {
-                    tooltip.style.display = 'none';
-                    dessinerGraphique(-1);
                 }
-            });
-
-            canvas.addEventListener('mouseleave', () => {
-                tooltip.style.display = 'none';
-                dessinerGraphique(-1);
             });
         }
 
-        setTimeout(resizeCanvas, 100);
+        function renderKpis(rows) {
+            const sumV = rows.reduce((s, r) => s + r.visits, 0);
+            const sumU = rows.reduce((s, r) => s + r.uniques, 0);
+            const maxPeak = rows.reduce((m, r) => Math.max(m, r.peak), 0);
+            const best = rows.reduce((b, r) => (r.visits > b.visits ? r : b), rows[0] || { visits: 0 });
+            setText('kpi-visits', sumV);
+            setText('kpi-uniques', sumU);
+            setText('kpi-avg', rows.length ? Math.round((sumV / rows.length) * 10) / 10 : 0);
+            setText('kpi-best', best.visits || 0);
+            setText('kpi-best-date', best.visits ? `le ${fmtShort(best.key)}` : '');
+            setText('kpi-peak', maxPeak);
+
+            const dEl = document.getElementById('kpi-visits-delta');
+            dEl.textContent = ''; dEl.className = 'k-delta';
+            if (rows.length === rangeDays) {
+                const prev = keysFor(rangeDays * 2).slice(0, rangeDays).reduce((s, k) => s + dayData(k).visits, 0);
+                if (prev > 0) {
+                    const pct = Math.round(((sumV - prev) / prev) * 100);
+                    dEl.textContent = `${pct >= 0 ? '▲ +' : '▼ '}${pct}% vs période préc.`;
+                    dEl.classList.add(pct >= 0 ? 'up' : 'down');
+                }
+            }
+        }
+
+        function renderTable(rows) {
+            const tbody = document.getElementById('hist-rows');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            if (!rows.length) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#666;font-style:italic;padding:30px;">Aucune donnée sur cette période</td></tr>';
+                return;
+            }
+            [...rows].reverse().forEach((r) => {
+                const tr = document.createElement('tr');
+                if (r.key === selectedDay) tr.className = 'row-selected';
+                const dev = (r.devices.mobile || 0) + (r.devices.desktop || 0);
+                const pct = (n) => dev ? ` (${Math.round((n / dev) * 100)}%)` : '';
+                const top = Object.entries(r.pages).sort((a, b) => b[1] - a[1])[0];
+                const cells = [
+                    fmtRow(r.key), r.visits, r.uniques, r.peak,
+                    `${r.devices.mobile || 0}${pct(r.devices.mobile || 0)}`,
+                    `${r.devices.desktop || 0}${pct(r.devices.desktop || 0)}`,
+                    top ? `${PAGE_LABELS[top[0]] || top[0]} (${top[1]})` : '-'
+                ];
+                cells.forEach((c) => { const td = document.createElement('td'); td.textContent = c; tr.appendChild(td); });
+                tr.addEventListener('click', () => selectDay(r.key));
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderDetail() {
+            const d = dayData(selectedDay);
+            const titre = fmtLong(selectedDay);
+            setText('day-title', titre.charAt(0).toUpperCase() + titre.slice(1));
+            setText('day-visits', d.visits);
+            setText('day-uniques', d.uniques);
+            setText('day-peak', d.peak);
+            const pages = Object.entries(d.pages).map(([k, n]) => [PAGE_LABELS[k] || k, n]).sort((a, b) => b[1] - a[1]);
+            dessinerBarres('day-bars-pages', pages, pages.reduce((s, e) => s + e[1], 0), "Aucune donnée pour ce jour");
+            const devs = [["📱 Mobile", d.devices.mobile || 0], ["🖥️ Ordinateur", d.devices.desktop || 0]].filter(e => e[1] > 0);
+            dessinerBarres('day-bars-devices', devs, devs.reduce((s, e) => s + e[1], 0), "Aucune donnée pour ce jour");
+        }
+
+        function selectDay(key) {
+            selectedDay = key;
+            renderDetail();
+            renderTable(histKeys.map(k => ({ key: k, ...dayData(k) })));
+            if (histChart) histChart.update('none');
+        }
+
+        function renderHistorique() {
+            const all = keysFor(HISTORY_FETCH_DAYS);
+            const firstIdx = all.findIndex((k) => { const x = dayData(k); return x.visits || x.uniques || x.peak; });
+            histKeys = firstIdx === -1 ? [] : keysFor(rangeDays).filter((k) => k >= all[firstIdx]);
+            const rows = histKeys.map((k) => ({ key: k, ...dayData(k) }));
+            livePeakRendered = dayData(getDateKey()).peak;
+
+            const empty = rows.length === 0;
+            document.getElementById('hist-chart-box').classList.toggle('hidden', empty);
+            document.getElementById('hist-empty').classList.toggle('hidden', !empty);
+            setText('hist-subtitle', empty
+                ? "Les données s'accumuleront au fil des visites"
+                : `Du ${fmtShort(histKeys[0])} au ${fmtShort(histKeys[histKeys.length - 1])} — cliquez sur un jour pour voir son détail`);
+
+            renderKpis(rows);
+            renderTable(rows);
+            renderDetail();
+
+            if (empty) return;
+            if (typeof Chart === 'undefined') {
+                const box = document.getElementById('hist-chart-box');
+                box.innerHTML = '<div class="chart-msg">Le graphique n\'a pas pu se charger (Chart.js bloqué). Le tableau ci-dessous reste disponible.</div>';
+                return;
+            }
+            if (!histChart) creerGraphique();
+            const small = rows.length <= 31;
+            histChart.data.labels = rows.map((r) => fmtAxis(r.key));
+            histChart.data.datasets[0].data = rows.map((r) => r.visits);
+            histChart.data.datasets[1].data = rows.map((r) => r.uniques);
+            histChart.data.datasets[2].data = rows.map((r) => r.peak);
+            histChart.data.datasets[1].pointRadius = small ? 3 : 0;
+            histChart.data.datasets[2].pointRadius = small ? 3 : 0;
+            histChart.update();
+        }
+
+        function exporterCsv() {
+            const head = ['date', 'visites', 'visiteurs_uniques', 'pic_connectes', 'mobile', 'ordinateur'];
+            const lines = [head.join(';')].concat(histKeys.map((k) => {
+                const d = dayData(k);
+                return [k, d.visits, d.uniques, d.peak, d.devices.mobile || 0, d.devices.desktop || 0].join(';');
+            }));
+            const blob = new Blob(['\ufeff' + lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `abysz-historique-${getDateKey()}.csv`;
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        }
+
+        document.querySelectorAll('#range-seg [data-range]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('#range-seg .seg-btn').forEach((b) => b.classList.remove('active'));
+                btn.classList.add('active');
+                rangeDays = parseInt(btn.getAttribute('data-range'), 10);
+                renderHistorique();
+            });
+        });
+        const csvBtn = document.getElementById('btn-export-csv');
+        if (csvBtn) csvBtn.addEventListener('click', exporterCsv);
 
         let dashboardStarted = false;
         onAuthStateChanged(auth, (user) => {
@@ -784,7 +864,7 @@
                 totalLive = info.total;
                 if (liveOnlineNum) liveOnlineNum.innerHTML = `<span class="live-indicator"></span>${info.total}`;
                 if (graphLiveCountEl) graphLiveCountEl.textContent = `${info.total} connecté(s)`;
-                reconstruireHistorique();
+                if (info.total > livePeakRendered) renderHistorique();
                 mettreAJourPicRecord(info.total);
                 afficherRepartition(info);
             });

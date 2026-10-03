@@ -173,7 +173,7 @@
     <main id="dashboard-content" style="padding-top: 140px;" class="dashboard-wrapper hidden">
         <h1 class="main-title">📊 Tableau de Bord</h1>
 
-        <nav class="dash-nav">
+        <div class="dash-nav">
             <a href="#sec-live">🟢 En direct</a>
             <a href="#sec-cumul">📊 Cumul</a>
             <a href="#sec-detail">📡 Détail</a>
@@ -181,7 +181,8 @@
             <a href="#sec-maint">🚧 Maintenance</a>
             <a href="#sec-roster">👥 Roster</a>
             <a href="#sec-players">🔒 Espaces joueurs</a>
-        </nav>
+            <a href="#sec-hours">⏱️ Par heure</a>
+        </div>
 
         <div class="section-title" id="sec-live">
             <span>🟢 En direct &amp; aujourd'hui</span>
@@ -313,6 +314,44 @@
                     <tr><th>Date</th><th>Visites</th><th>Uniques</th><th>Pic connectés</th><th>Mobile</th><th>Ordinateur</th><th>Page n°1</th></tr>
                 </thead>
                 <tbody id="hist-rows"></tbody>
+            </table>
+        </div>
+
+        <div class="section-title" id="sec-hours">
+            <span>⏱️ Données heure par heure</span>
+            <span class="last-update" id="hours-update"></span>
+        </div>
+        <div class="graph-card">
+            <div class="graph-header">
+                <div>
+                    <div class="graph-title">Trafic par heure</div>
+                    <div class="graph-subtitle" id="hours-subtitle">Heure de Paris</div>
+                </div>
+                <div class="hist-controls">
+                    <div class="seg" id="hours-seg">
+                        <button type="button" class="seg-btn active" data-hours="24">24 H</button>
+                        <button type="button" class="seg-btn" data-hours="48">48 H</button>
+                        <button type="button" class="seg-btn" data-hours="168">7 J</button>
+                    </div>
+                    <button type="button" class="seg-btn csv-btn" id="btn-export-hours-csv">⬇ CSV</button>
+                </div>
+            </div>
+            <div class="hist-kpis">
+                <div class="kpi"><div class="k-num" id="h-kpi-visits">0</div><div class="k-label">Visites</div></div>
+                <div class="kpi"><div class="k-num" id="h-kpi-uniques">0</div><div class="k-label">Uniques (cumul/heure)</div></div>
+                <div class="kpi"><div class="k-num" id="h-kpi-peak">0</div><div class="k-label">Pic de connectés</div></div>
+                <div class="kpi"><div class="k-num" id="h-kpi-busy">-</div><div class="k-label">Heure la plus active</div></div>
+                <div class="kpi"><div class="k-num" id="h-kpi-discord">0</div><div class="k-label">Clics Discord</div></div>
+            </div>
+            <div class="chart-box" id="hours-chart-box"><canvas id="hoursChart"></canvas></div>
+            <div class="chart-msg hidden" id="hours-empty">Pas encore de données horaires : elles s'accumulent à chaque visite.</div>
+        </div>
+        <div class="db-table-wrapper hist-table-wrapper" style="margin-bottom: 30px;">
+            <table class="db-table hist-table">
+                <thead>
+                    <tr><th>Heure</th><th>Visites</th><th>Uniques</th><th>Pic connectés</th><th>Mobile</th><th>Ordinateur</th><th>Clics Discord</th><th>Page n°1</th></tr>
+                </thead>
+                <tbody id="hours-rows"></tbody>
             </table>
         </div>
 
@@ -894,6 +933,159 @@
         const csvBtn = document.getElementById('btn-export-csv');
         if (csvBtn) csvBtn.addEventListener('click', exporterCsv);
 
+        // ===== DONNÉES HEURE PAR HEURE =====
+        let hourlyData = {};
+        let hoursRange = 24;
+        let hoursChart = null;
+        let hoursRows = [];
+
+        async function chargerHeures() {
+            try {
+                const snap = await get(rtdbQuery(ref(rtdb, "stats/hourly"), orderByKey(), limitToLast(9)));
+                hourlyData = snap.val() || {};
+                setText('hours-update', 'Mis à jour à ' + new Date().toLocaleTimeString('fr-FR'));
+                renderHeures();
+            } catch (e) {
+                console.warn("Stats horaires indisponibles :", e);
+                setText('hours-subtitle', "⚠️ Lecture de stats/hourly refusée (" + (e.code || e.message) + ") — ajoute les règles pour stats/hourly");
+            }
+        }
+
+        function heureParisMaintenant() {
+            const [y, m, d] = getDateKey().split('-').map(Number);
+            const part = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', hourCycle: 'h23', timeZone: 'Europe/Paris' })
+                .formatToParts(new Date()).find(p => p.type === 'hour');
+            return { y, m, d, hh: parseInt(part ? part.value : '0', 10) };
+        }
+
+        // Les n dernières heures, finissant à l'heure en cours (horloge de Paris)
+        function creneauxHoraires(n) {
+            const { y, m, d, hh } = heureParisMaintenant();
+            const base = Date.UTC(y, m - 1, d, hh);
+            const out = [];
+            for (let i = n - 1; i >= 0; i--) {
+                const t = new Date(base - i * 3600000);
+                out.push({ day: t.toISOString().slice(0, 10), h: String(t.getUTCHours()).padStart(2, '0') });
+            }
+            return out;
+        }
+
+        function donneesHeure(day, h) {
+            const r = (hourlyData[day] || {})[h] || {};
+            return {
+                visits: r.visits || 0, uniques: r.uniqueVisitors || 0, peak: r.peakOnline || 0,
+                pages: r.pages || {}, devices: r.devices || {}, clicks: r.clicks || {}
+            };
+        }
+
+        function labelHeure(r) {
+            return hoursRange <= 24 ? `${r.h}h` : `${fmtShort(r.day)} ${r.h}h`;
+        }
+
+        function creerGraphiqueHeures() {
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = '#888';
+            hoursChart = new Chart(document.getElementById('hoursChart'), {
+                data: {
+                    labels: [],
+                    datasets: [
+                        { type: 'bar', label: 'Visites', data: [], yAxisID: 'y', order: 3, borderRadius: 4, backgroundColor: 'rgba(168, 85, 247, 0.6)' },
+                        { type: 'line', label: 'Visiteurs uniques', data: [], yAxisID: 'y', order: 2, borderColor: '#22c55e', tension: 0.3, borderWidth: 2 },
+                        { type: 'line', label: 'Pic de connectés', data: [], yAxisID: 'y1', order: 1, borderColor: '#eab308', tension: 0.3, borderWidth: 2.5 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { labels: { usePointStyle: true, boxWidth: 8, color: '#aaa' } },
+                        tooltip: {
+                            backgroundColor: 'rgba(10, 10, 10, 0.95)', borderColor: '#a855f7', borderWidth: 1, padding: 10,
+                            callbacks: {
+                                title: (items) => { const r = hoursRows[items[0].dataIndex]; return r ? `${fmtShort(r.day)} à ${r.h}h` : ''; },
+                                label: (c) => ` ${c.dataset.label} : ${c.parsed.y}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { maxTicksLimit: 12, autoSkip: true, color: '#777' } },
+                        y: { beginAtZero: true, grid: { color: '#1a1a1a' }, ticks: { precision: 0, color: '#777' } },
+                        y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false }, ticks: { precision: 0, color: '#eab308' } }
+                    }
+                }
+            });
+        }
+
+        function renderHeures() {
+            hoursRows = creneauxHoraires(hoursRange).map(s => ({ ...s, ...donneesHeure(s.day, s.h) }));
+            const cur = hoursRows[hoursRows.length - 1];
+            if (cur) cur.peak = Math.max(cur.peak, totalLive);
+
+            const sum = (f) => hoursRows.reduce((t, r) => t + f(r), 0);
+            const busiest = hoursRows.reduce((b, r) => (r.visits > b.visits ? r : b), hoursRows[0] || { visits: 0 });
+            setText('h-kpi-visits', sum(r => r.visits));
+            setText('h-kpi-uniques', sum(r => r.uniques));
+            setText('h-kpi-peak', hoursRows.reduce((m, r) => Math.max(m, r.peak), 0));
+            setText('h-kpi-busy', busiest.visits ? `${busiest.h}h` : '-');
+            setText('h-kpi-discord', sum(r => r.clicks.discord || 0));
+            setText('hours-subtitle', `Heure de Paris — les ${hoursRange} dernières heures`);
+
+            const empty = hoursRows.every(r => !r.visits && !r.uniques && !r.peak);
+            document.getElementById('hours-empty').classList.toggle('hidden', !empty);
+            document.getElementById('hours-chart-box').classList.toggle('hidden', empty);
+
+            if (!empty && typeof Chart !== 'undefined') {
+                if (!hoursChart) creerGraphiqueHeures();
+                const small = hoursRows.length <= 48;
+                hoursChart.data.labels = hoursRows.map(labelHeure);
+                hoursChart.data.datasets[0].data = hoursRows.map(r => r.visits);
+                hoursChart.data.datasets[1].data = hoursRows.map(r => r.uniques);
+                hoursChart.data.datasets[2].data = hoursRows.map(r => r.peak);
+                hoursChart.data.datasets[1].pointRadius = small ? 3 : 0;
+                hoursChart.data.datasets[2].pointRadius = small ? 3 : 0;
+                hoursChart.update();
+            }
+
+            const tbody = document.getElementById('hours-rows');
+            tbody.innerHTML = '';
+            [...hoursRows].reverse().forEach((r) => {
+                const dev = (r.devices.mobile || 0) + (r.devices.desktop || 0);
+                const pct = (n) => dev ? ` (${Math.round((n / dev) * 100)}%)` : '';
+                const top = Object.entries(r.pages).sort((a, b) => b[1] - a[1])[0];
+                const tr = document.createElement('tr');
+                [`${fmtShort(r.day)} ${r.h}h`, r.visits, r.uniques, r.peak,
+                 `${r.devices.mobile || 0}${pct(r.devices.mobile || 0)}`,
+                 `${r.devices.desktop || 0}${pct(r.devices.desktop || 0)}`,
+                 r.clicks.discord || 0,
+                 top ? `${PAGE_LABELS[top[0]] || top[0]} (${top[1]})` : '-'
+                ].forEach((c) => { const td = document.createElement('td'); td.textContent = c; tr.appendChild(td); });
+                tbody.appendChild(tr);
+            });
+        }
+
+        function exporterCsvHeures() {
+            const head = ['date', 'heure', 'visites', 'visiteurs_uniques', 'pic_connectes', 'mobile', 'ordinateur', 'clics_discord'];
+            const lines = [head.join(';')].concat(hoursRows.map((r) =>
+                [r.day, r.h, r.visits, r.uniques, r.peak, r.devices.mobile || 0, r.devices.desktop || 0, r.clicks.discord || 0].join(';')));
+            const blob = new Blob(['\ufeff' + lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `abysz-heures-${getDateKey()}.csv`;
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        }
+
+        document.querySelectorAll('#hours-seg [data-hours]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('#hours-seg .seg-btn').forEach((b) => b.classList.remove('active'));
+                btn.classList.add('active');
+                hoursRange = parseInt(btn.getAttribute('data-hours'), 10);
+                renderHeures();
+            });
+        });
+        const hoursCsvBtn = document.getElementById('btn-export-hours-csv');
+        if (hoursCsvBtn) hoursCsvBtn.addEventListener('click', exporterCsvHeures);
+
         let dashboardStarted = false;
         onAuthStateChanged(auth, (user) => {
             if (user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
@@ -907,6 +1099,8 @@
                 chargerHistorique30Jours();
                 chargerPicRecord().then(rafraichirStatsQuotidiennes);
                 setInterval(rafraichirStatsQuotidiennes, 60000);
+                chargerHeures();
+                setInterval(chargerHeures, 60000);
                 setupPlayerEditing(); 
                 setupMaintenanceSystem();
                 
@@ -955,6 +1149,7 @@
                 if (!confirm("Réinitialiser TOUTES les statistiques (visites, clics, historique) ?\nLe record de connectés est conservé.")) return;
                 try {
                     await remove(ref(rtdb, "stats/daily"));
+                    await remove(ref(rtdb, "stats/hourly"));
                     const promises = [];
                     for (const col of ["analytics", "traffic_history"]) {
                         const snap = await getDocs(collection(db, col));

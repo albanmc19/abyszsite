@@ -18,7 +18,7 @@
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 25px; }
         .stat-card { background: #0b0b0b; border: 1px solid #1a1a1a; border-radius: 12px; padding: 25px 15px; text-align: center; position: relative; }
         .stat-card .num { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; font-weight: 700; color: #a855f7; margin-bottom: 10px; }
-        .stat-card .label { color: #555; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        .stat-card .label { color: #9a9a9a; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
         
         .live-indicator { display: inline-block; width: 10px; height: 10px; background-color: #22c55e; border-radius: 50%; margin-right: 6px; box-shadow: 0 0 8px #22c55e; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
@@ -26,7 +26,7 @@
         .graph-card { background: #0b0b0b; border: 1px solid #1a1a1a; border-radius: 12px; padding: 20px; margin-bottom: 30px; }
         .graph-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
         .graph-title { font-family: 'Orbitron', sans-serif; font-size: 1.05rem; color: #ffffff; }
-        .graph-subtitle { font-size: 0.75rem; color: #666; margin-top: 4px; font-family: 'Inter', sans-serif; }
+        .graph-subtitle { font-size: 0.75rem; color: #8f8f8f; margin-top: 4px; font-family: 'Inter', sans-serif; }
         .online-counter-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(20, 20, 20, 0.8); border: 1px solid #2a2a2a; padding: 6px 12px; border-radius: 20px; font-family: 'Orbitron', sans-serif; font-size: 0.78rem; color: #e0e0e0; }
         .pulse-dot { width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; animation: pulse-live 1.8s infinite; flex-shrink: 0; }
         @keyframes pulse-live { 0% { transform: scale(0.95); opacity: 0.8; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(0.95); opacity: 0.8; } }
@@ -47,7 +47,7 @@
         .roster-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
         .roster-card { background: #141414; border-left: 3px solid #a855f7; padding: 15px 20px; border-radius: 8px; font-family: 'Orbitron', sans-serif; }
         .roster-card .num { font-size: 1.5rem; color: #fff; font-weight: bold; }
-        .roster-card .label { color: #666; font-size: 0.75rem; text-transform: uppercase; }
+        .roster-card .label { color: #9a9a9a; font-size: 0.75rem; text-transform: uppercase; }
         
         .db-table-wrapper { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
         .db-table { width: 100%; min-width: 640px; border-collapse: collapse; font-family: 'Inter', sans-serif; text-align: left; table-layout: auto; }
@@ -108,8 +108,8 @@
         .hist-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }
         .kpi { background: #0d0d0d; border: 1px solid #1f1f1f; border-radius: 10px; padding: 12px 14px; }
         .kpi .k-num { font-family: 'Orbitron', sans-serif; font-size: 1.3rem; color: #fff; font-weight: 700; }
-        .kpi .k-label { color: #666; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; font-family: 'Inter', sans-serif; }
-        .kpi .k-delta { font-size: 0.72rem; margin-top: 4px; font-family: 'Inter', sans-serif; color: #666; min-height: 1em; }
+        .kpi .k-label { color: #9a9a9a; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; font-family: 'Inter', sans-serif; }
+        .kpi .k-delta { font-size: 0.72rem; margin-top: 4px; font-family: 'Inter', sans-serif; color: #8f8f8f; min-height: 1em; }
         .k-delta.up { color: #22c55e; } .k-delta.down { color: #ff4444; }
         .chart-box { position: relative; height: 340px; width: 100%; }
         .chart-msg { color: #666; font-style: italic; text-align: center; padding: 60px 10px; font-family: 'Inter', sans-serif; }
@@ -121,6 +121,25 @@
         .day-detail-head { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
         .day-mini { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
         .day-mini .kpi { min-width: 120px; }
+        /* ===== Lisibilité ===== */
+        html { scroll-behavior: smooth; }
+        .section-title { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; scroll-margin-top: 110px; }
+        .dash-nav { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: -15px 0 10px; }
+        .dash-nav a { color: #ccc; text-decoration: none; font-size: 0.8rem; font-family: 'Inter', sans-serif; font-weight: 600; padding: 7px 14px; border: 1px solid #222; border-radius: 999px; background: #0b0b0b; transition: all .2s; }
+        .dash-nav a:hover { color: #fff; border-color: #a855f7; background: rgba(168, 85, 247, 0.12); }
+        .last-update { font-family: 'Inter', sans-serif; text-transform: none; letter-spacing: 0; font-size: 0.72rem; color: #8f8f8f; font-weight: 400; }
+        .stat-card .hint { color: #8f8f8f; font-size: 0.72rem; margin-top: 8px; font-family: 'Inter', sans-serif; line-height: 1.35; }
+        .section-tools { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; text-transform: none; letter-spacing: 0; }
+        .section-tools .page-selector { padding: 8px 14px; font-size: 0.8rem; }
+        .reset-btn-sm { padding: 8px 14px; font-size: 0.72rem; }
+        summary.section-title { justify-content: flex-start; cursor: pointer; list-style: none; user-select: none; }
+        summary.section-title::-webkit-details-marker { display: none; }
+        summary.section-title::before { content: '▸'; display: inline-block; margin-right: 4px; color: #a855f7; transition: transform .2s; }
+        details.dash-details[open] > summary.section-title::before { transform: rotate(90deg); }
+        .chip { font-family: 'Inter', sans-serif; text-transform: none; letter-spacing: 0; font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; border: 1px solid; }
+        .chip-on { color: #ff4444; border-color: rgba(255, 68, 68, .5); background: rgba(255, 68, 68, .12); }
+        .chip-off { color: #22c55e; border-color: rgba(34, 197, 94, .5); background: rgba(34, 197, 94, .1); }
+
         @media (max-width: 900px) { .chart-box { height: 270px; } .hist-controls { width: 100%; } }
 
         @media (max-width: 900px) {
@@ -152,45 +171,81 @@
     </div>
 
     <main id="dashboard-content" style="padding-top: 140px;" class="dashboard-wrapper hidden">
-        <h1 class="main-title">📊 Tableau de Bord des Données Récoltées</h1>
+        <h1 class="main-title">📊 Tableau de Bord</h1>
 
+        <nav class="dash-nav">
+            <a href="#sec-live">🟢 En direct</a>
+            <a href="#sec-cumul">📊 Cumul</a>
+            <a href="#sec-detail">📡 Détail</a>
+            <a href="#sec-histo">📈 Historique</a>
+            <a href="#sec-maint">🚧 Maintenance</a>
+            <a href="#sec-roster">👥 Roster</a>
+            <a href="#sec-players">🔒 Espaces joueurs</a>
+        </nav>
+
+        <div class="section-title" id="sec-live">
+            <span>🟢 En direct &amp; aujourd'hui</span>
+            <span class="last-update" id="last-update">connexion…</span>
+        </div>
         <div class="stats-grid">
             <div class="stat-card" style="border-color: #22c55e;">
                 <div id="live-online" class="num" style="color: #22c55e;"><span class="live-indicator"></span>0</div>
-                <div class="label">En Ligne Actuellement</div>
+                <div class="label">En ligne actuellement</div>
+                <div class="hint">visiteurs actifs en ce moment</div>
             </div>
             <div class="stat-card" style="border-color: #eab308;">
                 <div id="record-peak" class="num" style="color: #eab308;">0</div>
-                <div class="label">Pic Historique Record</div>
-                <div id="record-peak-date" style="color: #555; font-size: 0.65rem; margin-top: 6px; font-family: 'Inter', sans-serif;"></div>
+                <div class="label">Pic record</div>
+                <div class="hint" id="record-peak-date">plus de connectés en même temps</div>
             </div>
             <div class="stat-card">
+                <div id="today-visits" class="num">0</div>
+                <div class="label">Visites aujourd'hui</div>
+                <div class="hint">depuis minuit (heure de Paris)</div>
+            </div>
+            <div class="stat-card">
+                <div id="today-uniques" class="num">0</div>
+                <div class="label">Visiteurs uniques aujourd'hui</div>
+                <div class="hint">personnes différentes</div>
+            </div>
+        </div>
+
+        <div class="section-title" id="sec-cumul">
+            <span>📊 Cumul depuis le début du suivi</span>
+            <span class="section-tools">
+                <select id="page-filter" class="page-selector" aria-label="Filtrer les visites par page">
+                    <option value="all">Visites : toutes les pages</option>
+                    <option value="index.html">Visites : Accueil</option>
+                    <option value="roster.html">Visites : Roster</option>
+                    <option value="boutique.html">Visites : Boutique</option>
+                </select>
+                <button id="reset-analytics-btn" class="reset-btn reset-btn-sm">🗑️ Réinitialiser</button>
+            </span>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card">
                 <div id="site-visites" class="num">0</div>
-                <div class="label">Visites Totales</div>
+                <div class="label">Visites totales</div>
+                <div class="hint" id="site-visites-hint">—</div>
             </div>
             <div class="stat-card">
                 <div id="discord-clicks" class="num">0</div>
                 <div class="label">Clics Discord</div>
+                <div class="hint">sur « Rejoindre le Discord »</div>
             </div>
             <div class="stat-card">
                 <div id="boutique-interest" class="num">0</div>
-                <div class="label">Intérêt Boutique</div>
+                <div class="label">Intérêt boutique</div>
+                <div class="hint">clics sur l'onglet Boutique</div>
             </div>
             <div class="stat-card">
                 <div id="conversion-rate" class="num" style="color: #a855f7;">0%</div>
                 <div class="label">Conversion</div>
-            <div class="stat-card">
-                <div id="today-visits" class="num">0</div>
-                <div class="label">Visites Aujourd'hui</div>
-            </div>
-            <div class="stat-card">
-                <div id="today-uniques" class="num">0</div>
-                <div class="label">Visiteurs Uniques Aujourd'hui</div>
-            </div>
+                <div class="hint">clics Discord ÷ visites</div>
             </div>
         </div>
 
-        <div class="section-title">📡 Détail en direct</div>
+        <div class="section-title" id="sec-detail">📡 Détail en direct</div>
         <div class="breakdown-grid">
             <div class="graph-card">
                 <div class="graph-title">Visiteurs par page</div>
@@ -204,7 +259,7 @@
             </div>
         </div>
 
-        <div class="section-title">📈 Historique de fréquentation</div>
+        <div class="section-title" id="sec-histo">📈 Historique de fréquentation</div>
         <div class="graph-card">
             <div class="graph-header">
                 <div>
@@ -261,18 +316,9 @@
             </table>
         </div>
 
-        <div class="filter-container">
-            <button id="reset-analytics-btn" class="reset-btn">🗑️ Réinitialiser Analytics</button>
-            <select id="page-filter" class="page-selector">
-                <option value="all">Toutes les pages</option>
-                <option value="index.html">Accueil</option>
-                <option value="roster.html">Roster</option>
-                <option value="boutique.html">Boutique</option>
-            </select>
-        </div>
-
         <!-- SECTION SYSTEME DE MISE A JOUR & MAINTENANCE -->
-        <div class="section-title">🚧 System & Mode Maintenance</div>
+        <details class="dash-details" id="sec-maint">
+        <summary class="section-title"><span>🚧 System &amp; Mode Maintenance</span> <span class="chip chip-off" id="maint-summary-chip">inactif</span></summary>
         <div class="admin-edit-box" style="border-color: #ff4444;">
             <h2 style="color: #ff4444;">🚧 Contrôle du Mode Maintenance</h2>
             <p style="color: #777; font-size: 0.85rem; margin-top: -5px; margin-bottom: 20px;">Afficher un écran de maintenance et restreindre l'accès à tout ou partie du site.</p>
@@ -322,7 +368,10 @@
             <p id="maint-success" class="success-message hidden">✅ État du site mis à jour avec succès !</p>
         </div>
 
-        <div class="section-title">👥 Gestion des Effectifs & Roster</div>
+        </details>
+
+        <details class="dash-details" id="sec-roster" open>
+        <summary class="section-title">👥 Gestion des Effectifs &amp; Roster</summary>
         <div class="roster-stats">
             <div class="roster-card"><div class="label">Équipe Principale</div><div id="count-main" class="num">0</div></div>
             <div class="roster-card" style="border-left-color: #22c55e;"><div class="label">Académie</div><div id="count-academy" class="num">0</div></div>
@@ -340,7 +389,10 @@
             </table>
         </div>
 
-        <div class="section-title">🔒 GESTION DES ESPACES PRIVÉS JOUEURS</div>
+        </details>
+
+        <details class="dash-details" id="sec-players">
+        <summary class="section-title">🔒 Gestion des espaces privés joueurs</summary>
         <div class="admin-edit-box" style="border-color: #22c55e;">
             <h2 style="color: #22c55e;">🛠️ Configurer l'espace d'un joueur</h2>
             <p style="color: #777; font-size: 0.85rem; margin-top: -5px; margin-bottom: 20px;">Recherchez l'adresse e-mail exacte du compte joueur.</p>
@@ -397,13 +449,14 @@
                 <p id="save-success" class="success-message hidden">✅ Espace privé mis à jour et synchronisé avec succès !</p>
             </div>
         </div>
+        </details>
     </main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, query, orderBy, onSnapshot, getDocs, deleteDoc, doc, getDoc, where, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-        import { getDatabase, ref, onValue, get, query as rtdbQuery, orderByKey, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+        import { getDatabase, ref, onValue, remove, get, query as rtdbQuery, orderByKey, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -440,7 +493,6 @@
         const recordPeakDateEl = document.getElementById('record-peak-date');
         const graphLiveCountEl = document.getElementById('graph-live-count');
 
-        let listeDocsAnalytics = [];
         const JOURS_HISTORIQUE = 30;
         const HISTORY_FETCH_DAYS = 365;
         let picDuJourCache = 0;
@@ -499,7 +551,8 @@
                     uniqueVisitors: v.uniqueVisitors || 0,
                     peakOnline: v.peakOnline || 0,
                     pages: v.pages || {},
-                    devices: v.devices || {}
+                    devices: v.devices || {},
+            clicks: v.clicks || {}
                 });
             });
             return out;
@@ -518,6 +571,7 @@
         }
 
         let fsPeaks = {};     // ancien historique Firestore (traffic_history)
+        let statsReadError = '';
         let rtdbDaily = {};   // nouvelles stats Realtime Database (stats/daily)
         let totalLive = 0;
         let recordLoaded = false;
@@ -545,6 +599,7 @@
             try {
                 const days = await getDailyStats(rtdb, HISTORY_FETCH_DAYS);
                 rtdbDaily = {};
+                statsReadError = '';
                 let best = null;
                 days.forEach(d => {
                     rtdbDaily[d.date] = d;
@@ -553,7 +608,12 @@
                 if (best && best.peakOnline > 0) mettreAJourPicRecord(best.peakOnline, best.date);
                 renderHistorique();
                 afficherStatsDuJour();
-            } catch (e) { console.warn("Stats quotidiennes indisponibles :", e); }
+                calculerEtAfficherStats();
+            } catch (e) {
+                console.warn("Stats quotidiennes indisponibles :", e);
+                statsReadError = "⚠️ Lecture de stats/daily refusée (" + (e.code || e.message) + ") — vérifie les règles de la Realtime Database et que tu es connecté en admin";
+                renderHistorique();
+            }
         }
 
         async function chargerPicRecord() {
@@ -784,7 +844,7 @@
             const empty = rows.length === 0;
             document.getElementById('hist-chart-box').classList.toggle('hidden', empty);
             document.getElementById('hist-empty').classList.toggle('hidden', !empty);
-            setText('hist-subtitle', empty
+            setText('hist-subtitle', statsReadError ? statsReadError : empty
                 ? "Les données s'accumuleront au fil des visites"
                 : `Du ${fmtShort(histKeys[0])} au ${fmtShort(histKeys[histKeys.length - 1])} — cliquez sur un jour pour voir son détail`);
 
@@ -844,7 +904,6 @@
                 dashboardStarted = true;
                 lancerTraqueTempsReel();
                 chargerDonneesDashboard();
-                ecouterCollectionAnalytics();
                 chargerHistorique30Jours();
                 chargerPicRecord().then(rafraichirStatsQuotidiennes);
                 setInterval(rafraichirStatsQuotidiennes, 60000);
@@ -867,52 +926,54 @@
                 if (info.total > livePeakRendered) renderHistorique();
                 mettreAJourPicRecord(info.total);
                 afficherRepartition(info);
+                setText('last-update', 'Mis à jour à ' + new Date().toLocaleTimeString('fr-FR'));
             });
         }
 
-        function ecouterCollectionAnalytics() {
-            onSnapshot(collection(db, "analytics"), (snapshot) => {
-                listeDocsAnalytics = [];
-                snapshot.forEach((d) => listeDocsAnalytics.push(d.data()));
-                calculerEtAfficherStats(pageFilter ? pageFilter.value : "all");
-            });
-        }
+        const PAGE_FILTER_KEYS = { "index.html": "index", "roster.html": "roster", "boutique.html": "boutique" };
 
+        // Cumul calculé depuis stats/daily (Realtime Database)
         function calculerEtAfficherStats(filtrePage) {
-            let totalVisites = 0; let totalDiscord = 0; let totalBoutique = 0;
-
-            listeDocsAnalytics.forEach((docData) => {
-                const pageDuDoc = docData.page || "";
-                
-                let estDiscord = docData.isDiscordClick === true || docData.clickType === "discord";
-                if (estDiscord) { totalDiscord++; return; }
-                if (pageDuDoc.includes("boutique")) totalBoutique++;
-                
-                if (filtrePage !== "all" && !pageDuDoc.includes(filtrePage)) return;
-                totalVisites++;
+            filtrePage = filtrePage || (pageFilter ? pageFilter.value : "all");
+            let visites = 0, discord = 0, boutique = 0, premier = null;
+            Object.entries(rtdbDaily).forEach(([date, d]) => {
+                const pages = d.pages || {}, clicks = d.clicks || {};
+                visites += filtrePage === "all" ? (d.visits || 0) : (pages[PAGE_FILTER_KEYS[filtrePage]] || 0);
+                discord += clicks.discord || 0;
+                boutique += Math.max(clicks.boutique || 0, pages.boutique || 0);
+                if (!premier || date < premier) premier = date;
             });
-
-            if(siteVisitesNum) siteVisitesNum.textContent = totalVisites;
-            if(discordClicksNum) discordClicksNum.textContent = totalDiscord;
-            if(boutiqueInterestNum) boutiqueInterestNum.textContent = totalBoutique;
-            if(conversionRateNum) {
-                conversionRateNum.textContent = totalVisites > 0 ? `${((totalDiscord / totalVisites) * 100).toFixed(1)}%` : "0%";
-            }
+            if (siteVisitesNum) siteVisitesNum.textContent = visites;
+            if (discordClicksNum) discordClicksNum.textContent = discord;
+            if (boutiqueInterestNum) boutiqueInterestNum.textContent = boutique;
+            if (conversionRateNum) conversionRateNum.textContent = visites > 0 ? `${((discord / visites) * 100).toFixed(1)}%` : "0%";
+            setText('site-visites-hint', premier ? `depuis le ${fmtShort(premier)}` : "en attente des premières visites");
         }
 
         function setupResetButton() {
             resetBtn.onclick = async () => {
-                if (confirm("Réinitialiser toutes les statistiques d'analytics ?")) {
-                    try {
-                        const snap = await getDocs(collection(db, "analytics"));
-                        const promises = [];
-                        snap.forEach((d) => promises.push(deleteDoc(doc(db, "analytics", d.id))));
-                        await Promise.all(promises);
-                        alert("Statistiques remises à zéro !");
-                    } catch (e) { alert(e.message); }
-                }
+                if (!confirm("Réinitialiser TOUTES les statistiques (visites, clics, historique) ?\nLe record de connectés est conservé.")) return;
+                try {
+                    await remove(ref(rtdb, "stats/daily"));
+                    const promises = [];
+                    for (const col of ["analytics", "traffic_history"]) {
+                        const snap = await getDocs(collection(db, col));
+                        snap.forEach((d) => promises.push(deleteDoc(doc(db, col, d.id))));
+                    }
+                    await Promise.all(promises);
+                    await rafraichirStatsQuotidiennes();
+                    alert("Statistiques remises à zéro !");
+                } catch (e) { alert(e.message); }
             };
         }
+
+        // Les liens du menu ouvrent la section repliée ciblée
+        document.querySelectorAll('.dash-nav a').forEach((a) => {
+            a.addEventListener('click', () => {
+                const t = document.querySelector(a.getAttribute('href'));
+                if (t && t.tagName === 'DETAILS') t.open = true;
+            });
+        });
 
         function chargerDonneesDashboard() {
             const q = query(collection(db, "roster"), orderBy("createdAt", "asc"));
@@ -1027,6 +1088,9 @@
                 if (snap.exists()) {
                     const data = snap.data();
                     maintToggle.checked = !!data.active;
+                    const chip = document.getElementById('maint-summary-chip');
+                    if (chip) { chip.textContent = data.active ? 'ACTIF' : 'inactif'; chip.className = 'chip ' + (data.active ? 'chip-on' : 'chip-off'); }
+                    if (data.active) { const sec = document.getElementById('sec-maint'); if (sec) sec.open = true; }
                     maintPagesInput.value = (data.blockedPages || []).join(', ');
                     maintMsgInput.value = data.message || '';
                     

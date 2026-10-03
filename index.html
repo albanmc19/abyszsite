@@ -1252,6 +1252,19 @@
         const bump = (obj) => update(ref(rtdb), obj).catch(() => {});
         const inc = (sub) => bump({ [dayPath(sub)]: increment(1) });
 
+        // Heure de Paris sur 2 chiffres ("00" à "23"), indépendante de la langue du navigateur
+        function parisHour() {
+            const part = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", hourCycle: "h23", timeZone: "Europe/Paris" })
+                .formatToParts(new Date()).find((x) => x.type === "hour");
+            return (part ? part.value : "00").padStart(2, "0");
+        }
+        // Données heure par heure : stats/hourly/AAAA-MM-JJ/HH/...
+        const hourPath = (sub) => `stats/hourly/${todayKey()}/${parisHour()}/${sub}`;
+        const incClick = (name) => bump({
+            [dayPath(`clicks/${name}`)]: increment(1),
+            [hourPath(`clicks/${name}`)]: increment(1)
+        });
+
         // 1) Contexte du visiteur (une fois par chargement de page)
         (function trackContext() {
             const ua = navigator.userAgent;
@@ -1263,7 +1276,7 @@
             const w = window.innerWidth;
             const screenSize = w < 600 ? "petit" : w < 1024 ? "moyen" : "grand";
             const tz = safeKey(Intl.DateTimeFormat().resolvedOptions().timeZone);
-            const hour = new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", hourCycle: "h23", timeZone: "Europe/Paris" }).format(new Date());
+            const hour = parisHour();
 
             let source = "direct";
             try {
@@ -1295,6 +1308,44 @@
             });
         })();
 
+        // 1b) Données HEURE PAR HEURE : visites, uniques, pages, appareils, pic de connectés
+        (function trackHourly() {
+            let p = location.pathname.toLowerCase().split("/").pop();
+            if (!p || !p.includes(".")) p = "index.html";
+            const pageKey = p.replace(/\.html?$/, "").replace(/[.#$\[\]\/]/g, "_") || "index";
+            const device = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? "mobile" : "desktop";
+
+            const upd = {
+                [hourPath("visits")]: increment(1),
+                [hourPath(`pages/${pageKey}`)]: increment(1),
+                [hourPath(`devices/${device}`)]: increment(1)
+            };
+            try {
+                const stamp = todayKey() + "_" + parisHour();
+                if (localStorage.getItem("abysz_last_hour") !== stamp) {
+                    localStorage.setItem("abysz_last_hour", stamp);
+                    upd[hourPath("uniqueVisitors")] = increment(1);
+                }
+            } catch (e) {}
+            bump(upd);
+
+            // Pic de connectés de l'heure en cours
+            let offset = 0, lastOnline = null;
+            const sent = {};
+            const checkPeak = () => {
+                if (lastOnline === null) return;
+                const total = computeOnline(lastOnline, Date.now() + offset).total;
+                const key = todayKey() + "_" + parisHour();
+                if (total < 1 || (sent[key] || 0) >= total) return;
+                sent[key] = total;
+                rtdbTransaction(ref(rtdb, hourPath("peakOnline")),
+                    (cur) => ((cur || 0) >= total ? undefined : total)).catch(() => {});
+            };
+            onValue(ref(rtdb, ".info/serverTimeOffset"), (s) => { offset = s.val() || 0; });
+            onValue(ref(rtdb, "online_users"), (s) => { lastOnline = s.val() || {}; checkPeak(); });
+            setInterval(checkPeak, 30000);
+        })();
+
         // 2) Clics (délégation en phase de capture : fonctionne même avec stopPropagation)
         const CLICK_MAP = [
             ["#discord-btn", "discord"],
@@ -1316,11 +1367,11 @@
             const partnerBtn = e.target.closest(".partner-link-btn");
             if (partnerBtn) {
                 const nameEl = partnerBtn.closest(".partner-card")?.querySelector(".partner-name");
-                inc(`clicks/partenaire_${safeKey(nameEl ? nameEl.textContent : "inconnu")}`);
+                incClick(`partenaire_${safeKey(nameEl ? nameEl.textContent : "inconnu")}`);
                 return;
             }
             for (const [selector, name] of CLICK_MAP) {
-                if (e.target.closest(selector)) { inc(`clicks/${name}`); break; }
+                if (e.target.closest(selector)) { incClick(name); break; }
             }
         }, true);
 
@@ -1330,7 +1381,10 @@
             if (visibleSince === null) return;
             const s = Math.round((Date.now() - visibleSince) / 1000);
             visibleSince = null;
-            if (s > 0 && s < 7200) bump({ [dayPath("engagement/totalSeconds")]: increment(s) });
+            if (s > 0 && s < 7200) bump({
+                [dayPath("engagement/totalSeconds")]: increment(s),
+                [hourPath("engagement/totalSeconds")]: increment(s)
+            });
         }
         document.addEventListener("visibilitychange", () => {
             if (document.visibilityState === "hidden") flushTime();

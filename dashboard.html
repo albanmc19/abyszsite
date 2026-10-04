@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Dashboard de gestion ABYSZ Esports">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="no-referrer">
+    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'; form-action 'self'">
     <title>ABYSZ | Dashboard Admin</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
@@ -149,7 +152,7 @@
             .graph-header { flex-direction: column; align-items: flex-start; }
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
 
@@ -167,7 +170,15 @@
     <div id="access-denied" class="restricted-zone hidden">
         <h2>🔒 ACCÈS RESTREINT</h2>
         <p style="color: #aaa; margin-bottom: 25px;">Vous devez être connecté avec un compte administrateur.</p>
-        <a href="roster.html" class="btn">Retour au Roster pour se connecter</a>
+        <p id="denied-info" style="color:#ccc; font-size:0.9rem; margin-bottom:20px;"></p>
+        <form id="denied-login-form" style="max-width:340px; margin:0 auto 20px;">
+            <div class="input-group"><label for="denied-email">Adresse e-mail</label><input type="email" id="denied-email" autocomplete="username" required></div>
+            <div class="input-group"><label for="denied-password">Mot de passe</label><input type="password" id="denied-password" autocomplete="current-password" required></div>
+            <button type="submit" class="btn-admin">Se connecter</button>
+            <p id="denied-error" class="error-message hidden"></p>
+        </form>
+        <button type="button" id="denied-logout" class="btn-admin hidden" style="margin-bottom:20px;">Changer de compte</button>
+        <div><a href="roster.html" class="btn">Retour au Roster</a></div>
     </div>
 
     <main id="dashboard-content" style="padding-top: 140px;" class="dashboard-wrapper hidden">
@@ -493,7 +504,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, query, orderBy, onSnapshot, getDocs, deleteDoc, doc, getDoc, where, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         import { getDatabase, ref, onValue, remove, get, query as rtdbQuery, orderByKey, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
@@ -513,6 +524,9 @@
         const rtdb = getDatabase(app);
 
         const ADMIN_EMAIL = "abyszofficial@gmail.com";
+        // Re-vérification au moment de chaque action sensible (en plus du contrôle d'affichage)
+        const isAdmin = () => !!(auth.currentUser && auth.currentUser.email && auth.currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
+        const safeUrl = (u) => { if (!u) return ""; try { const x = new URL(u); return (x.protocol === "http:" || x.protocol === "https:") ? x.href : ""; } catch { return ""; } };
 
         const accessDeniedSec = document.getElementById('access-denied');
         const dashboardContentSec = document.getElementById('dashboard-content');
@@ -1086,6 +1100,22 @@
         const hoursCsvBtn = document.getElementById('btn-export-hours-csv');
         if (hoursCsvBtn) hoursCsvBtn.addEventListener('click', exporterCsvHeures);
 
+        const deniedInfo = document.getElementById('denied-info');
+        const deniedForm = document.getElementById('denied-login-form');
+        const deniedError = document.getElementById('denied-error');
+        const deniedLogout = document.getElementById('denied-logout');
+        if (deniedForm) deniedForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const pw = document.getElementById('denied-password');
+            const btn = deniedForm.querySelector('button');
+            deniedError.classList.add('hidden');
+            btn.disabled = true;
+            try { await signInWithEmailAndPassword(auth, document.getElementById('denied-email').value, pw.value); }
+            catch (err) { deniedError.textContent = "Échec de connexion : identifiants invalides."; deniedError.classList.remove('hidden'); }
+            finally { btn.disabled = false; pw.value = ''; }
+        });
+        if (deniedLogout) deniedLogout.addEventListener('click', () => signOut(auth));
+
         let dashboardStarted = false;
         onAuthStateChanged(auth, (user) => {
             if (user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
@@ -1098,24 +1128,31 @@
                 chargerDonneesDashboard();
                 chargerHistorique30Jours();
                 chargerPicRecord().then(rafraichirStatsQuotidiennes);
-                setInterval(rafraichirStatsQuotidiennes, 60000);
+                setInterval(() => { if (!document.hidden) rafraichirStatsQuotidiennes(); }, 60000);
                 chargerHeures();
-                setInterval(chargerHeures, 60000);
+                setInterval(() => { if (!document.hidden) chargerHeures(); }, 60000);
                 setupPlayerEditing(); 
                 setupMaintenanceSystem();
                 
                 if(pageFilter) pageFilter.addEventListener('change', () => calculerEtAfficherStats(pageFilter.value));
                 if(resetBtn) setupResetButton();
             } else {
+                // Déconnexion après démarrage : on recharge pour couper tous les écouteurs et vider les données affichées
+                if (dashboardStarted) { location.reload(); return; }
                 if(accessDeniedSec) accessDeniedSec.classList.remove('hidden');
                 if(dashboardContentSec) dashboardContentSec.classList.add('hidden');
+                if (deniedInfo) deniedInfo.textContent = user
+                    ? "Connecté avec " + (user.email || "un compte sans e-mail") + " : ce compte n'est pas administrateur."
+                    : "Vous n'êtes pas connecté.";
+                if (deniedLogout) deniedLogout.classList.toggle('hidden', !user);
+                if (deniedForm) deniedForm.classList.toggle('hidden', !!user);
             }
         });
 
         function lancerTraqueTempsReel() {
             watchOnline(rtdb, (info) => {
                 totalLive = info.total;
-                if (liveOnlineNum) liveOnlineNum.innerHTML = `<span class="live-indicator"></span>${info.total}`;
+                if (liveOnlineNum) liveOnlineNum.innerHTML = `<span class="live-indicator"></span>${Number(info.total) || 0}`;
                 if (graphLiveCountEl) graphLiveCountEl.textContent = `${info.total} connecté(s)`;
                 if (info.total > livePeakRendered) renderHistorique();
                 mettreAJourPicRecord(info.total);
@@ -1146,6 +1183,7 @@
 
         function setupResetButton() {
             resetBtn.onclick = async () => {
+                if (!isAdmin()) return alert("Droits insuffisants.");
                 if (!confirm("Réinitialiser TOUTES les statistiques (visites, clics, historique) ?\nLe record de connectés est conservé.")) return;
                 try {
                     await remove(ref(rtdb, "stats/daily"));
@@ -1307,6 +1345,7 @@
             // Enregistrement
             maintForm.onsubmit = async (e) => {
                 e.preventDefault();
+                if (!isAdmin()) return alert("Droits insuffisants.");
                 maintSuccess.classList.add('hidden');
                 btnSave.textContent = "Mise à jour en cours...";
                 btnSave.disabled = true;
@@ -1322,7 +1361,7 @@
                     await setDoc(maintDocRef, {
                         active: maintToggle.checked,
                         blockedPages: pagesArray,
-                        message: maintMsgInput.value.trim(),
+                        message: maintMsgInput.value.trim().slice(0, 500),
                         estimatedEnd: endTimeVal,
                         updatedAt: Date.now()
                     }, { merge: true });
@@ -1353,6 +1392,7 @@
                 if (editFormContainer) editFormContainer.classList.add('hidden');
                 if (successMsg) successMsg.classList.add('hidden');
 
+                if (!isAdmin()) return;
                 const emailRecherche = searchInput ? searchInput.value.trim().toLowerCase() : "";
                 if (!emailRecherche) return;
 
@@ -1386,7 +1426,8 @@
                 modifyForm.onsubmit = async (e) => {
                     e.preventDefault();
                     if (successMsg) successMsg.classList.add('hidden');
-                    const emailRecherche = searchInput ? searchInput.value.trim().toLowerCase() : "";
+                    if (!isAdmin()) return;
+                const emailRecherche = searchInput ? searchInput.value.trim().toLowerCase() : "";
                     if (!emailRecherche) return;
 
                     try {
@@ -1403,7 +1444,7 @@
                                 role: document.getElementById('player-role-input').value.trim(),
                                 rank: document.getElementById('player-rank-input').value.trim(),
                                 joinDate: document.getElementById('player-date-input').value.trim(),
-                                documentUrl: document.getElementById('player-doc-input').value.trim(), 
+                                documentUrl: safeUrl(document.getElementById('player-doc-input').value.trim()),
                                 staffMessage: document.getElementById('player-msg-input').value.trim()
                             };
 

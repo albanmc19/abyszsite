@@ -1171,7 +1171,7 @@
 
             let p = location.pathname.toLowerCase().split("/").pop();
             if (!p || !p.includes(".")) p = "index.html";
-            const pageKey = p.replace(/\.html?$/, "").replace(/[.#$\[\]\/]/g, "_") || "index";
+            const pageKey = p.replace(/\.html?$/, "").normalize("NFD").replace(/[^a-z0-9_-]/g, "_").slice(0, 30) || "index";
             const device = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? "mobile" : "desktop";
             const today = new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Paris" }); // YYYY-MM-DD
 
@@ -1253,7 +1253,7 @@
         });
 
         // ================== TRACKING ÉTENDU (écrit dans stats/daily/<date>/...) ==================
-        const safeKey = (s) => String(s || "inconnu").toLowerCase().replace(/[.#$\[\]\/\s]/g, "_").slice(0, 60) || "inconnu";
+        const safeKey = (s) => String(s || "inconnu").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9_-]/g, "_").slice(0, 60) || "inconnu";
         const todayKey = () => new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Paris" });
         const dayPath = (sub) => `stats/daily/${todayKey()}/${sub}`;
         const bump = (obj) => update(ref(rtdb), obj).catch(() => {});
@@ -1319,7 +1319,7 @@
         const checkHourPeak = (function trackHourly() {
             let p = location.pathname.toLowerCase().split("/").pop();
             if (!p || !p.includes(".")) p = "index.html";
-            const pageKey = p.replace(/\.html?$/, "").replace(/[.#$\[\]\/]/g, "_") || "index";
+            const pageKey = p.replace(/\.html?$/, "").normalize("NFD").replace(/[^a-z0-9_-]/g, "_").slice(0, 30) || "index";
             const device = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? "mobile" : "desktop";
 
             const upd = {

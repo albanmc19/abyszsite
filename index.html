@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'; form-action 'self'">
     <title>Abysz Esports</title>
     <meta name="description" content="Découvrez Abysz Esports : actualités, rosters, compétitions de jeux vidéo, boutique officielle et communauté Discord. Rejoignez la légende !">
     <meta name="keywords" content="esports, gaming, abysz, compétition gaming, roster esports, tournois">
 
+    <link rel="preload" as="image" href="baniere.png">
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +21,7 @@
         html { scroll-behavior: smooth; scrollbar-gutter: stable; }
         body { background-color: #0a0a0a; color: #ffffff; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
         .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); will-change: transform, opacity; }
-        .reveal-visible { opacity: 1; transform: translateY(0); }
+        .reveal-visible { opacity: 1; transform: translateY(0); will-change: auto; }
 
         .adsense-container {
             max-width: 1000px;
@@ -28,92 +31,6 @@
         }
     </style>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
-            authDomain: "abysz-esports.firebaseapp.com",
-            databaseURL: "https://abysz-esports-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "abysz-esports",
-            storageBucket: "abysz-esports.firebasestorage.app",
-            messagingSenderId: "200968659347",
-            appId: "1:200968659347:web:3a13d1614d00ed29968866"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        function getCurrentFileName() {
-            let path = window.location.pathname.toLowerCase();
-            if (path.endsWith('/') || path.endsWith('/abyszsite')) {
-                return "index.html";
-            }
-            return path.split('/').pop();
-        }
-
-        onSnapshot(doc(db, "system", "maintenance"), (snap) => {
-            if (snap.exists()) {
-                const data = snap.data();
-                const currentPage = getCurrentFileName();
-                const blockedPages = (data.blockedPages || []).map(p => p.trim().toLowerCase());
-
-                if (data.active && (blockedPages.includes("all") || blockedPages.includes(currentPage))) {
-                    document.documentElement.innerHTML = `
-                        <head>
-                            <meta charset="UTF-8">
-                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                            <title>🚧 Site en Maintenance — ABYSZ</title>
-                            <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-                            <style>
-                                * { box-sizing: border-box; margin: 0; padding: 0; }
-                                body {
-                                    background-color: #0a0a0a;
-                                    color: #ffffff;
-                                    font-family: 'Inter', sans-serif;
-                                    min-height: 100vh;
-                                    display: flex;
-                                    flex-direction: column;
-                                    justify-content: center;
-                                    align-items: center;
-                                    text-align: center;
-                                    padding: 20px;
-                                }
-                                .maint-card {
-                                    background: #111111;
-                                    border: 1px solid #ff4444;
-                                    border-radius: 16px;
-                                    padding: 40px 25px;
-                                    max-width: 550px;
-                                    width: 100%;
-                                    box-shadow: 0 0 30px rgba(255, 68, 68, 0.2);
-                                }
-                                h1 {
-                                    font-family: 'Orbitron', sans-serif;
-                                    color: #ff4444;
-                                    font-size: 1.8rem;
-                                    margin-bottom: 15px;
-                                    text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
-                                }
-                                p {
-                                    color: #cccccc;
-                                    font-size: 1rem;
-                                    line-height: 1.6;
-                                }
-                            </style>
-                        </head>
-                        <body>
-                            <div class="maint-card">
-                                <h1>🚧 SITE EN MAINTENANCE</h1>
-                                <p>${data.message || 'Le site est actuellement sous mise à jour. Nous revenons très vite !'}</p>
-                            </div>
-                        </body>
-                    `;
-                }
-            }
-        });
-    </script>
         
     <style>
         nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; position: relative; z-index: 1000; background: #0a0a0a; border-bottom: 1px solid #1a1a1a; }
@@ -735,7 +652,7 @@
             <a href="staffabysz.html" class="nav-staff-link">Staff</a>
         </div>
         
-        <button class="menu-toggle" id="mobile-menu-toggle" aria-label="Ouvrir le menu">
+        <button class="menu-toggle" id="mobile-menu-toggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="nav-links-list">
             <span></span>
             <span></span>
             <span></span>
@@ -796,13 +713,13 @@
         </div>
         
         <div class="carousel-wrapper" id="carousel-wrapper">
-            <button class="carousel-btn prev" id="prev-slide">❮</button>
+            <button class="carousel-btn prev" id="prev-slide" aria-label="Annonce précédente">❮</button>
             <div class="carousel-track-container">
                 <div class="carousel-track" id="announcements-feed">
                     <p class="loading-text">Connexion à la base de données Abysz...</p>
                 </div>
             </div>
-            <button class="carousel-btn next" id="next-slide">❯</button>
+            <button class="carousel-btn next" id="next-slide" aria-label="Annonce suivante">❯</button>
         </div>
         <div class="carousel-dots" id="carousel-dots"></div>
     </section>
@@ -857,20 +774,20 @@
         <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
     </footer>
  
-    <div id="admin-modal" class="modal-overlay">
+    <div id="admin-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Portail Abysz">
         <div class="modal-content">
-            <span class="modal-close" id="close-modal-btn">&times;</span>
+            <span class="modal-close" id="close-modal-btn" role="button" aria-label="Fermer">&times;</span>
             
             <div id="admin-login-step">
                 <h3>Connexion Portail Abysz</h3>
                 <form id="login-form">
                     <div class="input-group">
                         <label for="admin-email">Adresse e-mail</label>
-                        <input type="email" id="admin-email" placeholder="exemple@abysz.com" required>
+                        <input type="email" id="admin-email" autocomplete="username" placeholder="exemple@abysz.com" required>
                     </div>
                     <div class="input-group">
                         <label for="admin-password">Mot de passe</label>
-                        <input type="password" id="admin-password" placeholder="••••••••" required>
+                        <input type="password" id="admin-password" autocomplete="current-password" placeholder="••••••••" required>
                     </div>
                     <button type="submit" class="form-btn" id="login-btn">Se connecter</button>
                 </form>
@@ -1085,12 +1002,104 @@
         const db = getFirestore(app);
         const rtdb = getDatabase(app);
 
-        // --- VISITEUR UNIQUE POUR LIKES ET VUES ---
-        let visitorId = localStorage.getItem("abysz_visitor_id");
-        if (!visitorId) {
-            visitorId = "usr_" + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
-            localStorage.setItem("abysz_visitor_id", visitorId);
+        // ---------- Helpers sécurité ----------
+        const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+        const safeUrl = (u) => { try { const x = new URL(u, location.href); return (x.protocol === "http:" || x.protocol === "https:") ? x.href : ""; } catch { return ""; } };
+        const safeColor = (c, d) => /^#[0-9a-f]{6}$/i.test(c || "") ? c : d;
+        const ALLOWED_TAGS = new Set(["STRONG", "B", "EM", "I", "BR", "P", "UL", "OL", "LI"]);
+        function sanitizeHtml(html) {
+            const t = document.createElement("template");
+            t.innerHTML = html;
+            const walk = (n) => [...n.childNodes].forEach((c) => {
+                if (c.nodeType === 1) {
+                    if (!ALLOWED_TAGS.has(c.tagName)) { c.replaceWith(document.createTextNode(c.textContent)); return; }
+                    [...c.attributes].forEach((a) => c.removeAttribute(a.name));
+                    walk(c);
+                } else if (c.nodeType !== 3) c.remove();
+            });
+            walk(t.content);
+            return t.innerHTML;
         }
+        function getVisitorId() {
+            try {
+                let id = localStorage.getItem("abysz_visitor_id");
+                if (!id) { id = "usr_" + (crypto.randomUUID ? crypto.randomUUID().replace(/-/g, "") : Math.random().toString(36).slice(2) + Date.now().toString(36)); localStorage.setItem("abysz_visitor_id", id); }
+                return id;
+            } catch { return "usr_anon"; }
+        }
+
+        // ---------- Mode maintenance ----------
+        function getCurrentFileName() {
+            let path = window.location.pathname.toLowerCase();
+            if (path.endsWith('/') || path.endsWith('/abyszsite')) {
+                return "index.html";
+            }
+            return path.split('/').pop();
+        }
+
+        onSnapshot(doc(db, "system", "maintenance"), (snap) => {
+            if (snap.exists()) {
+                const data = snap.data();
+                const currentPage = getCurrentFileName();
+                const blockedPages = (data.blockedPages || []).map(p => p.trim().toLowerCase());
+
+                if (data.active && (blockedPages.includes("all") || blockedPages.includes(currentPage))) {
+                    document.documentElement.innerHTML = `
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <title>🚧 Site en Maintenance — ABYSZ</title>
+                            <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+                            <style>
+                                * { box-sizing: border-box; margin: 0; padding: 0; }
+                                body {
+                                    background-color: #0a0a0a;
+                                    color: #ffffff;
+                                    font-family: 'Inter', sans-serif;
+                                    min-height: 100vh;
+                                    display: flex;
+                                    flex-direction: column;
+                                    justify-content: center;
+                                    align-items: center;
+                                    text-align: center;
+                                    padding: 20px;
+                                }
+                                .maint-card {
+                                    background: #111111;
+                                    border: 1px solid #ff4444;
+                                    border-radius: 16px;
+                                    padding: 40px 25px;
+                                    max-width: 550px;
+                                    width: 100%;
+                                    box-shadow: 0 0 30px rgba(255, 68, 68, 0.2);
+                                }
+                                h1 {
+                                    font-family: 'Orbitron', sans-serif;
+                                    color: #ff4444;
+                                    font-size: 1.8rem;
+                                    margin-bottom: 15px;
+                                    text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+                                }
+                                p {
+                                    color: #cccccc;
+                                    font-size: 1rem;
+                                    line-height: 1.6;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="maint-card">
+                                <h1>🚧 SITE EN MAINTENANCE</h1>
+                                <p>${esc(data.message || 'Le site est actuellement sous mise à jour. Nous revenons très vite !')}</p>
+                            </div>
+                        </body>
+                    `;
+                }
+            }
+        });
+
+        // --- VISITEUR UNIQUE POUR LIKES ET VUES ---
+        const visitorId = getVisitorId();
 
         // --- ÉCOUTE DES TEXTES DE L'ACCUEIL ---
         onSnapshot(doc(db, "site_content", "home"), (snap) => {
@@ -1099,7 +1108,7 @@
                 if (data.heroTitle) document.getElementById("hero-title").textContent = data.heroTitle;
                 if (data.heroSlogan) document.getElementById("hero-slogan").textContent = data.heroSlogan;
                 if (data.aboutTitle) document.getElementById("about-title").textContent = data.aboutTitle;
-                if (data.aboutText) document.getElementById("about-text").innerHTML = data.aboutText;
+                if (data.aboutText) document.getElementById("about-text").innerHTML = sanitizeHtml(data.aboutText);
             }
         });
 
@@ -1114,7 +1123,8 @@
                 if (data.title) sectionTitle.textContent = data.title;
                 if (data.text) sectionText.textContent = data.text;
                 if (data.imageUrl) {
-                    sectionImg.src = data.imageUrl;
+                    sectionImg.referrerPolicy = "no-referrer";
+                    sectionImg.src = safeUrl(data.imageUrl);
                     sectionImg.classList.remove("hidden");
                 } else {
                     sectionImg.classList.add("hidden");
@@ -1157,11 +1167,7 @@
         }
 
         function startPresence(rtdb, { onCount } = {}) {
-            let visitorId = localStorage.getItem("abysz_visitor_id");
-            if (!visitorId) {
-                visitorId = "usr_" + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
-                localStorage.setItem("abysz_visitor_id", visitorId);
-            }
+            const visitorId = getVisitorId();
 
             let p = location.pathname.toLowerCase().split("/").pop();
             if (!p || !p.includes(".")) p = "index.html";
@@ -1242,6 +1248,7 @@
         startPresence(rtdb, {
             onCount: ({ total }) => {
                 if (siteOnlineCountElement) siteOnlineCountElement.textContent = `${Math.max(1, total)} en ligne`;
+                checkHourPeak(total);
             }
         });
 
@@ -1309,7 +1316,7 @@
         })();
 
         // 1b) Données HEURE PAR HEURE : visites, uniques, pages, appareils, pic de connectés
-        (function trackHourly() {
+        const checkHourPeak = (function trackHourly() {
             let p = location.pathname.toLowerCase().split("/").pop();
             if (!p || !p.includes(".")) p = "index.html";
             const pageKey = p.replace(/\.html?$/, "").replace(/[.#$\[\]\/]/g, "_") || "index";
@@ -1329,21 +1336,14 @@
             } catch (e) {}
             bump(upd);
 
-            // Pic de connectés de l'heure en cours
-            let offset = 0, lastOnline = null;
+            // Pic de connectés de l'heure (alimenté par le compteur de présence : 0 écouteur supplémentaire)
             const sent = {};
-            const checkPeak = () => {
-                if (lastOnline === null) return;
-                const total = computeOnline(lastOnline, Date.now() + offset).total;
+            return (total) => {
                 const key = todayKey() + "_" + parisHour();
                 if (total < 1 || (sent[key] || 0) >= total) return;
                 sent[key] = total;
-                rtdbTransaction(ref(rtdb, hourPath("peakOnline")),
-                    (cur) => ((cur || 0) >= total ? undefined : total)).catch(() => {});
+                rtdbTransaction(ref(rtdb, hourPath("peakOnline")), (cur) => ((cur || 0) >= total ? undefined : total)).catch(() => {});
             };
-            onValue(ref(rtdb, ".info/serverTimeOffset"), (s) => { offset = s.val() || 0; });
-            onValue(ref(rtdb, "online_users"), (s) => { lastOnline = s.val() || {}; checkPeak(); });
-            setInterval(checkPeak, 30000);
         })();
 
         // 2) Clics (délégation en phase de capture : fonctionne même avec stopPropagation)
@@ -1452,6 +1452,7 @@
         if (mobileMenuToggle) {
             mobileMenuToggle.addEventListener('click', () => {
                 mobileMenuToggle.classList.toggle('open');
+                mobileMenuToggle.setAttribute('aria-expanded', navLinksList.classList.contains('mobile-open') ? 'false' : 'true');
                 navLinksList.classList.toggle('mobile-open');
             });
         }
@@ -1470,6 +1471,12 @@
             partnerLogoFileInput.addEventListener('change', async (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
+                if (!file.type.startsWith('image/') || file.size > 5 * 1024 * 1024) {
+                    const st = e.target.parentElement.querySelector('.upload-status');
+                    if (st) { st.textContent = "❌ Image invalide ou trop lourde (max 5 Mo)."; st.style.color = "#ff4444"; }
+                    e.target.value = '';
+                    return;
+                }
 
                 partnerUploadStatus.textContent = "⏳ Envoi du logo en cours...";
                 partnerUploadStatus.style.color = "#a855f7";
@@ -1503,6 +1510,12 @@
             customFileInput.addEventListener('change', async (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
+                if (!file.type.startsWith('image/') || file.size > 5 * 1024 * 1024) {
+                    const st = e.target.parentElement.querySelector('.upload-status');
+                    if (st) { st.textContent = "❌ Image invalide ou trop lourde (max 5 Mo)."; st.style.color = "#ff4444"; }
+                    e.target.value = '';
+                    return;
+                }
 
                 customUploadStatus.textContent = "⏳ Envoi de l'image en cours...";
                 customUploadStatus.style.color = "#a855f7";
@@ -1550,25 +1563,12 @@
                 }
             } catch (e) {}
 
-            try {
-                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
-                const response = await fetch(proxyUrl);
-                if (response.ok) {
-                    const result = await response.json();
-                    const data = JSON.parse(result.contents);
-                    const onlineCount = data.presence_count ?? 0;
-                    countElement.textContent = `${onlineCount} membre${onlineCount > 1 ? 's' : ''} en ligne`;
-                    return;
-                }
-            } catch (err) {
-                console.error("Erreur Discord:", err);
-            }
 
             countElement.textContent = "Communauté Active";
         }
 
         fetchDiscordOnlineCount();
-        setInterval(fetchDiscordOnlineCount, 30000);
+        setInterval(() => { if (!document.hidden) fetchDiscordOnlineCount(); }, 30000);
 
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
@@ -1613,12 +1613,17 @@
             const pass = document.getElementById('admin-password').value;
             loginError.classList.add('hidden');
 
+            const lb = document.getElementById('login-btn');
+            lb.disabled = true;
             try {
                 await signInWithEmailAndPassword(auth, email, pass);
                 modal.classList.remove('active');
             } catch (err) {
                 loginError.textContent = "Échec de connexion : Identifiants invalides.";
                 loginError.classList.remove('hidden');
+            } finally {
+                lb.disabled = false;
+                document.getElementById('admin-password').value = '';
             }
         });
 
@@ -1704,7 +1709,7 @@
         }
 
         closeModalBtn.onclick = () => modal.classList.remove('active');
-        window.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
 
         customsectionForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1868,7 +1873,7 @@
         function startAutoSlide() {
             stopAutoSlide();
             if (totalSlides > 1) {
-                autoSlideTimer = setInterval(nextSlide, 5000);
+                autoSlideTimer = setInterval(() => { if (!document.hidden) nextSlide(); }, 5000);
             }
         }
 
@@ -1890,7 +1895,7 @@
             snapshot.forEach((docSnap) => {
                 const ann = docSnap.data();
                 if (ann.expiresAt && ann.expiresAt <= now) {
-                    deleteDoc(doc(db, "announcements", docSnap.id));
+                    if (isUserAdmin) deleteDoc(doc(db, "announcements", docSnap.id)).catch(() => {});
                     return;
                 }
                 validCards.push({ id: docSnap.id, ...ann });
@@ -1949,10 +1954,10 @@
                         <span class="badge ${categoryBadgeClass}">${categoryLabel}</span>
                         ${ann.priority === 'urgent' ? '<span class="badge badge-urgent">URGENT</span>' : ''}
                     </div>
-                    <h3>${ann.title}</h3>
-                    <p>${ann.content}</p>
-                    ${ann.imageUrl ? `<img src="${ann.imageUrl}" class="announcement-img" alt="${ann.title}">` : ''}
-                    ${(ann.btnText && ann.btnLink) ? `<a href="${ann.btnLink}" target="_blank" rel="noopener noreferrer" class="announcement-action-btn">${ann.btnText}</a>` : ''}
+                    <h3>${esc(ann.title)}</h3>
+                    <p>${esc(ann.content)}</p>
+                    ${safeUrl(ann.imageUrl) ? `<img src="${esc(safeUrl(ann.imageUrl))}" class="announcement-img" alt="${esc(ann.title)}" loading="lazy" decoding="async" referrerpolicy="no-referrer">` : ''}
+                    ${(ann.btnText && safeUrl(ann.btnLink)) ? `<a href="${esc(safeUrl(ann.btnLink))}" target="_blank" rel="noopener noreferrer" class="announcement-action-btn">${esc(ann.btnText)}</a>` : ''}
                     
                     <div class="announcement-footer">
                         <span class="announcement-date">Publié le ${formattedDate}</span>
@@ -2047,9 +2052,9 @@
                 const partnerCard = document.createElement("div");
                 partnerCard.className = "partner-card";
                 
-                const mainColor = partner.color || '#a855f7';
+                const mainColor = safeColor(partner.color, '#a855f7');
                 partnerCard.style.setProperty('--partner-color', mainColor);
-                partnerCard.style.setProperty('--partner-btn-text', partner.btnTextColor || '#ffffff');
+                partnerCard.style.setProperty('--partner-btn-text', safeColor(partner.btnTextColor, '#ffffff'));
                 partnerCard.style.setProperty('--partner-glow', mainColor + '33');
 
                 let adminActionsHtml = '';
@@ -2064,15 +2069,15 @@
 
                 partnerCard.innerHTML = `
                     ${adminActionsHtml}
-                    <span class="partner-tier-badge">${partner.tier || 'PARTENAIRE'}</span>
+                    <span class="partner-tier-badge">${esc(partner.tier || 'PARTENAIRE')}</span>
                     <div class="partner-logo-wrapper">
-                        <img src="${partner.logoUrl}" alt="${partner.name}" class="partner-logo">
+                        <img src="${esc(safeUrl(partner.logoUrl))}" alt="${esc(partner.name)}" class="partner-logo" loading="lazy" decoding="async" referrerpolicy="no-referrer">
                     </div>
-                    <h3 class="partner-name">${partner.name}</h3>
-                    <div class="partner-role">${partner.role}</div>
-                    ${partner.promo ? `<div class="partner-promo-code">🏷️ ${partner.promo}</div>` : ''}
-                    <p class="partner-desc">${partner.description}</p>
-                    <a href="${partner.siteUrl}" target="_blank" rel="noopener noreferrer" class="partner-link-btn">${partner.btnLabel || 'Visiter le site'}</a>
+                    <h3 class="partner-name">${esc(partner.name)}</h3>
+                    <div class="partner-role">${esc(partner.role)}</div>
+                    ${partner.promo ? `<div class="partner-promo-code">🏷️ ${esc(partner.promo)}</div>` : ''}
+                    <p class="partner-desc">${esc(partner.description)}</p>
+                    <a href="${esc(safeUrl(partner.siteUrl))}" target="_blank" rel="noopener noreferrer" class="partner-link-btn">${esc(partner.btnLabel || 'Visiter le site')}</a>
                 `;
 
                 partnersFeed.appendChild(partnerCard);
@@ -2123,6 +2128,7 @@
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('reveal-visible');
+                    observer.unobserve(entry.target);
                 }
             });
         }, observerOptions);

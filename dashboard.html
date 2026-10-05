@@ -163,7 +163,7 @@
             <li><a href="roster.html">Roster</a></li>
             <li><a href="boutique.html">Boutique</a></li>
             <li><a href="espace-joueur.html" style="color: #a855f7; font-weight: bold;">👤 Espace Joueur</a></li>
-            <li id="nav-dashboard" class="nav-dashboard-link"><a href="dashboard.html">📊 Dashboard</a></li>
+            <li id="nav-dashboard" class="nav-dashboard-link hidden"><a href="dashboard.html">📊 Dashboard</a></li>
         </ul>
     </nav>
 
@@ -1121,6 +1121,8 @@
             if (user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
                 if(accessDeniedSec) accessDeniedSec.classList.add('hidden');
                 if(dashboardContentSec) dashboardContentSec.classList.remove('hidden');
+                const navDash = document.getElementById('nav-dashboard');
+                if (navDash) navDash.classList.remove('hidden');
                 
                 if (dashboardStarted) return;
                 dashboardStarted = true;

@@ -24,9 +24,9 @@
         .login-btn { border: 1px solid #22c55e; color: #22c55e; }
         .login-btn:hover { background: #22c55e; color: white; box-shadow: 0 0 15px #22c55e; }
         
-        .roster-footer { text-align: center; padding: 0 20px 30px; font-size: 0.75rem; color: #555; font-family: 'Inter', sans-serif; }
-        .login-link { color: #555; text-decoration: none; transition: color 0.2s; }
-        .login-link:hover, .login-link:focus-visible { color: #22c55e; }
+        nav ul li a.nav-login-btn::after { display: none !important; }
+        .nav-login-btn { display: inline-block; font-family: 'Orbitron', sans-serif; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.5px; color: #a855f7 !important; text-decoration: none; padding: 7px 18px; border-radius: 20px; background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.4); transition: all 0.25s ease; white-space: nowrap; }
+        .nav-login-btn:hover, .nav-login-btn:focus-visible { background: #a855f7; color: #ffffff !important; box-shadow: 0 0 12px rgba(168, 85, 247, 0.5); transform: translateY(-1px); }
         .logout-btn { border: 1px solid #ff4444; color: #ff4444; }
         .logout-btn:hover { background: #ff4444; color: white; box-shadow: 0 0 15px #ff4444; }
 
@@ -117,6 +117,7 @@
             <li><a href="roster.html">Roster</a></li>
             <li><a href="boutique.html">Boutique</a></li>
             <li id="nav-dashboard" class="hidden"><a href="dashboard.html">📊 Dashboard</a></li>
+            <li id="login-btn"><a href="espace-joueur.html" class="nav-login-btn">Connexion</a></li>
             </ul>
     </nav>
 
@@ -151,10 +152,6 @@
             <a href="index.html" style="color: #a855f7; text-decoration: none; font-family: 'Orbitron', sans-serif; font-weight: bold;">← Retour à l'accueil</a>
         </div>
     </section>
-
-    <footer class="roster-footer">
-        © 2026 Abysz Esports • <a href="espace-joueur.html" class="login-link" id="login-btn">Espace membre</a>
-    </footer>
 
     <div id="popups-container"></div>
 

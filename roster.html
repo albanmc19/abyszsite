@@ -86,6 +86,22 @@
         .btn-remove-img:hover { background: #ff4444; color: #fff; }
         .hidden { display: none !important; }
 
+        /* ── MODALE DE CONNEXION ── */
+        .login-popup { max-width: 400px; }
+        .login-sub { text-align: center; color: #888; font-family: 'Inter', sans-serif; font-size: 0.85rem; margin: 0 0 20px 0; }
+        .pw-wrap { position: relative; }
+        .pw-wrap input { padding-right: 44px !important; }
+        .pw-toggle { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #888; cursor: pointer; font-size: 1rem; padding: 6px 8px; }
+        .pw-toggle:hover { color: #fff; }
+        .login-row { display: flex; justify-content: space-between; align-items: center; font-family: 'Inter', sans-serif; font-size: 0.82rem; color: #aaa; margin: 4px 0 14px 0; gap: 10px; }
+        .login-row label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .link-btn { background: none; border: none; color: #b975ff; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 0.82rem; padding: 0; text-decoration: underline; }
+        .login-msg { min-height: 1.2em; margin: 0 0 12px 0; font-family: 'Inter', sans-serif; font-size: 0.85rem; text-align: center; }
+        .login-msg.err { color: #ef4444; }
+        .login-msg.ok { color: #22c55e; }
+        .form-btn:disabled { opacity: 0.6; cursor: wait; }
+        .login-popup input:focus-visible, .login-popup button:focus-visible { outline: 2px solid #b975ff; outline-offset: 2px; }
+
         /* ── GRAPHIQUE CONTENEUR ── */
         .chart-container { background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 10px; margin: 15px 0; height: 160px; }
 
@@ -117,7 +133,7 @@
             <li><a href="roster.html">Roster</a></li>
             <li><a href="boutique.html">Boutique</a></li>
             <li id="nav-dashboard" class="hidden"><a href="dashboard.html">📊 Dashboard</a></li>
-            <li id="login-btn"><a href="espace-joueur.html" class="nav-login-btn">Connexion</a></li>
+            <li id="login-btn"><a href="espace-joueur.html" class="nav-login-btn" id="open-login">Connexion</a></li>
             </ul>
     </nav>
 
@@ -155,9 +171,36 @@
 
     <div id="popups-container"></div>
 
+    <div class="popup-overlay" id="login-overlay" role="dialog" aria-modal="true" aria-labelledby="login-title">
+        <div class="popup login-popup">
+            <span class="popup-close" id="login-close" aria-label="Fermer">&times;</span>
+            <h3 class="popup-pseudo" id="login-title">Connexion</h3>
+            <p class="login-sub">Accès réservé aux joueurs et au staff ABYSZ.</p>
+            <form id="login-form" novalidate>
+                <div class="input-group">
+                    <label for="login-email">EMAIL</label>
+                    <input type="email" id="login-email" autocomplete="username" required>
+                </div>
+                <div class="input-group">
+                    <label for="login-password">MOT DE PASSE</label>
+                    <div class="pw-wrap">
+                        <input type="password" id="login-password" autocomplete="current-password" required>
+                        <button type="button" class="pw-toggle" id="pw-toggle" aria-label="Afficher le mot de passe">👁</button>
+                    </div>
+                </div>
+                <div class="login-row">
+                    <label><input type="checkbox" id="login-remember" checked> Rester connecté</label>
+                    <button type="button" class="link-btn" id="login-forgot">Mot de passe oublié ?</button>
+                </div>
+                <p class="login-msg" id="login-msg" role="alert" aria-live="polite"></p>
+                <button type="submit" class="form-btn" id="login-submit">Se connecter</button>
+            </form>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, sendPasswordResetEmail, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -198,11 +241,11 @@
                     if ((user.email || "").toLowerCase() === ADMIN_EMAIL) {
                         estAdmin = true;
                         if (addBtn) addBtn.classList.remove("hidden");
-                        if (welcomeMsg) welcomeMsg.innerText = "Espace Administrateur";
+                        if (welcomeMsg) welcomeMsg.innerText = "Espace Administrateur · " + (user.email || "");
                     } else {
                         estAdmin = false;
                         if (addBtn) addBtn.classList.add("hidden");
-                        if (welcomeMsg) welcomeMsg.innerText = "Espace Joueur";
+                        if (welcomeMsg) welcomeMsg.innerText = "Connecté : " + (user.email || "");
                         
                         // ON RESTE SUR LA PAGE MAIS ON AJOUTE UN BOUTON DANS LA NAV POUR ALLER À SON ESPACE
                         if (navLinks) {
@@ -231,15 +274,76 @@
             const logoutBtn = document.getElementById("logout-btn");
             if (logoutBtn) {
                 logoutBtn.addEventListener("click", () => {
-                    signOut(auth).then(() => {
-                        alert("Déconnexion réussie.");
-                    }).catch((error) => console.error(error));
+                    signOut(auth).catch((error) => console.error(error));
                 });
             }
 
+            setupLoginModal();
             ecouterRosterFirestore();
             setupAddPlayerButton();
         });
+
+        // ── CONNEXION ──
+        const AUTH_ERRORS = {
+            "auth/invalid-credential": "Email ou mot de passe incorrect.",
+            "auth/wrong-password": "Email ou mot de passe incorrect.",
+            "auth/user-not-found": "Email ou mot de passe incorrect.",
+            "auth/invalid-email": "Adresse email invalide.",
+            "auth/missing-password": "Entre ton mot de passe.",
+            "auth/user-disabled": "Ce compte est désactivé.",
+            "auth/too-many-requests": "Trop de tentatives. Réessaie dans quelques minutes.",
+            "auth/network-request-failed": "Problème de connexion réseau."
+        };
+
+        function setupLoginModal() {
+            const overlay = document.getElementById("login-overlay");
+            const form = document.getElementById("login-form");
+            const emailEl = document.getElementById("login-email");
+            const pwEl = document.getElementById("login-password");
+            const msg = document.getElementById("login-msg");
+            const submit = document.getElementById("login-submit");
+            const setMsg = (text, type) => { msg.textContent = text || ""; msg.className = "login-msg" + (type ? " " + type : ""); };
+
+            const open = () => { setMsg(""); overlay.classList.add("active"); emailEl.focus(); };
+            const close = () => { overlay.classList.remove("active"); pwEl.value = ""; setMsg(""); };
+
+            document.getElementById("open-login").addEventListener("click", (e) => { e.preventDefault(); open(); });
+            document.getElementById("login-close").addEventListener("click", close);
+            overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
+            document.addEventListener("keydown", (e) => { if (e.key === "Escape" && overlay.classList.contains("active")) close(); });
+
+            document.getElementById("pw-toggle").addEventListener("click", () => {
+                pwEl.type = pwEl.type === "password" ? "text" : "password";
+            });
+
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const email = emailEl.value.trim();
+                if (!email || !pwEl.value) { setMsg("Remplis l'email et le mot de passe.", "err"); return; }
+                submit.disabled = true; submit.textContent = "Connexion...";
+                setMsg("");
+                try {
+                    const remember = document.getElementById("login-remember").checked;
+                    await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+                    await signInWithEmailAndPassword(auth, email, pwEl.value);
+                    close();
+                } catch (err) {
+                    setMsg(AUTH_ERRORS[err.code] || "Connexion impossible. Réessaie.", "err");
+                } finally {
+                    submit.disabled = false; submit.textContent = "Se connecter";
+                }
+            });
+
+            document.getElementById("login-forgot").addEventListener("click", async () => {
+                const email = emailEl.value.trim();
+                if (!email) { setMsg("Entre ton email ci-dessus d'abord.", "err"); emailEl.focus(); return; }
+                try { await sendPasswordResetEmail(auth, email); } catch (err) {
+                    if (err.code === "auth/invalid-email") { setMsg(AUTH_ERRORS[err.code], "err"); return; }
+                }
+                // Réponse identique que le compte existe ou non (évite de révéler les comptes)
+                setMsg("Si un compte existe pour cette adresse, un email de réinitialisation vient d'être envoyé.", "ok");
+            });
+        }
 
         function ecouterRosterFirestore() {
             const q = query(collection(db, "roster"), orderBy("createdAt", "asc"));

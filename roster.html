@@ -7,7 +7,7 @@
     <title>ABYSZ | Roster 2026</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1494144032841410"
      crossorigin="anonymous"></script>
@@ -24,6 +24,9 @@
         .login-btn { border: 1px solid #22c55e; color: #22c55e; }
         .login-btn:hover { background: #22c55e; color: white; box-shadow: 0 0 15px #22c55e; }
         
+        .roster-footer { text-align: center; padding: 0 20px 30px; font-size: 0.75rem; color: #555; font-family: 'Inter', sans-serif; }
+        .login-link { color: #555; text-decoration: none; transition: color 0.2s; }
+        .login-link:hover, .login-link:focus-visible { color: #22c55e; }
         .logout-btn { border: 1px solid #ff4444; color: #ff4444; }
         .logout-btn:hover { background: #ff4444; color: white; box-shadow: 0 0 15px #ff4444; }
 
@@ -113,7 +116,7 @@
             <li><a href="index.html">Accueil</a></li>
             <li><a href="roster.html">Roster</a></li>
             <li><a href="boutique.html">Boutique</a></li>
-            <li><a href="dashboard.html">📊 Dashboard</a></li>
+            <li id="nav-dashboard" class="hidden"><a href="dashboard.html">📊 Dashboard</a></li>
             </ul>
     </nav>
 
@@ -123,8 +126,7 @@
             <div class="admin-actions-header">
                 <span id="user-welcome-msg" style="font-family:'Inter', sans-serif; color:#aaa; font-size:0.9rem; margin-right:10px;"></span>
                 <button class="admin-gate-btn hidden" id="add-player-btn">➕ Nouveau Joueur</button>
-                <button class="admin-gate-btn login-btn" id="login-btn">🔑 Connexion</button>
-                <button class="admin-gate-btn logout-btn hidden" id="logout-btn">🔒 Déconnexion</button>
+                                <button class="admin-gate-btn logout-btn hidden" id="logout-btn">🔒 Déconnexion</button>
             </div>
         </div>
 
@@ -150,11 +152,15 @@
         </div>
     </section>
 
+    <footer class="roster-footer">
+        © 2026 Abysz Esports • <a href="espace-joueur.html" class="login-link" id="login-btn">Espace membre</a>
+    </footer>
+
     <div id="popups-container"></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -175,6 +181,9 @@
         let estAdmin = false;
 
         const ADMIN_EMAIL = "abyszofficial@gmail.com";
+        const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+        const safeUrl = (u) => { try { const x = new URL(u, location.href); return (x.protocol === "http:" || x.protocol === "https:") ? x.href : ""; } catch { return ""; } };
+        const safeImg = (u) => /^(data:image\/(png|jpe?g|gif|webp);base64,|https?:\/\/)/i.test(String(u || "")) ? u : "logo.png";
 
         document.addEventListener("DOMContentLoaded", () => {
             onAuthStateChanged(auth, (user) => {
@@ -189,7 +198,7 @@
                 if (oldSpaceLink) oldSpaceLink.remove();
 
                 if (user) {
-                    if (user.email === ADMIN_EMAIL) {
+                    if ((user.email || "").toLowerCase() === ADMIN_EMAIL) {
                         estAdmin = true;
                         if (addBtn) addBtn.classList.remove("hidden");
                         if (welcomeMsg) welcomeMsg.innerText = "Espace Administrateur";
@@ -216,6 +225,9 @@
                     if (welcomeMsg) welcomeMsg.innerText = "";
                 }
 
+                const navDashboard = document.getElementById("nav-dashboard");
+                if (navDashboard) navDashboard.classList.toggle("hidden", !estAdmin);
+
                 renderRosters(localPlayersList);
             });
 
@@ -228,57 +240,9 @@
                 });
             }
 
-            const loginBtn = document.getElementById("login-btn");
-            if (loginBtn) {
-                loginBtn.addEventListener("click", openLoginPopup);
-            }
-
             ecouterRosterFirestore();
             setupAddPlayerButton();
         });
-
-        function openLoginPopup() {
-            const container = document.getElementById("popups-container");
-            if (!container) return;
-
-            container.innerHTML = `
-                <div id="login-popup-overlay" class="popup-overlay active">
-                    <div class="popup" style="max-width: 360px;">
-                        <span class="popup-close" id="close-login-popup">&times;</span>
-                        <h3 style="font-family:'Orbitron', sans-serif; color:#a855f7; text-align:center; margin-bottom:20px; text-transform:uppercase; font-size:1.2rem;">Connexion</h3>
-                        <form id="login-direct-form" onsubmit="return false;">
-                            <div class="input-group">
-                                <label>Adresse E-mail</label>
-                                <input type="email" id="login-email" placeholder="votre@email.com" required>
-                            </div>
-                            <div class="input-group">
-                                <label>Mot de passe</label>
-                                <input type="password" id="login-password" placeholder="••••••••" required>
-                            </div>
-                            <button type="submit" class="form-btn" style="margin-top:15px; background:#22c55e;">Se connecter</button>
-                        </form>
-                    </div>
-                </div>
-            `;
-
-            const overlay = document.getElementById("login-popup-overlay");
-            const fermerPopup = () => { overlay.classList.remove("active"); setTimeout(() => overlay.remove(), 200); };
-            
-            document.getElementById("close-login-popup").addEventListener("click", fermerPopup);
-
-            document.getElementById("login-direct-form").addEventListener("submit", async () => {
-                const email = document.getElementById("login-email").value.trim();
-                const pass = document.getElementById("login-password").value;
-
-                try {
-                    await signInWithEmailAndPassword(auth, email, pass);
-                    fermerPopup();
-                } catch (error) {
-                    alert("Identifiants incorrects ou problème réseau.");
-                    console.error(error);
-                }
-            });
-        }
 
         function ecouterRosterFirestore() {
             const q = query(collection(db, "roster"), orderBy("createdAt", "asc"));
@@ -317,15 +281,15 @@
                 const card = document.createElement("div");
                 card.className = "player-card-container";
                 
-                const avatar = (player.image && player.image !== "#" && player.image.trim() !== "") ? player.image : "logo.png";
+                const avatar = (player.image && player.image !== "#" && player.image.trim() !== "") ? safeImg(player.image) : "logo.png";
                 const pseudo = player.pseudo || "Inconnu";
                 const role = player.role || "Non spécifié";
 
                 card.innerHTML = `
                     <div class="player-card" style="cursor:pointer; background:#141414; border-radius:12px; overflow:hidden; border: 1px solid #2a2a2a; text-align:center; padding-bottom:15px; transition: transform 0.2s;">
-                        <img src="${avatar}" class="player-avatar-img" alt="${pseudo}">
-                        <h3 style="font-family:'Orbitron', sans-serif; margin:15px 0 5px 0; color:#fff;">${pseudo}</h3>
-                        <p style="color:#a855f7; font-size:0.9rem; margin:0; font-family:'Inter', sans-serif;">${role}</p>
+                        <img src="${esc(avatar)}" class="player-avatar-img" alt="${esc(pseudo)}" loading="lazy" decoding="async">
+                        <h3 style="font-family:'Orbitron', sans-serif; margin:15px 0 5px 0; color:#fff;">${esc(pseudo)}</h3>
+                        <p style="color:#a855f7; font-size:0.9rem; margin:0; font-family:'Inter', sans-serif;">${esc(role)}</p>
                     </div>
                 `;
 
@@ -358,7 +322,7 @@
             const isNewPlayer = !player.id;
             const playerId = player.id || "p_" + Date.now();
             
-            let imageBase64String = player.image || "logo.png";
+            let imageBase64String = safeImg(player.image || "logo.png");
             const avatar = (imageBase64String && imageBase64String !== "#" && imageBase64String.trim() !== "") ? imageBase64String : "logo.png";
 
             let localPrHistory = (player.prHistory && Array.isArray(player.prHistory)) ? [...player.prHistory] : [];
@@ -380,10 +344,10 @@
             let socialHtml = "";
             if (!isNewPlayer && (player.twitter || player.twitch || player.youtube || player.tiktok)) {
                 socialHtml = `<div class="social-links-container">`;
-                if (player.twitter) socialHtml += `<a href="${player.twitter}" target="_blank" rel="noopener noreferrer" class="social-icon-link" title="Twitter / X">🐦</a>`;
-                if (player.twitch) socialHtml += `<a href="${player.twitch}" target="_blank" rel="noopener noreferrer" class="social-icon-link" title="Twitch">🎮</a>`;
-                if (player.youtube) socialHtml += `<a href="${player.youtube}" target="_blank" rel="noopener noreferrer" class="social-icon-link" title="YouTube">📺</a>`;
-                if (player.tiktok) socialHtml += `<a href="${player.tiktok}" target="_blank" rel="noopener noreferrer" class="social-icon-link" title="TikTok">🎵</a>`;
+                if (player.twitter) socialHtml += `<a href="${esc(safeUrl(player.twitter))}" target="_blank" rel="noopener noreferrer" class="social-icon-link" title="Twitter / X">🐦</a>`;
+                if (player.twitch) socialHtml += `<a href="${esc(safeUrl(player.twitch))}" target="_blank" rel="noopener noreferrer" class="social-icon-link" title="Twitch">🎮</a>`;
+                if (player.youtube) socialHtml += `<a href="${esc(safeUrl(player.youtube))}" target="_blank" rel="noopener noreferrer" class="social-icon-link" title="YouTube">📺</a>`;
+                if (player.tiktok) socialHtml += `<a href="${esc(safeUrl(player.tiktok))}" target="_blank" rel="noopener noreferrer" class="social-icon-link" title="TikTok">🎵</a>`;
                 socialHtml += `</div>`;
             }
 
@@ -393,12 +357,12 @@
                         <span class="popup-close">&times;</span>
                         
                         <div id="view-mode-${playerId}" class="${startInEditMode ? 'hidden' : ''}">
-                            <img src="${avatar}" class="popup-avatar-img" id="view-avatar-${playerId}" alt="">
-                            <h3 class="popup-pseudo">${player.pseudo || 'Nouveau Joueur'}</h3>
+                            <img src="${esc(avatar)}" class="popup-avatar-img" id="view-avatar-${playerId}" alt="">
+                            <h3 class="popup-pseudo">${esc(player.pseudo || 'Nouveau Joueur')}</h3>
                             <div style="text-align:center; margin-bottom:5px;">${trendHtml}</div>
                             ${socialHtml}
-                            <p style="text-align:center; color:#aaa; margin-top:5px; margin-bottom:10px; font-family:'Inter', sans-serif;">${player.role || 'Rôle non défini'}</p>
-                            <p style="text-align:center; color:#22c55e; font-weight:600; font-family:'Orbitron', sans-serif; margin-bottom:15px;">Earnings : ${player.earnings || '0 €'}</p>
+                            <p style="text-align:center; color:#aaa; margin-top:5px; margin-bottom:10px; font-family:'Inter', sans-serif;">${esc(player.role || 'Rôle non défini')}</p>
+                            <p style="text-align:center; color:#22c55e; font-weight:600; font-family:'Orbitron', sans-serif; margin-bottom:15px;">Earnings : ${esc(player.earnings || '0 €')}</p>
                             
                             <button class="form-btn edit-toggle-btn ${estAdmin ? '' : 'hidden'}" id="btn-to-edit-${playerId}">✏️ Éditer le profil / PR</button>
 
@@ -417,7 +381,7 @@
                             <h3 style="font-family:'Orbitron', sans-serif; color:#a855f7; text-align:center; margin-bottom:15px;">
                                 ${isNewPlayer ? 'Créer le joueur' : 'Modifier le profil'}
                             </h3>
-                            <img src="${avatar}" class="popup-avatar-img" id="edit-preview-${playerId}" style="max-height: 100px;">
+                            <img src="${esc(avatar)}" class="popup-avatar-img" id="edit-preview-${playerId}" style="max-height: 100px;">
 
                             <form id="form-${playerId}" onsubmit="return false;">
                                 <div class="input-group">
@@ -431,7 +395,7 @@
 
                                 <div class="input-group">
                                     <label>Pseudo</label>
-                                    <input type="text" id="input-pseudo-${playerId}" value="${player.pseudo || ''}" required>
+                                    <input type="text" id="input-pseudo-${playerId}" value="${esc(player.pseudo || '')}" required>
                                 </div>
                                 <div class="input-group">
                                     <label>Catégorie d'équipe</label>
@@ -443,11 +407,11 @@
                                 </div>
                                 <div class="input-group">
                                     <label>Rôle / Division</label>
-                                    <input type="text" id="input-role-${playerId}" value="${player.role || ''}" required>
+                                    <input type="text" id="input-role-${playerId}" value="${esc(player.role || '')}" required>
                                 </div>
                                 <div class="input-group">
                                     <label>Earnings</label>
-                                    <input type="text" id="input-earnings-${playerId}" value="${player.earnings || ''}">
+                                    <input type="text" id="input-earnings-${playerId}" value="${esc(player.earnings || '')}">
                                 </div>
 
                                 <div class="input-group">
@@ -467,10 +431,10 @@
 
                                 <div class="input-group" style="border-top: 1px solid #222; padding-top:15px; margin-top:15px;">
                                     <label style="color:#fff;">🔗 Liens des Réseaux Sociaux</label>
-                                    <input type="url" id="input-twitter-${playerId}" value="${player.twitter || ''}" placeholder="Lien Twitter / X" style="margin-bottom:8px;">
-                                    <input type="url" id="input-twitch-${playerId}" value="${player.twitch || ''}" placeholder="Lien Twitch" style="margin-bottom:8px;">
-                                    <input type="url" id="input-youtube-${playerId}" value="${player.youtube || ''}" placeholder="Lien YouTube" style="margin-bottom:8px;">
-                                    <input type="url" id="input-tiktok-${playerId}" value="${player.tiktok || ''}" placeholder="Lien TikTok">
+                                    <input type="url" id="input-twitter-${playerId}" value="${esc(player.twitter || '')}" placeholder="Lien Twitter / X" style="margin-bottom:8px;">
+                                    <input type="url" id="input-twitch-${playerId}" value="${esc(player.twitch || '')}" placeholder="Lien Twitch" style="margin-bottom:8px;">
+                                    <input type="url" id="input-youtube-${playerId}" value="${esc(player.youtube || '')}" placeholder="Lien YouTube" style="margin-bottom:8px;">
+                                    <input type="url" id="input-tiktok-${playerId}" value="${esc(player.tiktok || '')}" placeholder="Lien TikTok">
                                 </div>
 
                                 <button type="submit" class="form-btn" style="margin-top:20px;">💾 Sauvegarder tout le profil</button>
@@ -493,8 +457,8 @@
                 if (localPrHistory.length > 0) {
                     let rows = localPrHistory.map(r => `
                         <tr>
-                            <td>${r.date || ''}</td>
-                            <td>${r.label || 'Tournoi'}</td>
+                            <td>${esc(r.date || '')}</td>
+                            <td>${esc(r.label || 'Tournoi')}</td>
                             <td class="pr-val-col">${Number(r.value).toLocaleString('fr-FR')}</td>
                         </tr>`).join("");
                     tableContainer.innerHTML = `<table class="pr-table"><thead><tr><th>DATE</th><th>ÉVÉNEMENT</th><th>PR TOTAL</th></tr></thead><tbody>${rows}</tbody></table>`;
@@ -551,7 +515,7 @@
                 }
                 editPrBox.innerHTML = localPrHistory.map((r, idx) => `
                     <div style="display:flex; justify-content:space-between; align-items:center; background:#111; padding:4px 8px; margin-bottom:4px; border-radius:4px; font-size:0.8rem;">
-                        <span style="color:#aaa;">[${r.date}] ${r.label} : <b>${r.value}</b></span>
+                        <span style="color:#aaa;">[${esc(r.date)}] ${esc(r.label)} : <b>${esc(r.value)}</b></span>
                         <button type="button" class="btn-del-pr-row" data-index="${idx}" style="background:none; border:none; color:#ff4444; cursor:pointer;">❌</button>
                     </div>
                 `).join("");
@@ -616,6 +580,7 @@
             });
 
             document.getElementById(`form-${playerId}`).addEventListener("submit", async () => {
+                if (!estAdmin) return;
                 const pseudo = document.getElementById(`input-pseudo-${playerId}`).value.trim();
                 const team = document.getElementById(`input-team-${playerId}`).value;
                 const role = document.getElementById(`input-role-${playerId}`).value.trim();
@@ -647,7 +612,7 @@
 
             if (!isNewPlayer) {
                 document.getElementById(`btn-delete-${playerId}`).addEventListener("click", async () => {
-                    if (confirm(`Voulez-vous vraiment retirer ${player.pseudo || 'ce joueur'} ?`)) {
+                    if (estAdmin && confirm(`Voulez-vous vraiment retirer ${player.pseudo || 'ce joueur'} ?`)) {
                         try {
                             await deleteDoc(doc(db, "roster", playerId));
                             alert("Joueur supprimé.");

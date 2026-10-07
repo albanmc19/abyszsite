@@ -115,7 +115,7 @@
         .pr-table tr:last-child td { border-bottom: none; }
         .pr-table td.pr-val-col { color: #b975ff; font-weight: 700; font-family: 'Orbitron', sans-serif; }
     </style>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; connect-src https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com https://*.firebasedatabase.app wss://*.firebasedatabase.app; img-src 'self' data: blob:; frame-ancestors 'none';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; connect-src https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com https://*.firebasedatabase.app wss://*.firebasedatabase.app; img-src 'self' data: blob: https:; frame-ancestors 'none';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -223,7 +223,45 @@
         const ADMIN_EMAIL = "abyszofficial@gmail.com";
         const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
         const safeUrl = (u) => { try { const x = new URL(u, location.href); return (x.protocol === "http:" || x.protocol === "https:") ? x.href : ""; } catch { return ""; } };
-        const safeImg = (u) => /^(data:image\/(png|jpe?g|gif|webp);base64,|https?:\/\/)/i.test(String(u || "")) ? u : "logo.png";
+        const safeImg = (u) => /^(data:image\/(png|jpe?g|gif|webp|avif);base64,|https?:\/\/)/i.test(String(u || "")) ? u : "logo.png";
+
+        // ── Redimensionne + compresse l'image côté navigateur (limite Firestore : 1 Mio / document) ──
+        const MAX_INPUT_BYTES = 25 * 1024 * 1024;   // fichier source max
+        const MAX_DATAURL_CHARS = 180000;            // ~135 Ko d'image : large marge sous 1 Mio
+        async function loadBitmap(file) {
+            if (window.createImageBitmap) {
+                try { return await createImageBitmap(file, { imageOrientation: "from-image" }); } catch (_) { /* fallback ci-dessous */ }
+            }
+            return await new Promise((resolve, reject) => {
+                const url = URL.createObjectURL(file);
+                const img = new Image();
+                img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+                img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("decode")); };
+                img.src = url;
+            });
+        }
+        async function fileToCompressedDataURL(file) {
+            const bmp = await loadBitmap(file);
+            const srcW = bmp.width || bmp.naturalWidth, srcH = bmp.height || bmp.naturalHeight;
+            if (!srcW || !srcH) throw new Error("decode");
+            let maxW = 600, maxH = 700, quality = 0.85, out = "";
+            for (let i = 0; i < 8; i++) {
+                const scale = Math.min(1, maxW / srcW, maxH / srcH);
+                const canvas = document.createElement("canvas");
+                canvas.width = Math.max(1, Math.round(srcW * scale));
+                canvas.height = Math.max(1, Math.round(srcH * scale));
+                const ctx = canvas.getContext("2d");
+                ctx.fillStyle = "#141414";               // fond pour les PNG transparents
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(bmp, 0, 0, canvas.width, canvas.height);
+                out = canvas.toDataURL("image/jpeg", quality);
+                if (out.length <= MAX_DATAURL_CHARS) break;
+                if (quality > 0.55) quality -= 0.1; else { maxW *= 0.8; maxH *= 0.8; }
+            }
+            if (bmp.close) bmp.close();
+            if (out.length > MAX_DATAURL_CHARS) throw new Error("toolarge");
+            return out;
+        }
 
         document.addEventListener("DOMContentLoaded", () => {
             onAuthStateChanged(auth, (user) => {
@@ -647,16 +685,31 @@
                 renderEditPrList();
             });
 
-            document.getElementById(`file-input-${playerId}`).addEventListener("change", (e) => {
+            let imageProcessing = null;   // promesse en cours (le submit l'attend)
+            const fileInput = document.getElementById(`file-input-${playerId}`);
+            fileInput.addEventListener("change", (e) => {
                 const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        imageBase64String = event.target.result;
-                        document.getElementById(`edit-preview-${playerId}`).src = imageBase64String;
-                    };
-                    reader.readAsDataURL(file);
-                }
+                if (!file) return;
+                if (!file.type.startsWith("image/")) { alert("Ce fichier n'est pas une image."); e.target.value = ""; return; }
+                if (file.size > MAX_INPUT_BYTES) { alert("Image trop lourde (25 Mo maximum)."); e.target.value = ""; return; }
+
+                const preview = document.getElementById(`edit-preview-${playerId}`);
+                const label = document.querySelector(`label[for="file-input-${playerId}"]`);
+                if (label) label.textContent = "⏳ Traitement de l'image…";
+
+                imageProcessing = fileToCompressedDataURL(file)
+                    .then((dataUrl) => { imageBase64String = dataUrl; preview.src = dataUrl; })
+                    .catch((err) => {
+                        console.error(err);
+                        alert(err.message === "toolarge"
+                            ? "Impossible de compresser assez cette image. Essaie avec une image plus petite."
+                            : "Format d'image non supporté par ce navigateur (ex. HEIC). Utilise un JPG, PNG ou WebP.");
+                    })
+                    .finally(() => {
+                        imageProcessing = null;
+                        if (label) label.textContent = "📁 Choisir un fichier image";
+                        e.target.value = "";   // permet de re-sélectionner le même fichier
+                    });
             });
 
             document.getElementById(`btn-clear-img-${playerId}`).addEventListener("click", () => {
@@ -682,6 +735,9 @@
 
             document.getElementById(`form-${playerId}`).addEventListener("submit", async () => {
                 if (!estAdmin) return;
+                const submitBtn = document.querySelector(`#form-${playerId} button[type="submit"]`);
+                if (submitBtn) submitBtn.disabled = true;
+                if (imageProcessing) await imageProcessing;   // attend la fin de la compression
                 const pseudo = document.getElementById(`input-pseudo-${playerId}`).value.trim();
                 const team = document.getElementById(`input-team-${playerId}`).value;
                 const role = document.getElementById(`input-role-${playerId}`).value.trim();
@@ -693,6 +749,11 @@
                 const tiktok = document.getElementById(`input-tiktok-${playerId}`).value.trim();
 
                 try {
+                    if (String(imageBase64String).length > 900000) {
+                        alert("L'image est trop lourde pour être enregistrée. Choisis-en une autre (elle sera recompressée automatiquement).");
+                        if (submitBtn) submitBtn.disabled = false;
+                        return;
+                    }
                     const playerDocRef = doc(db, "roster", playerId);
                     const dataToSave = {
                         pseudo, team, role, earnings,
@@ -707,7 +768,13 @@
                     closePopup();
                 } catch (err) {
                     console.error(err);
-                    alert("Erreur lors de la sauvegarde.");
+                    if (submitBtn) submitBtn.disabled = false;
+                    const msgs = {
+                        "permission-denied": "Sauvegarde refusée : tes droits ou les règles Firestore l'empêchent. Reconnecte-toi.",
+                        "invalid-argument": "Sauvegarde refusée : le document est trop volumineux (image).",
+                        "unavailable": "Connexion à Firebase impossible. Réessaie."
+                    };
+                    alert(msgs[err.code] || "Erreur lors de la sauvegarde.");
                 }
             });
 

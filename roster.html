@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-adsense-account" content="ca-pub-1494144032841410">
     <meta name="description" content="Roster 2026 de l'équipe ABYSZ Esports">
     <title>ABYSZ | Roster 2026</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1494144032841410"
-     crossorigin="anonymous"></script>
+    <!-- AdSense retiré : aucun encart pub sur cette page. Le script ne se chargeait qu'avant la CSP et déposait des cookies sans consentement. -->
 
     <style>
         /* ── ARCHITECTURE GLOBALE & NAV ── */
@@ -115,7 +115,7 @@
         .pr-table tr:last-child td { border-bottom: none; }
         .pr-table td.pr-val-col { color: #b975ff; font-weight: 700; font-family: 'Orbitron', sans-serif; }
     </style>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; connect-src https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com https://*.firebasedatabase.app wss://*.firebasedatabase.app; img-src 'self' data: blob: https:; frame-ancestors 'none';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://pagead2.googlesyndication.com https://partner.googleadservices.com https://tpc.googlesyndication.com https://www.googletagservices.com https://*.adtrafficquality.google; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; connect-src https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com https://*.firebasedatabase.app wss://*.firebasedatabase.app https://pagead2.googlesyndication.com https://*.adtrafficquality.google; img-src 'self' data: blob: https:; frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://*.safeframe.googlesyndication.com https://www.google.com https://*.adtrafficquality.google; frame-ancestors 'none';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -147,9 +147,16 @@
             </div>
         </div>
 
+        <div style="max-width:1200px; margin:0 auto 30px auto; padding:0 20px; font-family:'Inter', sans-serif; color:#bbb; line-height:1.7; font-size:0.95rem;">
+            <p style="margin:0 0 10px 0;">Le roster d'ABYSZ Esports est organisé en trois niveaux : l'<strong>équipe principale</strong>, qui représente la structure en compétition, les <strong>joueurs académiques</strong>, notre équipe de développement, et le <strong>centre de formation (CDF)</strong>, où progressent les futurs talents.</p>
+            <p style="margin:0;">Clique sur un joueur pour ouvrir sa fiche. Les compositions évoluent au fil de la saison : les recrutements ouverts sont publiés dans les <a href="index.html#annonces" style="color:#a855f7;">annonces</a>, et tu peux suivre les lives de la team sur <a href="tv.html" style="color:#a855f7;">Abysz TV</a>.</p>
+        </div>
+
         <div class="roster-grid" id="main-roster-grid">
             <p class="loading-text">Connexion à Firestore...</p>
         </div>
+
+        <div class="abysz-ad" data-ad="milieu"></div>
 
         <h2 style="margin-top:80px; text-align:center; font-family:'Orbitron', sans-serif; color:#fff;">Joueurs Académiques</h2>
         <p style="text-align:center; margin-bottom:30px; color:#aaa; font-family:'Inter', sans-serif;">Notre équipe de développement et d'avenir</p>
@@ -163,9 +170,15 @@
             <p class="loading-text">Connexion à Firestore...</p>
         </div>
 
+        <div class="abysz-ad" data-ad="bas"></div>
+
         <br><br><br>
         <div style="text-align: center;">
             <a href="index.html" style="color: #a855f7; text-decoration: none; font-family: 'Orbitron', sans-serif; font-weight: bold;">← Retour à l'accueil</a>
+            <p style="margin-top: 18px; font-size: 0.8rem; color: #888;">
+                <a href="cookies.html" style="color: #aaa;">Cookies</a> •
+                <a href="#" data-open-cookie-prefs style="color: #aaa;">Gérer mes cookies</a>
+            </p>
         </div>
     </section>
 
@@ -794,6 +807,10 @@
             }
         }
     </script>
-    <script type="module" src="abysz-tracker.js"></script>
+    <script src="cookie-consent.js"></script>
+    <script>
+        // Le tracker ne démarre qu'après consentement "Mesure d'audience"
+        window.AbyszConsent.on("analytics", function () { import("./abysz-tracker.js").catch(function (e) { console.error(e); }); });
+    </script>
 </body>
 </html>

@@ -34,7 +34,7 @@
         .error-text { text-align: center; color: #ef4444; font-family: 'Orbitron', sans-serif; font-style: italic; grid-column: 1/-1; padding: 20px; font-size: 0.9rem; }
 
         /* ── ROSTER GRID ── */
-        .roster-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .roster-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 275px)); justify-content: center; gap: 20px; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
         /* ── IMAGES ── */
         .player-avatar-img { width: 100%; height: 230px; object-fit: cover; border-bottom: 2px solid #a855f7; background: #141414; }
@@ -64,6 +64,9 @@
         /* ── FORMULAIRES EDITION ── */
         .input-group { margin-bottom: 15px; text-align: left; }
         .input-group label { display: block; margin-bottom: 6px; color: #a855f7; font-size: 0.8rem; font-family: 'Orbitron', sans-serif; font-weight: 600; }
+        .input-group textarea { width: 100%; padding: 10px 14px; background: #0a0a0a; border: 1px solid #2a2a2a; color: white; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.9rem; box-sizing: border-box; resize: vertical; min-height: 110px; line-height: 1.5; }
+        .input-group .field-hint { color: #777; font-size: 0.75rem; font-family: 'Inter', sans-serif; margin: 6px 0 0 0; line-height: 1.4; }
+        .intro-popup { max-width: 640px; }
         .input-group input, .input-group select { width: 100%; padding: 10px 14px; background: #0a0a0a; border: 1px solid #2a2a2a; color: white; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.9rem; box-sizing: border-box; }
         
         .file-upload-btn { display: block; text-align: center; background: #1a1a1a; border: 1px dashed #a855f7; color: #ccc; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; }
@@ -139,17 +142,18 @@
 
     <section style="padding-top: 160px; padding-bottom: 80px;">
         <div class="roster-header-container">
-            <h2 style="font-family:'Orbitron', sans-serif; color:#fff; font-size:2rem; margin:0;">Notre Roster 2026</h2>
+            <h2 id="roster-title" style="font-family:'Orbitron', sans-serif; color:#fff; font-size:2rem; margin:0;">Notre Roster 2026</h2>
             <div class="admin-actions-header">
                 <span id="user-welcome-msg" style="font-family:'Inter', sans-serif; color:#aaa; font-size:0.9rem; margin-right:10px;"></span>
+                <button class="admin-gate-btn hidden" id="edit-intro-btn">✏️ Modifier le texte</button>
                 <button class="admin-gate-btn hidden" id="add-player-btn">➕ Nouveau Joueur</button>
                                 <button class="admin-gate-btn logout-btn hidden" id="logout-btn">🔒 Déconnexion</button>
             </div>
         </div>
 
         <div style="max-width:1200px; margin:0 auto 30px auto; padding:0 20px; font-family:'Inter', sans-serif; color:#bbb; line-height:1.7; font-size:0.95rem;">
-            <p style="margin:0 0 10px 0;">Le roster d'ABYSZ Esports est organisé en trois niveaux : l'<strong>équipe principale</strong>, qui représente la structure en compétition, les <strong>joueurs académiques</strong>, notre équipe de développement, et le <strong>centre de formation (CDF)</strong>, où progressent les futurs talents.</p>
-            <p style="margin:0;">Clique sur un joueur pour ouvrir sa fiche. Les compositions évoluent au fil de la saison : les recrutements ouverts sont publiés dans les <a href="index.html#annonces" style="color:#a855f7;">annonces</a>, et tu peux suivre les lives de la team sur <a href="tv.html" style="color:#a855f7;">Abysz TV</a>.</p>
+            <p id="roster-intro-p1" style="margin:0 0 10px 0;">Le roster d'ABYSZ Esports est organisé en trois niveaux : l'<strong>équipe principale</strong>, qui représente la structure en compétition, les <strong>joueurs académiques</strong>, notre équipe de développement, et le <strong>centre de formation (CDF)</strong>, où progressent les futurs talents.</p>
+            <p id="roster-intro-p2" style="margin:0;">Clique sur un joueur pour ouvrir sa fiche. Les compositions évoluent au fil de la saison : les recrutements ouverts sont publiés dans les <a href="index.html#annonces" style="color:#a855f7;">annonces</a>, et tu peux suivre les lives de la team sur <a href="tv.html" style="color:#a855f7;">Abysz TV</a>.</p>
         </div>
 
         <div class="roster-grid" id="main-roster-grid">
@@ -211,6 +215,32 @@
         </div>
     </div>
 
+    <div class="popup-overlay" id="intro-overlay" role="dialog" aria-modal="true" aria-labelledby="intro-title">
+        <div class="popup intro-popup">
+            <span class="popup-close" id="intro-close" aria-label="Fermer">&times;</span>
+            <h3 class="popup-pseudo" id="intro-title" style="margin-bottom:20px;">Modifier le texte du roster</h3>
+            <form id="intro-form" novalidate>
+                <div class="input-group">
+                    <label for="intro-input-title">TITRE</label>
+                    <input type="text" id="intro-input-title" maxlength="120">
+                </div>
+                <div class="input-group">
+                    <label for="intro-input-p1">PARAGRAPHE 1</label>
+                    <textarea id="intro-input-p1" maxlength="1200"></textarea>
+                </div>
+                <div class="input-group">
+                    <label for="intro-input-p2">PARAGRAPHE 2</label>
+                    <textarea id="intro-input-p2" maxlength="1200"></textarea>
+                    <p class="field-hint">Mise en forme : <b>**gras**</b> pour mettre en gras, <b>[texte du lien](https://...)</b> pour un lien (ou <b>[annonces](index.html#annonces)</b> pour une page du site).</p>
+                </div>
+                <p class="login-msg" id="intro-msg" role="alert" aria-live="polite"></p>
+                <button type="submit" class="form-btn" id="intro-save">💾 Enregistrer</button>
+                <button type="button" class="form-btn edit-toggle-btn" id="intro-reset" style="margin-top:5px;">↩️ Rétablir le texte par défaut</button>
+                <button type="button" class="form-btn edit-toggle-btn" id="intro-cancel" style="margin-top:5px;">Annuler</button>
+            </form>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, sendPasswordResetEmail, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -237,6 +267,93 @@
         const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
         const safeUrl = (u) => { try { const x = new URL(u, location.href); return (x.protocol === "http:" || x.protocol === "https:") ? x.href : ""; } catch { return ""; } };
         const safeImg = (u) => /^(data:image\/(png|jpe?g|gif|webp|avif);base64,|https?:\/\/)/i.test(String(u || "")) ? u : "logo.png";
+
+        // ── TEXTE D'INTRODUCTION MODIFIABLE (stocké dans Firestore : siteContent/rosterIntro) ──
+        // Mise en forme autorisée : **gras** et [texte](lien). Tout le reste est échappé (sécurité).
+        const DEFAULT_INTRO = {
+            title: "Notre Roster 2026",
+            p1: "Le roster d'ABYSZ Esports est organisé en trois niveaux : l'**équipe principale**, qui représente la structure en compétition, les **joueurs académiques**, notre équipe de développement, et le **centre de formation (CDF)**, où progressent les futurs talents.",
+            p2: "Clique sur un joueur pour ouvrir sa fiche. Les compositions évoluent au fil de la saison : les recrutements ouverts sont publiés dans les [annonces](index.html#annonces), et tu peux suivre les lives de la team sur [Abysz TV](tv.html)."
+        };
+        let currentIntro = { ...DEFAULT_INTRO };
+
+        const richText = (t) => esc(t)
+            .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+            .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (m, label, url) => {
+                const u = safeUrl(url.replace(/&amp;/g, "&"));
+                return u ? `<a href="${esc(u)}" style="color:#a855f7;">${label}</a>` : label;
+            });
+
+        function renderIntro(data) {
+            currentIntro = {
+                title: (data && data.title) || DEFAULT_INTRO.title,
+                p1: (data && data.p1) || DEFAULT_INTRO.p1,
+                p2: (data && data.p2) || DEFAULT_INTRO.p2
+            };
+            const t = document.getElementById("roster-title");
+            const p1 = document.getElementById("roster-intro-p1");
+            const p2 = document.getElementById("roster-intro-p2");
+            if (t) t.textContent = currentIntro.title;
+            if (p1) p1.innerHTML = richText(currentIntro.p1);
+            if (p2) p2.innerHTML = richText(currentIntro.p2);
+        }
+
+        function ecouterIntroFirestore() {
+            onSnapshot(doc(db, "siteContent", "rosterIntro"), (snap) => {
+                renderIntro(snap.exists() ? snap.data() : null);
+            }, (error) => console.error("Texte du roster :", error));
+        }
+
+        function setupIntroEditor() {
+            const overlay = document.getElementById("intro-overlay");
+            const form = document.getElementById("intro-form");
+            const inTitle = document.getElementById("intro-input-title");
+            const inP1 = document.getElementById("intro-input-p1");
+            const inP2 = document.getElementById("intro-input-p2");
+            const msg = document.getElementById("intro-msg");
+            const saveBtn = document.getElementById("intro-save");
+            const setMsg = (text, type) => { msg.textContent = text || ""; msg.className = "login-msg" + (type ? " " + type : ""); };
+            const close = () => { overlay.classList.remove("active"); setMsg(""); };
+
+            document.getElementById("edit-intro-btn").addEventListener("click", () => {
+                if (!estAdmin) return;
+                inTitle.value = currentIntro.title;
+                inP1.value = currentIntro.p1;
+                inP2.value = currentIntro.p2;
+                setMsg("");
+                overlay.classList.add("active");
+                inTitle.focus();
+            });
+            document.getElementById("intro-close").addEventListener("click", close);
+            document.getElementById("intro-cancel").addEventListener("click", close);
+            overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
+            document.addEventListener("keydown", (e) => { if (e.key === "Escape" && overlay.classList.contains("active")) close(); });
+
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                if (!estAdmin) return;
+                const title = inTitle.value.trim(), p1 = inP1.value.trim(), p2 = inP2.value.trim();
+                if (!title || !p1 || !p2) { setMsg("Remplis le titre et les deux paragraphes.", "err"); return; }
+                saveBtn.disabled = true; saveBtn.textContent = "Enregistrement...";
+                try {
+                    await setDoc(doc(db, "siteContent", "rosterIntro"), { title, p1, p2, updatedAt: serverTimestamp() });
+                    close();
+                } catch (err) {
+                    console.error(err);
+                    setMsg(err.code === "permission-denied"
+                        ? "Refusé : ajoute la règle Firestore pour « siteContent » (voir instructions) ou reconnecte-toi."
+                        : "Erreur lors de l'enregistrement.", "err");
+                } finally {
+                    saveBtn.disabled = false; saveBtn.textContent = "💾 Enregistrer";
+                }
+            });
+
+            document.getElementById("intro-reset").addEventListener("click", async () => {
+                if (!estAdmin || !confirm("Rétablir le texte d'origine ?")) return;
+                try { await deleteDoc(doc(db, "siteContent", "rosterIntro")); close(); }
+                catch (err) { console.error(err); setMsg("Erreur lors de la réinitialisation.", "err"); }
+            });
+        }
 
         // ── Redimensionne + compresse l'image côté navigateur (limite Firestore : 1 Mio / document) ──
         const MAX_INPUT_BYTES = 25 * 1024 * 1024;   // fichier source max
@@ -318,6 +435,8 @@
 
                 const navDashboard = document.getElementById("nav-dashboard");
                 if (navDashboard) navDashboard.classList.toggle("hidden", !estAdmin);
+                const editIntroBtn = document.getElementById("edit-intro-btn");
+                if (editIntroBtn) editIntroBtn.classList.toggle("hidden", !estAdmin);
 
                 renderRosters(localPlayersList);
             });
@@ -331,6 +450,8 @@
 
             setupLoginModal();
             ecouterRosterFirestore();
+            ecouterIntroFirestore();
+            setupIntroEditor();
             setupAddPlayerButton();
         });
 

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-adsense-account" content="ca-pub-1494144032841410">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'; form-action 'self'">
     <title>Abysz Esports</title>
@@ -636,45 +637,6 @@
             .discord-widget-wrapper .btn { width: 100%; box-sizing: border-box; }
         }
     </style>
-    <style>
-        /* ===== COOKIES : bandeau + préférences ===== */
-        .cc-banner { position: fixed; left: 0; right: 0; bottom: 0; z-index: 9000; display: flex; justify-content: center; padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px)); pointer-events: none; animation: cc-up 0.45s cubic-bezier(0.25, 1, 0.5, 1); }
-        @keyframes cc-up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
-        .cc-inner { pointer-events: auto; max-width: 920px; width: 100%; box-sizing: border-box; background: rgba(20, 20, 20, 0.97); border: 1px solid #2a2a2a; border-top: 3px solid #a855f7; border-radius: 16px; padding: 20px 22px; display: flex; gap: 22px; align-items: center; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(168, 85, 247, 0.18); backdrop-filter: blur(10px); }
-        .cc-title { font-family: 'Orbitron', sans-serif; font-size: 0.95rem; display: block; margin-bottom: 6px; }
-        .cc-text p { margin: 0; color: #b3b3b3; font-size: 0.85rem; line-height: 1.55; }
-        .cc-text a { color: #a855f7; }
-        .cc-actions { display: flex; gap: 10px; flex-shrink: 0; }
-        .cc-btn { font-family: 'Orbitron', sans-serif; font-size: 0.74rem; font-weight: 700; letter-spacing: 0.4px; padding: 11px 16px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; white-space: nowrap; transition: transform 0.2s ease, box-shadow 0.3s ease, background 0.2s ease; }
-        .cc-btn:hover { transform: translateY(-2px); }
-        .cc-btn-accept { background: #a855f7; color: #fff; }
-        .cc-btn-accept:hover { background: #b975ff; box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
-        .cc-btn-refuse { background: #262626; color: #fff; border-color: #3a3a3a; }
-        .cc-btn-refuse:hover { background: #333; }
-        .cc-btn-custom { background: transparent; color: #a855f7; border-color: #a855f7; }
-        .cc-btn-custom:hover { background: rgba(168, 85, 247, 0.15); }
-        .cc-btn:focus-visible, .cc-text a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-
-        .cc-cat { background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; }
-        .cc-cat-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-        .cc-cat-name { font-family: 'Orbitron', sans-serif; font-size: 0.85rem; color: #fff; }
-        .cc-cat p { margin: 8px 0 0; color: #999; font-size: 0.82rem; line-height: 1.5; }
-        .cc-always { font-family: 'Orbitron', sans-serif; font-size: 0.7rem; color: #10b981; white-space: nowrap; }
-        .cc-switch { position: relative; width: 46px; height: 26px; flex-shrink: 0; }
-        .cc-switch input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; z-index: 2; }
-        .cc-slider { position: absolute; inset: 0; background: #333; border-radius: 26px; transition: background 0.25s; }
-        .cc-slider::before { content: ''; position: absolute; width: 20px; height: 20px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform 0.25s; }
-        .cc-switch input:checked + .cc-slider { background: #a855f7; }
-        .cc-switch input:checked + .cc-slider::before { transform: translateX(20px); }
-        .cc-switch input:focus-visible + .cc-slider { outline: 2px solid #fff; outline-offset: 2px; }
-
-        @media (max-width: 768px) {
-            .cc-inner { flex-direction: column; align-items: stretch; gap: 16px; padding: 18px 16px; }
-            .cc-actions { flex-direction: column; }
-            .cc-btn { width: 100%; padding: 13px 16px; }
-        }
-        @media (prefers-reduced-motion: reduce) { .cc-banner { animation: none; } }
-    </style>
 </head>
 <body>
  
@@ -731,13 +693,22 @@
         </p>
     </section>
 
-    <div class="adsense-container hidden">
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-1494144032841410"
-             data-ad-slot="AUTO"
-             data-full-width-responsive="true"></ins>
-    </div>
+    <section class="about-section reveal" id="decouvrir">
+        <h2>Ce que vous trouverez sur Abysz</h2>
+        <ul>
+            <li><strong>Le <a href="roster.html" style="color:#a855f7;">roster</a> :</strong> l'équipe principale, les joueurs académiques et le centre de formation, avec la fiche de chaque joueur.</li>
+            <li><strong><a href="tv.html" style="color:#a855f7;">Abysz TV</a> :</strong> les lives de la team et nos vidéos officielles au même endroit.</li>
+            <li><strong>Les annonces :</strong> matchs, tournois, événements et recrutements, publiés ici en premier.</li>
+            <li><strong>La <a href="boutique.html" style="color:#a855f7;">boutique</a> :</strong> les produits officiels de la structure.</li>
+            <li><strong>Le Discord :</strong> la communauté pour échanger avec les joueurs et suivre les événements en direct.</li>
+        </ul>
+        <h2 style="margin-top:30px;">Questions fréquentes</h2>
+        <p><strong>Comment suivre les matchs ?</strong> Les lives sont diffusés sur nos chaînes (Twitch, YouTube, TikTok) et regroupés sur Abysz TV ; les dates sont annoncées dans la section Annonces.</p>
+        <p><strong>Comment rejoindre Abysz ?</strong> Les recrutements ouverts sont publiés dans les annonces avec le tag « Recrutement ». Le plus simple est aussi de nous contacter sur Discord ou par e-mail à abyszofficial@gmail.com.</p>
+        <p><strong>Comment sont utilisées mes données ?</strong> Consulte notre <a href="politique-confidentialite.html" style="color:#a855f7;">politique de confidentialité</a> et notre <a href="cookies.html" style="color:#a855f7;">politique de cookies</a> ; tu peux modifier ton choix à tout moment.</p>
+    </section>
+
+    <div class="abysz-ad" data-ad="haut"></div>
 
     <section id="annonces" class="announcements-container reveal">
         <div class="section-header">
@@ -773,6 +744,8 @@
         </div>
     </section>
 
+    <div class="abysz-ad" data-ad="milieu"></div>
+
     <section id="custom-section" class="custom-section-container reveal">
         <div class="section-header">
             <div class="title-area">
@@ -806,7 +779,7 @@
             <a href="mentions-legales.html">Mentions Légales</a> • 
             <a href="politique-confidentialite.html">Politique de Confidentialité</a> • 
             <a href="cookies.html">Cookies</a> • 
-            <a href="#" id="manage-cookies-link">Gérer mes cookies</a>
+            <a href="#" data-open-cookie-prefs>Gérer mes cookies</a>
         </div>
         <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
     </footer>
@@ -1018,154 +991,7 @@
         </div>
     </div>
  
-    <div id="cookie-banner" class="cc-banner hidden" role="region" aria-label="Gestion des cookies">
-        <div class="cc-inner">
-            <div class="cc-text">
-                <strong class="cc-title">🍪 Vos préférences cookies</strong>
-                <p>Abysz utilise des traceurs pour mesurer l'audience du site et afficher de la publicité. Vous pouvez tout accepter, tout refuser ou choisir, et modifier votre choix à tout moment. <a href="cookies.html">En savoir plus</a></p>
-            </div>
-            <div class="cc-actions">
-                <button type="button" class="cc-btn cc-btn-refuse" id="cc-refuse">Tout refuser</button>
-                <button type="button" class="cc-btn cc-btn-accept" id="cc-accept">Tout accepter</button>
-                <button type="button" class="cc-btn cc-btn-custom" id="cc-custom">Personnaliser</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="cookie-prefs" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="cc-prefs-title">
-        <div class="modal-content">
-            <span class="modal-close" id="cc-prefs-close" role="button" tabindex="0" aria-label="Fermer">&times;</span>
-            <h3 id="cc-prefs-title">Préférences cookies</h3>
-
-            <div class="cc-cat">
-                <div class="cc-cat-head"><span class="cc-cat-name">Nécessaires</span><span class="cc-always">Toujours actifs</span></div>
-                <p>Mémorisent votre choix de cookies, votre connexion et un identifiant anonyme pour les « J'aime » des annonces. Indispensables au fonctionnement du site.</p>
-            </div>
-            <div class="cc-cat">
-                <div class="cc-cat-head">
-                    <span class="cc-cat-name">Mesure d'audience</span>
-                    <label class="cc-switch"><input type="checkbox" id="cc-analytics" aria-label="Mesure d'audience"><span class="cc-slider"></span></label>
-                </div>
-                <p>Statistiques de fréquentation (pages vues, appareil, durée de visite, visiteurs en ligne) pour améliorer le site.</p>
-            </div>
-            <div class="cc-cat">
-                <div class="cc-cat-head">
-                    <span class="cc-cat-name">Publicité</span>
-                    <label class="cc-switch"><input type="checkbox" id="cc-ads" aria-label="Publicité"><span class="cc-slider"></span></label>
-                </div>
-                <p>Affichage de publicités via Google AdSense, qui peut déposer ses propres cookies.</p>
-            </div>
-            <button type="button" class="form-btn" id="cc-save">Enregistrer mes choix</button>
-        </div>
-    </div>
-
-    <script>
-    (function () {
-        var KEY = 'abysz_cookie_consent_v1';
-        var MAX_AGE = 182 * 24 * 60 * 60 * 1000; // le choix est redemandé après 6 mois
-        var ADS_CLIENT = 'ca-pub-1494144032841410';
-        var $ = function (id) { return document.getElementById(id); };
-        var applied = { analytics: false, ads: false };
-        var waiting = { analytics: [], ads: [] };
-        var state = null, lastFocus = null;
-
-        function read() {
-            try {
-                var r = JSON.parse(localStorage.getItem(KEY));
-                if (r && r.v === 1 && r.t && Date.now() - r.t < MAX_AGE) return r;
-            } catch (e) {}
-            return null;
-        }
-        function write(a, d) {
-            var r = { v: 1, t: Date.now(), analytics: !!a, ads: !!d };
-            try { localStorage.setItem(KEY, JSON.stringify(r)); } catch (e) {}
-            return r;
-        }
-
-        function loadAds() {
-            document.querySelectorAll('.adsense-container').forEach(function (c) { c.classList.remove('hidden'); });
-            var s = document.createElement('script');
-            s.async = true; s.crossOrigin = 'anonymous';
-            s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + ADS_CLIENT;
-            s.onload = function () {
-                document.querySelectorAll('ins.adsbygoogle').forEach(function () {
-                    try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
-                });
-            };
-            document.head.appendChild(s);
-        }
-
-        function run(cat) {
-            applied[cat] = true;
-            if (cat === 'ads') loadAds();
-            waiting[cat].splice(0).forEach(function (fn) { try { fn(); } catch (e) { console.error(e); } });
-        }
-        function apply(r) {
-            if (r.analytics && !applied.analytics) run('analytics');
-            if (r.ads && !applied.ads) run('ads');
-        }
-
-        // Retrait du consentement : on supprime ce qui a été déposé
-        function cleanup() {
-            try { ['abysz_last_day', 'abysz_first_seen', 'abysz_last_hour'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
-            document.cookie.split(';').forEach(function (c) {
-                var n = c.split('=')[0].trim();
-                if (/^(__gads|__gpi|__eoi|_ga|_gid|IDE|test_cookie)/.test(n)) {
-                    ['', ';domain=' + location.hostname, ';domain=.' + location.hostname].forEach(function (d) {
-                        document.cookie = n + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/' + d;
-                    });
-                }
-            });
-        }
-
-        function showBanner() { $('cookie-banner').classList.remove('hidden'); }
-        function hideBanner() { $('cookie-banner').classList.add('hidden'); }
-        function openPrefs() {
-            lastFocus = document.activeElement;
-            $('cc-analytics').checked = !!(state && state.analytics);
-            $('cc-ads').checked = !!(state && state.ads);
-            $('cookie-prefs').classList.add('active');
-            $('cc-analytics').focus();
-        }
-        function closePrefs() {
-            $('cookie-prefs').classList.remove('active');
-            if (lastFocus && lastFocus.focus) lastFocus.focus();
-        }
-
-        function commit(a, d) {
-            var prev = state || {};
-            state = write(a, d);
-            hideBanner();
-            $('cookie-prefs').classList.remove('active');
-            if ((prev.analytics && !state.analytics) || (prev.ads && !state.ads)) {
-                cleanup();
-                location.reload();
-                return;
-            }
-            apply(state);
-        }
-
-        $('cc-accept').addEventListener('click', function () { commit(true, true); });
-        $('cc-refuse').addEventListener('click', function () { commit(false, false); });
-        $('cc-custom').addEventListener('click', openPrefs);
-        $('cc-save').addEventListener('click', function () { commit($('cc-analytics').checked, $('cc-ads').checked); });
-        $('cc-prefs-close').addEventListener('click', closePrefs);
-        $('cc-prefs-close').addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); closePrefs(); } });
-        $('cookie-prefs').addEventListener('click', function (e) { if (e.target === this) closePrefs(); });
-        document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && $('cookie-prefs').classList.contains('active')) closePrefs(); });
-        var manage = $('manage-cookies-link');
-        if (manage) manage.addEventListener('click', function (e) { e.preventDefault(); openPrefs(); });
-
-        window.AbyszConsent = {
-            on: function (cat, fn) { if (applied[cat]) fn(); else waiting[cat].push(fn); },
-            open: openPrefs,
-            get: function () { return state; }
-        };
-
-        state = read();
-        if (state) apply(state); else showBanner();
-    })();
-    </script>
+    <script src="cookie-consent.js"></script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";

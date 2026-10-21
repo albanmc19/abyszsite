@@ -268,7 +268,7 @@
         const safeUrl = (u) => { try { const x = new URL(u, location.href); return (x.protocol === "http:" || x.protocol === "https:") ? x.href : ""; } catch { return ""; } };
         const safeImg = (u) => /^(data:image\/(png|jpe?g|gif|webp|avif);base64,|https?:\/\/)/i.test(String(u || "")) ? u : "logo.png";
 
-        // ── TEXTE D'INTRODUCTION MODIFIABLE (stocké dans Firestore : siteContent/rosterIntro) ──
+        // ── TEXTE D'INTRODUCTION MODIFIABLE (stocké dans Firestore : site_content/rosterIntro) ──
         // Mise en forme autorisée : **gras** et [texte](lien). Tout le reste est échappé (sécurité).
         const DEFAULT_INTRO = {
             title: "Notre Roster 2026",
@@ -299,7 +299,7 @@
         }
 
         function ecouterIntroFirestore() {
-            onSnapshot(doc(db, "siteContent", "rosterIntro"), (snap) => {
+            onSnapshot(doc(db, "site_content", "rosterIntro"), (snap) => {
                 renderIntro(snap.exists() ? snap.data() : null);
             }, (error) => console.error("Texte du roster :", error));
         }
@@ -336,12 +336,12 @@
                 if (!title || !p1 || !p2) { setMsg("Remplis le titre et les deux paragraphes.", "err"); return; }
                 saveBtn.disabled = true; saveBtn.textContent = "Enregistrement...";
                 try {
-                    await setDoc(doc(db, "siteContent", "rosterIntro"), { title, p1, p2, updatedAt: serverTimestamp() });
+                    await setDoc(doc(db, "site_content", "rosterIntro"), { title, p1, p2, updatedAt: serverTimestamp() });
                     close();
                 } catch (err) {
                     console.error(err);
                     setMsg(err.code === "permission-denied"
-                        ? "Refusé : ajoute la règle Firestore pour « siteContent » (voir instructions) ou reconnecte-toi."
+                        ? "Refusé : reconnecte-toi avec le compte admin."
                         : "Erreur lors de l'enregistrement.", "err");
                 } finally {
                     saveBtn.disabled = false; saveBtn.textContent = "💾 Enregistrer";
@@ -350,7 +350,7 @@
 
             document.getElementById("intro-reset").addEventListener("click", async () => {
                 if (!estAdmin || !confirm("Rétablir le texte d'origine ?")) return;
-                try { await deleteDoc(doc(db, "siteContent", "rosterIntro")); close(); }
+                try { await deleteDoc(doc(db, "site_content", "rosterIntro")); close(); }
                 catch (err) { console.error(err); setMsg("Erreur lors de la réinitialisation.", "err"); }
             });
         }

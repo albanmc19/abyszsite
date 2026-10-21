@@ -154,6 +154,20 @@ border-bottom: 1px solid #1e1e1e;
 .cookie-table tr:last-child td {
 border-bottom: none;
 }
+.cookie-manage-btn {
+background: #a855f7;
+color: #fff;
+border: none;
+padding: 12px 24px;
+border-radius: 8px;
+font-family: 'Orbitron', sans-serif;
+font-weight: 700;
+font-size: 0.85rem;
+cursor: pointer;
+margin: 5px 0 15px 0;
+transition: transform 0.2s ease, box-shadow 0.3s ease, background 0.2s ease;
+}
+.cookie-manage-btn:hover { background: #b975ff; transform: translateY(-2px); box-shadow: 0 0 20px rgba(168, 85, 247, 0.6); }
 /* Footer */
 footer {
 padding: 35px 20px;
@@ -215,26 +229,31 @@ ABYSZ
 <p>Le site <strong>Abysz Esports</strong> utilise différents types de cookies, présentés dans le tableau ci-dessous :</p>
 <table class="cookie-table">
 <tr>
-<th>Type de cookie</th>
+<th>Catégorie</th>
 <th>Finalité</th>
 <th>Émetteur</th>
+<th>Consentement</th>
 </tr>
 <tr>
-<td>Cookies essentiels</td>
-<td>Fonctionnement du site, authentification de l'espace membre/admin</td>
+<td>Nécessaires</td>
+<td>Fonctionnement du site, connexion à l'espace membre/admin, mémorisation de votre choix cookies, identifiant anonyme pour les « J'aime » des annonces</td>
 <td>Abysz Esports / Firebase (Google)</td>
+<td>Non requis (toujours actifs)</td>
 </tr>
 <tr>
-<td>Cookies de mesure d'audience</td>
-<td>Statistiques de visite anonymisées</td>
-<td>Firebase (Google)</td>
+<td>Mesure d'audience</td>
+<td>Statistiques de fréquentation : pages vues, appareil, navigateur, durée de visite, profondeur de défilement, clics, visiteurs en ligne</td>
+<td>Abysz Esports / Firebase (Google)</td>
+<td>Requis</td>
 </tr>
 <tr>
-<td>Cookies publicitaires</td>
+<td>Publicité</td>
 <td>Affichage et personnalisation des annonces</td>
 <td>Google AdSense</td>
+<td>Requis</td>
 </tr>
 </table>
+<p>La mesure d'audience et la publicité ne sont activées qu'<strong>après votre accord</strong>. Sans consentement, aucun script publicitaire n'est chargé et aucune statistique de visite n'est enregistrée.</p>
 <div class="highlight-box">
 Ce site fait appel à <strong>Google AdSense</strong> pour l'affichage de publicités. Google et ses partenaires peuvent utiliser des cookies pour diffuser des annonces basées sur vos visites antérieures de ce site ou d'autres sites internet.
 </div>
@@ -244,8 +263,8 @@ Ce site fait appel à <strong>Google AdSense</strong> pour l'affichage de public
 <h2>3. Cookies tiers</h2>
 <p>Certains cookies sont déposés par des services tiers intégrés au site :</p>
 <ul>
-<li><strong>Google AdSense :</strong> diffusion de publicités personnalisées ou non personnalisées.</li>
-<li><strong>Google Firebase :</strong> authentification, base de données en temps réel et hébergement du contenu dynamique (annonces, partenaires).</li>
+<li><strong>Google AdSense :</strong> diffusion de publicités personnalisées ou non personnalisées (uniquement si vous acceptez la catégorie « Publicité »).</li>
+<li><strong>Google Firebase :</strong> authentification, base de données en temps réel et hébergement du contenu dynamique (annonces, partenaires). Les statistiques de visite ne sont enregistrées que si vous acceptez la « Mesure d'audience ».</li>
 <li><strong>Discord :</strong> widget d'affichage du nombre de membres en ligne.</li>
 </ul>
 <p>Ces services tiers peuvent avoir leur propre politique de gestion des cookies, indépendante de celle d'Abysz Esports.</p>
@@ -253,12 +272,15 @@ Ce site fait appel à <strong>Google AdSense</strong> pour l'affichage de public
 
 <section class="legal-section">
 <h2>4. Durée de conservation</h2>
-<p>Les cookies déposés sur ce site ont une durée de vie variable selon leur finalité, allant de la simple session de navigation jusqu'à 13 mois maximum, conformément aux recommandations de la CNIL.</p>
+<p>Votre choix de consentement est conservé <strong>6 mois</strong>, puis il vous est de nouveau demandé. Les cookies déposés sur ce site ont une durée de vie variable selon leur finalité, allant de la simple session de navigation jusqu'à 13 mois maximum, conformément aux recommandations de la CNIL.</p>
 </section>
 
 <section class="legal-section">
 <h2>5. Comment gérer les cookies ?</h2>
-<p>Vous pouvez à tout moment choisir de désactiver les cookies. Votre navigateur peut également être paramétré pour vous signaler les cookies déposés et vous demander de les accepter ou non.</p>
+<p>Vous pouvez modifier ou retirer votre consentement à tout moment, aussi simplement que vous l'avez donné :</p>
+<button type="button" class="cookie-manage-btn" data-open-cookie-prefs>🍪 Modifier mes choix</button>
+<p>Un lien « Gérer mes cookies » est également disponible en bas de la page d'accueil.</p>
+<p>Vous pouvez aussi choisir de désactiver les cookies. Votre navigateur peut également être paramétré pour vous signaler les cookies déposés et vous demander de les accepter ou non.</p>
 <p>Vous pouvez gérer ces paramètres directement dans les réglages de votre navigateur :</p>
 <ul>
 <li>Google Chrome : Paramètres → Confidentialité et sécurité → Cookies</li>
@@ -283,10 +305,12 @@ Attention : la désactivation de certains cookies peut altérer votre expérienc
 <a href="index.html">Accueil</a> •
 <a href="mentions-legales.html">Mentions Légales</a> •
 <a href="politique-confidentialite.html">Politique de Confidentialité</a> •
-<a href="cookies.html" style="color: #a855f7;">Cookies</a>
+<a href="cookies.html" style="color: #a855f7;">Cookies</a> •
+<a href="#" data-open-cookie-prefs>Gérer mes cookies</a>
 </div>
 <p>© 2026 Abysz Esports • Contact : abyszofficial@gmail.com</p>
 </footer>
 
+<script src="cookie-consent.js" defer></script>
 </body>
 </html>

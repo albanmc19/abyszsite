@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-JT2xlXAfRrNX1BBBuOZPfQ/FersOTEhCA9aq6Km8S8s=' https://www.gstatic.com; style-src 'sha256-guV6DxIuaIYZTXPL3wy7LPko/+HpMGLzDCN3tEX5prc=' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://i.ytimg.com https://www.dailymotion.com; frame-src https://www.youtube-nocookie.com https://player.twitch.tv https://clips.twitch.tv https://player.kick.com https://player.vimeo.com https://www.dailymotion.com; connect-src https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://decapi.me; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
+<meta name="google-adsense-account" content="ca-pub-1494144032841410">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-JT2xlXAfRrNX1BBBuOZPfQ/FersOTEhCA9aq6Km8S8s=' https://www.gstatic.com; style-src 'sha256-xgsjmGFut7v6P5QXICSjTZNXviVzj1PxHnKtNb6okkk=' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://i.ytimg.com https://www.dailymotion.com; frame-src https://www.youtube-nocookie.com https://player.twitch.tv https://clips.twitch.tv https://player.kick.com https://player.vimeo.com https://www.dailymotion.com; connect-src https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://decapi.me; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>ABYSZ TV — Lives & Vidéos Officielles</title>
 <link rel="icon" type="image/png" href="logo.png">
@@ -91,6 +92,7 @@ h1 span{color:var(--p)}
 .toast.success{border-color:#10b981}.toast.error{border-color:var(--r)}
 footer{padding:28px;text-align:center;border-top:1px solid #151520;color:#666680;font:.8rem Orbitron,sans-serif;margin-top:50px}
 @media(max-width:640px){.card.big{grid-column:auto}h1{font-size:1.8rem}nav{padding:12px 16px}}
+.txt{max-width:900px;margin:50px auto 0;padding:0 20px;color:#b8b8c8;line-height:1.7;font-size:.95rem}.txt h2{font-family:Orbitron,sans-serif;color:#fff;font-size:1.3rem}.txt a,footer a{color:#a855f7;text-decoration:none}footer a{margin:0 6px}
 </style>
 </head>
 <body>
@@ -136,8 +138,9 @@ footer{padding:28px;text-align:center;border-top:1px solid #151520;color:#666680
 <div class="modal" id="m-p"><div class="box w"><div class="ph"><b id="p-t"></b><div><a class="btn s g" id="p-a" target="_blank" rel="noopener noreferrer">Ouvrir ↗</a><button class="btn s g" data-close>✕</button></div></div><div class="ar" id="p-body"></div></div></div>
 
 <div id="toasts"></div>
-<footer>© 2026 ABYSZ ESPORTS • TOUS DROITS RÉSERVÉS</footer>
+<footer>© 2026 ABYSZ ESPORTS • TOUS DROITS RÉSERVÉS<br><a href="mentions-legales.html">Mentions légales</a> • <a href="politique-confidentialite.html">Confidentialité</a> • <a href="cookies.html">Cookies</a> • <a href="#" data-open-cookie-prefs>Gérer mes cookies</a></footer>
 
+<script src="cookie-consent.js"></script>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import {getAuth,setPersistence,browserSessionPersistence,signInWithEmailAndPassword,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";

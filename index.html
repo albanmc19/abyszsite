@@ -2506,11 +2506,9 @@
                 const messaging = getMessaging(app);
                 const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
                 if (!token) throw new Error('no-token');
-                try {
-                    await setDoc(doc(db, 'push_tokens', token), { token, lang: window.I18N.getLang(), createdAt: fsServerTimestamp() });
-                } catch (err) {
-                    if (!(err && err.code === 'permission-denied')) throw err; // déjà enregistré : OK
-                }
+                // Aucun compte nécessaire : n'importe quel visiteur peut s'enregistrer (voir règles Firestore).
+                // Si l'écriture échoue, l'erreur remonte et le bouton affiche un message (plus d'échec silencieux).
+                await setDoc(doc(db, 'push_tokens', token), { token, lang: window.I18N.getLang(), createdAt: fsServerTimestamp() });
                 try { localStorage.setItem(FLAG, '1'); } catch (e) {}
                 // Notification quand le site est ouvert au premier plan
                 onMessage(messaging, (payload) => {

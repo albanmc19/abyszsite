@@ -2506,9 +2506,19 @@
                 const messaging = getMessaging(app);
                 const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
                 if (!token) throw new Error('no-token');
-                // Aucun compte nécessaire : n'importe quel visiteur peut s'enregistrer (voir règles Firestore).
-                // Si l'écriture échoue, l'erreur remonte et le bouton affiche un message (plus d'échec silencieux).
-                await setDoc(doc(db, 'push_tokens', token), { token, lang: window.I18N.getLang(), createdAt: fsServerTimestamp() });
+                // Aucun compte nécessaire : n'importe quel visiteur peut s'enregistrer (règles Firestore push_tokens).
+                // Les règles exigent le champ "topics" (1 à 3 thèmes) : par défaut, tous les thèmes.
+                const ref = doc(db, 'push_tokens', token);
+                const lang = window.I18N.getLang();
+                const topics = ['annonces', 'matchs', 'boutique'];
+                try {
+                    await setDoc(ref, { token, topics, lang, createdAt: fsServerTimestamp() }); // 1re activation
+                } catch (err) {
+                    if (!(err && err.code === 'permission-denied')) throw err;
+                    // Jeton déjà enregistré : les règles interdisent de réécrire createdAt, on met à jour le reste.
+                    // Si ça échoue aussi, c'est un vrai problème de règles : l'erreur remonte au bouton.
+                    await updateDoc(ref, { topics, lang });
+                }
                 try { localStorage.setItem(FLAG, '1'); } catch (e) {}
                 // Notification quand le site est ouvert au premier plan
                 onMessage(messaging, (payload) => {

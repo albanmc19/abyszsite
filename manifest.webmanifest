@@ -1,0 +1,14 @@
+{
+  "name": "Abysz Esports",
+  "short_name": "Abysz",
+  "description": "Actualités, rosters, compétitions et communauté Abysz Esports.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#a855f7",
+  "lang": "fr",
+  "icons": [
+    { "src": "logo.png", "sizes": "any", "type": "image/png", "purpose": "any" }
+  ]
+}

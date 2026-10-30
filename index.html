@@ -12,6 +12,8 @@
 
     <link rel="preload" as="image" href="baniere.png">
     <link rel="icon" type="image/png" href="logo.png">
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#0a0a0a">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -637,6 +639,77 @@
             .discord-widget-wrapper .btn { width: 100%; box-sizing: border-box; }
         }
     </style>
+    <style>
+        /* ===== SÉLECTEUR DE LANGUE ===== */
+        .lang-switch { display: inline-flex; gap: 4px; padding: 3px; background: #141414; border: 1px solid #2a2a2a; border-radius: 999px; order: 2; flex-shrink: 0; }
+        .lang-btn { font-family: 'Orbitron', sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; color: #aaa; background: transparent; border: none; padding: 6px 12px; border-radius: 999px; cursor: pointer; transition: all 0.25s ease; }
+        .lang-btn:hover { color: #fff; }
+        .lang-btn[aria-pressed="true"] { background: linear-gradient(135deg, #a855f7, #7e22ce); color: #fff; box-shadow: 0 0 12px rgba(168, 85, 247, 0.5); }
+        .lang-btn:focus-visible { outline: 2px solid #a855f7; outline-offset: 2px; }
+
+        /* ===== NEWSLETTER / ABONNEMENT ===== */
+        .subscribe-section { padding: 60px 20px; max-width: 1000px; margin: 0 auto; }
+        .subscribe-card { position: relative; display: grid; grid-template-columns: 1fr 1.1fr; gap: 35px; align-items: center; background: linear-gradient(160deg, #141414 0%, #0f0a17 100%); border: 1px solid rgba(168, 85, 247, 0.35); border-radius: 22px; padding: 38px; overflow: hidden; box-shadow: 0 0 40px rgba(168, 85, 247, 0.12); }
+        .subscribe-card::before { content: ''; position: absolute; width: 320px; height: 320px; right: -110px; top: -140px; background: radial-gradient(circle, rgba(168, 85, 247, 0.28), transparent 65%); pointer-events: none; }
+        .subscribe-info, .subscribe-form-wrap { position: relative; z-index: 1; }
+        .subscribe-kicker { display: inline-flex; align-items: center; gap: 8px; font-family: 'Orbitron', sans-serif; font-size: 0.72rem; font-weight: 600; letter-spacing: 1.5px; color: #a855f7; background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); padding: 5px 12px; border-radius: 999px; margin-bottom: 16px; }
+        .subscribe-kicker .pulse-dot { width: 7px; height: 7px; }
+        .subscribe-info h2 { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; line-height: 1.25; margin: 0 0 12px 0; }
+        .subscribe-info p { color: #bbb; line-height: 1.6; margin: 0; font-size: 0.98rem; }
+        .sub-topics-label { display: block; font-family: 'Orbitron', sans-serif; font-size: 0.78rem; color: #a855f7; font-weight: 600; margin-bottom: 10px; }
+        .sub-topics { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+        .sub-chip { position: relative; }
+        .sub-chip input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+        .sub-chip span { display: inline-block; padding: 8px 14px; border-radius: 999px; background: #0a0a0a; border: 1px solid #2a2a2a; color: #bbb; font-size: 0.85rem; transition: all 0.2s ease; }
+        .sub-chip input:checked + span { background: rgba(168, 85, 247, 0.18); border-color: #a855f7; color: #fff; }
+        .sub-chip input:focus-visible + span { outline: 2px solid #a855f7; outline-offset: 2px; }
+        .sub-row { display: flex; gap: 10px; }
+        .sub-row input[type="email"] { flex: 1; min-width: 0; padding: 14px 16px; background: #0a0a0a; border: 1px solid #2a2a2a; color: #fff; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.95rem; transition: border-color 0.3s, box-shadow 0.3s; box-sizing: border-box; }
+        .sub-row input[type="email"]:focus { border-color: #a855f7; outline: none; box-shadow: 0 0 12px rgba(168, 85, 247, 0.25); }
+        .sub-submit { background: linear-gradient(135deg, #a855f7, #7e22ce); color: #fff; border: none; padding: 14px 24px; border-radius: 10px; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 0.85rem; cursor: pointer; white-space: nowrap; transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s; }
+        .sub-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 0 20px rgba(168, 85, 247, 0.55); }
+        .sub-submit:disabled { opacity: 0.6; cursor: wait; }
+        .sub-consent { display: flex; align-items: flex-start; gap: 10px; margin-top: 14px; font-size: 0.8rem; color: #999; line-height: 1.5; cursor: pointer; }
+        .sub-consent input { margin-top: 3px; accent-color: #a855f7; flex-shrink: 0; }
+        .sub-consent a { color: #a855f7; }
+        .sub-hp { position: absolute !important; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+        .sub-status { min-height: 1.3em; margin-top: 12px; font-size: 0.88rem; line-height: 1.4; }
+        .sub-status.error { color: #ff6b6b; }
+        .sub-status.ok { color: #22c55e; }
+        .sub-success { display: none; text-align: center; padding: 20px 0; }
+        .sub-success .sub-check { width: 64px; height: 64px; margin: 0 auto 16px; border-radius: 50%; background: rgba(34, 197, 94, 0.12); border: 2px solid #22c55e; color: #22c55e; font-size: 1.9rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(34, 197, 94, 0.3); }
+        .sub-success h3 { font-family: 'Orbitron', sans-serif; margin: 0 0 8px 0; font-size: 1.15rem; }
+        .sub-success p { color: #bbb; margin: 0; font-size: 0.92rem; }
+        .subscribe-card.done .sub-form { display: none; }
+        .subscribe-card.done .sub-success { display: block; }
+
+        .push-box { margin-top: 20px; padding-top: 18px; border-top: 1px solid rgba(168, 85, 247, 0.2); }
+        .push-box p { font-size: 0.88rem; color: #aaa; margin: 0 0 12px 0; }
+        .push-btn { display: inline-flex; align-items: center; gap: 8px; background: rgba(168, 85, 247, 0.12); color: #fff; border: 1px solid #a855f7; padding: 11px 18px; border-radius: 10px; font-family: 'Orbitron', sans-serif; font-weight: 600; font-size: 0.78rem; cursor: pointer; transition: all 0.25s ease; }
+        .push-btn:hover:not(:disabled) { background: #a855f7; box-shadow: 0 0 18px rgba(168, 85, 247, 0.5); transform: translateY(-1px); }
+        .push-btn:disabled { opacity: 0.7; cursor: default; }
+        .push-btn.on { border-color: #22c55e; background: rgba(34, 197, 94, 0.12); }
+        .push-msg { margin-top: 10px; font-size: 0.82rem; line-height: 1.45; color: #ff9f9f; }
+        .push-msg.info { color: #bbb; }
+        .nav-staff-mobile { display: none; }
+        @media (max-width: 430px) {
+            .logo .nav-staff-link { display: none; }
+            nav ul li.nav-staff-mobile { display: block; }
+        }
+
+        @media (max-width: 768px) {
+            .lang-switch { order: 0; margin-left: auto; margin-right: 12px; }
+            .lang-btn { padding: 5px 9px; font-size: 0.68rem; }
+            .lang-switch { gap: 2px; padding: 2px; margin-right: 10px; }
+            nav { padding: 12px; gap: 6px; }
+            .logo { gap: 6px; min-width: 0; }
+            .social-links { gap: 8px; margin-left: 4px; }
+            .subscribe-card { grid-template-columns: 1fr; padding: 26px 20px; gap: 22px; }
+            .subscribe-info h2 { font-size: 1.4rem; }
+            .sub-row { flex-direction: column; }
+            .sub-submit { width: 100%; }
+        }
+    </style>
 </head>
 <body>
  
@@ -653,19 +726,24 @@
             <a href="staffabysz.html" class="nav-staff-link">Staff</a>
         </div>
         
-        <button class="menu-toggle" id="mobile-menu-toggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="nav-links-list">
+        <div class="lang-switch" role="group" aria-label="Langue / Language" data-i18n-aria="lang_group">
+            <button type="button" class="lang-btn" data-lang="fr" aria-pressed="true" title="Français">FR</button>
+            <button type="button" class="lang-btn" data-lang="en" aria-pressed="false" title="English">EN</button>
+        </div>
+
+        <button class="menu-toggle" id="mobile-menu-toggle" data-i18n-aria="menu_open" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="nav-links-list">
             <span></span>
             <span></span>
             <span></span>
         </button>
 
         <ul id="nav-links-list">
-            <li><a href="index.html">Accueil</a></li>
+            <li><a href="index.html" data-i18n="nav_home">Accueil</a></li>
             <li><a href="tv.html" class="abysz-tv-badge"><span class="live-dot-tv"></span><span>📺 ABYSZ TV</span></a></li>
             <li><a href="roster.html">Roster</a></li>
-            <li><a href="#annonces">Planning</a></li>
-            <li><a href="boutique.html" class="nav-shop"><span class="nav-shop-icon">🛍️</span><span>Boutique</span><span class="nav-shop-new">NEW</span></a></li>
-            <li><a href="#rejoindre-commu" class="btn-animated-join">🚀 Rejoindre</a></li>
+            <li><a href="#annonces" data-i18n="nav_planning">Planning</a></li>
+            <li><a href="boutique.html" class="nav-shop"><span class="nav-shop-icon">🛍️</span><span data-i18n="nav_shop">Boutique</span><span class="nav-shop-new">NEW</span></a></li>
+            <li><a href="#rejoindre-commu" class="btn-animated-join" data-i18n="nav_join">🚀 Rejoindre</a></li>
             <li>
                 <div class="online-counter-badge">
                     <span class="pulse-dot"></span>
@@ -674,21 +752,22 @@
             </li>
             <li id="nav-espace-joueur" class="hidden"><a href="espace-joueur.html" style="color: #a855f7; font-weight: bold;">Mon Espace</a></li>
             <li id="nav-dashboard" class="nav-dashboard-link hidden"><a href="dashboard.html">📊 Dashboard</a></li>
+            <li class="nav-staff-mobile"><a href="staffabysz.html" style="color:#a855f7;font-weight:bold;">Staff</a></li>
         </ul>
     </nav>
 
     <section id="accueil" class="hero" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url('./baniere.png');">
         <h1 id="hero-title">ABYSZ</h1>
         <p class="slogan" id="hero-slogan">The beginning of every legend</p>
-        <a href="roster.html" class="btn">Découvrir le roster</a>
+        <a href="roster.html" class="btn" data-i18n="hero_cta">Découvrir le roster</a>
     </section>
 
     <section class="about-section reveal">
         <div style="display: flex; align-items: center; justify-content: space-between;">
-            <h2 id="about-title">À Propos d'Abysz Esports</h2>
+            <h2 id="about-title" data-i18n="about_title">À Propos d'Abysz Esports</h2>
             <button class="edit-home-btn hidden" id="quick-edit-home-btn" title="Modifier les textes">✏️ Modifier les textes</button>
         </div>
-        <p id="about-text">
+        <p id="about-text" data-i18n-html="about_text">
             Bienvenue sur la plateforme officielle d'<strong>Abysz Esports</strong>. Structure esport passionnée et ambitieuse, nous réunissons des joueurs de haut niveau, une équipe encadrante dédiée et une communauté passionnée de gaming. Suivez nos matchs en direct, découvrez nos rosters officiels et rejoignez l'aventure compétitive dès aujourd'hui.
         </p>
     </section>
@@ -698,20 +777,20 @@
     <section id="annonces" class="announcements-container reveal">
         <div class="section-header">
             <div class="title-area">
-                <h2>Annonces Récentes</h2>
+                <h2 data-i18n="ann_title">Annonces Récentes</h2>
                 <button class="add-btn hidden" id="quick-add-btn" title="Créer une annonce">+</button>
             </div>
-            <button class="admin-gate-btn" id="admin-gate-btn">🔑 Connexion</button>
+            <button class="admin-gate-btn" id="admin-gate-btn" data-i18n="login">🔑 Connexion</button>
         </div>
         
         <div class="carousel-wrapper" id="carousel-wrapper">
-            <button class="carousel-btn prev" id="prev-slide" aria-label="Annonce précédente">❮</button>
+            <button class="carousel-btn prev" id="prev-slide" aria-label="Annonce précédente" data-i18n-aria="ann_prev">❮</button>
             <div class="carousel-track-container">
                 <div class="carousel-track" id="announcements-feed">
-                    <p class="loading-text">Connexion à la base de données Abysz...</p>
+                    <p class="loading-text" data-i18n="ann_loading">Connexion à la base de données Abysz...</p>
                 </div>
             </div>
-            <button class="carousel-btn next" id="next-slide" aria-label="Annonce suivante">❯</button>
+            <button class="carousel-btn next" id="next-slide" aria-label="Annonce suivante" data-i18n-aria="ann_next">❯</button>
         </div>
         <div class="carousel-dots" id="carousel-dots"></div>
     </section>
@@ -719,13 +798,13 @@
     <section id="partenaires" class="partners-container reveal">
         <div class="section-header">
             <div class="title-area">
-                <h2>Nos Partenaires</h2>
+                <h2 data-i18n="partners_title">Nos Partenaires</h2>
                 <button class="add-btn hidden" id="quick-add-partner-btn" title="Ajouter un partenaire">+</button>
             </div>
         </div>
         
         <div class="partners-grid" id="partners-feed">
-            <p class="loading-text">Chargement des partenaires...</p>
+            <p class="loading-text" data-i18n="partners_loading">Chargement des partenaires...</p>
         </div>
     </section>
 
@@ -734,39 +813,88 @@
     <section id="custom-section" class="custom-section-container reveal">
         <div class="section-header">
             <div class="title-area">
-                <h2 id="custom-section-title">À la Une</h2>
+                <h2 id="custom-section-title" data-i18n="custom_title">À la Une</h2>
                 <button class="edit-home-btn hidden" id="quick-edit-custom-btn" title="Modifier cette section">✏️ Modifier la section</button>
             </div>
         </div>
         <div class="custom-card">
             <img src="" id="custom-section-img" class="custom-card-img hidden" alt="Illustration">
             <div class="custom-card-content">
-                <p id="custom-section-text">Chargement des informations...</p>
+                <p id="custom-section-text" data-i18n="custom_loading">Chargement des informations...</p>
             </div>
         </div>
     </section>
  
+    <section id="abonnement" class="subscribe-section reveal">
+        <div class="subscribe-card" id="subscribe-card">
+            <div class="subscribe-info">
+                <span class="subscribe-kicker"><span class="pulse-dot"></span><span data-i18n="sub_kicker">NEWSLETTER ABYSZ</span></span>
+                <h2 data-i18n="sub_title">Reste dans la boucle</h2>
+                <p data-i18n="sub_text">Annonces, matchs, tournois, drops boutique : reçois les dernières news d'Abysz directement dans ta boîte mail. Pas de spam, promis.</p>
+
+                <div class="push-box hidden" id="push-box">
+                    <p data-i18n="push_hint">Ou reçois une notification directement sur ton appareil, sans e-mail.</p>
+                    <button type="button" class="push-btn" id="push-btn" data-i18n="push_btn">🔔 Activer les notifications</button>
+                    <div class="push-msg" id="push-msg" role="status" aria-live="polite"></div>
+                </div>
+            </div>
+
+            <div class="subscribe-form-wrap">
+                <form class="sub-form" id="subscribe-form" novalidate>
+                    <span class="sub-topics-label" data-i18n="sub_topics">Je veux recevoir :</span>
+                    <div class="sub-topics">
+                        <label class="sub-chip"><input type="checkbox" name="topic" value="annonces" checked><span data-i18n="sub_t_news">📣 Annonces</span></label>
+                        <label class="sub-chip"><input type="checkbox" name="topic" value="matchs" checked><span data-i18n="sub_t_matches">🏆 Matchs &amp; tournois</span></label>
+                        <label class="sub-chip"><input type="checkbox" name="topic" value="boutique"><span data-i18n="sub_t_shop">🛍️ Boutique &amp; promos</span></label>
+                    </div>
+
+                    <div class="sub-row">
+                        <input type="email" id="sub-email" name="email" autocomplete="email" inputmode="email" maxlength="254" required placeholder="ton@email.com" data-i18n-placeholder="sub_placeholder" aria-label="Adresse e-mail" data-i18n-aria="sub_email_label">
+                        <button type="submit" class="sub-submit" id="sub-submit" data-i18n="sub_btn">S'abonner</button>
+                    </div>
+
+                    <div class="sub-hp" aria-hidden="true">
+                        <label>Ne pas remplir <input type="text" id="sub-website" name="website" tabindex="-1" autocomplete="off"></label>
+                    </div>
+
+                    <label class="sub-consent">
+                        <input type="checkbox" id="sub-consent" required>
+                        <span><span data-i18n="sub_consent">J'accepte de recevoir les actualités d'Abysz par e-mail. Je peux me désabonner à tout moment.</span> <a href="politique-confidentialite.html" data-i18n="sub_privacy">Politique de confidentialité</a></span>
+                    </label>
+
+                    <div class="sub-status" id="sub-status" role="status" aria-live="polite"></div>
+                </form>
+
+                <div class="sub-success" id="sub-success">
+                    <div class="sub-check">✓</div>
+                    <h3 data-i18n="sub_ok_title">Bienvenue dans la légende !</h3>
+                    <p data-i18n="sub_ok_text">Ton inscription est bien enregistrée. À très vite sur ta boîte mail.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section id="rejoindre-commu" class="reveal" style="padding: 60px 20px; text-align: center;">
-        <h2>REJOINDRE LA COMMUNAUTÉ</h2>
-        <p class="subtitle" style="color:#ccc; margin-bottom: 20px;">Entre dans l'univers Abysz, échange avec les joueurs et suis nos événements en direct !</p>
+        <h2 data-i18n="community_title">REJOINDRE LA COMMUNAUTÉ</h2>
+        <p class="subtitle" data-i18n="community_sub" style="color:#ccc; margin-bottom: 20px;">Entre dans l'univers Abysz, échange avec les joueurs et suis nos événements en direct !</p>
         
         <div class="discord-widget-wrapper">
-            <a href="https://discord.gg/KeSPkvjBVy" target="_blank" rel="noopener noreferrer" class="btn" id="discord-btn">Rejoindre le Discord</a>
+            <a href="https://discord.gg/KeSPkvjBVy" target="_blank" rel="noopener noreferrer" class="btn" id="discord-btn" data-i18n="discord_btn">Rejoindre le Discord</a>
             <div class="discord-online-counter">
                 <span class="online-dot"></span>
-                <span id="discord-online-count">Communauté Active</span>
+                <span id="discord-online-count" data-i18n="discord_active">Communauté Active</span>
             </div>
         </div>
     </section>
  
     <footer>
         <div class="footer-links">
-            <a href="mentions-legales.html">Mentions Légales</a> • 
-            <a href="politique-confidentialite.html">Politique de Confidentialité</a> • 
+            <a href="mentions-legales.html" data-i18n="f_legal">Mentions Légales</a> • 
+            <a href="politique-confidentialite.html" data-i18n="f_privacy">Politique de Confidentialité</a> • 
             <a href="cookies.html">Cookies</a> • 
-            <a href="#" data-open-cookie-prefs>Gérer mes cookies</a>
+            <a href="#" data-open-cookie-prefs data-i18n="f_cookie_prefs">Gérer mes cookies</a>
         </div>
-        <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
+        <p>© 2026 Abysz Esports • <span data-i18n="f_contact">Nous contacter :</span> abyszofficial@gmail.com</p>
     </footer>
  
     <div id="admin-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Portail Abysz">
@@ -976,12 +1104,173 @@
         </div>
     </div>
  
+    <!-- ===== TRADUCTION FR / EN ===== -->
+    <script>
+    (function () {
+        var D = {
+            fr: {
+                lang_group: "Langue", menu_open: "Ouvrir le menu",
+                nav_home: "Accueil", nav_planning: "Planning", nav_shop: "Boutique", nav_join: "🚀 Rejoindre",
+                hero_cta: "Découvrir le roster",
+                about_title: "À Propos d'Abysz Esports",
+                about_text: "Bienvenue sur la plateforme officielle d'<strong>Abysz Esports</strong>. Structure esport passionnée et ambitieuse, nous réunissons des joueurs de haut niveau, une équipe encadrante dédiée et une communauté passionnée de gaming. Suivez nos matchs en direct, découvrez nos rosters officiels et rejoignez l'aventure compétitive dès aujourd'hui.",
+                ann_title: "Annonces Récentes", ann_prev: "Annonce précédente", ann_next: "Annonce suivante",
+                ann_loading: "Connexion à la base de données Abysz...", ann_empty: "Aucune annonce publiée pour le moment.",
+                login: "🔑 Connexion", my_space: "👤 Mon Espace", admin_dash: "⚙️ Dashboard / Admin",
+                cat_general: "Général", cat_match: "Match / Tournoi", cat_recruit: "Recrutement", cat_event: "Événement",
+                published_on: "Publié le",
+                partners_title: "Nos Partenaires", partners_loading: "Chargement des partenaires...", partners_empty: "Aucun partenaire affiché pour le moment.",
+                partner_default: "PARTENAIRE", visit_site: "Visiter le site",
+                custom_title: "À la Une", custom_loading: "Chargement des informations...",
+                custom_default: "Bienvenue dans cette nouvelle section ! Vous pouvez la personnaliser depuis le panneau d'administration.",
+                sub_kicker: "NEWSLETTER ABYSZ", sub_title: "Reste dans la boucle",
+                sub_text: "Annonces, matchs, tournois, drops boutique : reçois les dernières news d'Abysz directement dans ta boîte mail. Pas de spam, promis.",
+                sub_topics: "Je veux recevoir :", sub_t_news: "📣 Annonces", sub_t_matches: "🏆 Matchs & tournois", sub_t_shop: "🛍️ Boutique & promos",
+                sub_placeholder: "ton@email.com", sub_email_label: "Adresse e-mail", sub_btn: "S'abonner", sub_sending: "Envoi...",
+                sub_consent: "J'accepte de recevoir les actualités d'Abysz par e-mail. Je peux me désabonner à tout moment.",
+                sub_privacy: "Politique de confidentialité",
+                sub_ok_title: "Bienvenue dans la légende !", sub_ok_text: "Ton inscription est bien enregistrée. À très vite sur ta boîte mail.",
+                sub_err_email: "Entre une adresse e-mail valide.", sub_err_consent: "Merci de cocher la case de consentement.",
+                sub_err_topic: "Choisis au moins un type d'actualité.",
+                sub_err_exists: "Cette adresse est déjà inscrite (ou l'inscription est momentanément indisponible).",
+                sub_err_net: "Une erreur est survenue, réessaie dans un instant.",
+                sub_already: "Tu es déjà abonné(e) depuis cet appareil. Merci !",
+                push_hint: "Ou reçois une notification directement sur ton appareil, sans e-mail.",
+                push_btn: "🔔 Activer les notifications", push_on: "✅ Notifications activées", push_wait: "⏳ Activation...",
+                push_denied: "Les notifications sont bloquées par ton navigateur. Autorise-les dans les réglages du site puis réessaie.",
+                push_ios: "Sur iPhone : ajoute d'abord le site à l'écran d'accueil (Partager → Sur l'écran d'accueil), ouvre-le depuis l'icône, puis reviens ici.",
+                push_unsupported: "Ton navigateur ne gère pas les notifications push.",
+                push_err: "Impossible d'activer les notifications pour le moment. Réessaie dans un instant.",
+                community_title: "REJOINDRE LA COMMUNAUTÉ",
+                community_sub: "Entre dans l'univers Abysz, échange avec les joueurs et suis nos événements en direct !",
+                discord_btn: "Rejoindre le Discord", discord_active: "Communauté Active",
+                discord_online_one: "{n} membre en ligne", discord_online_many: "{n} membres en ligne",
+                online_n: "{n} en ligne",
+                f_legal: "Mentions Légales", f_privacy: "Politique de Confidentialité", f_cookie_prefs: "Gérer mes cookies", f_contact: "Nous contacter :",
+                page_title: "Abysz Esports",
+                page_desc: "Découvrez Abysz Esports : actualités, rosters, compétitions de jeux vidéo, boutique officielle et communauté Discord. Rejoignez la légende !"
+            },
+            en: {
+                lang_group: "Language", menu_open: "Open menu",
+                nav_home: "Home", nav_planning: "Schedule", nav_shop: "Shop", nav_join: "🚀 Join us",
+                hero_cta: "Discover the roster",
+                about_title: "About Abysz Esports",
+                about_text: "Welcome to the official platform of <strong>Abysz Esports</strong>. A passionate and ambitious esports organization, we bring together top-level players, a dedicated coaching staff and a community of gaming enthusiasts. Watch our matches live, discover our official rosters and join the competitive adventure today.",
+                ann_title: "Latest Announcements", ann_prev: "Previous announcement", ann_next: "Next announcement",
+                ann_loading: "Connecting to the Abysz database...", ann_empty: "No announcements published yet.",
+                login: "🔑 Log in", my_space: "👤 My Space", admin_dash: "⚙️ Dashboard / Admin",
+                cat_general: "General", cat_match: "Match / Tournament", cat_recruit: "Recruitment", cat_event: "Event",
+                published_on: "Published on",
+                partners_title: "Our Partners", partners_loading: "Loading partners...", partners_empty: "No partners to display yet.",
+                partner_default: "PARTNER", visit_site: "Visit website",
+                custom_title: "Featured", custom_loading: "Loading information...",
+                custom_default: "Welcome to this new section! You can customize it from the admin panel.",
+                sub_kicker: "ABYSZ NEWSLETTER", sub_title: "Stay in the loop",
+                sub_text: "Announcements, matches, tournaments, shop drops: get the latest Abysz news straight to your inbox. No spam, promised.",
+                sub_topics: "I want to receive:", sub_t_news: "📣 Announcements", sub_t_matches: "🏆 Matches & tournaments", sub_t_shop: "🛍️ Shop & deals",
+                sub_placeholder: "you@email.com", sub_email_label: "Email address", sub_btn: "Subscribe", sub_sending: "Sending...",
+                sub_consent: "I agree to receive Abysz news by email. I can unsubscribe at any time.",
+                sub_privacy: "Privacy policy",
+                sub_ok_title: "Welcome to the legend!", sub_ok_text: "You're subscribed. See you soon in your inbox.",
+                sub_err_email: "Please enter a valid email address.", sub_err_consent: "Please tick the consent box.",
+                sub_err_topic: "Pick at least one type of news.",
+                sub_err_exists: "This address is already subscribed (or sign-up is temporarily unavailable).",
+                sub_err_net: "Something went wrong, please try again in a moment.",
+                sub_already: "You're already subscribed from this device. Thank you!",
+                push_hint: "Or get a notification right on your device, no email needed.",
+                push_btn: "🔔 Enable notifications", push_on: "✅ Notifications enabled", push_wait: "⏳ Enabling...",
+                push_denied: "Notifications are blocked by your browser. Allow them in the site settings, then try again.",
+                push_ios: "On iPhone: first add the site to your Home Screen (Share → Add to Home Screen), open it from the icon, then come back here.",
+                push_unsupported: "Your browser doesn't support push notifications.",
+                push_err: "Couldn't enable notifications right now. Please try again in a moment.",
+                community_title: "JOIN THE COMMUNITY",
+                community_sub: "Step into the Abysz universe, chat with the players and follow our live events!",
+                discord_btn: "Join the Discord", discord_active: "Active Community",
+                discord_online_one: "{n} member online", discord_online_many: "{n} members online",
+                online_n: "{n} online",
+                f_legal: "Legal Notice", f_privacy: "Privacy Policy", f_cookie_prefs: "Manage my cookies", f_contact: "Contact us:",
+                page_title: "Abysz Esports",
+                page_desc: "Discover Abysz Esports: news, rosters, video game competitions, official shop and Discord community. Join the legend!"
+            }
+        };
+
+        var lang = "fr";
+        try {
+            var saved = localStorage.getItem("abysz_lang");
+            if (saved === "fr" || saved === "en") lang = saved;
+        } catch (e) {}
+
+        var listeners = [];
+
+        function t(key, params) {
+            var s = (D[lang] && D[lang][key]);
+            if (s === undefined) s = D.fr[key];
+            if (s === undefined) s = key;
+            if (params) s = s.replace(/\{(\w+)\}/g, function (m, k) { return params[k] !== undefined ? params[k] : m; });
+            return s;
+        }
+
+        function fmtDate(ts) {
+            try {
+                return new Date(Number(ts)).toLocaleDateString(lang === "en" ? "en-GB" : "fr-FR", { day: "numeric", month: "long", year: "numeric" });
+            } catch (e) { return ""; }
+        }
+
+        function apply(root) {
+            root = root || document;
+            root.querySelectorAll("[data-i18n]").forEach(function (el) { el.textContent = t(el.getAttribute("data-i18n")); });
+            root.querySelectorAll("[data-i18n-html]").forEach(function (el) { el.innerHTML = t(el.getAttribute("data-i18n-html")); });
+            root.querySelectorAll("[data-i18n-aria]").forEach(function (el) { el.setAttribute("aria-label", t(el.getAttribute("data-i18n-aria"))); });
+            root.querySelectorAll("[data-i18n-placeholder]").forEach(function (el) { el.setAttribute("placeholder", t(el.getAttribute("data-i18n-placeholder"))); });
+            root.querySelectorAll("[data-date]").forEach(function (el) { var v = el.getAttribute("data-date"); if (v) el.textContent = fmtDate(v); });
+        }
+
+        function setI18n(el, key) {
+            if (!el) return;
+            el.setAttribute("data-i18n", key);
+            el.textContent = t(key);
+        }
+
+        function updateChrome() {
+            document.documentElement.lang = lang;
+            document.title = t("page_title");
+            var md = document.querySelector('meta[name="description"]');
+            if (md) md.setAttribute("content", t("page_desc"));
+            document.querySelectorAll(".lang-btn").forEach(function (b) {
+                b.setAttribute("aria-pressed", b.getAttribute("data-lang") === lang ? "true" : "false");
+            });
+        }
+
+        function setLang(l) {
+            if (l !== "fr" && l !== "en") return;
+            lang = l;
+            try { localStorage.setItem("abysz_lang", l); } catch (e) {}
+            updateChrome();
+            apply(document);
+            listeners.forEach(function (fn) { try { fn(lang); } catch (e) {} });
+        }
+
+        window.I18N = {
+            t: t, setI18n: setI18n, fmtDate: fmtDate, apply: apply, setLang: setLang,
+            getLang: function () { return lang; },
+            onLangChange: function (fn) { listeners.push(fn); }
+        };
+
+        document.querySelectorAll(".lang-btn").forEach(function (b) {
+            b.addEventListener("click", function () { setLang(b.getAttribute("data-lang")); });
+        });
+
+        updateChrome();
+        if (lang !== "fr") apply(document);
+    })();
+    </script>
+
     <script src="cookie-consent.js"></script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, setDoc, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, setDoc, runTransaction, serverTimestamp as fsServerTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         import { getDatabase, ref, onValue, onDisconnect, set, update, remove, increment, serverTimestamp, runTransaction as rtdbTransaction } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
         const firebaseConfig = {
@@ -998,6 +1287,9 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         const rtdb = getDatabase(app);
+
+        import { getMessaging, getToken, onMessage, isSupported as messagingSupported } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
+        const { t, setI18n, fmtDate, onLangChange } = window.I18N;
 
         // ---------- Helpers sécurité ----------
         const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -1104,8 +1396,8 @@
                 const data = snap.data();
                 if (data.heroTitle) document.getElementById("hero-title").textContent = data.heroTitle;
                 if (data.heroSlogan) document.getElementById("hero-slogan").textContent = data.heroSlogan;
-                if (data.aboutTitle) document.getElementById("about-title").textContent = data.aboutTitle;
-                if (data.aboutText) document.getElementById("about-text").innerHTML = sanitizeHtml(data.aboutText);
+                if (data.aboutTitle) { const el = document.getElementById("about-title"); el.textContent = data.aboutTitle; el.removeAttribute("data-i18n"); }
+                if (data.aboutText) { const el = document.getElementById("about-text"); el.innerHTML = sanitizeHtml(data.aboutText); el.removeAttribute("data-i18n-html"); }
             }
         });
 
@@ -1117,8 +1409,8 @@
 
             if (snap.exists()) {
                 const data = snap.data();
-                if (data.title) sectionTitle.textContent = data.title;
-                if (data.text) sectionText.textContent = data.text;
+                if (data.title) { sectionTitle.textContent = data.title; sectionTitle.removeAttribute("data-i18n"); }
+                if (data.text) { sectionText.textContent = data.text; sectionText.removeAttribute("data-i18n"); }
                 if (data.imageUrl) {
                     sectionImg.referrerPolicy = "no-referrer";
                     sectionImg.src = safeUrl(data.imageUrl);
@@ -1127,8 +1419,8 @@
                     sectionImg.classList.add("hidden");
                 }
             } else {
-                sectionTitle.textContent = "À la Une";
-                sectionText.textContent = "Bienvenue dans cette nouvelle section ! Vous pouvez la personnaliser depuis le panneau d'administration.";
+                setI18n(sectionTitle, "custom_title");
+                setI18n(sectionText, "custom_default");
                 sectionImg.classList.add("hidden");
             }
         });
@@ -1243,16 +1535,21 @@
 
         // Compteur "en ligne" : lecture seule (aucun traceur), toujours actif
         const siteOnlineCountElement = document.getElementById("site-online-count");
+        let siteOnlineN = 1;
+        const renderSiteOnline = () => { if (siteOnlineCountElement) siteOnlineCountElement.textContent = t("online_n", { n: siteOnlineN }); };
+        onLangChange(renderSiteOnline);
         onValue(ref(rtdb, "online_users"), (snap) => {
             const info = computeOnline(snap.val() || {}, Date.now());
-            if (siteOnlineCountElement) siteOnlineCountElement.textContent = `${Math.max(1, info.total)} en ligne`;
+            siteOnlineN = Math.max(1, info.total);
+            renderSiteOnline();
         });
 
         // Tout ce qui suit (présence, statistiques, clics, scroll...) ne démarre qu'après consentement "Mesure d'audience"
         function startAnalytics() {
         startPresence(rtdb, {
             onCount: ({ total }) => {
-                if (siteOnlineCountElement) siteOnlineCountElement.textContent = `${Math.max(1, total)} en ligne`;
+                siteOnlineN = Math.max(1, total);
+                renderSiteOnline();
                 checkHourPeak(total);
             }
         });
@@ -1554,6 +1851,16 @@
 
         const DISCORD_SERVER_ID = "1370836256556187771";
 
+        let discordOnlineN = null;
+        function renderDiscordOnline() {
+            const el = document.getElementById('discord-online-count');
+            if (!el) return;
+            if (discordOnlineN === null) { setI18n(el, 'discord_active'); return; }
+            el.removeAttribute('data-i18n');
+            el.textContent = t(discordOnlineN > 1 ? 'discord_online_many' : 'discord_online_one', { n: discordOnlineN });
+        }
+        onLangChange(renderDiscordOnline);
+
         async function fetchDiscordOnlineCount() {
             const countElement = document.getElementById('discord-online-count');
             if (!countElement) return;
@@ -1565,13 +1872,15 @@
                 if (response.ok) {
                     const data = await response.json();
                     const onlineCount = data.presence_count ?? 0;
-                    countElement.textContent = `${onlineCount} membre${onlineCount > 1 ? 's' : ''} en ligne`;
+                    discordOnlineN = onlineCount;
+                    renderDiscordOnline();
                     return;
                 }
             } catch (e) {}
 
 
-            countElement.textContent = "Communauté Active";
+            discordOnlineN = null;
+            renderDiscordOnline();
         }
 
         fetchDiscordOnlineCount();
@@ -1582,7 +1891,7 @@
             if (user) {
                 isUserAdmin = user.email === "abyszofficial@gmail.com";
 
-                adminGateBtn.textContent = isUserAdmin ? "⚙️ Dashboard / Admin" : "👤 Mon Espace";
+                setI18n(adminGateBtn, isUserAdmin ? "admin_dash" : "my_space");
                 adminGateBtn.classList.add('logged-in');
                 
                 if (navEspaceJoueur) navEspaceJoueur.classList.remove('hidden');
@@ -1599,7 +1908,7 @@
                 if (userDisplayEmail) userDisplayEmail.textContent = user.email;
             } else {
                 isUserAdmin = false;
-                adminGateBtn.textContent = "🔑 Connexion";
+                setI18n(adminGateBtn, "login");
                 adminGateBtn.classList.remove('logged-in');
                 
                 if (quickAddBtn) quickAddBtn.classList.add('hidden');
@@ -1912,7 +2221,7 @@
             currentSlide = 0;
 
             if (totalSlides === 0) {
-                feed.innerHTML = '<p class="loading-text">Aucune annonce publiée pour le moment.</p>';
+                feed.innerHTML = `<p class="loading-text" data-i18n="ann_empty">${t("ann_empty")}</p>`;
                 prevBtn.style.display = 'none';
                 nextBtn.style.display = 'none';
                 stopAutoSlide();
@@ -1928,17 +2237,15 @@
                 const card = document.createElement("div");
                 card.className = `announcement-card ${ann.priority === 'urgent' ? 'priority-urgent' : ''}`;
 
-                const formattedDate = ann.createdAt 
-                    ? new Date(ann.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
-                    : '';
+                const formattedDate = ann.createdAt ? fmtDate(ann.createdAt) : '';
 
-                let categoryLabel = 'Général';
+                let categoryKey = 'cat_general';
                 let categoryBadgeClass = 'badge-general';
                 
                 switch(ann.category) {
-                    case 'match': categoryLabel = 'Match / Tournoi'; categoryBadgeClass = 'badge-match'; break;
-                    case 'recrutement': categoryLabel = 'Recrutement'; categoryBadgeClass = 'badge-recrutement'; break;
-                    case 'evenement': categoryLabel = 'Événement'; categoryBadgeClass = 'badge-evenement'; break;
+                    case 'match': categoryKey = 'cat_match'; categoryBadgeClass = 'badge-match'; break;
+                    case 'recrutement': categoryKey = 'cat_recruit'; categoryBadgeClass = 'badge-recrutement'; break;
+                    case 'evenement': categoryKey = 'cat_event'; categoryBadgeClass = 'badge-evenement'; break;
                 }
 
                 const likedByList = Array.isArray(ann.likedBy) ? ann.likedBy : [];
@@ -1958,7 +2265,7 @@
                 card.innerHTML = `
                     ${adminActionsHtml}
                     <div class="announcement-meta">
-                        <span class="badge ${categoryBadgeClass}">${categoryLabel}</span>
+                        <span class="badge ${categoryBadgeClass}" data-i18n="${categoryKey}">${t(categoryKey)}</span>
                         ${ann.priority === 'urgent' ? '<span class="badge badge-urgent">URGENT</span>' : ''}
                     </div>
                     <h3>${esc(ann.title)}</h3>
@@ -1967,7 +2274,7 @@
                     ${(ann.btnText && safeUrl(ann.btnLink)) ? `<a href="${esc(safeUrl(ann.btnLink))}" target="_blank" rel="noopener noreferrer" class="announcement-action-btn">${esc(ann.btnText)}</a>` : ''}
                     
                     <div class="announcement-footer">
-                        <span class="announcement-date">Publié le ${formattedDate}</span>
+                        <span class="announcement-date"><span data-i18n="published_on">${t("published_on")}</span> <span data-date="${ann.createdAt || ''}">${formattedDate}</span></span>
                         <button class="like-btn ${isLiked ? 'liked' : ''}" data-id="${ann.id}">
                             <span class="like-heart">${isLiked ? '❤️' : '🤍'}</span>
                             <span class="like-count">${likesCount}</span>
@@ -2048,7 +2355,7 @@
             partnersData = {};
 
             if (snapshot.empty) {
-                partnersFeed.innerHTML = '<p class="loading-text">Aucun partenaire affiché pour le moment.</p>';
+                partnersFeed.innerHTML = `<p class="loading-text" data-i18n="partners_empty">${t("partners_empty")}</p>`;
                 return;
             }
 
@@ -2076,7 +2383,7 @@
 
                 partnerCard.innerHTML = `
                     ${adminActionsHtml}
-                    <span class="partner-tier-badge">${esc(partner.tier || 'PARTENAIRE')}</span>
+                    <span class="partner-tier-badge"${partner.tier ? '' : ' data-i18n="partner_default"'}>${esc(partner.tier || t('partner_default'))}</span>
                     <div class="partner-logo-wrapper">
                         <img src="${esc(safeUrl(partner.logoUrl))}" alt="${esc(partner.name)}" class="partner-logo" loading="lazy" decoding="async" referrerpolicy="no-referrer">
                     </div>
@@ -2084,7 +2391,7 @@
                     <div class="partner-role">${esc(partner.role)}</div>
                     ${partner.promo ? `<div class="partner-promo-code">🏷️ ${esc(partner.promo)}</div>` : ''}
                     <p class="partner-desc">${esc(partner.description)}</p>
-                    <a href="${esc(safeUrl(partner.siteUrl))}" target="_blank" rel="noopener noreferrer" class="partner-link-btn">${esc(partner.btnLabel || 'Visiter le site')}</a>
+                    <a href="${esc(safeUrl(partner.siteUrl))}" target="_blank" rel="noopener noreferrer" class="partner-link-btn"${partner.btnLabel ? '' : ' data-i18n="visit_site"'}>${esc(partner.btnLabel || t('visit_site'))}</a>
                 `;
 
                 partnersFeed.appendChild(partnerCard);
@@ -2169,6 +2476,140 @@
         });
 
         document.getElementById('img-lightbox-close').addEventListener('click', closeLightbox);
+
+
+        // ================== NOTIFICATIONS PUSH (Firebase Cloud Messaging) ==================
+        (function initPush() {
+            // >>> Colle ici ta clé VAPID : Firebase Console > Paramètres du projet > Cloud Messaging > Web Push certificates
+            const VAPID_KEY = "BCL-DbvI05TUrzRWg-Sd_Bql3L8H5QNMyqB362zt9wl54L57ITX1WzRCyOe89WifE1cmbtzqIxceeudlf6Kmw2Y";
+            const SW_URL = "./firebase-messaging-sw.js";
+
+            const box = document.getElementById('push-box');
+            const btn = document.getElementById('push-btn');
+            const msg = document.getElementById('push-msg');
+            if (!box || !btn) return;
+
+            const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+            const FLAG = 'abysz_push_on';
+
+            const showMsg = (key, info) => {
+                msg.className = 'push-msg' + (info ? ' info' : '');
+                if (key) { msg.setAttribute('data-i18n', key); msg.textContent = t(key); }
+                else { msg.removeAttribute('data-i18n'); msg.textContent = ''; }
+            };
+            const setOn = () => { btn.classList.add('on'); btn.disabled = true; setI18n(btn, 'push_on'); showMsg(null); };
+
+            async function register() {
+                const reg = await navigator.serviceWorker.register(SW_URL);
+                await navigator.serviceWorker.ready;
+                const messaging = getMessaging(app);
+                const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
+                if (!token) throw new Error('no-token');
+                try {
+                    await setDoc(doc(db, 'push_tokens', token), { token, lang: window.I18N.getLang(), createdAt: fsServerTimestamp() });
+                } catch (err) {
+                    if (!(err && err.code === 'permission-denied')) throw err; // déjà enregistré : OK
+                }
+                try { localStorage.setItem(FLAG, '1'); } catch (e) {}
+                // Notification quand le site est ouvert au premier plan
+                onMessage(messaging, (payload) => {
+                    const n = payload.notification || {};
+                    reg.showNotification(n.title || 'Abysz Esports', { body: n.body || '', icon: n.icon || 'logo.png', data: { link: (payload.fcmOptions && payload.fcmOptions.link) || './' } });
+                });
+            }
+
+            (async () => {
+                // iPhone : les push web ne marchent que si le site est installé sur l'écran d'accueil
+                if (isIOS && !isStandalone) {
+                    box.classList.remove('hidden'); btn.classList.add('hidden'); showMsg('push_ios', true); return;
+                }
+                let ok = false;
+                try { ok = 'Notification' in window && 'serviceWorker' in navigator && await messagingSupported(); } catch (e) {}
+                if (!ok) { return; } // navigateur incompatible : on n'affiche rien
+                box.classList.remove('hidden');
+
+                if (Notification.permission === 'granted') {
+                    let flagged = false; try { flagged = !!localStorage.getItem(FLAG); } catch (e) {}
+                    setOn();
+                    if (flagged) register().catch(() => {}); // rafraîchit le token en silence
+                    return;
+                }
+                if (Notification.permission === 'denied') { showMsg('push_denied'); }
+            })();
+
+            btn.addEventListener('click', async () => {
+                if (btn.disabled) return;
+                btn.disabled = true; setI18n(btn, 'push_wait'); showMsg(null);
+                try {
+                    const perm = await Notification.requestPermission();
+                    if (perm !== 'granted') {
+                        setI18n(btn, 'push_btn'); btn.disabled = false;
+                        showMsg(perm === 'denied' ? 'push_denied' : null);
+                        return;
+                    }
+                    await register();
+                    setOn();
+                } catch (err) {
+                    console.error('Push:', err);
+                    setI18n(btn, 'push_btn'); btn.disabled = false; showMsg('push_err');
+                }
+            });
+        }());
+
+        // ================== ABONNEMENT NEWSLETTER ==================
+        (function initSubscribe() {
+            const form = document.getElementById('subscribe-form');
+            if (!form) return;
+            const card = document.getElementById('subscribe-card');
+            const emailInput = document.getElementById('sub-email');
+            const consent = document.getElementById('sub-consent');
+            const honeypot = document.getElementById('sub-website');
+            const submitBtn = document.getElementById('sub-submit');
+            const statusEl = document.getElementById('sub-status');
+            const EMAIL_RE = /^[^\s@\/]+@[^\s@\/]+\.[^\s@\/]{2,}$/;
+            const FLAG = 'abysz_subscribed';
+
+            const showStatus = (key, type) => {
+                statusEl.className = 'sub-status' + (type ? ' ' + type : '');
+                if (key) { statusEl.setAttribute('data-i18n', key); statusEl.textContent = t(key); }
+                else { statusEl.removeAttribute('data-i18n'); statusEl.textContent = ''; }
+            };
+
+            try { if (localStorage.getItem(FLAG)) card.classList.add('done'); } catch (e) {}
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (honeypot && honeypot.value) { card.classList.add('done'); return; } // bot : on fait semblant
+
+                const email = emailInput.value.trim().toLowerCase();
+                const topics = [...form.querySelectorAll('input[name="topic"]:checked')].map(i => i.value);
+
+                if (!EMAIL_RE.test(email) || email.length > 254) return showStatus('sub_err_email', 'error');
+                if (topics.length === 0) return showStatus('sub_err_topic', 'error');
+                if (!consent.checked) return showStatus('sub_err_consent', 'error');
+
+                submitBtn.disabled = true;
+                showStatus('sub_sending', '');
+                try {
+                    await setDoc(doc(db, 'subscribers', email), {
+                        email,
+                        topics,
+                        lang: window.I18N.getLang(),
+                        source: 'home',
+                        createdAt: fsServerTimestamp()
+                    });
+                    try { localStorage.setItem(FLAG, '1'); } catch (e) {}
+                    showStatus(null);
+                    card.classList.add('done');
+                } catch (err) {
+                    showStatus(err && err.code === 'permission-denied' ? 'sub_err_exists' : 'sub_err_net', 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            });
+        }());
+
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeLightbox();

@@ -152,6 +152,68 @@
             .graph-header { flex-direction: column; align-items: flex-start; }
         }
     </style>
+    <style>
+        /* ===== Communication : newsletter & push ===== */
+        .muted { color: #8f8f8f; font-size: 0.85rem; line-height: 1.5; font-family: 'Inter', sans-serif; }
+        .comms-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+        .comms-grid > div { min-width: 0; }
+        .comms-msg { margin-top: 10px; font-size: 0.85rem; font-family: 'Inter', sans-serif; min-height: 1.2em; }
+        .comms-msg.ok { color: #22c55e; } .comms-msg.err { color: #ff6b6b; } .comms-msg.info { color: #aaa; }
+        .box-title { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; color: #a855f7; letter-spacing: 1px; margin: 22px 0 12px; padding-bottom: 8px; border-bottom: 1px solid #222; text-transform: uppercase; }
+        .box-title:first-child { margin-top: 0; }
+        .input-group input[type="color"] { padding: 3px; height: 44px; cursor: pointer; }
+        .input-group select { cursor: pointer; }
+        .input-group .count { color: #666; font-size: 0.72rem; font-family: 'Inter', sans-serif; text-align: right; }
+        .chk-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+        .chk-chip { position: relative; }
+        .chk-chip input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; margin: 0; }
+        .chk-chip span { display: inline-block; padding: 8px 14px; border-radius: 999px; background: #050505; border: 1px solid #222; color: #aaa; font-size: 0.82rem; font-family: 'Inter', sans-serif; transition: all .2s; }
+        .chk-chip input:checked + span { background: rgba(168, 85, 247, .18); border-color: #a855f7; color: #fff; }
+        .chk-chip input:focus-visible + span { outline: 2px solid #a855f7; outline-offset: 2px; }
+        .audience-box { background: #0a0a0a; border: 1px dashed #2a2a2a; border-radius: 10px; padding: 14px 16px; margin: 4px 0 16px; }
+        .audience-count { font-family: 'Orbitron', sans-serif; font-size: 1rem; color: #fff; }
+        .audience-count b { color: #a855f7; font-size: 1.4rem; }
+        .btn-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+        .btn-ghost { background: #050505; color: #ddd; border: 1px solid #2a2a2a; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 0.78rem; padding: 11px 18px; border-radius: 8px; cursor: pointer; transition: all .2s; }
+        .btn-ghost:hover:not(:disabled) { border-color: #a855f7; color: #fff; background: rgba(168, 85, 247, .1); }
+        .btn-danger { background: #050505; color: #ff6b6b; border: 1px solid rgba(255, 68, 68, .5); font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 0.78rem; padding: 11px 18px; border-radius: 8px; cursor: pointer; transition: all .2s; }
+        .btn-danger:hover:not(:disabled) { background: #ff4444; color: #fff; }
+        .btn-send { background: linear-gradient(135deg, #22c55e, #15803d); }
+        .btn-send:hover:not(:disabled) { background: linear-gradient(135deg, #34d673, #22c55e); box-shadow: 0 0 15px rgba(34, 197, 94, .35); }
+        .btn-admin:disabled, .btn-ghost:disabled, .btn-danger:disabled { opacity: .45; cursor: not-allowed; }
+        .preview-wrap { position: sticky; top: 100px; }
+        .preview-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px; flex-wrap: wrap; }
+        .preview-stage { background: #050505; border: 1px solid #222; border-radius: 12px; padding: 12px; display: flex; justify-content: center; }
+        .nl-preview { width: 100%; max-width: 100%; height: 640px; border: 0; border-radius: 8px; background: #0a0a0a; transition: max-width .25s ease; }
+        .progress { height: 10px; background: #151515; border-radius: 999px; overflow: hidden; margin-top: 14px; display: none; }
+        .progress.show { display: block; }
+        .progress > div { height: 100%; width: 0; background: linear-gradient(90deg, #a855f7, #22c55e); transition: width .3s ease; }
+        .progress-label { font-size: 0.8rem; color: #aaa; margin-top: 8px; font-family: 'Inter', sans-serif; display: none; }
+        .progress-label.show { display: block; }
+        .log-box { margin-top: 12px; max-height: 150px; overflow: auto; background: #050505; border: 1px solid #1f1f1f; border-radius: 8px; padding: 10px 12px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 0.74rem; color: #aaa; display: none; }
+        .log-box.show { display: block; }
+        .log-box .err { color: #ff6b6b; } .log-box .ok { color: #22c55e; }
+        .notif-card { display: flex; gap: 12px; align-items: flex-start; background: #1f1f23; border: 1px solid #333; border-radius: 14px; padding: 14px; box-shadow: 0 8px 24px rgba(0, 0, 0, .5); max-width: 380px; }
+        .notif-card img { width: 40px; height: 40px; border-radius: 8px; object-fit: contain; background: #0a0a0a; flex-shrink: 0; }
+        .notif-card .nt { font-weight: 700; font-size: 0.92rem; color: #fff; word-break: break-word; }
+        .notif-card .nb { font-size: 0.85rem; color: #ccc; margin-top: 2px; word-break: break-word; white-space: pre-wrap; }
+        .notif-card .nl { font-size: 0.72rem; color: #888; margin-top: 6px; word-break: break-all; }
+        .hist-box { margin-top: 26px; }
+        .hist-box .db-table { min-width: 560px; }
+        .pill { display: inline-block; font-size: 0.7rem; padding: 2px 9px; border-radius: 999px; border: 1px solid #333; color: #aaa; font-family: 'Inter', sans-serif; font-weight: 700; }
+        .pill.sent { color: #22c55e; border-color: rgba(34, 197, 94, .5); background: rgba(34, 197, 94, .1); }
+        .pill.draft { color: #eab308; border-color: rgba(234, 179, 8, .5); background: rgba(234, 179, 8, .1); }
+        .mini-btn { background: #050505; color: #ddd; border: 1px solid #2a2a2a; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-family: 'Inter', sans-serif; font-weight: 600; margin-left: 4px; }
+        .mini-btn:hover { border-color: #a855f7; color: #fff; }
+        .mini-btn.del:hover { border-color: #ff4444; color: #ff6b6b; }
+        .sub-tools { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 14px; }
+        .sub-tools input[type="search"] { background: #050505; border: 1px solid #222; border-radius: 8px; padding: 10px 14px; color: #fff; font-family: 'Inter', sans-serif; min-width: 240px; flex: 1; max-width: 380px; }
+        .sub-tools input[type="search"]:focus { border-color: #a855f7; outline: none; }
+        .tbl-scroll { max-height: 360px; overflow: auto; }
+        .tbl-scroll .db-table th { position: sticky; top: 0; z-index: 1; }
+        .topic-tag { display: inline-block; font-size: 0.68rem; padding: 2px 8px; border-radius: 999px; background: rgba(168, 85, 247, .12); border: 1px solid rgba(168, 85, 247, .35); color: #c9a0ff; margin-right: 4px; font-family: 'Inter', sans-serif; }
+        @media (max-width: 980px) { .comms-grid { grid-template-columns: 1fr; } .preview-wrap { position: static; } .nl-preview { height: 520px; } }
+    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
@@ -193,6 +255,9 @@
             <a href="#sec-roster">👥 Roster</a>
             <a href="#sec-players">🔒 Espaces joueurs</a>
             <a href="#sec-hours">⏱️ Par heure</a>
+            <a href="#sec-subs">📬 Abonnés</a>
+            <a href="#sec-newsletter">📧 Newsletter</a>
+            <a href="#sec-push">🔔 Push</a>
         </div>
 
         <div class="section-title" id="sec-live">
@@ -497,6 +562,175 @@
                     <button type="submit" class="btn-admin" style="background: #22c55e;" id="btn-save-player">Enregistrer les modifications</button>
                 </form>
                 <p id="save-success" class="success-message hidden">✅ Espace privé mis à jour et synchronisé avec succès !</p>
+            </div>
+        </div>
+        </details>
+
+        <!-- ============ COMMUNICATION : ABONNÉS / ENVOI / NEWSLETTER / PUSH ============ -->
+        <details class="dash-details" id="sec-subs" open>
+        <summary class="section-title">📬 Abonnés &amp; appareils</summary>
+        <div class="stats-grid">
+            <div class="stat-card"><div id="sub-total" class="num">0</div><div class="label">Abonnés newsletter</div><div class="hint">adresses e-mail inscrites</div></div>
+            <div class="stat-card"><div id="push-total" class="num">0</div><div class="label">Appareils push</div><div class="hint">navigateurs avec notifications activées</div></div>
+            <div class="stat-card"><div id="sub-topic-annonces" class="num">0</div><div class="label">📣 Annonces</div><div class="hint">abonnés à ce thème</div></div>
+            <div class="stat-card"><div id="sub-topic-matchs" class="num">0</div><div class="label">🏆 Matchs &amp; tournois</div><div class="hint">abonnés à ce thème</div></div>
+            <div class="stat-card"><div id="sub-topic-boutique" class="num">0</div><div class="label">🛍️ Boutique &amp; promos</div><div class="hint">abonnés à ce thème</div></div>
+        </div>
+        <div class="sub-tools">
+            <input type="search" id="sub-search" placeholder="Rechercher une adresse e-mail…" aria-label="Rechercher un abonné">
+            <button type="button" class="btn-ghost" id="sub-export">⬇️ Exporter en CSV</button>
+        </div>
+        <p id="subs-msg" class="comms-msg"></p>
+        <div class="db-table-wrapper tbl-scroll">
+            <table class="db-table" style="min-width:560px;">
+                <thead><tr><th>E-mail</th><th>Thèmes</th><th>Langue</th><th>Inscrit le</th><th>Action</th></tr></thead>
+                <tbody id="subs-rows"><tr><td colspan="5" style="text-align:center;color:#666;font-style:italic;padding:30px;">Chargement...</td></tr></tbody>
+            </table>
+        </div>
+        </details>
+
+        <details class="dash-details" id="sec-sender" open>
+        <summary class="section-title"><span>⚙️ Serveur d'envoi</span> <span class="chip chip-on" id="sender-chip">non configuré</span></summary>
+        <div class="admin-edit-box">
+            <p class="muted" style="margin-top:0;">Les e-mails et les notifications sont envoyés par un petit serveur gratuit (Cloudflare Worker) qui vérifie que c'est bien toi avant d'envoyer. Colle ici son adresse (voir le guide d'installation).</p>
+            <div class="search-row">
+                <div class="input-group" style="margin-bottom:0;">
+                    <label for="worker-url">Adresse du serveur d'envoi</label>
+                    <input type="url" id="worker-url" placeholder="https://abysz-sender.ton-compte.workers.dev" autocomplete="off">
+                </div>
+                <button type="button" class="btn-admin" id="worker-save">Enregistrer &amp; tester</button>
+            </div>
+            <p id="worker-msg" class="comms-msg"></p>
+        </div>
+        </details>
+
+        <details class="dash-details" id="sec-newsletter" open>
+        <summary class="section-title">📧 Newsletter</summary>
+        <div class="admin-edit-box" style="border-color:#a855f7;">
+            <div class="comms-grid">
+                <div>
+                    <div class="box-title">1 · Contenu</div>
+                    <div class="form-grid">
+                        <div class="input-group"><label for="nl-draft-select">Brouillons &amp; envoyées</label><select id="nl-draft-select"><option value="">— Nouvelle newsletter —</option></select></div>
+                        <div class="input-group"><label for="nl-name">Nom interne (non envoyé)</label><input type="text" id="nl-name" maxlength="80" placeholder="Ex : Annonce tournoi novembre"></div>
+                    </div>
+                    <div class="input-group"><label for="nl-subject">Objet de l'e-mail</label><input type="text" id="nl-subject" maxlength="150" placeholder="Ex : 🏆 Abysz au tournoi de ce week-end !"></div>
+                    <div class="input-group"><label for="nl-preheader">Texte d'aperçu (affiché après l'objet dans la boîte mail)</label><input type="text" id="nl-preheader" maxlength="120" placeholder="Ex : Toutes les infos pour suivre le live"></div>
+                    <div class="input-group"><label for="nl-title">Grand titre</label><input type="text" id="nl-title" maxlength="120" placeholder="Ex : C'est le grand jour !"></div>
+                    <div class="input-group"><label for="nl-image">Image de bannière (lien https, facultatif)</label><input type="url" id="nl-image" placeholder="https://…/banniere.png"></div>
+                    <div class="input-group"><label for="nl-body">Texte</label><textarea id="nl-body" rows="8" placeholder="Écris ton message ici.&#10;&#10;Saute une ligne pour créer un nouveau paragraphe. Mets **du texte** entre deux étoiles pour le mettre en gras."></textarea></div>
+                    <div class="form-grid">
+                        <div class="input-group"><label for="nl-btn-text">Texte du bouton (facultatif)</label><input type="text" id="nl-btn-text" maxlength="40" placeholder="Voir le live"></div>
+                        <div class="input-group"><label for="nl-btn-link">Lien du bouton (https)</label><input type="url" id="nl-btn-link" placeholder="https://…"></div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="input-group"><label for="nl-footer">Signature</label><input type="text" id="nl-footer" maxlength="120" value="L'équipe Abysz Esports"></div>
+                        <div class="input-group"><label for="nl-accent">Couleur d'accent</label><input type="color" id="nl-accent" value="#a855f7"></div>
+                    </div>
+
+                    <div class="box-title">2 · Destinataires</div>
+                    <div class="audience-box">
+                        <div class="chk-row" id="nl-topics">
+                            <label class="chk-chip"><input type="checkbox" name="nl-topic" value="annonces" checked><span>📣 Annonces</span></label>
+                            <label class="chk-chip"><input type="checkbox" name="nl-topic" value="matchs" checked><span>🏆 Matchs &amp; tournois</span></label>
+                            <label class="chk-chip"><input type="checkbox" name="nl-topic" value="boutique" checked><span>🛍️ Boutique &amp; promos</span></label>
+                        </div>
+                        <div class="input-group" style="margin-bottom:12px;"><label for="nl-lang">Langue des abonnés</label>
+                            <select id="nl-lang"><option value="all">Toutes les langues</option><option value="fr">🇫🇷 Français uniquement</option><option value="en">🇬🇧 Anglais uniquement</option></select>
+                        </div>
+                        <div class="audience-count"><b id="nl-count">0</b> destinataire(s)</div>
+                        <p class="muted" id="nl-count-hint" style="margin:6px 0 0;">Reçoivent l'e-mail : les abonnés à au moins un des thèmes cochés.</p>
+                    </div>
+
+                    <div class="box-title">3 · Envoi</div>
+                    <div class="btn-row">
+                        <button type="button" class="btn-admin" id="nl-save">💾 Enregistrer le brouillon</button>
+                        <button type="button" class="btn-ghost" id="nl-test">🧪 M'envoyer un test</button>
+                        <button type="button" class="btn-admin btn-send" id="nl-send">🚀 Envoyer à tous</button>
+                    </div>
+                    <div class="btn-row">
+                        <button type="button" class="btn-ghost" id="nl-new">➕ Nouvelle</button>
+                        <button type="button" class="btn-ghost hidden" id="nl-retry">🔁 Réessayer les échecs</button>
+                        <button type="button" class="btn-danger hidden" id="nl-delete">🗑️ Supprimer</button>
+                    </div>
+                    <div class="progress" id="nl-progress"><div></div></div>
+                    <div class="progress-label" id="nl-progress-label"></div>
+                    <p id="nl-msg" class="comms-msg"></p>
+                    <div class="log-box" id="nl-log"></div>
+                </div>
+
+                <div>
+                    <div class="preview-wrap">
+                        <div class="preview-head">
+                            <span class="box-title" style="margin:0;border:0;padding:0;">Aperçu en direct</span>
+                            <div class="seg" role="group" aria-label="Taille de l'aperçu">
+                                <button type="button" class="seg-btn active" id="nl-view-desktop">💻 Ordi</button>
+                                <button type="button" class="seg-btn" id="nl-view-mobile">📱 Mobile</button>
+                            </div>
+                        </div>
+                        <div class="preview-stage"><iframe id="nl-preview" class="nl-preview" sandbox title="Aperçu de la newsletter"></iframe></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hist-box">
+                <div class="box-title">Historique</div>
+                <div class="db-table-wrapper tbl-scroll" style="max-height:280px;">
+                    <table class="db-table">
+                        <thead><tr><th>Newsletter</th><th>Statut</th><th>Date</th><th>Envoyés</th><th>Action</th></tr></thead>
+                        <tbody id="nl-history"><tr><td colspan="5" style="text-align:center;color:#666;font-style:italic;padding:24px;">Aucune newsletter</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        </details>
+
+        <details class="dash-details" id="sec-push" open>
+        <summary class="section-title">🔔 Notifications push</summary>
+        <div class="admin-edit-box" style="border-color:#eab308;">
+            <div class="comms-grid">
+                <div>
+                    <div class="box-title" style="color:#eab308;">Message</div>
+                    <div class="input-group"><label for="pn-title-in">Titre</label><input type="text" id="pn-title-in" maxlength="65" placeholder="Ex : 🔴 Abysz est en live !"><div class="count" id="pn-title-count">0 / 65</div></div>
+                    <div class="input-group"><label for="pn-body-in">Message</label><textarea id="pn-body-in" rows="3" maxlength="178" placeholder="Ex : Rejoins-nous maintenant pour le match de la finale."></textarea><div class="count" id="pn-body-count">0 / 178</div></div>
+                    <div class="input-group"><label for="pn-link-in">Lien ouvert au clic (https)</label><input type="url" id="pn-link-in" placeholder="https://…"></div>
+                    <div class="input-group"><label for="pn-image-in">Image (lien https, facultatif)</label><input type="url" id="pn-image-in" placeholder="https://…/image.png"></div>
+                    <div class="input-group"><label for="pn-lang">Langue des appareils</label>
+                        <select id="pn-lang"><option value="all">Toutes les langues</option><option value="fr">🇫🇷 Français uniquement</option><option value="en">🇬🇧 Anglais uniquement</option></select>
+                    </div>
+                    <div class="audience-box" style="border-color:#3a3320;"><div class="audience-count"><b id="pn-count" style="color:#eab308;">0</b> appareil(s) ciblé(s)</div></div>
+                    <div class="btn-row">
+                        <button type="button" class="btn-ghost" id="pn-device">📲 Activer sur cet appareil (tests)</button>
+                        <button type="button" class="btn-ghost" id="pn-test">🧪 Tester sur mon appareil</button>
+                        <button type="button" class="btn-admin btn-send" id="pn-send">🚀 Envoyer à tous</button>
+                    </div>
+                    <div class="progress" id="pn-progress"><div></div></div>
+                    <div class="progress-label" id="pn-progress-label"></div>
+                    <p id="pn-msg" class="comms-msg"></p>
+                    <div class="log-box" id="pn-log"></div>
+                </div>
+                <div>
+                    <div class="preview-wrap">
+                        <div class="preview-head"><span class="box-title" style="margin:0;border:0;padding:0;color:#eab308;">Aperçu</span></div>
+                        <div class="preview-stage" style="padding:30px 14px;">
+                            <div class="notif-card" aria-label="Aperçu de la notification">
+                                <img src="logo.png" alt="">
+                                <div><div class="nt" id="pn-prev-title">Titre de la notification</div><div class="nb" id="pn-prev-body">Ton message apparaîtra ici.</div><div class="nl" id="pn-prev-link"></div></div>
+                            </div>
+                        </div>
+                        <p class="muted" style="margin-top:12px;">L'apparence exacte dépend de l'appareil (Windows, Android, Mac…). Les notifications arrivent même si le site est fermé.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hist-box">
+                <div class="box-title" style="color:#eab308;">Historique</div>
+                <div class="db-table-wrapper tbl-scroll" style="max-height:260px;">
+                    <table class="db-table">
+                        <thead><tr><th>Titre</th><th>Message</th><th>Date</th><th>Résultat</th><th>Action</th></tr></thead>
+                        <tbody id="pn-history"><tr><td colspan="5" style="text-align:center;color:#666;font-style:italic;padding:24px;">Aucune notification envoyée</td></tr></tbody>
+                    </table>
+                </div>
             </div>
         </div>
         </details>
@@ -1457,6 +1691,535 @@
                 };
             }
         }
+    </script>
+
+    <!-- ============ COMMUNICATION : newsletter + push (envoi via le serveur Worker) ============ -->
+    <script type="module">
+        import { getApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, collection, doc, onSnapshot, addDoc, setDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getMessaging, getToken, isSupported as messagingSupported } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
+
+        const app = getApp();
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const ADMIN_EMAIL = "abyszofficial@gmail.com";
+        const VAPID_KEY = "BCL-DbvI05TUrzRWg-Sd_Bql3L8H5QNMyqB362zt9wl54L57ITX1WzRCyOe89WifE1cmbtzqIxceeudlf6Kmw2Y";
+        const CHUNK = 40;                       // taille des lots envoyés au serveur d'envoi
+        const LS_URL = "abysz_worker_url";
+        const LS_DEVICE = "abysz_admin_push_token";
+        const SITE_ORIGIN = location.origin;
+
+        const $ = (id) => document.getElementById(id);
+        const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+        const safeHttps = (u) => { try { const x = new URL(String(u || "").trim()); return x.protocol === "https:" ? x.href : ""; } catch { return ""; } };
+        const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+        const chunk = (arr, n) => { const out = []; for (let i = 0; i < arr.length; i += n) out.push(arr.slice(i, i + n)); return out; };
+        const fmtDate = (ms) => ms ? new Date(ms).toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—";
+        const tsMs = (t) => (t && typeof t.toMillis === "function") ? t.toMillis() : (typeof t === "number" ? t : 0);
+        const isAdminUser = (u) => !!(u && u.email && u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
+        const isAdmin = () => isAdminUser(auth.currentUser);
+        const TOPICS = ["annonces", "matchs", "boutique"];
+        const TOPIC_LABEL = { annonces: "Annonces", matchs: "Matchs", boutique: "Boutique" };
+
+        function say(el, text, cls) { if (!el) return; el.className = "comms-msg" + (cls ? " " + cls : ""); el.textContent = text || ""; }
+
+        /* ---------- État ---------- */
+        let subs = [];        // { id, email, topics[], lang, createdAt }
+        let pushTokens = [];  // { id, lang }
+        let newsletters = []; // { id, ...data }
+        let pushHistory = [];
+        let currentId = null; // newsletter en cours d'édition
+        let busy = false;
+        let lastRun = null;   // pour "réessayer les échecs"
+
+        /* ---------- Appel du serveur d'envoi ---------- */
+        const workerUrl = () => { try { return (localStorage.getItem(LS_URL) || "").replace(/\/+$/, ""); } catch { return ""; } };
+
+        async function callWorker(path, payload) {
+            const base = workerUrl();
+            if (!base) throw Object.assign(new Error("Serveur d'envoi non configuré (section ⚙️ ci-dessus)."), { fatal: true });
+            if (!isAdmin()) throw Object.assign(new Error("Accès réservé à l'administrateur."), { fatal: true });
+            const idToken = await auth.currentUser.getIdToken();
+            let r;
+            try {
+                r = await fetch(base + path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...payload, idToken }) });
+            } catch (e) {
+                throw new Error("Serveur d'envoi injoignable (vérifie l'adresse et ALLOWED_ORIGIN).");
+            }
+            const data = await r.json().catch(() => ({}));
+            if (!r.ok) throw Object.assign(new Error(data.error || ("Erreur " + r.status)), { fatal: r.status === 401 || r.status === 403 || r.status === 500 });
+            return data;
+        }
+
+        /* ---------- Barre de progression + journal ---------- */
+        function progress(prefix, done, total, label) {
+            const bar = $(prefix + "-progress"), lab = $(prefix + "-progress-label");
+            bar.classList.add("show"); lab.classList.add("show");
+            bar.firstElementChild.style.width = (total ? Math.round(done / total * 100) : 0) + "%";
+            lab.textContent = label || (done + " / " + total);
+        }
+        function resetProgress(prefix) {
+            $(prefix + "-progress").classList.remove("show"); $(prefix + "-progress-label").classList.remove("show");
+            const lg = $(prefix + "-log"); lg.classList.remove("show"); lg.textContent = "";
+        }
+        function log(prefix, text, cls) {
+            const lg = $(prefix + "-log"); lg.classList.add("show");
+            const d = document.createElement("div"); if (cls) d.className = cls; d.textContent = text; lg.appendChild(d); lg.scrollTop = lg.scrollHeight;
+        }
+        function setBusy(v) {
+            busy = v;
+            ["nl-save", "nl-test", "nl-send", "nl-retry", "nl-new", "nl-delete", "pn-test", "pn-send", "pn-device"].forEach((id) => { const b = $(id); if (b) b.disabled = v; });
+        }
+
+        /* ============================================================
+           SERVEUR D'ENVOI : configuration + test
+           ============================================================ */
+        async function checkSender() {
+            const chip = $("sender-chip"), msg = $("worker-msg"), base = workerUrl();
+            $("worker-url").value = base;
+            if (!base) { chip.className = "chip chip-on"; chip.textContent = "non configuré"; say(msg, "", ""); return; }
+            chip.className = "chip chip-on"; chip.textContent = "test en cours…";
+            try {
+                const r = await fetch(base + "/api/health");
+                const h = await r.json();
+                if (!h.ok) throw new Error("réponse inattendue");
+                const missing = [];
+                if (!h.push) missing.push("push (SERVICE_ACCOUNT)");
+                if (!h.email) missing.push("e-mails (BREVO_API_KEY / SENDER_EMAIL)");
+                if (!h.unsub) missing.push("désabonnement (UNSUB_SECRET)");
+                if (missing.length) {
+                    chip.className = "chip chip-on"; chip.textContent = "⚠️ incomplet";
+                    say(msg, "Serveur joignable, mais il manque : " + missing.join(", ") + ".", "err");
+                } else {
+                    chip.className = "chip chip-off"; chip.textContent = "✅ connecté";
+                    say(msg, "Serveur d'envoi opérationnel : push, e-mails et désabonnement sont prêts.", "ok");
+                }
+            } catch (e) {
+                chip.className = "chip chip-on"; chip.textContent = "injoignable";
+                say(msg, "Impossible de joindre le serveur. Vérifie l'adresse (https://…workers.dev) et ALLOWED_ORIGIN.", "err");
+            }
+        }
+        function wireSender() {
+            $("worker-save").addEventListener("click", () => {
+                const v = $("worker-url").value.trim().replace(/\/+$/, "");
+                let ok = false;
+                try { const u = new URL(v); ok = u.protocol === "https:" || (u.protocol === "http:" && u.hostname === "localhost"); } catch (e) { /* invalide */ }
+                if (!ok) { say($("worker-msg"), "Adresse invalide : elle doit commencer par https://", "err"); return; }
+                try { localStorage.setItem(LS_URL, v); } catch (e) { /* ignore */ }
+                checkSender();
+            });
+        }
+
+        /* ============================================================
+           ABONNÉS
+           ============================================================ */
+        function renderSubs() {
+            $("sub-total").textContent = subs.length;
+            $("push-total").textContent = pushTokens.length;
+            TOPICS.forEach((t) => { $("sub-topic-" + t).textContent = subs.filter((s) => s.topics.includes(t)).length; });
+
+            const q = $("sub-search").value.trim().toLowerCase();
+            const rows = subs.filter((s) => !q || s.email.includes(q)).slice(0, 500);
+            const tb = $("subs-rows");
+            if (!rows.length) { tb.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#666;font-style:italic;padding:30px;">${subs.length ? "Aucun résultat" : "Aucun abonné pour le moment"}</td></tr>`; }
+            else {
+                tb.innerHTML = rows.map((s) => `<tr>
+                    <td>${esc(s.email)}</td>
+                    <td>${s.topics.map((t) => `<span class="topic-tag">${esc(TOPIC_LABEL[t] || t)}</span>`).join("")}</td>
+                    <td>${esc(String(s.lang || "").toUpperCase())}</td>
+                    <td class="nowrap">${esc(fmtDate(s.createdAt))}</td>
+                    <td><button type="button" class="mini-btn del" data-del-sub="${esc(s.id)}" title="Supprimer cet abonné">🗑️</button></td></tr>`).join("");
+            }
+            updateAudience(); updatePushAudience();
+        }
+        function wireSubs() {
+            $("sub-search").addEventListener("input", renderSubs);
+            $("subs-rows").addEventListener("click", async (e) => {
+                const b = e.target.closest("[data-del-sub]"); if (!b || !isAdmin()) return;
+                const id = b.getAttribute("data-del-sub");
+                if (!confirm("Supprimer l'abonné " + id + " ?")) return;
+                try { await deleteDoc(doc(db, "subscribers", id)); } catch (err) { alert("Erreur : " + err.message); }
+            });
+            $("sub-export").addEventListener("click", () => {
+                if (!isAdmin() || !subs.length) return;
+                const cell = (v) => { let s = String(v ?? ""); if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; };
+                const lines = [["email", "themes", "langue", "inscrit_le"].map(cell).join(";")];
+                subs.forEach((s) => lines.push([s.email, s.topics.join(","), s.lang, s.createdAt ? new Date(s.createdAt).toISOString() : ""].map(cell).join(";")));
+                const blob = new Blob(["\ufeff" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+                const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+                a.download = "abonnes-abysz-" + new Date().toISOString().slice(0, 10) + ".csv";
+                document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+            });
+        }
+
+        /* ============================================================
+           NEWSLETTER
+           ============================================================ */
+        const NL = { name: "nl-name", subject: "nl-subject", preheader: "nl-preheader", title: "nl-title", image: "nl-image", body: "nl-body", btnText: "nl-btn-text", btnLink: "nl-btn-link", footer: "nl-footer", accent: "nl-accent", lang: "nl-lang" };
+        const nlTopics = () => [...document.querySelectorAll('input[name="nl-topic"]:checked')].map((i) => i.value);
+
+        function readNl() {
+            const o = {};
+            Object.keys(NL).forEach((k) => { o[k] = $(NL[k]).value.trim(); });
+            o.topics = nlTopics();
+            return o;
+        }
+        function fillNl(n) {
+            n = n || {};
+            const d = { name: "", subject: "", preheader: "", title: "", image: "", body: "", btnText: "", btnLink: "", footer: "L'équipe Abysz Esports", accent: "#a855f7", lang: "all" };
+            Object.keys(NL).forEach((k) => { $(NL[k]).value = n[k] !== undefined && n[k] !== null ? n[k] : d[k]; });
+            const t = Array.isArray(n.topics) ? n.topics : TOPICS;
+            document.querySelectorAll('input[name="nl-topic"]').forEach((i) => { i.checked = t.includes(i.value); });
+            updatePreview(); updateAudience();
+        }
+
+        function buildEmailHtml(n, isPreview) {
+            const accent = /^#[0-9a-f]{6}$/i.test(n.accent || "") ? n.accent : "#a855f7";
+            const en = n.lang === "en";
+            const ff = "Arial,Helvetica,sans-serif";
+            const body = String(n.body || "").trim();
+            const paras = body ? esc(body).split(/\n{2,}/).map((p) =>
+                `<p style="margin:0 0 16px 0;font-size:16px;line-height:1.65;color:#d4d4d8;font-family:${ff};">${p.replace(/\n/g, "<br>").replace(/\*\*(.+?)\*\*/g, '<strong style="color:#ffffff;">$1</strong>')}</p>`).join("") : "";
+            const img = safeHttps(n.image);
+            const link = safeHttps(n.btnLink);
+            const btn = (n.btnText && link) ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:10px 0 6px;"><tr><td style="border-radius:10px;background:${accent};"><a href="${esc(link)}" target="_blank" style="display:inline-block;padding:14px 28px;font-family:${ff};font-size:15px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:10px;">${esc(n.btnText)}</a></td></tr></table>` : "";
+            const title = n.title ? `<h1 style="margin:0 0 18px 0;font-family:${ff};font-size:26px;line-height:1.25;color:#ffffff;">${esc(n.title)}</h1>` : "";
+            const pre = n.preheader ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${esc(n.preheader)}</div>` : "";
+            const why = en ? "You receive this email because you subscribed to the Abysz Esports newsletter." : "Tu reçois cet e-mail car tu t'es abonné(e) à la newsletter d'Abysz Esports.";
+            const unsub = en ? "Unsubscribe" : "Se désabonner";
+            const html = `<!DOCTYPE html><html lang="${en ? "en" : "fr"}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>${esc(n.subject || "Abysz Esports")}</title></head>` +
+                `<body style="margin:0;padding:0;background:#0a0a0a;">${pre}` +
+                `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;"><tr><td align="center" style="padding:24px 12px;">` +
+                `<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#141414;border:1px solid #2a2a2a;border-radius:16px;overflow:hidden;">` +
+                `<tr><td style="padding:22px 32px;border-bottom:3px solid ${accent};"><img src="${esc(SITE_ORIGIN)}/logo.png" width="34" height="34" alt="" style="vertical-align:middle;border:0;margin-right:10px;"><span style="vertical-align:middle;font-family:${ff};font-weight:800;font-size:18px;letter-spacing:3px;color:#ffffff;">ABYSZ</span></td></tr>` +
+                (img ? `<tr><td style="padding:0;"><img src="${esc(img)}" width="600" alt="" style="display:block;width:100%;max-width:600px;height:auto;border:0;"></td></tr>` : "") +
+                `<tr><td style="padding:32px;">${title}${paras}${btn}${n.footer ? `<p style="margin:26px 0 0 0;font-family:${ff};font-size:15px;color:#a1a1aa;">${esc(n.footer)}</p>` : ""}</td></tr>` +
+                `<tr><td style="padding:20px 32px;background:#0f0f0f;border-top:1px solid #222;font-family:${ff};font-size:12px;line-height:1.6;color:#71717a;">${why}<br><a href="{{UNSUB_URL}}" style="color:${accent};">${unsub}</a></td></tr>` +
+                `</table></td></tr></table></body></html>`;
+            return isPreview ? html.split("{{UNSUB_URL}}").join("#") : html;
+        }
+        function buildEmailText(n) {
+            const en = n.lang === "en";
+            const link = safeHttps(n.btnLink);
+            return [n.title, n.body, (n.btnText && link) ? n.btnText + " : " + link : "", n.footer, "--", (en ? "Unsubscribe: " : "Se désabonner : ") + "{{UNSUB_URL}}"].filter(Boolean).join("\n\n");
+        }
+
+        let previewTimer = null;
+        function updatePreview() {
+            clearTimeout(previewTimer);
+            previewTimer = setTimeout(() => { $("nl-preview").srcdoc = buildEmailHtml(readNl(), true); }, 150);
+        }
+
+        function audience(topics, lang) {
+            return subs.filter((s) => (lang === "all" || s.lang === lang) && s.topics.some((t) => topics.includes(t)));
+        }
+        function updateAudience() {
+            const n = audience(nlTopics(), $("nl-lang").value).length;
+            $("nl-count").textContent = n;
+            $("nl-count-hint").textContent = n > 300
+                ? "⚠️ L'offre gratuite de Brevo est limitée à 300 e-mails par jour : au-delà, les envois seront refusés."
+                : "Reçoivent l'e-mail : les abonnés à au moins un des thèmes cochés.";
+        }
+
+        function validateNl(n) {
+            if (!n.subject) return "Ajoute un objet.";
+            if (!n.title && !n.body) return "Ajoute un titre ou un texte.";
+            if (n.image && !safeHttps(n.image)) return "L'image doit être un lien https.";
+            if (n.btnText && !safeHttps(n.btnLink)) return "Le bouton a besoin d'un lien https valide.";
+            if (n.btnLink && !safeHttps(n.btnLink)) return "Le lien du bouton doit commencer par https://";
+            return "";
+        }
+
+        async function saveNewsletter(extra) {
+            const n = readNl();
+            const payload = {
+                name: n.name || n.subject || "Sans titre", subject: n.subject, preheader: n.preheader, title: n.title, image: n.image,
+                body: n.body, btnText: n.btnText, btnLink: n.btnLink, footer: n.footer, accent: n.accent, topics: n.topics, lang: n.lang,
+                updatedAt: serverTimestamp(), ...(extra || {})
+            };
+            if (currentId) await setDoc(doc(db, "newsletters", currentId), payload, { merge: true });
+            else { const r = await addDoc(collection(db, "newsletters"), { ...payload, status: "draft", createdAt: serverTimestamp() }); currentId = r.id; }
+            $("nl-delete").classList.remove("hidden");
+            $("nl-draft-select").value = currentId;
+        }
+
+        /* Envoi d'une liste de destinataires, par lots */
+        async function runEmailChunks(recipients, n, opts) {
+            const subject = (opts.test ? "[TEST] " : "") + n.subject;
+            const html = buildEmailHtml(n, false), text = buildEmailText(n);
+            let sent = 0, failed = 0; const failedEmails = [];
+            const parts = chunk(recipients, CHUNK);
+            progress("nl", 0, recipients.length);
+            for (let i = 0; i < parts.length; i++) {
+                try {
+                    const res = await callWorker("/api/email", { subject, html, text, recipients: parts[i].map((r) => ({ email: r.email })) });
+                    sent += res.sent || 0; failed += res.failed || 0;
+                    (res.errors || []).forEach((er) => { failedEmails.push(er.email); log("nl", "✗ " + er.email + " : " + er.error, "err"); });
+                } catch (err) {
+                    failed += parts[i].length; parts[i].forEach((r) => failedEmails.push(r.email));
+                    log("nl", "✗ Lot " + (i + 1) + "/" + parts.length + " : " + err.message, "err");
+                    if (err.fatal) { for (let j = i + 1; j < parts.length; j++) { failed += parts[j].length; parts[j].forEach((r) => failedEmails.push(r.email)); } break; }
+                }
+                progress("nl", Math.min((i + 1) * CHUNK, recipients.length), recipients.length, `Envoi en cours… ${Math.min((i + 1) * CHUNK, recipients.length)} / ${recipients.length}`);
+                if (i < parts.length - 1) await sleep(250);
+            }
+            return { sent, failed, failedEmails };
+        }
+
+        async function sendNewsletter(retry) {
+            if (busy || !isAdmin()) return;
+            const n = retry ? lastRun.n : readNl();
+            const err = validateNl(n);
+            if (err) { say($("nl-msg"), err, "err"); return; }
+            if (!workerUrl()) { say($("nl-msg"), "Configure d'abord le serveur d'envoi (section ⚙️).", "err"); return; }
+
+            let recipients;
+            if (retry) recipients = lastRun.failedEmails.map((email) => ({ email }));
+            else {
+                recipients = audience(n.topics, n.lang);
+                if (!recipients.length) { say($("nl-msg"), "Aucun destinataire pour ces thèmes / cette langue.", "err"); return; }
+                const done = newsletters.find((x) => x.id === currentId && x.status === "sent");
+                if (done && !confirm("Cette newsletter a déjà été envoyée le " + fmtDate(tsMs(done.sentAt)) + ". La renvoyer quand même ?")) return;
+            }
+            if (!confirm((retry ? "Réessayer l'envoi à " : "Envoyer « " + n.subject + " » à ") + recipients.length + " personne(s) ?\n\nCette action est définitive.")) return;
+
+            setBusy(true); resetProgress("nl"); say($("nl-msg"), "", "");
+            try {
+                if (!retry) await saveNewsletter();
+                const res = await runEmailChunks(recipients, n, { test: false });
+                const prev = retry ? (lastRun.stats || { sent: 0 }) : { sent: 0 };
+                const stats = { total: (retry ? lastRun.stats.total : recipients.length), sent: prev.sent + res.sent, failed: res.failedEmails.length };
+                lastRun = { n, failedEmails: res.failedEmails, stats };
+                if (stats.sent > 0 || !retry) await saveNewsletter({ status: "sent", sentAt: serverTimestamp(), stats });
+                $("nl-retry").classList.toggle("hidden", !res.failedEmails.length);
+                progress("nl", recipients.length, recipients.length, `Terminé : ${res.sent} envoyé(s), ${res.failed} échec(s).`);
+                say($("nl-msg"), res.failed ? `⚠️ ${res.sent} envoyé(s), ${res.failed} échec(s). Détails ci-dessous.` : `✅ Newsletter envoyée à ${res.sent} personne(s) !`, res.failed ? "err" : "ok");
+            } catch (e) { say($("nl-msg"), "Erreur : " + e.message, "err"); }
+            setBusy(false);
+        }
+
+        async function sendNewsletterTest() {
+            if (busy || !isAdmin()) return;
+            const n = readNl(); const err = validateNl(n);
+            if (err) { say($("nl-msg"), err, "err"); return; }
+            if (!workerUrl()) { say($("nl-msg"), "Configure d'abord le serveur d'envoi (section ⚙️).", "err"); return; }
+            setBusy(true); resetProgress("nl"); say($("nl-msg"), "Envoi du test…", "info");
+            try {
+                const res = await runEmailChunks([{ email: auth.currentUser.email }], n, { test: true });
+                say($("nl-msg"), res.sent ? "✅ Test envoyé à " + auth.currentUser.email + " (vérifie aussi les spams)." : "❌ Échec du test : " + (document.querySelector("#nl-log .err")?.textContent || "erreur inconnue"), res.sent ? "ok" : "err");
+            } catch (e) { say($("nl-msg"), "Erreur : " + e.message, "err"); }
+            setBusy(false);
+        }
+
+        function renderNlHistory() {
+            const sel = $("nl-draft-select"), keep = currentId || "";
+            sel.innerHTML = '<option value="">— Nouvelle newsletter —</option>' + newsletters.map((n) =>
+                `<option value="${esc(n.id)}">${n.status === "sent" ? "✅ " : "📝 "}${esc(n.name || n.subject || "Sans titre")}</option>`).join("");
+            sel.value = newsletters.some((n) => n.id === keep) ? keep : "";
+
+            const tb = $("nl-history");
+            if (!newsletters.length) { tb.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#666;font-style:italic;padding:24px;">Aucune newsletter</td></tr>'; return; }
+            tb.innerHTML = newsletters.map((n) => {
+                const sent = n.status === "sent";
+                const st = n.stats ? `${esc(n.stats.sent)} / ${esc(n.stats.total)}` : "—";
+                return `<tr><td>${esc(n.name || n.subject || "Sans titre")}</td>
+                    <td><span class="pill ${sent ? "sent" : "draft"}">${sent ? "Envoyée" : "Brouillon"}</span></td>
+                    <td class="nowrap">${esc(fmtDate(tsMs(sent ? n.sentAt : n.updatedAt)))}</td><td>${st}</td>
+                    <td><button type="button" class="mini-btn" data-open-nl="${esc(n.id)}">Ouvrir</button><button type="button" class="mini-btn" data-dup-nl="${esc(n.id)}">Dupliquer</button></td></tr>`;
+            }).join("");
+        }
+        function loadNl(id, asCopy) {
+            const n = newsletters.find((x) => x.id === id); if (!n) return;
+            currentId = asCopy ? null : id; lastRun = null;
+            $("nl-retry").classList.add("hidden");
+            fillNl(asCopy ? { ...n, name: (n.name || "Sans titre") + " (copie)" } : n);
+            $("nl-delete").classList.toggle("hidden", !currentId);
+            $("nl-draft-select").value = currentId || "";
+            resetProgress("nl"); say($("nl-msg"), asCopy ? "Copie créée : modifie-la puis enregistre." : "", asCopy ? "info" : "");
+            $("sec-newsletter").scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        function wireNewsletter() {
+            Object.values(NL).forEach((id) => $(id).addEventListener("input", updatePreview));
+            $("nl-lang").addEventListener("change", () => { updatePreview(); updateAudience(); });
+            document.querySelectorAll('input[name="nl-topic"]').forEach((i) => i.addEventListener("change", updateAudience));
+            $("nl-view-desktop").addEventListener("click", () => { $("nl-preview").style.maxWidth = "100%"; $("nl-view-desktop").classList.add("active"); $("nl-view-mobile").classList.remove("active"); });
+            $("nl-view-mobile").addEventListener("click", () => { $("nl-preview").style.maxWidth = "390px"; $("nl-view-mobile").classList.add("active"); $("nl-view-desktop").classList.remove("active"); });
+            $("nl-draft-select").addEventListener("change", (e) => { if (e.target.value) loadNl(e.target.value, false); else $("nl-new").click(); });
+            $("nl-new").addEventListener("click", () => { if (busy) return; currentId = null; lastRun = null; fillNl(null); $("nl-draft-select").value = ""; $("nl-delete").classList.add("hidden"); $("nl-retry").classList.add("hidden"); resetProgress("nl"); say($("nl-msg"), "", ""); });
+            $("nl-save").addEventListener("click", async () => {
+                if (busy || !isAdmin()) return;
+                const n = readNl(); if (!n.subject && !n.name && !n.title) { say($("nl-msg"), "Ajoute au moins un objet ou un nom.", "err"); return; }
+                try { await saveNewsletter(); say($("nl-msg"), "✅ Brouillon enregistré.", "ok"); } catch (e) { say($("nl-msg"), "Erreur : " + e.message + " (règles Firestore à jour ?)", "err"); }
+            });
+            $("nl-delete").addEventListener("click", async () => {
+                if (busy || !isAdmin() || !currentId) return;
+                if (!confirm("Supprimer définitivement cette newsletter ?")) return;
+                try { await deleteDoc(doc(db, "newsletters", currentId)); $("nl-new").click(); say($("nl-msg"), "Newsletter supprimée.", "info"); } catch (e) { say($("nl-msg"), "Erreur : " + e.message, "err"); }
+            });
+            $("nl-test").addEventListener("click", sendNewsletterTest);
+            $("nl-send").addEventListener("click", () => sendNewsletter(false));
+            $("nl-retry").addEventListener("click", () => { if (lastRun && lastRun.failedEmails.length) sendNewsletter(true); });
+            $("nl-history").addEventListener("click", (e) => {
+                const o = e.target.closest("[data-open-nl]"), d = e.target.closest("[data-dup-nl]");
+                if (o) loadNl(o.getAttribute("data-open-nl"), false); else if (d) loadNl(d.getAttribute("data-dup-nl"), true);
+            });
+            fillNl(null);
+        }
+
+        /* ============================================================
+           NOTIFICATIONS PUSH
+           ============================================================ */
+        const readPn = () => ({ title: $("pn-title-in").value.trim(), body: $("pn-body-in").value.trim(), link: $("pn-link-in").value.trim(), image: $("pn-image-in").value.trim(), lang: $("pn-lang").value });
+
+        function updatePushPreview() {
+            const p = readPn();
+            $("pn-prev-title").textContent = p.title || "Titre de la notification";
+            $("pn-prev-body").textContent = p.body || "Ton message apparaîtra ici.";
+            $("pn-prev-link").textContent = safeHttps(p.link) ? new URL(p.link).host : SITE_ORIGIN.replace(/^https?:\/\//, "");
+            $("pn-title-count").textContent = $("pn-title-in").value.length + " / 65";
+            $("pn-body-count").textContent = $("pn-body-in").value.length + " / 178";
+        }
+        function pushTargets(lang) { return pushTokens.filter((t) => lang === "all" || t.lang === lang); }
+        function updatePushAudience() { $("pn-count").textContent = pushTargets($("pn-lang").value).length; }
+
+        function validatePn(p) {
+            if (!p.title) return "Ajoute un titre.";
+            if (!p.body) return "Ajoute un message.";
+            if (p.link && !safeHttps(p.link)) return "Le lien doit commencer par https://";
+            if (p.image && !safeHttps(p.image)) return "L'image doit être un lien https.";
+            return "";
+        }
+        const pnPayload = (p) => ({ title: p.title, body: p.body, link: safeHttps(p.link) || SITE_ORIGIN + "/", ...(safeHttps(p.image) ? { image: safeHttps(p.image) } : {}) });
+
+        function refreshDeviceBtn() {
+            let has = false; try { has = !!localStorage.getItem(LS_DEVICE); } catch (e) { /* ignore */ }
+            $("pn-device").textContent = has ? "✅ Appareil de test activé" : "📲 Activer sur cet appareil (tests)";
+        }
+        async function registerAdminDevice() {
+            if (busy) return;
+            const m = $("pn-msg");
+            try {
+                if (!("Notification" in window) || !("serviceWorker" in navigator) || !(await messagingSupported())) throw new Error("Ce navigateur ne gère pas les notifications push.");
+                const perm = await Notification.requestPermission();
+                if (perm !== "granted") throw new Error("Notifications refusées : autorise-les dans les réglages du navigateur.");
+                const reg = await navigator.serviceWorker.register("./firebase-messaging-sw.js");
+                await navigator.serviceWorker.ready;
+                const token = await getToken(getMessaging(app), { vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
+                if (!token) throw new Error("Aucun jeton reçu.");
+                try { localStorage.setItem(LS_DEVICE, token); } catch (e) { /* ignore */ }
+                refreshDeviceBtn(); say(m, "✅ Cet appareil recevra tes notifications de test.", "ok");
+            } catch (e) { say(m, "Erreur : " + e.message, "err"); }
+        }
+
+        async function sendPushTest() {
+            if (busy || !isAdmin()) return;
+            const p = readPn(); const err = validatePn(p); const m = $("pn-msg");
+            if (err) { say(m, err, "err"); return; }
+            let token = ""; try { token = localStorage.getItem(LS_DEVICE) || ""; } catch (e) { /* ignore */ }
+            if (!token) { say(m, "Clique d'abord sur « Activer sur cet appareil (tests) ».", "err"); return; }
+            if (!workerUrl()) { say(m, "Configure d'abord le serveur d'envoi (section ⚙️).", "err"); return; }
+            setBusy(true); resetProgress("pn"); say(m, "Envoi du test…", "info");
+            try {
+                const res = await callWorker("/api/push", { ...pnPayload(p), tokens: [token] });
+                if (res.sent) say(m, "✅ Test envoyé : la notification doit apparaître sur cet appareil.", "ok");
+                else {
+                    if (res.gone && res.gone.length) { try { localStorage.removeItem(LS_DEVICE); } catch (e) { /* ignore */ } refreshDeviceBtn(); }
+                    say(m, "❌ Échec : " + (res.firstError || "inconnu") + (res.gone && res.gone.length ? " — réactive l'appareil de test." : ""), "err");
+                }
+            } catch (e) { say(m, "Erreur : " + e.message, "err"); }
+            setBusy(false);
+        }
+
+        async function sendPushAll() {
+            if (busy || !isAdmin()) return;
+            const p = readPn(); const err = validatePn(p); const m = $("pn-msg");
+            if (err) { say(m, err, "err"); return; }
+            if (!workerUrl()) { say(m, "Configure d'abord le serveur d'envoi (section ⚙️).", "err"); return; }
+            const targets = pushTargets(p.lang);
+            if (!targets.length) { say(m, "Aucun appareil abonné aux notifications.", "err"); return; }
+            if (!confirm("Envoyer « " + p.title + " » à " + targets.length + " appareil(s) ?\n\nCette action est définitive.")) return;
+
+            setBusy(true); resetProgress("pn"); say(m, "", "");
+            let sent = 0, failed = 0, removed = 0;
+            const parts = chunk(targets, CHUNK);
+            progress("pn", 0, targets.length);
+            for (let i = 0; i < parts.length; i++) {
+                try {
+                    const res = await callWorker("/api/push", { ...pnPayload(p), tokens: parts[i].map((t) => t.id) });
+                    sent += res.sent || 0; failed += res.failed || 0;
+                    if (res.firstError && res.failed) log("pn", "✗ " + res.failed + " échec(s) dans le lot " + (i + 1) + " : " + res.firstError, "err");
+                    for (const tk of (res.gone || [])) { try { await deleteDoc(doc(db, "push_tokens", tk)); removed++; } catch (e) { /* ignore */ } }
+                } catch (e) {
+                    failed += parts[i].length; log("pn", "✗ Lot " + (i + 1) + "/" + parts.length + " : " + e.message, "err");
+                    if (e.fatal) { for (let j = i + 1; j < parts.length; j++) failed += parts[j].length; break; }
+                }
+                const done = Math.min((i + 1) * CHUNK, targets.length);
+                progress("pn", done, targets.length, `Envoi en cours… ${done} / ${targets.length}`);
+                if (i < parts.length - 1) await sleep(200);
+            }
+            progress("pn", targets.length, targets.length, `Terminé : ${sent} envoyée(s), ${failed} échec(s)` + (removed ? `, ${removed} appareil(s) inactif(s) retiré(s).` : "."));
+            say(m, failed ? `⚠️ ${sent} envoyée(s), ${failed} échec(s).` : `✅ Notification envoyée à ${sent} appareil(s) !`, failed ? "err" : "ok");
+            try { await addDoc(collection(db, "push_history"), { title: p.title, body: p.body, link: safeHttps(p.link) || "", lang: p.lang, total: targets.length, sent, failed, removed, createdAt: serverTimestamp() }); } catch (e) { log("pn", "Historique non enregistré (règles Firestore ?) : " + e.message, "err"); }
+            setBusy(false);
+        }
+
+        function renderPushHistory() {
+            const tb = $("pn-history");
+            if (!pushHistory.length) { tb.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#666;font-style:italic;padding:24px;">Aucune notification envoyée</td></tr>'; return; }
+            tb.innerHTML = pushHistory.slice(0, 50).map((h) => `<tr><td>${esc(h.title)}</td><td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(h.body)}</td>
+                <td class="nowrap">${esc(fmtDate(tsMs(h.createdAt)))}</td><td class="nowrap">${esc(h.sent)} / ${esc(h.total)}</td>
+                <td><button type="button" class="mini-btn" data-reuse-pn="${esc(h.id)}">Réutiliser</button></td></tr>`).join("");
+        }
+        function wirePush() {
+            ["pn-title-in", "pn-body-in", "pn-link-in", "pn-image-in", "pn-lang"].forEach((id) => $(id).addEventListener("input", () => { updatePushPreview(); updatePushAudience(); }));
+            $("pn-device").addEventListener("click", registerAdminDevice);
+            $("pn-test").addEventListener("click", sendPushTest);
+            $("pn-send").addEventListener("click", sendPushAll);
+            $("pn-history").addEventListener("click", (e) => {
+                const b = e.target.closest("[data-reuse-pn]"); if (!b) return;
+                const h = pushHistory.find((x) => x.id === b.getAttribute("data-reuse-pn")); if (!h) return;
+                $("pn-title-in").value = h.title || ""; $("pn-body-in").value = h.body || ""; $("pn-link-in").value = h.link || ""; $("pn-lang").value = h.lang || "all";
+                updatePushPreview(); updatePushAudience(); $("sec-push").scrollIntoView({ behavior: "smooth", block: "start" });
+            });
+            refreshDeviceBtn(); updatePushPreview();
+        }
+
+        /* ============================================================
+           DÉMARRAGE (uniquement pour l'administrateur connecté)
+           ============================================================ */
+        function watch(name, onData, onErr) {
+            onSnapshot(collection(db, name), (snap) => onData(snap), (err) => onErr && onErr(err));
+        }
+        function init() {
+            wireSender(); wireSubs(); wireNewsletter(); wirePush(); checkSender();
+
+            watch("subscribers", (snap) => {
+                subs = snap.docs.map((d) => { const x = d.data(); return { id: d.id, email: String(x.email || d.id).toLowerCase(), topics: Array.isArray(x.topics) ? x.topics.filter((t) => TOPICS.includes(t)) : [], lang: x.lang === "en" ? "en" : "fr", createdAt: tsMs(x.createdAt) }; })
+                    .sort((a, b) => b.createdAt - a.createdAt);
+                say($("subs-msg"), "", ""); renderSubs();
+            }, () => say($("subs-msg"), "Lecture des abonnés impossible : ajoute les règles Firestore pour « subscribers ».", "err"));
+
+            watch("push_tokens", (snap) => {
+                pushTokens = snap.docs.map((d) => ({ id: d.id, lang: d.data().lang === "en" ? "en" : "fr" }));
+                renderSubs();
+            }, () => say($("subs-msg"), "Lecture des appareils push impossible : ajoute les règles Firestore pour « push_tokens ».", "err"));
+
+            watch("newsletters", (snap) => {
+                newsletters = snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => tsMs(b.updatedAt) - tsMs(a.updatedAt));
+                renderNlHistory();
+            }, () => say($("nl-msg"), "Historique indisponible : ajoute les règles Firestore pour « newsletters ».", "err"));
+
+            watch("push_history", (snap) => {
+                pushHistory = snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => tsMs(b.createdAt) - tsMs(a.createdAt));
+                renderPushHistory();
+            }, () => say($("pn-msg"), "Historique indisponible : ajoute les règles Firestore pour « push_history ».", "err"));
+        }
+
+        let started = false;
+        onAuthStateChanged(auth, (user) => { if (started || !isAdminUser(user)) return; started = true; init(); });
     </script>
 </body>
 </html>

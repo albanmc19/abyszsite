@@ -1288,7 +1288,7 @@
         const db = getFirestore(app);
         const rtdb = getDatabase(app);
 
-        import { getMessaging, getToken, onMessage, isSupported as messagingSupported } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
+        import { getMessaging, getToken, deleteToken, onMessage, isSupported as messagingSupported } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
         const { t, setI18n, fmtDate, onLangChange } = window.I18N;
 
         // ---------- Helpers sécurité ----------
@@ -2529,14 +2529,24 @@
                 if (!ok) { return; } // navigateur incompatible : on n'affiche rien
                 box.classList.remove('hidden');
 
-                if (Notification.permission === 'granted') {
-                    let flagged = false; try { flagged = !!localStorage.getItem(FLAG); } catch (e) {}
+                // Activation MANUELLE : on ne considère les notifs actives que si l'utilisateur a
+                // cliqué sur le bouton sur cet appareil (drapeau local), pas seulement parce que
+                // la permission du navigateur est restée « autorisée ».
+                let flagged = false; try { flagged = !!localStorage.getItem(FLAG); } catch (e) {}
+                if (Notification.permission === 'granted' && flagged) {
                     setOn();
-                    if (flagged) register().catch(() => {}); // rafraîchit le token en silence
+                    register().catch(() => {}); // rafraîchit le token en silence
                     return;
                 }
                 if (Notification.permission === 'denied') { showMsg('push_denied'); }
             })();
+
+            // Réinstallation de l'appli : on repart de zéro, l'utilisateur doit re-cliquer sur le bouton
+            window.addEventListener('appinstalled', async () => {
+                try { localStorage.removeItem(FLAG); } catch (e) {}
+                try { await deleteToken(getMessaging(app)); } catch (e) {}
+                btn.classList.remove('on'); btn.disabled = false; setI18n(btn, 'push_btn'); showMsg(null);
+            });
 
             btn.addEventListener('click', async () => {
                 if (btn.disabled) return;

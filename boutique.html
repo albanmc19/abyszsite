@@ -375,6 +375,42 @@
         .sh-toast { background: #141414; padding: 13px 20px; border-radius: 10px; font-size: .85rem; border-left: 4px solid #a855f7; box-shadow: 0 10px 25px rgba(0,0,0,.6); }
         .sh-toast.error { border-color: #ef4444; } .sh-toast.success { border-color: #10b981; }
         [hidden] { display: none !important; }
+        .shop-container { position: relative; isolation: isolate; }
+        .shop-container::before { content: ""; position: absolute; inset: -60px 0 auto; height: 520px; z-index: -1; pointer-events: none; background: radial-gradient(420px 260px at 20% 30%, rgba(168,85,247,.22), transparent 70%), radial-gradient(380px 240px at 80% 20%, rgba(236,72,153,.16), transparent 70%); animation: shOrb 14s ease-in-out infinite alternate; }
+        @keyframes shOrb { to { transform: translate3d(0, 24px, 0) scale(1.08); opacity: .8; } }
+        .shop-header h1 { background: linear-gradient(90deg, #fff 0%, #c084fc 30%, #ec4899 55%, #fff 80%); background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; animation: shGrad 7s linear infinite; }
+        .shop-header h1 .tv-adm-tag { -webkit-text-fill-color: #fff; }
+        @keyframes shGrad { to { background-position: -250% 0; } }
+        @keyframes shIn { from { opacity: 0; transform: translateY(34px) scale(.96); } }
+        .shop-header p { animation: shIn .9s .15s cubic-bezier(.2,.8,.2,1) backwards; }
+        .product-card { transition: transform .18s ease-out, box-shadow .3s, border-color .3s; transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); will-change: transform; }
+        .product-card:hover { transform: perspective(900px) translateY(-8px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); box-shadow: 0 22px 55px rgba(168,85,247,.32), 0 0 0 1px #a855f7; }
+        .product-card::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,.14), transparent 45%); opacity: 0; transition: opacity .3s; }
+        .product-card:hover::after { opacity: 1; }
+        .product-card.pre { opacity: 0; }
+        .product-card.in { animation: shIn .75s cubic-bezier(.2,.8,.2,1) backwards; animation-delay: var(--d, 0s); }
+        .product-img-box { background: radial-gradient(circle at 50% 62%, rgba(168,85,247,.28), #0a0a0a 68%); }
+        .product-img { animation: shFloat 5s ease-in-out infinite; filter: drop-shadow(0 14px 18px rgba(0,0,0,.6)); }
+        .product-card:hover .product-img { scale: 1.1; transition: scale .4s ease; }
+        @keyframes shFloat { 50% { transform: translateY(-8px); } }
+        .sh-tease { filter: blur(14px) brightness(.55) saturate(.6) !important; }
+        .sh-gray { filter: grayscale(1) brightness(.7) !important; animation: none; }
+        .product-badge { animation: shBadge 2.4s ease-in-out infinite; }
+        @keyframes shBadge { 50% { transform: scale(1.1) rotate(-3deg); } }
+        .product-price { font-size: 1.35rem; text-shadow: 0 0 18px rgba(168,85,247,.55); }
+        .add-to-cart-btn:not(:disabled) { position: relative; overflow: hidden; background: linear-gradient(135deg, #a855f7, #7e22ce); color: #fff; border-color: transparent; box-shadow: 0 0 16px rgba(168,85,247,.45); }
+        .add-to-cart-btn:not(:disabled)::before { content: ""; position: absolute; top: 0; left: -120%; width: 60%; height: 100%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.45), transparent); transform: skewX(-20deg); animation: shSweep 3.2s ease-in-out infinite; }
+        @keyframes shSweep { 0%, 55% { left: -120%; } 100% { left: 170%; } }
+        .add-to-cart-btn:not(:disabled):hover { transform: scale(1.07); box-shadow: 0 0 28px rgba(168,85,247,.85); }
+        .add-to-cart-btn:not(:disabled):active { transform: scale(.95); }
+        .sh-ribbon.soon { background: linear-gradient(90deg, #7e22ce, #ec4899); animation: shRib 2s ease-in-out infinite; }
+        @keyframes shRib { 50% { opacity: .75; } }
+        .sh-drop { color: #c084fc; font: 600 .72rem 'Orbitron', sans-serif; margin: 0 0 10px; }
+        .sh-cd { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 18px; }
+        .sh-cb2 { background: #0a0a0a; border: 1px solid rgba(168,85,247,.45); border-radius: 10px; padding: 8px 4px; text-align: center; box-shadow: inset 0 0 12px rgba(168,85,247,.15); }
+        .sh-cb2 b { display: block; font: 700 1.25rem 'Orbitron', sans-serif; color: #fff; text-shadow: 0 0 10px #a855f7; }
+        .sh-cb2 small { color: #8a8a9e; font-size: .6rem; text-transform: uppercase; }
+        @media (prefers-reduced-motion: reduce) { .product-card.pre { opacity: 1; } .product-card.in, .product-img, .product-badge, .shop-header h1, .shop-header p, .add-to-cart-btn::before, .shop-container::before, .sh-ribbon { animation: none !important; } }
         .nav-admin-btn { background: none; border-color: transparent; color: #8a8a9e; font-weight: 500; }
         .nav-admin-btn:hover { color: #fff; border-color: #2a2a2a; box-shadow: none; }
         .nav-admin-btn.on { color: #a855f7; }
@@ -489,6 +525,11 @@
                 <div class="sh-fg"><label for="e-s">Disponibilité</label><select class="sh-inp" id="e-s"><option value="ok">Disponible</option><option value="soon">Bientôt</option><option value="soldout">Épuisé</option></select></div>
             </div>
             <div class="sh-2">
+                <div class="sh-fg"><label for="e-dt">Date de sortie (compte à rebours si « Bientôt »)</label><input class="sh-inp" type="datetime-local" id="e-dt"></div>
+                <div class="sh-fg"><label for="e-nf">Lien « Me prévenir » (Discord, TikTok…)</label><input class="sh-inp" id="e-nf" maxlength="400" placeholder="https://"></div>
+            </div>
+            <label style="display:flex;gap:8px;align-items:center;color:#ccc;font-size:.85rem;margin-bottom:12px"><input type="checkbox" id="e-tz"> Mode mystère « Bientôt » : image floutée et prix masqué</label>
+            <div class="sh-2">
                 <div class="sh-fg"><label for="e-b">Badge (optionnel)</label><input class="sh-inp" id="e-b" maxlength="20" placeholder="Nouveau, -20 %…"></div>
                 <div class="sh-fg"><label for="e-bc">Couleur du badge</label><select class="sh-inp" id="e-bc"><option value="green">Vert</option><option value="purple">Violet</option><option value="red">Rouge</option><option value="amber">Orange</option><option value="blue">Bleu</option></select></div>
             </div>
@@ -539,13 +580,13 @@ const D = {
     fr: { lang_group: "Langue", menu_open: "Ouvrir le menu", nav_home: "Accueil", nav_planning: "Planning", nav_shop: "Boutique", nav_join: "🚀 Rejoindre", online_n: "{n} en ligne",
         f_legal: "Mentions Légales", f_privacy: "Politique de Confidentialité", f_cookie_prefs: "Gérer mes cookies", f_contact: "Nous contacter :", auth_in: "🔒 Connexion", auth_out: "🔓 Déconnexion",
         page_title: "ABYSZ | Boutique Officielle", shop_h: "Boutique Officielle", shop_sub: "Portez fièrement les couleurs de la structure ABYSZ Esports",
-        buy: "Acheter", soldout: "ÉPUISÉ", soon: "BIENTÔT", all: "TOUT", empty: "Aucun article pour le moment.",
+        notify: "🔔 Me prévenir", soon_btn: "Bientôt disponible", drop_on: "Sortie le {d}", cd_d: "jours", cd_h: "heures", cd_m: "min", cd_s: "sec", live_now: "🎉 {n} est disponible !", buy: "Acheter", soldout: "ÉPUISÉ", soon: "BIENTÔT", all: "TOUT", empty: "Aucun article pour le moment.",
         om_body: "Vous allez être redirigé vers la boutique officielle de notre partenaire {p} pour finaliser votre commande en toute sécurité.", om_go: "Continuer vers {p}", om_partner: "notre partenaire",
         err_url: "Le lien de redirection doit commencer par https://", err_title: "Un nom d'article est requis" },
     en: { lang_group: "Language", menu_open: "Open menu", nav_home: "Home", nav_planning: "Schedule", nav_shop: "Shop", nav_join: "🚀 Join us", online_n: "{n} online",
         f_legal: "Legal Notice", f_privacy: "Privacy Policy", f_cookie_prefs: "Manage my cookies", f_contact: "Contact us:", auth_in: "🔒 Log in", auth_out: "🔓 Log out",
         page_title: "ABYSZ | Official Shop", shop_h: "Official Shop", shop_sub: "Proudly wear the colours of ABYSZ Esports",
-        buy: "Buy", soldout: "SOLD OUT", soon: "COMING SOON", all: "ALL", empty: "No items yet.",
+        notify: "🔔 Notify me", soon_btn: "Coming soon", drop_on: "Drops {d}", cd_d: "days", cd_h: "hours", cd_m: "min", cd_s: "sec", live_now: "🎉 {n} is now available!", buy: "Buy", soldout: "SOLD OUT", soon: "COMING SOON", all: "ALL", empty: "No items yet.",
         om_body: "You are about to be redirected to the official store of our partner {p} to complete your order securely.", om_go: "Continue to {p}", om_partner: "our partner",
         err_url: "The redirect link must start with https://", err_title: "An item name is required" }
 };
@@ -574,7 +615,8 @@ function cleanP(r) {
     return { id: clean(r.id, 24).replace(/[^\w-]/g, "") || "p" + Date.now().toString(36), title, titleEn: clean(r.titleEn, 60), desc: clean(r.desc, 400), descEn: clean(r.descEn, 400),
         price: clean(r.price, 24), old: clean(r.old, 24), img: safeImg(r.img), cat: clean(r.cat, 24).toUpperCase(), badge: clean(r.badge, 20), bc: BCK.includes(r.bc) ? r.bc : "green",
         status: ST.includes(r.status) ? r.status : "ok", btn: clean(r.btn, 24), url: safeUrl(String(r.url || "").trim()), mode: r.mode === "modal" ? "modal" : "direct",
-        partner: clean(r.partner, 40), mtext: clean(r.mtext, 300), off: !!r.off };
+        partner: clean(r.partner, 40), mtext: clean(r.mtext, 300), off: !!r.off,
+        date: Math.max(0, +r.date || 0), teaser: !!r.teaser, notify: safeUrl(String(r.notify || "").trim()) };
 }
 let P = DEF.map(cleanP), tag = "__all__", editI = -1;
 
@@ -588,20 +630,46 @@ function buy(p) {
     go.onclick = () => { window.open(p.url, "_blank", "noopener"); closeAll(); };
     openM("orderModal");
 }
-function card(p, i) {
-    const en = lang === "en", title = en && p.titleEn ? p.titleEn : p.title, desc = en && p.descEn ? p.descEn : p.desc;
-    const w = el("div", "product-card" + (p.off ? " sh-hid" : ""));
+const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const IO = "IntersectionObserver" in window ? new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.remove("pre"); e.target.classList.add("in"); IO.unobserve(e.target); } }), { threshold: 0.12 }) : null;
+const eff = (p) => p.status === "soon" && p.date && p.date <= Date.now() ? "ok" : p.status;
+function tilt(e) {
+    if (RM || e.pointerType !== "mouse") return;
+    const c = e.currentTarget, r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+    c.style.setProperty("--rx", ((0.5 - y) * 10).toFixed(2) + "deg"); c.style.setProperty("--ry", ((x - 0.5) * 12).toFixed(2) + "deg");
+    c.style.setProperty("--mx", (x * 100).toFixed(1) + "%"); c.style.setProperty("--my", (y * 100).toFixed(1) + "%");
+}
+const untilt = (e) => { e.currentTarget.style.setProperty("--rx", "0deg"); e.currentTarget.style.setProperty("--ry", "0deg"); };
+function tick() {
+    $$(".sh-cd").forEach((c) => {
+        const l = +c.dataset.t - Date.now();
+        if (l <= 0) { if (!c.dataset.done) { c.dataset.done = "1"; toast(t("live_now", { n: P.find((x) => x.id === c.dataset.id)?.title || "" })); render(); } return; }
+        const bs = c.querySelectorAll("b");
+        [Math.floor(l / 864e5), Math.floor(l / 36e5) % 24, Math.floor(l / 6e4) % 60, Math.floor(l / 1e3) % 60].forEach((x, k) => { bs[k].textContent = String(x).padStart(2, "0"); });
+    });
+}
+setInterval(tick, 1000);
+function card(p, i, n = 0) {
+    const en = lang === "en", st = eff(p), soon = st === "soon", title = en && p.titleEn ? p.titleEn : p.title, desc = en && p.descEn ? p.descEn : p.desc;
+    const w = el("div", "product-card" + (IO ? " pre" : "") + (p.off ? " sh-hid" : "")); w.style.setProperty("--d", (n * 0.09).toFixed(2) + "s");
+    w.addEventListener("pointermove", tilt); w.addEventListener("pointerleave", untilt);
     if (p.badge) { const b = el("div", "product-badge", p.badge); b.style.background = BC[p.bc]; w.append(b); }
-    const ib = el("div", "product-img-box"), im = el("img", "product-img"); im.alt = title; im.loading = "lazy"; im.src = p.img || "logo.png";
+    const ib = el("div", "product-img-box"), im = el("img", "product-img" + (soon && p.teaser ? " sh-tease" : st === "soldout" ? " sh-gray" : "")); im.alt = title; im.loading = "lazy"; im.src = p.img || "logo.png";
     im.onerror = () => { im.onerror = null; im.src = "logo.png"; }; ib.append(im);
-    if (p.status !== "ok") ib.append(el("div", "sh-ribbon", t(p.status)));
+    if (st !== "ok") ib.append(el("div", "sh-ribbon " + st, t(st)));
     const info = el("div", "product-info"), top = el("div");
     if (p.cat) top.append(el("div", "sh-cat", p.cat));
     top.append(el("h3", "product-title", title)); if (desc) top.append(el("p", "product-desc", desc));
-    const ft = el("div", "product-footer"), pr = el("span", "product-price", p.price);
-    if (p.old) pr.prepend(el("span", "product-old", p.old));
-    const bt = el("button", "add-to-cart-btn", p.btn || t("buy")); bt.type = "button"; bt.disabled = p.status !== "ok" || !p.url;
-    bt.addEventListener("click", () => buy(p)); ft.append(pr, bt); info.append(top, ft); w.append(ib, info);
+    if (soon && p.date) {
+        top.append(el("div", "sh-drop", t("drop_on", { d: new Date(p.date).toLocaleString(en ? "en-GB" : "fr-FR", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }) })));
+        const cd = el("div", "sh-cd"); cd.dataset.t = p.date; cd.dataset.id = p.id;
+        ["d", "h", "m", "s"].forEach((u) => { const b = el("div", "sh-cb2"); b.append(el("b", "", "00"), el("small", "", t("cd_" + u))); cd.append(b); }); top.append(cd);
+    }
+    const ft = el("div", "product-footer"), pr = el("span", "product-price", soon && p.teaser ? "???" : p.price);
+    if (p.old && !(soon && p.teaser)) pr.prepend(el("span", "product-old", p.old));
+    const bt = el("button", "add-to-cart-btn", soon ? (p.notify ? t("notify") : t("soon_btn")) : (p.btn || t("buy"))); bt.type = "button";
+    bt.disabled = soon ? !p.notify : st !== "ok" || !p.url;
+    bt.addEventListener("click", () => (soon ? window.open(p.notify, "_blank", "noopener") : buy(p))); ft.append(pr, bt); info.append(top, ft); w.append(ib, info);
     if (isAdmin()) {
         const cc = el("div", "sh-cc");
         [["⬆", () => mv(i, -1)], ["⬇", () => mv(i, 1)], [p.off ? "🙈" : "👁", () => { P[i].off = !P[i].off; save(); }], ["✏️", () => edit(i)],
@@ -616,24 +684,27 @@ function render() {
     if (tag !== "__all__" && !cats.includes(tag)) tag = "__all__";
     if (cats.length > 1) ["__all__", ...cats].forEach((c) => { const b = el("button", "sh-chip" + (c === tag ? " act" : ""), c === "__all__" ? t("all") : c); b.type = "button"; b.addEventListener("click", () => { tag = c; render(); }); ch.append(b); });
     const g = $("#sh-grid"); g.replaceChildren();
-    list.filter((x) => tag === "__all__" || x.p.cat === tag).forEach((x) => g.append(card(x.p, x.i)));
+    list.filter((x) => tag === "__all__" || x.p.cat === tag).forEach((x, n) => g.append(card(x.p, x.i, n)));
+    if (IO) g.querySelectorAll(".pre").forEach((c) => IO.observe(c));
+    tick();
     if (!g.children.length) g.append(el("p", "shop-header", t("empty")));
 }
 
 /* ---------- Édition (admin) ---------- */
-const F = { title: "e-t", titleEn: "e-te", desc: "e-d", descEn: "e-de", price: "e-p", old: "e-o", img: "e-i", cat: "e-c", status: "e-s", badge: "e-b", bc: "e-bc", btn: "e-bt", mode: "e-m", url: "e-u", partner: "e-pa", mtext: "e-mt" };
+const F = { title: "e-t", titleEn: "e-te", desc: "e-d", descEn: "e-de", price: "e-p", old: "e-o", img: "e-i", cat: "e-c", status: "e-s", badge: "e-b", bc: "e-bc", btn: "e-bt", mode: "e-m", url: "e-u", partner: "e-pa", mtext: "e-mt", notify: "e-nf" };
 function edit(i) {
     if (!isAdmin()) return;
     editI = i; const p = P[i] || cleanP({ title: "x", status: "ok", mode: "direct", bc: "green" });
     $("#e-h").textContent = i < 0 ? "➕ Nouvel article" : "✏️ Modifier l'article";
     for (const [k, id] of Object.entries(F)) $("#" + id).value = i < 0 && k === "title" ? "" : p[k] || "";
-    $("#e-off").checked = !!p.off; openM("m-p");
+    $("#e-off").checked = !!p.off; $("#e-tz").checked = !!p.teaser;
+    $("#e-dt").value = p.date ? new Date(p.date - new Date(p.date).getTimezoneOffset() * 6e4).toISOString().slice(0, 16) : ""; openM("m-p");
 }
 $("#sh-add").addEventListener("click", () => edit(-1));
 $("#e-ok").addEventListener("click", async () => {
     if (!isAdmin()) return;
-    const r = { id: P[editI]?.id, off: $("#e-off").checked }; for (const [k, id] of Object.entries(F)) r[k] = $("#" + id).value;
-    if (r.url.trim() && !safeUrl(r.url.trim())) return toast(t("err_url"), "error");
+    const r = { id: P[editI]?.id, off: $("#e-off").checked, teaser: $("#e-tz").checked, date: $("#e-dt").value ? new Date($("#e-dt").value).getTime() : 0 }; for (const [k, id] of Object.entries(F)) r[k] = $("#" + id).value;
+    if ((r.url.trim() && !safeUrl(r.url.trim())) || (r.notify.trim() && !safeUrl(r.notify.trim()))) return toast(t("err_url"), "error");
     const p = cleanP(r); if (!p) return toast(t("err_title"), "error");
     editI < 0 ? P.push(p) : (P[editI] = p); P = P.slice(0, 60); closeAll(); save();
 });

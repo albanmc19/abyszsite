@@ -374,6 +374,10 @@
         #sh-toasts { position: fixed; top: 76px; right: 16px; z-index: 1500; display: flex; flex-direction: column; gap: 10px; }
         .sh-toast { background: #141414; padding: 13px 20px; border-radius: 10px; font-size: .85rem; border-left: 4px solid #a855f7; box-shadow: 0 10px 25px rgba(0,0,0,.6); }
         .sh-toast.error { border-color: #ef4444; } .sh-toast.success { border-color: #10b981; }
+        [hidden] { display: none !important; }
+        .nav-admin-btn { background: none; border-color: transparent; color: #8a8a9e; font-weight: 500; }
+        .nav-admin-btn:hover { color: #fff; border-color: #2a2a2a; box-shadow: none; }
+        .nav-admin-btn.on { color: #a855f7; }
         @media (max-width: 520px) { .sh-2 { grid-template-columns: 1fr; } }
     </style>
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://pagead2.googlesyndication.com https://partner.googleadservices.com https://tpc.googlesyndication.com https://www.googletagservices.com https://*.adtrafficquality.google; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; connect-src https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com https://*.firebasedatabase.app wss://*.firebasedatabase.app https://pagead2.googlesyndication.com https://*.adtrafficquality.google; img-src 'self' data: blob: https:; frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://*.safeframe.googlesyndication.com https://www.google.com https://*.adtrafficquality.google; frame-ancestors 'none';">
@@ -453,9 +457,11 @@
     <div class="modal-overlay" id="m-auth" role="dialog" aria-modal="true">
         <div class="modal-card">
             <button class="close-modal-btn" data-close aria-label="Fermer">&times;</button>
-            <div class="modal-header">🔑 Espace Admin</div>
+            <div class="modal-header">🔑 Connexion</div>
+            <p class="modal-body" style="margin-bottom:16px">Espace réservé à l'équipe ABYSZ.</p>
             <div class="sh-fg"><label for="a-mail">Email</label><input class="sh-inp" type="email" id="a-mail" autocomplete="username" maxlength="120"></div>
             <div class="sh-fg"><label for="a-pw">Mot de passe</label><input class="sh-inp" type="password" id="a-pw" autocomplete="current-password" maxlength="128"></div>
+            <label style="display:flex;gap:8px;align-items:center;color:#8a8a9e;font-size:.8rem;margin-bottom:16px;cursor:pointer"><input type="checkbox" id="a-show"> Afficher le mot de passe</label>
             <button class="modal-confirm-btn" id="a-ok">Connexion</button>
         </div>
     </div>
@@ -531,13 +537,13 @@ const safeImg = (s) => { s = String(s || "").trim(); if (/^https:\/\//i.test(s))
 
 const D = {
     fr: { lang_group: "Langue", menu_open: "Ouvrir le menu", nav_home: "Accueil", nav_planning: "Planning", nav_shop: "Boutique", nav_join: "🚀 Rejoindre", online_n: "{n} en ligne",
-        f_legal: "Mentions Légales", f_privacy: "Politique de Confidentialité", f_cookie_prefs: "Gérer mes cookies", f_contact: "Nous contacter :", auth_in: "👤 Admin", auth_out: "👤 Déconnexion",
+        f_legal: "Mentions Légales", f_privacy: "Politique de Confidentialité", f_cookie_prefs: "Gérer mes cookies", f_contact: "Nous contacter :", auth_in: "🔒 Connexion", auth_out: "🔓 Déconnexion",
         page_title: "ABYSZ | Boutique Officielle", shop_h: "Boutique Officielle", shop_sub: "Portez fièrement les couleurs de la structure ABYSZ Esports",
         buy: "Acheter", soldout: "ÉPUISÉ", soon: "BIENTÔT", all: "TOUT", empty: "Aucun article pour le moment.",
         om_body: "Vous allez être redirigé vers la boutique officielle de notre partenaire {p} pour finaliser votre commande en toute sécurité.", om_go: "Continuer vers {p}", om_partner: "notre partenaire",
         err_url: "Le lien de redirection doit commencer par https://", err_title: "Un nom d'article est requis" },
     en: { lang_group: "Language", menu_open: "Open menu", nav_home: "Home", nav_planning: "Schedule", nav_shop: "Shop", nav_join: "🚀 Join us", online_n: "{n} online",
-        f_legal: "Legal Notice", f_privacy: "Privacy Policy", f_cookie_prefs: "Manage my cookies", f_contact: "Contact us:", auth_in: "👤 Admin", auth_out: "👤 Log out",
+        f_legal: "Legal Notice", f_privacy: "Privacy Policy", f_cookie_prefs: "Manage my cookies", f_contact: "Contact us:", auth_in: "🔒 Log in", auth_out: "🔓 Log out",
         page_title: "ABYSZ | Official Shop", shop_h: "Official Shop", shop_sub: "Proudly wear the colours of ABYSZ Esports",
         buy: "Buy", soldout: "SOLD OUT", soon: "COMING SOON", all: "ALL", empty: "No items yet.",
         om_body: "You are about to be redirected to the official store of our partner {p} to complete your order securely.", om_go: "Continue to {p}", om_partner: "our partner",
@@ -553,7 +559,7 @@ function applyI18n() {
     $$("[data-i18n-aria]").forEach((e) => e.setAttribute("aria-label", t(e.dataset.i18nAria)));
     $$(".lang-btn").forEach((b) => b.setAttribute("aria-pressed", b.dataset.lang === lang ? "true" : "false"));
     $("#site-online-count").textContent = t("online_n", { n: online });
-    $("#tv-auth-btn").textContent = isAdmin() ? t("auth_out") : t("auth_in");
+    $("#tv-auth-btn").textContent = isAdmin() ? t("auth_out") : t("auth_in"); $("#tv-auth-btn").classList.toggle("on", isAdmin());
 }
 
 /* ---------- Articles ---------- */
@@ -669,7 +675,7 @@ async function initFirebase() {
     } catch (e) { console.warn("Firebase indisponible :", e); }
 }
 let fails = 0, lock = 0;
-$("#tv-auth-btn").addEventListener("click", async () => { if (isAdmin()) { await AU.signOut(auth); toast("Déconnecté"); return; } if (!auth) return toast("Connexion indisponible pour le moment", "error"); openM("m-auth"); });
+$("#tv-auth-btn").addEventListener("click", async () => { if (isAdmin()) { await AU.signOut(auth); toast("Déconnecté"); return; } if (!auth) return toast("Connexion indisponible pour le moment", "error"); openM("m-auth"); setTimeout(() => $("#a-mail").focus(), 60); });
 async function login() {
     if (Date.now() < lock) return toast("Trop de tentatives, patiente 1 minute", "error");
     try { await AU.signInWithEmailAndPassword(auth, $("#a-mail").value.trim(), $("#a-pw").value); fails = 0; if (!isAdmin()) return toast("Ce compte n'a pas les droits admin", "error"); closeAll(); toast("Session admin ouverte", "success"); }
@@ -678,6 +684,8 @@ async function login() {
 }
 $("#a-ok").addEventListener("click", login);
 $("#a-pw").addEventListener("keydown", (e) => { if (e.key === "Enter") login(); });
+$("#a-mail").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#a-pw").focus(); });
+$("#a-show").addEventListener("change", (e) => { $("#a-pw").type = e.target.checked ? "text" : "password"; });
 
 applyI18n(); render(); initFirebase();
     </script>

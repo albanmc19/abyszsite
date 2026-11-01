@@ -340,6 +340,11 @@
         .tv-chip { background: var(--tv-c); border: 1px solid var(--tv-b); color: #a0a0b0; padding: 6px 14px; border-radius: 20px; cursor: pointer; font: 600 .7rem 'Orbitron', sans-serif; }
         .tv-chip.act, .tv-chip:hover { border-color: var(--tv-p); color: #fff; background: rgba(168,85,247,.2); }
 
+        .tv-vtools { margin-bottom: 14px; max-width: 420px; }
+        .tv-more { display: flex; justify-content: center; margin-top: 26px; }
+        .tv-date { color: var(--tv-t); font-size: .72rem; margin-top: 8px; }
+        .tv-th .tv-pinb { position: absolute; top: 8px; left: 8px; z-index: 2; background: rgba(10,10,10,.88); border: 1px solid var(--tv-p); color: #fff; font: 700 .6rem 'Orbitron', sans-serif; padding: 3px 9px; border-radius: 999px; }
+        .tv-feedst { color: var(--tv-t); font-size: .78rem; align-self: center; }
         .tv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         .tv-cardw { position: relative; }
         .tv-cardw.big { grid-column: span 2; }
@@ -347,6 +352,8 @@
         .tv-card:hover { transform: translateY(-6px); border-color: var(--tv-p); box-shadow: 0 12px 30px rgba(168,85,247,.25); }
         .tv-card.cur { border-color: var(--tv-p); box-shadow: 0 0 22px rgba(168,85,247,.45); }
         .tv-th { position: relative; aspect-ratio: 16/9; width: 100%; background: radial-gradient(circle, #1a1a26, #0d0d14); display: flex; align-items: center; justify-content: center; }
+        .tv-cardw.big .tv-th { aspect-ratio: 21/9; }
+        @media (max-width: 640px) { .tv-cardw.big .tv-th { aspect-ratio: 16/9; } }
         .tv-th img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
         .tv-th .tv-pf { position: absolute; left: 10px; bottom: 8px; font-size: 1.1rem; filter: drop-shadow(0 0 4px #000); }
         .tv-pl { position: relative; width: 50px; height: 50px; border-radius: 50%; background: rgba(168,85,247,.92); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(168,85,247,.8); transition: .3s; font-size: 1rem; }
@@ -452,6 +459,7 @@
                 <div class="tv-info-l"><span id="tv-i-t"></span><span id="tv-i-v"></span></div>
                 <div class="tv-acts">
                     <a class="tv-btn s g" id="tv-open" target="_blank" rel="noopener noreferrer" data-i18n="act_open" hidden>Ouvrir ↗</a>
+                    <button type="button" class="tv-btn s g" id="tv-next" data-i18n="act_next" hidden>⏭ Suivante</button>
                     <button type="button" class="tv-btn s g" id="tv-share" data-i18n="act_share">🔗 Partager</button>
                     <button type="button" class="tv-btn s g" id="tv-fs" data-i18n="act_fs">⛶ Plein écran</button>
                 </div>
@@ -461,6 +469,8 @@
         <div class="tv-bar">
             <button type="button" class="tv-btn s" id="tv-add-ch">➕ Chaîne</button>
             <button type="button" class="tv-btn s g" id="tv-set-key">🔑 Clé API YouTube</button>
+            <button type="button" class="tv-btn s g" id="tv-feed-r">🔄 Flux YouTube</button>
+            <span class="tv-feedst" id="tv-feedst"></span>
         </div>
 
         <h2 class="tv-sec" id="finder" data-i18n="find_h">🔎 Regarder n'importe quel stream</h2>
@@ -483,8 +493,10 @@
         <p class="tv-hint" data-i18n="find_hint">Colle un lien de live ou de vidéo, ou un pseudo avec la plateforme choisie. TikTok s'ouvre directement dans son app.</p>
 
         <h2 class="tv-sec" id="videos"><span data-i18n="vid_h">🎬 Vidéos de la Team</span> <button type="button" class="tv-btn s" id="tv-add-v" hidden>➕ Ajouter</button></h2>
+        <div class="tv-vtools"><input class="tv-inp" id="tv-vq" type="search" maxlength="60" autocomplete="off" data-i18n-placeholder="vid_search" placeholder="Rechercher une vidéo…" aria-label="Rechercher une vidéo"></div>
         <div class="tv-chips" id="tv-chips"></div>
         <div class="tv-grid" id="tv-grid"></div>
+        <div class="tv-more"><button type="button" class="tv-btn g" id="tv-more" hidden></button></div>
         <div class="tv-foot-space"></div>
     </main>
 
@@ -575,6 +587,7 @@ const D = {
         copied: "Lien copié ✔", copy_prompt: "Copie ce lien :",
         vid_h: "🎬 Vidéos de la Team", chip_all: "TOUT", vid_empty: "📹 Aucune vidéo pour le moment.", vid_untitled: "Sans titre",
         vid_unsup: "⚠ Lien non supporté (visible admin uniquement)",
+        vid_search: "Rechercher une vidéo…", vid_more: "Voir plus ({n})", vid_nofound: "🔎 Aucune vidéo ne correspond à ta recherche.", vid_pinned: "📌 À LA UNE", act_next: "⏭ Suivante",
         auth_in: "👤 Admin", auth_out: "👤 Déconnexion",
         f_legal: "Mentions Légales", f_privacy: "Politique de Confidentialité", f_cookie_prefs: "Gérer mes cookies", f_contact: "Nous contacter :"
     },
@@ -603,6 +616,7 @@ const D = {
         copied: "Link copied ✔", copy_prompt: "Copy this link:",
         vid_h: "🎬 Team Videos", chip_all: "ALL", vid_empty: "📹 No videos yet.", vid_untitled: "Untitled",
         vid_unsup: "⚠ Unsupported link (admin only)",
+        vid_search: "Search a video…", vid_more: "Show more ({n})", vid_nofound: "🔎 No video matches your search.", vid_pinned: "📌 FEATURED", act_next: "⏭ Next",
         auth_in: "👤 Admin", auth_out: "👤 Log out",
         f_legal: "Legal Notice", f_privacy: "Privacy Policy", f_cookie_prefs: "Manage my cookies", f_contact: "Contact us:"
     }
@@ -629,7 +643,7 @@ const S = {
     ch: [{ platform: "twitch", id: "abysz_o", name: "Twitch" }, { platform: "tiktok", id: "abysz_o", name: "TikTok" }],
     vid: [], live: {}, key: "",
     mode: "channel",   // channel | custom | video
-    sel: 0, manual: false, cur: null, vidIdx: -1,
+    sel: 0, manual: false, cur: null, curUrl: "", feed: [], list: [], q: "", shown: 12,
     tag: ALL, edit: -1, scr: null
 };
 
@@ -764,6 +778,7 @@ function renderInfo() {
         right = S.mode === "video" ? (S.cur.tag || "") : (S.cur.p.kind === "live" ? t("live_now") : "");
         open = S.cur.p.watch;
     }
+    $("#tv-next").hidden = !(S.mode === "video" && S.list.length > 1);
     $("#tv-i-t").textContent = left;
     $("#tv-i-v").textContent = right;
     const o = $("#tv-open");
@@ -814,7 +829,7 @@ async function watch(input, hint = "auto", opts = {}) {
         p = mk.ytLive(id, false);
     }
     if (!p) { toast(t("err_src"), "error"); return false; }
-    S.mode = "custom"; S.cur = { p, title: opts.title || "", watch: p.watch }; S.cur.watch = p.watch; S.sel = -1; S.vidIdx = -1; S.manual = true;
+    S.mode = "custom"; S.cur = { p, title: opts.title || "", watch: p.watch }; S.cur.watch = p.watch; S.sel = -1; S.curUrl = ""; S.manual = true;
     if (p.kind === "external") screen({ ic: ICON[p.platform] || "⚡", hraw: p.label, p: "scr_ext_p", link: p.watch });
     else mount(p.embed);
     renderRail(); renderVideos(); renderInfo(); setHash();
@@ -822,16 +837,21 @@ async function watch(input, hint = "auto", opts = {}) {
     return true;
 }
 
-function playVideo(i) {
-    const v = S.vid[i], p = parseSource(v?.url);
+function playVideo(v) {
+    const p = parseSource(v?.url);
     if (!p || p.kind !== "video") return;
-    S.mode = "video"; S.cur = { p, title: v.title, tag: v.tag, watch: p.watch }; S.vidIdx = i; S.sel = -1; S.manual = true;
+    S.mode = "video"; S.cur = { p, title: v.title, tag: v.tag, watch: p.watch }; S.curUrl = v.url; S.sel = -1; S.manual = true;
     mount(p.embed);
     renderRail(); renderVideos(); renderInfo(); setHash(); scrollToPlayer();
 }
+function nextVideo() {
+    if (S.list.length < 2) return;
+    const i = S.list.findIndex((v) => v.url === S.curUrl);
+    playVideo(S.list[(i + 1) % S.list.length]);
+}
 
 function selectChannel(i) {
-    S.mode = "channel"; S.sel = i; S.manual = true; S.cur = null; S.vidIdx = -1;
+    S.mode = "channel"; S.sel = i; S.manual = true; S.cur = null; S.curUrl = "";
     renderRail(); renderVideos(); showChannel(); setHash();
 }
 
@@ -902,42 +922,91 @@ function renderRail() {
         r.append(w);
     });
 }
+/* --- Vidéos de la team : manuelles (Firestore) + flux YouTube automatique --- */
+const TEAM_YT = "UCn0XszECC_mr_QfOry6UUsA";
+const norm = (s) => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const vdate = (v) => v.date || v.added || 0;
+const fmtDate = (ms) => new Date(ms).toLocaleDateString(lang === "en" ? "en-GB" : "fr-FR", { day: "numeric", month: "short", year: "numeric" });
+
+function allVideos() {
+    const man = S.vid.map((v, i) => ({ ...v, m: true, i }));
+    const seen = new Set(man.map((v) => parseSource(v.url)?.watch).filter(Boolean));
+    const feed = S.feed.filter((v) => !seen.has(parseSource(v.url)?.watch));   // pas de doublon avec les vidéos ajoutées à la main
+    return [...man, ...feed];
+}
+async function loadFeed() {
+    S.feed = [];
+    if (S.key) {
+        const ids = [...new Set(S.ch.filter((c) => c.platform === "youtube").map((c) => c.id))].slice(0, 3);
+        if (!ids.length) ids.push(TEAM_YT);
+        const b = "https://www.googleapis.com/youtube/v3/";
+        const res = await Promise.allSettled(ids.map(async (id) => (await (await fetch(`${b}playlistItems?part=snippet,contentDetails&maxResults=24&playlistId=UU${id.slice(2)}&key=${S.key}`)).json()).items || []));
+        res.forEach((r) => {
+            if (r.status !== "fulfilled") return;
+            r.value.forEach((i) => {
+                const id = i.contentDetails?.videoId, title = clean(i.snippet?.title, 120);
+                if (!/^[\w-]{11}$/.test(id || "") || /^(Private|Deleted) video$/i.test(title)) return;
+                S.feed.push({ title, tag: "YOUTUBE", url: `https://www.youtube.com/watch?v=${id}`, date: Date.parse(i.contentDetails.videoPublishedAt || i.snippet.publishedAt) || 0, auto: true });
+            });
+        });
+    }
+    $("#tv-feedst").textContent = S.key ? `Flux YouTube : ${S.feed.length} vidéo(s) importée(s) automatiquement` : "Flux YouTube désactivé : ajoute une clé API pour importer les vidéos automatiquement";
+    renderVideos();
+}
+
 function renderVideos() {
-    const tags = [ALL, ...new Set(S.vid.map((v) => v.tag))], ch = $("#tv-chips"); ch.replaceChildren();
+    const adm = isAdmin();
+    const all = allVideos().filter((v) => adm || parseSource(v.url)?.kind === "video");
+    all.sort((a, b) => (b.pin ? 1 : 0) - (a.pin ? 1 : 0) || vdate(b) - vdate(a));
+
+    const tags = [ALL, ...new Set(all.map((v) => v.tag))], ch = $("#tv-chips"); ch.replaceChildren();
     if (!tags.includes(S.tag)) S.tag = ALL;
     if (tags.length > 2) tags.forEach((tg) => {
         const b = el("button", "tv-chip" + (tg === S.tag ? " act" : ""), tg === ALL ? t("chip_all") : tg); b.type = "button";
-        b.addEventListener("click", () => { S.tag = tg; renderVideos(); });
+        b.addEventListener("click", () => { S.tag = tg; S.shown = 12; renderVideos(); });
         ch.append(b);
     });
+
+    const q = norm(S.q.trim());
+    const flt = all.filter((v) => (S.tag === ALL || v.tag === S.tag) && (!q || norm(v.title).includes(q)));
+    S.list = flt.filter((v) => parseSource(v.url)?.kind === "video");   // sert à la lecture « Suivante »
+    const shown = flt.slice(0, S.shown);
+
     const g = $("#tv-grid"); g.replaceChildren();
-    const adm = isAdmin(); let n = 0;
-    S.vid.forEach((v, i) => {
-        if (S.tag !== ALL && v.tag !== S.tag) return;
-        const pv = parseSource(v.url), ok = pv && pv.kind === "video";
-        if (!ok && !adm) return;
-        const w = el("div", "tv-cardw" + (n++ === 0 && S.tag === ALL ? " big" : ""));
-        const card = el("button", "tv-card" + (S.mode === "video" && S.vidIdx === i ? " cur" : "")); card.type = "button";
+    shown.forEach((v, n) => {
+        const pv = parseSource(v.url), ok = pv?.kind === "video";
+        const w = el("div", "tv-cardw" + (n === 0 && S.tag === ALL && !q ? " big" : ""));
+        const card = el("button", "tv-card" + (S.mode === "video" && S.curUrl === v.url ? " cur" : "")); card.type = "button";
         const th = el("div", "tv-th");
         if (ok && pv.thumb) { const im = el("img"); im.loading = "lazy"; im.alt = ""; im.referrerPolicy = "no-referrer"; im.src = pv.thumb; th.append(im); }
+        if (v.pin) th.append(el("span", "tv-pinb", t("vid_pinned")));
         if (ok) th.append(el("span", "tv-pf", ICON[pv.platform] || ""));
         th.append(el("div", "tv-pl", "▶"));
         const vi = el("div", "tv-vi"); vi.append(el("div", "tv-vt", v.tag), el("div", "tv-vn", v.title || t("vid_untitled")));
+        if (vdate(v) > 0) vi.append(el("div", "tv-date", fmtDate(vdate(v))));
         if (!ok) vi.append(el("div", "tv-warn", t("vid_unsup")));
         card.append(th, vi);
-        if (ok) card.addEventListener("click", () => playVideo(i)); else card.disabled = true;
+        if (ok) card.addEventListener("click", () => playVideo(v)); else card.disabled = true;
         w.append(card);
-        if (adm) {
+        if (adm && v.m) {
             const cc = el("div", "tv-cc");
-            [["✏️", () => editVid(i)], ["🗑️", () => { if (confirm("Supprimer cette vidéo ?")) { S.vid.splice(i, 1); save(); } }]].forEach(([ic, f]) => {
+            [[v.pin ? "📍" : "📌", () => { S.vid[v.i].pin = !S.vid[v.i].pin; save(); }],
+             ["✏️", () => editVid(v.i)],
+             ["🗑️", () => { if (confirm("Supprimer cette vidéo ?")) { S.vid.splice(v.i, 1); save(); } }]].forEach(([ic, f]) => {
                 const b = el("button", "tv-cb", ic); b.type = "button"; b.addEventListener("click", f); cc.append(b);
             });
             w.append(cc);
         }
         g.append(w);
     });
-    if (!g.children.length) g.append(el("div", "tv-empty", t("vid_empty")));
+    if (!flt.length) g.append(el("div", "tv-empty", t(q ? "vid_nofound" : "vid_empty")));
+
+    const rest = flt.length - shown.length, more = $("#tv-more");
+    more.hidden = rest <= 0;
+    if (rest > 0) more.textContent = t("vid_more", { n: rest });
+    $("#tv-next").hidden = !(S.mode === "video" && S.list.length > 1);
 }
+
 function rerender() { applyI18n(); renderOnline(); renderBadge(); renderRail(); renderVideos(); renderInfo(); paintScreen(); }
 
 /* ---------- Toasts / modales ---------- */
@@ -963,6 +1032,10 @@ menuBtn.addEventListener("click", () => {
 $("#tv-go").addEventListener("click", () => watch($("#tv-in").value, $("#tv-pf").value));
 $("#tv-in").addEventListener("keydown", (e) => { if (e.key === "Enter") watch($("#tv-in").value, $("#tv-pf").value); });
 $$("[data-pf]").forEach((b) => b.addEventListener("click", () => { $("#tv-pf").value = b.dataset.pf; $("#tv-in").focus(); }));
+$("#tv-next").addEventListener("click", nextVideo);
+$("#tv-more").addEventListener("click", () => { S.shown += 12; renderVideos(); });
+$("#tv-vq").addEventListener("input", (e) => { S.q = clean(e.target.value, 60); S.shown = 12; renderVideos(); });
+$("#tv-feed-r").addEventListener("click", () => loadFeed());
 $("#tv-share").addEventListener("click", () => copy(shareUrl()));
 $("#tv-fs").addEventListener("click", () => { const s = $("#tv-stage"); (s.requestFullscreen || s.webkitRequestFullscreen)?.call(s); });
 $("#tv-s-b").addEventListener("click", () => $("#videos").scrollIntoView({ behavior: "smooth" }));
@@ -1095,7 +1168,7 @@ function cleanCh(c) {
     const id = clean(c.id, 40);
     return RX[p]?.test(id) ? { platform: p, id, name: name || p.toUpperCase() } : null;
 }
-const cleanVid = (v) => ({ title: clean(v?.title, 120), tag: clean(v?.tag, 24).toUpperCase() || "OFFICIEL", url: clean(v?.url, 300) });
+const cleanVid = (v) => ({ title: clean(v?.title, 120), tag: clean(v?.tag, 24).toUpperCase() || "OFFICIEL", url: clean(v?.url, 300), added: Number(v?.added) || 0, pin: !!v?.pin });
 
 function editVid(i) {
     if (!isAdmin()) return;
@@ -1110,7 +1183,7 @@ $("#v-ok").addEventListener("click", () => {
     const v = cleanVid({ title: $("#v-t").value, tag: $("#v-g").value, url: $("#v-u").value });
     const p = parseSource(v.url);
     if (!v.title || !p || p.kind !== "video") return toast("Titre requis et lien vidéo valide (YouTube / Twitch VOD ou clip / Vimeo / Dailymotion)", "error");
-    S.edit < 0 ? S.vid.push(v) : (S.vid[S.edit] = v);
+    S.edit < 0 ? S.vid.push({ ...v, added: Date.now() }) : (S.vid[S.edit] = { ...S.vid[S.edit], ...v });
     if (S.vid.length > 100) S.vid.length = 100;
     closeAll(); save();
 });
@@ -1137,7 +1210,7 @@ async function save() {
         await FS.setDoc(FS.doc(db, "tv_config", "main"), { channels: S.ch, customVideos: S.vid, ytKey: S.key, twitchChannel: S.ch.find((c) => c.platform === "twitch")?.id || "" });
         toast("Enregistré ✔", "success");
     } catch (e) { console.error(e); toast("Échec de l'enregistrement", "error"); }
-    renderRail(); renderVideos(); if (S.mode === "channel") showChannel(); poll();
+    renderRail(); renderVideos(); if (S.mode === "channel") showChannel(); poll(); loadFeed();
 }
 
 /* ---------- Connexion admin ---------- */
@@ -1166,7 +1239,7 @@ const hashed = fromHash();
 (async () => {
     await initFirebase();
     await Promise.race([loadConfig(), sleep(5000)]);
-    renderRail(); renderVideos();
+    renderRail(); renderVideos(); loadFeed();
     await Promise.race([poll(), sleep(4000)]);
     if (S.mode === "channel" && !$("#tv-stage iframe") && !S.scr) showChannel();
     setInterval(() => { if (!document.hidden) poll(); }, 60000);

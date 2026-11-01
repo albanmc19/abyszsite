@@ -7,7 +7,7 @@
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'; form-action 'self'">
     <title>ABYSZ TV — Lives &amp; Vidéos Officielles</title>
-    <meta name="description" content="ABYSZ TV : regardez les lives de la team Abysz Esports, les vidéos officielles et n'importe quel stream Twitch, Kick, YouTube, Vimeo ou Dailymotion.">
+    <meta name="description" content="ABYSZ TV : lives de la team Abysz Esports, vidéos YouTube et TikTok officielles, recommandations, et n'importe quel stream Twitch, Kick, YouTube, Vimeo ou Dailymotion.">
 
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="manifest" href="manifest.webmanifest">
@@ -383,6 +383,12 @@
         .tv-toast.error { border-color: var(--tv-r); }
 
         .tv-foot-space { height: 50px; }
+        .tv-ar.tv-vert { aspect-ratio: 9/16; height: auto; width: min(100%, calc(min(78vh, 760px) * 9 / 16)); margin: 0 auto; }
+        .tv-ar.tv-vert:fullscreen { width: auto; height: 100%; }
+        .tv-th.tt { background: linear-gradient(135deg, #1a0f2b, #0f2a2e); }
+        .tv-th .tv-why { position: absolute; top: 8px; left: 8px; z-index: 2; background: rgba(10,10,10,.88); border: 1px solid var(--tv-p); color: #fff; font: 700 .6rem 'Orbitron', sans-serif; padding: 3px 9px; border-radius: 999px; }
+        .tv-reco { display: flex; gap: 16px; overflow-x: auto; padding: 6px 4px 14px; scroll-snap-type: x proximity; }
+        .tv-reco .tv-cardw { flex: 0 0 min(280px, 78vw); scroll-snap-align: start; }
         @media (max-width: 640px) {
             .tv-cardw.big { grid-column: auto; }
             .tv-hero h1 { font-size: 1.8rem; }
@@ -490,7 +496,13 @@
             <button type="button" class="tv-chip" data-pf="youtube">🔴 YouTube</button>
             <button type="button" class="tv-chip" data-pf="auto">🎞️ Vimeo · Dailymotion</button>
         </div>
-        <p class="tv-hint" data-i18n="find_hint">Colle un lien de live ou de vidéo, ou un pseudo avec la plateforme choisie. TikTok s'ouvre directement dans son app.</p>
+        <p class="tv-hint" data-i18n="find_hint">Colle un lien de live ou de vidéo, ou un pseudo avec la plateforme choisie. Les vidéos TikTok se lisent ici, les lives TikTok s'ouvrent dans l'app.</p>
+
+        <section id="tv-reco-wrap" hidden>
+            <h2 class="tv-sec" id="reco"><span data-i18n="reco_h">✨ Recommandé pour toi</span> <button type="button" class="tv-btn s g" id="tv-reco-shuffle" data-i18n="reco_shuffle">🔀 Autres idées</button> <button type="button" class="tv-btn s g" id="tv-reco-reset" data-i18n="reco_reset">↺ Réinitialiser</button></h2>
+            <p class="tv-hint" data-i18n="reco_hint">Sélection calculée sur ton appareil d'après ce que tu regardes (YouTube, TikTok, Twitch…). Rien n'est envoyé à un serveur.</p>
+            <div class="tv-reco" id="tv-reco"></div>
+        </section>
 
         <h2 class="tv-sec" id="videos"><span data-i18n="vid_h">🎬 Vidéos de la Team</span> <button type="button" class="tv-btn s" id="tv-add-v" hidden>➕ Ajouter</button></h2>
         <div class="tv-vtools"><input class="tv-inp" id="tv-vq" type="search" maxlength="60" autocomplete="off" data-i18n-placeholder="vid_search" placeholder="Rechercher une vidéo…" aria-label="Rechercher une vidéo"></div>
@@ -515,7 +527,7 @@
     <div class="tv-modal" id="m-v" role="dialog" aria-modal="true" aria-label="Vidéo"><div class="tv-box"><h2 id="v-h">Vidéo</h2>
         <div class="tv-fg"><label for="v-t">Titre</label><input class="tv-inp" id="v-t" maxlength="120"></div>
         <div class="tv-fg"><label for="v-g">Catégorie</label><input class="tv-inp" id="v-g" maxlength="24" placeholder="HIGHLIGHT, TRAILER…"></div>
-        <div class="tv-fg"><label for="v-u">Lien (YouTube, Shorts, Twitch VOD/clip, Vimeo, Dailymotion)</label><input class="tv-inp" id="v-u" maxlength="300"></div>
+        <div class="tv-fg"><label for="v-u">Lien (YouTube, Shorts, TikTok, Twitch VOD/clip, Vimeo, Dailymotion)</label><input class="tv-inp" id="v-u" maxlength="300"></div>
         <div class="tv-row"><button type="button" class="tv-btn" id="v-ok">Enregistrer</button><button type="button" class="tv-btn g" data-close>Annuler</button></div></div></div>
 
     <div id="tv-toasts" aria-live="polite"></div>
@@ -581,13 +593,16 @@ const D = {
         find_h: "🔎 Regarder n'importe quel stream",
         find_ph: "twitch.tv/pseudo · kick.com/pseudo · youtube.com/watch?v=…",
         find_go: "▶ Regarder", pf_auto: "Auto (lien)",
-        find_hint: "Colle un lien de live ou de vidéo (Twitch, Kick, YouTube, Vimeo, Dailymotion), ou un simple pseudo avec la plateforme choisie. TikTok s'ouvre directement dans son app.",
+        find_hint: "Colle un lien de live ou de vidéo (Twitch, Kick, YouTube, Vimeo, Dailymotion), ou un simple pseudo avec la plateforme choisie. Les vidéos TikTok se lisent ici, les lives TikTok s'ouvrent dans l'app.",
         err_src: "Lien ou pseudo non reconnu", err_platform: "Pour un simple pseudo, choisis Twitch, Kick ou YouTube dans la liste",
         err_handle: "Pour une chaîne YouTube @pseudo, colle plutôt le lien d'un live / d'une vidéo ou l'ID de chaîne (UC…)",
         copied: "Lien copié ✔", copy_prompt: "Copie ce lien :",
         vid_h: "🎬 Vidéos de la Team", chip_all: "TOUT", vid_empty: "📹 Aucune vidéo pour le moment.", vid_untitled: "Sans titre",
         vid_unsup: "⚠ Lien non supporté (visible admin uniquement)",
         vid_search: "Rechercher une vidéo…", vid_more: "Voir plus ({n})", vid_nofound: "🔎 Aucune vidéo ne correspond à ta recherche.", vid_pinned: "📌 À LA UNE", act_next: "⏭ Suivante",
+        reco_h: "✨ Recommandé pour toi", reco_shuffle: "🔀 Autres idées", reco_reset: "↺ Réinitialiser", reco_reset_ok: "Recommandations réinitialisées ✔",
+        reco_hint: "Sélection calculée sur ton appareil d'après ce que tu regardes (YouTube, TikTok, Twitch…). Rien n'est envoyé à un serveur.",
+        why_tag: "Tu aimes {tag}", why_plat: "Plus de {pf}", why_kw: "Dans ta veine", why_pin: "📌 À la une", why_new: "Nouveau", why_pop: "Populaire", why_mix: "Pour toi", why_discover: "Découverte", err_tt: "Vidéo TikTok introuvable ou privée",
         auth_in: "👤 Admin", auth_out: "👤 Déconnexion",
         f_legal: "Mentions Légales", f_privacy: "Politique de Confidentialité", f_cookie_prefs: "Gérer mes cookies", f_contact: "Nous contacter :"
     },
@@ -610,13 +625,16 @@ const D = {
         find_h: "🔎 Watch any stream",
         find_ph: "twitch.tv/name · kick.com/name · youtube.com/watch?v=…",
         find_go: "▶ Watch", pf_auto: "Auto (link)",
-        find_hint: "Paste a live or video link (Twitch, Kick, YouTube, Vimeo, Dailymotion), or just a username with the platform selected. TikTok opens directly in its app.",
+        find_hint: "Paste a live or video link (Twitch, Kick, YouTube, Vimeo, Dailymotion), or just a username with the platform selected. TikTok videos play here; TikTok lives open in the app.",
         err_src: "Unrecognised link or username", err_platform: "For a plain username, pick Twitch, Kick or YouTube in the list",
         err_handle: "For a YouTube @handle, paste a live / video link or the channel ID (UC…) instead",
         copied: "Link copied ✔", copy_prompt: "Copy this link:",
         vid_h: "🎬 Team Videos", chip_all: "ALL", vid_empty: "📹 No videos yet.", vid_untitled: "Untitled",
         vid_unsup: "⚠ Unsupported link (admin only)",
         vid_search: "Search a video…", vid_more: "Show more ({n})", vid_nofound: "🔎 No video matches your search.", vid_pinned: "📌 FEATURED", act_next: "⏭ Next",
+        reco_h: "✨ Recommended for you", reco_shuffle: "🔀 Other ideas", reco_reset: "↺ Reset", reco_reset_ok: "Recommendations reset ✔",
+        reco_hint: "Picks computed on your device from what you watch (YouTube, TikTok, Twitch…). Nothing is sent to a server.",
+        why_tag: "You like {tag}", why_plat: "More {pf}", why_kw: "Your kind of thing", why_pin: "📌 FEATURED", why_new: "New", why_pop: "Popular", why_mix: "For you", why_discover: "Discovery", err_tt: "TikTok video not found or private",
         auth_in: "👤 Admin", auth_out: "👤 Log out",
         f_legal: "Legal Notice", f_privacy: "Privacy Policy", f_cookie_prefs: "Manage my cookies", f_contact: "Contact us:"
     }
@@ -651,7 +669,7 @@ const S = {
 const RX = { twitch: /^[A-Za-z0-9_]{3,25}$/, youtube: /^UC[\w-]{22}$/, kick: /^[A-Za-z0-9_-]{3,25}$/, tiktok: /^[A-Za-z0-9_.]{2,30}$/ };
 const TW_RESERVED = new Set(["videos", "directory", "downloads", "jobs", "turbo", "settings", "subscriptions", "friends", "wallet", "p", "moderator", "popout", "embed", "u", "search", "drops", "inventory", "store", "prime"]);
 const KICK_RESERVED = new Set(["video", "videos", "categories", "category", "browse", "dashboard", "following", "search", "clips", "terms-of-service", "privacy-policy"]);
-const URLISH = /^(https?:\/\/|(www\.|m\.|clips\.|vm\.)?(twitch\.tv|kick\.com|youtube\.com|youtu\.be|vimeo\.com|dailymotion\.com|dai\.ly|tiktok\.com)\b)/i;
+const URLISH = /^(https?:\/\/|(www\.|m\.|clips\.|vm\.|vt\.)?(twitch\.tv|kick\.com|youtube\.com|youtu\.be|vimeo\.com|dailymotion\.com|dai\.ly|tiktok\.com)\b)/i;
 
 const mk = {
     twLive: (id, m) => ({ kind: "live", platform: "twitch", label: "Twitch · " + id, watch: `https://www.twitch.tv/${id}`, embed: `https://player.twitch.tv/?channel=${id}&parent=${HOST}&autoplay=true&muted=${m ? "true" : "false"}` }),
@@ -662,6 +680,7 @@ const mk = {
     ytLive: (ch, m) => ({ kind: "live", platform: "youtube", label: "YouTube Live", watch: `https://www.youtube.com/channel/${ch}/live`, embed: `https://www.youtube-nocookie.com/embed/live_stream?channel=${ch}&autoplay=1&rel=0${m ? "&mute=1" : ""}` }),
     vimeo: (id, w) => ({ kind: "video", platform: "vimeo", label: "Vimeo", watch: w, embed: `https://player.vimeo.com/video/${id}?autoplay=1` }),
     dm: (id, w) => ({ kind: "video", platform: "dailymotion", label: "Dailymotion", watch: w, thumb: `https://www.dailymotion.com/thumbnail/video/${id}`, embed: `https://www.dailymotion.com/embed/video/${id}?autoplay=1` }),
+    ttVideo: (id, w) => ({ kind: "video", platform: "tiktok", label: "TikTok", vertical: true, watch: w, embed: `https://www.tiktok.com/embed/v2/${id}` }),
     ext: (platform, label, w) => ({ kind: "external", platform, label, watch: w })
 };
 
@@ -722,7 +741,7 @@ function parseSource(input, hint = "auto", muted = false) {
             if (p[0] && p[0][0] === "@" && /^[\w.-]{1,60}$/.test(p[0].slice(1))) return { handle: p[0].slice(1) };
             id = p[0] === "watch" ? q.get("v") : ["shorts", "live", "embed", "v"].includes(p[0]) ? p[1] : null;
         }
-        return id && /^[\w-]{11}$/.test(id) ? mk.ytVideo(id) : null;
+        return id && /^[\w-]{11}$/.test(id) ? { ...mk.ytVideo(id), vertical: p[0] === "shorts" } : null;
     }
 
     // Vimeo / Dailymotion
@@ -731,7 +750,10 @@ function parseSource(input, hint = "auto", muted = false) {
     if (dm && /^[a-z0-9]+$/i.test(dm)) return mk.dm(dm, u.href);
 
     // TikTok : pas d'intégration possible
-    if (/(^|\.)tiktok\.com$/.test(h)) return mk.ext("tiktok", "TikTok", u.href);
+    if (/(^|\.)tiktok\.com$/.test(h)) {
+        if (h === "tiktok.com" && /^@[\w.]{1,30}$/.test(p[0] || "") && p[1] === "video" && /^\d{8,25}$/.test(p[2] || "")) return mk.ttVideo(p[2], `https://www.tiktok.com/${p[0]}/video/${p[2]}`);
+        return { ...mk.ext("tiktok", "TikTok", u.href), short: h !== "tiktok.com" || p[0] === "t" };   // liens courts vm./vt. : résolus via oEmbed
+    }
     return null;
 }
 
@@ -746,8 +768,8 @@ function frame(src) {
     f.src = src;
     return f;
 }
-function mount(src) { S.scr = null; paintScreen(); $("#tv-stage iframe")?.remove(); $("#tv-stage").append(frame(src)); }
-function screen(spec) { $("#tv-stage iframe")?.remove(); S.scr = spec; paintScreen(); }
+function mount(src, vert) { S.scr = null; paintScreen(); $("#tv-stage iframe")?.remove(); $("#tv-stage").classList.toggle("tv-vert", !!vert); $("#tv-stage").append(frame(src)); }
+function screen(spec) { $("#tv-stage iframe")?.remove(); $("#tv-stage").classList.remove("tv-vert"); S.scr = spec; paintScreen(); }
 function paintScreen() {
     const s = S.scr, sc = $("#tv-screen");
     sc.hidden = !s;
@@ -823,15 +845,16 @@ async function ytHandle(h) {
 async function watch(input, hint = "auto", opts = {}) {
     let p = parseSource(input, hint);
     if (p?.need) { toast(t("err_platform"), "error"); return false; }
+    if (p?.short) { p = await resolveTikTok(p.watch); if (!p) { toast(t("err_tt"), "error"); return false; } }
     if (p?.handle) {
         const id = await ytHandle(p.handle);
         if (!id) { toast(t("err_handle"), "error"); return false; }
         p = mk.ytLive(id, false);
     }
     if (!p) { toast(t("err_src"), "error"); return false; }
-    S.mode = "custom"; S.cur = { p, title: opts.title || "", watch: p.watch }; S.cur.watch = p.watch; S.sel = -1; S.curUrl = ""; S.manual = true;
+    trackEnd(); S.mode = "custom"; S.cur = { p, title: opts.title || "", watch: p.watch }; S.cur.watch = p.watch; S.sel = -1; S.curUrl = ""; S.manual = true;
     if (p.kind === "external") screen({ ic: ICON[p.platform] || "⚡", hraw: p.label, p: "scr_ext_p", link: p.watch });
-    else mount(p.embed);
+    else mount(p.embed, p.vertical);
     renderRail(); renderVideos(); renderInfo(); setHash();
     if (!opts.silent) scrollToPlayer();
     return true;
@@ -841,17 +864,16 @@ function playVideo(v) {
     const p = parseSource(v?.url);
     if (!p || p.kind !== "video") return;
     S.mode = "video"; S.cur = { p, title: v.title, tag: v.tag, watch: p.watch }; S.curUrl = v.url; S.sel = -1; S.manual = true;
-    mount(p.embed);
+    mount(p.embed, p.vertical); trackStart(v);
     renderRail(); renderVideos(); renderInfo(); setHash(); scrollToPlayer();
 }
-function nextVideo() {
-    if (S.list.length < 2) return;
-    const i = S.list.findIndex((v) => v.url === S.curUrl);
-    playVideo(S.list[(i + 1) % S.list.length]);
+function nextVideo() {   // « Suivante » = meilleure recommandation du moment
+    const c = Reco.rank(allVideos().filter((v) => parseSource(v.url)?.kind === "video"), 1, [S.curUrl])[0];
+    if (c) playVideo(c.v);
 }
 
 function selectChannel(i) {
-    S.mode = "channel"; S.sel = i; S.manual = true; S.cur = null; S.curUrl = "";
+    trackEnd(); S.mode = "channel"; S.sel = i; S.manual = true; S.cur = null; S.curUrl = "";
     renderRail(); renderVideos(); showChannel(); setHash();
 }
 
@@ -950,6 +972,17 @@ async function loadFeed() {
             });
         });
     }
+    if (S.feed.length) try {
+        const ids = S.feed.map((v) => v.url.slice(-11));
+        for (let i = 0; i < ids.length; i += 50) {
+            const j = await (await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails,statistics&id=${ids.slice(i, i + 50).join(",")}&key=${S.key}`)).json();
+            (j.items || []).forEach((it) => {
+                const v = S.feed.find((x) => x.url.endsWith(it.id)); if (!v) return;
+                const m = /^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/.exec(it.contentDetails?.duration || ""), d = m ? (+m[1] || 0) * 3600 + (+m[2] || 0) * 60 + (+m[3] || 0) : 0;
+                v.views = +it.statistics?.viewCount || 0; if (d && d <= 61) v.tag = "SHORT";
+            });
+        }
+    } catch {}
     $("#tv-feedst").textContent = S.key ? `Flux YouTube : ${S.feed.length} vidéo(s) importée(s) automatiquement` : "Flux YouTube désactivé : ajoute une clé API pour importer les vidéos automatiquement";
     renderVideos();
 }
@@ -973,38 +1006,149 @@ function renderVideos() {
     const shown = flt.slice(0, S.shown);
 
     const g = $("#tv-grid"); g.replaceChildren();
-    shown.forEach((v, n) => {
-        const pv = parseSource(v.url), ok = pv?.kind === "video";
-        const w = el("div", "tv-cardw" + (n === 0 && S.tag === ALL && !q ? " big" : ""));
-        const card = el("button", "tv-card" + (S.mode === "video" && S.curUrl === v.url ? " cur" : "")); card.type = "button";
-        const th = el("div", "tv-th");
-        if (ok && pv.thumb) { const im = el("img"); im.loading = "lazy"; im.alt = ""; im.referrerPolicy = "no-referrer"; im.src = pv.thumb; th.append(im); }
-        if (v.pin) th.append(el("span", "tv-pinb", t("vid_pinned")));
-        if (ok) th.append(el("span", "tv-pf", ICON[pv.platform] || ""));
-        th.append(el("div", "tv-pl", "▶"));
-        const vi = el("div", "tv-vi"); vi.append(el("div", "tv-vt", v.tag), el("div", "tv-vn", v.title || t("vid_untitled")));
-        if (vdate(v) > 0) vi.append(el("div", "tv-date", fmtDate(vdate(v))));
-        if (!ok) vi.append(el("div", "tv-warn", t("vid_unsup")));
-        card.append(th, vi);
-        if (ok) card.addEventListener("click", () => playVideo(v)); else card.disabled = true;
-        w.append(card);
-        if (adm && v.m) {
-            const cc = el("div", "tv-cc");
-            [[v.pin ? "📍" : "📌", () => { S.vid[v.i].pin = !S.vid[v.i].pin; save(); }],
-             ["✏️", () => editVid(v.i)],
-             ["🗑️", () => { if (confirm("Supprimer cette vidéo ?")) { S.vid.splice(v.i, 1); save(); } }]].forEach(([ic, f]) => {
-                const b = el("button", "tv-cb", ic); b.type = "button"; b.addEventListener("click", f); cc.append(b);
-            });
-            w.append(cc);
-        }
-        g.append(w);
-    });
+    shown.forEach((v, n) => g.append(buildCard(v, { big: n === 0 && S.tag === ALL && !q })));
     if (!flt.length) g.append(el("div", "tv-empty", t(q ? "vid_nofound" : "vid_empty")));
 
     const rest = flt.length - shown.length, more = $("#tv-more");
     more.hidden = rest <= 0;
     if (rest > 0) more.textContent = t("vid_more", { n: rest });
     $("#tv-next").hidden = !(S.mode === "video" && S.list.length > 1);
+    renderReco();
+}
+
+/* ---------- TikTok (oEmbed : titre, miniature, résolution des liens courts) ---------- */
+const TTC = {};
+async function ttMeta(url) {
+    if (TTC[url]) return TTC[url];
+    return TTC[url] = (async () => {
+        try { const h = JSON.parse(localStorage.getItem("abysz_tt") || "{}")[url]; if (h && Date.now() - h.t < 6 * 36e5) return h.m; } catch {}
+        try {
+            const r = await fetch("https://www.tiktok.com/oembed?url=" + encodeURIComponent(url), { referrerPolicy: "no-referrer" });
+            if (!r.ok) throw 0;
+            const j = await r.json(), m = { id: String(j.embed_product_id || ""), title: clean(j.title, 120), authorUrl: safeUrl(j.author_url) || "", thumb: safeUrl(j.thumbnail_url) || "" };
+            try { const c = JSON.parse(localStorage.getItem("abysz_tt") || "{}"); c[url] = { t: Date.now(), m }; localStorage.setItem("abysz_tt", JSON.stringify(c)); } catch {}
+            return m;
+        } catch { delete TTC[url]; return null; }
+    })();
+}
+async function resolveTikTok(url) {
+    const m = await ttMeta(url);
+    if (!m || !/^\d{8,25}$/.test(m.id) || !/^https:\/\/www\.tiktok\.com\/@[\w.]{1,30}$/.test(m.authorUrl)) return null;
+    return mk.ttVideo(m.id, `${m.authorUrl}/video/${m.id}`);
+}
+
+/* ---------- Carte vidéo (grille + recommandations) ---------- */
+function addThumb(th, src) { const im = el("img"); im.loading = "lazy"; im.alt = ""; im.referrerPolicy = "no-referrer"; im.src = src; th.prepend(im); }
+function buildCard(v, o = {}) {
+    const adm = isAdmin(), pv = parseSource(v.url), ok = pv?.kind === "video";
+    const w = el("div", "tv-cardw" + (o.big ? " big" : ""));
+    const card = el("button", "tv-card" + (S.mode === "video" && S.curUrl === v.url ? " cur" : "")); card.type = "button";
+    const th = el("div", "tv-th" + (pv?.platform === "tiktok" ? " tt" : ""));
+    if (ok && pv.thumb) addThumb(th, pv.thumb);
+    else if (ok && pv.platform === "tiktok") ttMeta(pv.watch).then((m) => { if (m?.thumb) addThumb(th, m.thumb); });
+    if (o.why) th.append(el("span", "tv-why", o.why)); else if (v.pin) th.append(el("span", "tv-pinb", t("vid_pinned")));
+    if (ok) th.append(el("span", "tv-pf", ICON[pv.platform] || ""));
+    th.append(el("div", "tv-pl", "▶"));
+    const vi = el("div", "tv-vi"); vi.append(el("div", "tv-vt", v.tag), el("div", "tv-vn", v.title || t("vid_untitled")));
+    if (vdate(v) > 0) vi.append(el("div", "tv-date", fmtDate(vdate(v))));
+    if (!ok) vi.append(el("div", "tv-warn", t("vid_unsup")));
+    card.append(th, vi);
+    if (ok) card.addEventListener("click", () => playVideo(v)); else card.disabled = true;
+    w.append(card);
+    if (adm && v.m && !o.why) {
+        const cc = el("div", "tv-cc");
+        [[v.pin ? "📍" : "📌", () => { S.vid[v.i].pin = !S.vid[v.i].pin; save(); }],
+         ["✏️", () => editVid(v.i)],
+         ["🗑️", () => { if (confirm("Supprimer cette vidéo ?")) { S.vid.splice(v.i, 1); save(); } }]].forEach(([ic, f]) => {
+            const b = el("button", "tv-cb", ic); b.type = "button"; b.addEventListener("click", f); cc.append(b);
+        });
+        w.append(cc);
+    }
+    return w;
+}
+
+/* ---------- Micro-algorithme de recommandation (100 % local, localStorage) ----------
+   Profil = affinités par catégorie / plateforme / mots du titre, apprises via le temps de visionnage
+   (zapper < 8 s = négatif, rester = positif) et qui s'estompent (demi-vie 30 j).
+   Score = affinités + fraîcheur (demi-vie 21 j) + popularité + « à la une » + un peu de hasard − déjà vu,
+   puis ré-ordonnancement pour mélanger plateformes / catégories + 1 slot « découverte ». */
+const PFNAME = { youtube: "YouTube", tiktok: "TikTok", twitch: "Twitch", vimeo: "Vimeo", dailymotion: "Dailymotion" };
+const gv = (o, k) => Object.prototype.hasOwnProperty.call(o, k) ? o[k] : 0;
+const tokens = (s) => [...new Set(norm(s).replace(/[^a-z0-9#\s]/g, " ").split(/\s+/).filter((w) => w.length >= 4))].slice(0, 12);
+const Reco = {
+    p: null, seed: Math.random(), K: "abysz_reco_v1",
+    load() {
+        let p = null; try { p = JSON.parse(localStorage.getItem(this.K) || "null"); } catch {}
+        if (!p || typeof p !== "object") p = {};
+        const now = Date.now(), f = Math.pow(0.5, Math.max(0, now - (p.t || now)) / (30 * 864e5));
+        for (const k of ["tag", "plat", "kw", "seen"]) {
+            p[k] = p[k] && typeof p[k] === "object" ? p[k] : {};
+            for (const x of Object.keys(p[k])) {
+                if (k === "seen") { if (now - p[k][x] > 30 * 864e5) delete p[k][x]; continue; }
+                p[k][x] *= f; if (!isFinite(p[k][x]) || Math.abs(p[k][x]) < 0.05) delete p[k][x];
+            }
+        }
+        p.t = now; p.n = +p.n || 0; this.p = p;
+    },
+    save() { try { localStorage.setItem(this.K, JSON.stringify(this.p)); } catch {} },
+    reset() { try { localStorage.removeItem(this.K); } catch {} this.load(); },
+    dwell(v, s) {
+        const short = parseSource(v.url)?.platform === "tiktok" || v.tag === "SHORT", [a, b, c] = short ? [4, 10, 20] : [8, 20, 60];
+        return s < a ? -0.8 : s < b ? 0.2 : s < c ? 1 : 2;
+    },
+    feedback(v, d) {
+        const p = this.p, pf = parseSource(v.url)?.platform || "";
+        const add = (o, k, x, lim) => { if (k) o[k] = Math.max(-lim, Math.min(lim, gv(o, k) + x)); };
+        add(p.tag, v.tag, d, 12); add(p.plat, pf, d * 0.6, 12); tokens(v.title).forEach((w) => add(p.kw, w, d * 0.4, 6));
+        const ks = Object.keys(p.kw); if (ks.length > 80) ks.sort((a, b) => Math.abs(p.kw[a]) - Math.abs(p.kw[b])).slice(0, ks.length - 80).forEach((k) => delete p.kw[k]);
+        p.n++; this.save();
+    },
+    jitter(u) { let h = 2166136261 ^ Math.floor(this.seed * 1e9); for (let i = 0; i < u.length; i++) { h ^= u.charCodeAt(i); h = Math.imul(h, 16777619); } return ((h >>> 0) % 1000) / 1000; },
+    score(v, now) {
+        const p = this.p, pf = parseSource(v.url)?.platform || "";
+        const tagA = Math.tanh(gv(p.tag, v.tag) / 3), platA = Math.tanh(gv(p.plat, pf) / 4);
+        const ws = tokens(v.title).map((w) => gv(p.kw, w)).sort((a, b) => b - a).slice(0, 3), kwA = ws.length ? Math.tanh(ws.reduce((a, b) => a + b, 0) / 4) : 0;
+        const age = vdate(v) ? Math.max(0, now - vdate(v)) / 864e5 : 60, seenAt = gv(p.seen, v.url);
+        const parts = { tag: 1.1 * tagA, plat: 0.6 * platA, kw: 0.9 * kwA, fresh: 0.8 * Math.pow(0.5, age / 21), pop: v.views ? 0.3 * Math.min(1, Math.log10(v.views + 1) / 6) : 0, pin: v.pin ? 0.35 : 0, wonder: 0.25 * this.jitter(v.url), seen: seenAt ? -1.4 * Math.pow(0.5, (now - seenAt) / (7 * 864e5)) : 0 };
+        return { s: Object.values(parts).reduce((a, b) => a + b, 0), parts, tagA };
+    },
+    rank(list, n = 6, exclude = []) {
+        const now = Date.now(), ex = new Set(exclude), cnt = { pf: {}, tag: {} }, out = [];
+        const pool = list.filter((v) => !ex.has(v.url)).map((v) => ({ v, pf: parseSource(v.url)?.platform || "", ...this.score(v, now) }));
+        while (out.length < n && pool.length) {
+            let bi = 0, bs = -1e9;
+            pool.forEach((c, i) => { const a = c.s - 0.35 * gv(cnt.pf, c.pf) - 0.25 * gv(cnt.tag, c.v.tag); if (a > bs) { bs = a; bi = i; } });
+            const c = pool.splice(bi, 1)[0]; cnt.pf[c.pf] = gv(cnt.pf, c.pf) + 1; cnt.tag[c.v.tag] = gv(cnt.tag, c.v.tag) + 1; out.push(c);
+        }
+        if (out.length >= 4 && this.p.n >= 3) {   // slot découverte : catégorie jamais appréciée
+            const d = pool.filter((c) => c.tagA <= 0 && !gv(this.p.seen, c.v.url)).sort((a, b) => b.s - a.s)[0];
+            if (d) out[out.length - 1] = { ...d, discover: true };
+        }
+        out.forEach((c) => { c.why = this.why(c); });
+        return out;
+    },
+    why(c) {
+        if (c.discover) return t("why_discover");
+        const P = c.parts;
+        if (P.tag > 0.25) return t("why_tag", { tag: c.v.tag });
+        if (P.plat > 0.15) return t("why_plat", { pf: PFNAME[c.pf] || c.pf });
+        if (P.kw > 0.2) return t("why_kw");
+        if (c.v.pin) return t("why_pin");
+        if (P.fresh > 0.55) return t("why_new");
+        return P.pop > 0.15 ? t("why_pop") : t("why_mix");
+    }
+};
+Reco.load();
+let play = null;
+function trackStart(v) { trackEnd(); play = { v, t0: Date.now() }; Reco.p.seen[v.url] = Date.now(); Reco.save(); }
+function trackEnd() { if (!play) return; const x = play; play = null; Reco.feedback(x.v, Reco.dwell(x.v, (Date.now() - x.t0) / 1000)); }
+addEventListener("pagehide", trackEnd);
+function renderReco() {
+    const pool = allVideos().filter((v) => parseSource(v.url)?.kind === "video");
+    const picks = pool.length >= 2 ? Reco.rank(pool, 6, S.mode === "video" ? [S.curUrl] : []) : [];
+    $("#tv-reco-wrap").hidden = !picks.length;
+    const box = $("#tv-reco"); box.replaceChildren();
+    picks.forEach((c) => box.append(buildCard(c.v, { why: c.why })));
 }
 
 function rerender() { applyI18n(); renderOnline(); renderBadge(); renderRail(); renderVideos(); renderInfo(); paintScreen(); }
@@ -1036,6 +1180,8 @@ $("#tv-next").addEventListener("click", nextVideo);
 $("#tv-more").addEventListener("click", () => { S.shown += 12; renderVideos(); });
 $("#tv-vq").addEventListener("input", (e) => { S.q = clean(e.target.value, 60); S.shown = 12; renderVideos(); });
 $("#tv-feed-r").addEventListener("click", () => loadFeed());
+$("#tv-reco-shuffle").addEventListener("click", () => { Reco.seed = Math.random(); renderReco(); });
+$("#tv-reco-reset").addEventListener("click", () => { Reco.reset(); renderReco(); toast(t("reco_reset_ok"), "success"); });
 $("#tv-share").addEventListener("click", () => copy(shareUrl()));
 $("#tv-fs").addEventListener("click", () => { const s = $("#tv-stage"); (s.requestFullscreen || s.webkitRequestFullscreen)?.call(s); });
 $("#tv-s-b").addEventListener("click", () => $("#videos").scrollIntoView({ behavior: "smooth" }));
@@ -1178,11 +1324,13 @@ function editVid(i) {
     openM("m-v");
 }
 $("#tv-add-v").addEventListener("click", () => editVid(-1));
-$("#v-ok").addEventListener("click", () => {
+$("#v-ok").addEventListener("click", async () => {
     if (!isAdmin()) return;
     const v = cleanVid({ title: $("#v-t").value, tag: $("#v-g").value, url: $("#v-u").value });
-    const p = parseSource(v.url);
-    if (!v.title || !p || p.kind !== "video") return toast("Titre requis et lien vidéo valide (YouTube / Twitch VOD ou clip / Vimeo / Dailymotion)", "error");
+    let p = parseSource(v.url);
+    if (p?.short) p = await resolveTikTok(p.watch);
+    if (p?.platform === "tiktok" && p.kind === "video") { v.url = p.watch; if (!v.title) v.title = (await ttMeta(p.watch))?.title || "TikTok"; }
+    if (!v.title || !p || p.kind !== "video") return toast("Titre requis et lien vidéo valide (YouTube / TikTok / Twitch VOD ou clip / Vimeo / Dailymotion)", "error");
     S.edit < 0 ? S.vid.push({ ...v, added: Date.now() }) : (S.vid[S.edit] = { ...S.vid[S.edit], ...v });
     if (S.vid.length > 100) S.vid.length = 100;
     closeAll(); save();

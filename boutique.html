@@ -5,12 +5,273 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-adsense-account" content="ca-pub-1494144032841410">
     <title>ABYSZ | Boutique Officielle</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="description" content="Boutique officielle ABYSZ Esports : maillots, accessoires et goodies de la structure.">
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#0a0a0a">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <!-- AdSense est chargé par cookie-consent.js uniquement après accord "Publicité" -->
+    <style>
+        html { scroll-behavior: smooth; scrollbar-gutter: stable; }
+        body { background-color: #0a0a0a; color: #ffffff; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
+        nav [hidden], main [hidden], .tv-modal [hidden] { display: none !important; }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; position: relative; z-index: 1000; background: #0a0a0a; border-bottom: 1px solid #1a1a1a; }
+        nav ul { display: flex; list-style: none; gap: 20px; margin: 0; padding: 0; align-items: center; }
+        nav ul li a { position: relative; transition: color 0.3s ease; text-decoration: none; color: white; }
+        nav ul li a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: #a855f7; transition: width 0.3s ease; }
+        nav ul li a:hover { color: #a855f7; }
+        nav ul li a:hover::after { width: 100%; }
+        
+        .logo { display: flex; align-items: center; gap: 10px; color: white; font-family: 'Orbitron', sans-serif; font-weight: bold; }
+        .social-links { display: flex; gap: 10px; margin-left: 10px; }
+        .social-links a { color: #ccc; transition: color 0.2s; }
+        .social-links a:hover { color: #a855f7; }
 
+        .nav-staff-link {
+            color: #a855f7;
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.35);
+            transition: all 0.25s ease;
+            white-space: nowrap;
+        }
+        .nav-staff-link:hover {
+            background: #a855f7;
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .abysz-tv-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, rgba(145, 70, 255, 0.2), rgba(168, 85, 247, 0.15));
+            border: 1px solid #9146FF;
+            padding: 6px 14px;
+            border-radius: 20px;
+            color: #ffffff !important;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 0 10px rgba(145, 70, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .abysz-tv-badge::after { display: none !important; }
+
+        .abysz-tv-badge:hover {
+            background: linear-gradient(135deg, #9146FF, #a855f7);
+            box-shadow: 0 0 20px rgba(145, 70, 255, 0.7);
+            transform: translateY(-2px) scale(1.03);
+            color: #ffffff !important;
+        }
+
+        .live-dot-tv {
+            width: 8px;
+            height: 8px;
+            background-color: #ff4444;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #ff4444;
+            animation: pulse-live-tv 1.5s infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes pulse-live-tv {
+            0% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 4px #ff4444; }
+            50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 12px #ff4444; }
+            100% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 4px #ff4444; }
+        }
+
+        .online-counter-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid #2a2a2a;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.78rem;
+            color: #e0e0e0;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10b981;
+            animation: pulse-live 1.8s infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes pulse-live {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        nav ul li a.btn-animated-join::after { display: none !important; }
+        .btn-animated-join {
+            position: relative;
+            background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
+            color: #ffffff;
+            padding: 8px 20px;
+            border-radius: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 800;
+            font-size: 0.82rem;
+            text-decoration: none;
+            letter-spacing: 1px;
+            display: inline-block;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+            animation: pulse-btn-glow 2.5s infinite alternate;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .btn-animated-join::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                60deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.35) 50%,
+                transparent 70%
+            );
+            transform: rotate(30deg);
+            animation: shimmer-btn 3.5s infinite;
+        }
+
+        .btn-animated-join:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.9), 0 0 50px rgba(168, 85, 247, 0.5);
+            background: linear-gradient(135deg, #b975ff 0%, #a855f7 100%);
+        }
+
+        @keyframes pulse-btn-glow {
+            0% { box-shadow: 0 0 12px rgba(168, 85, 247, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(168, 85, 247, 0.8), 0 0 35px rgba(168, 85, 247, 0.4); }
+            100% { box-shadow: 0 0 12px rgba(168, 85, 247, 0.4); }
+        }
+
+        @keyframes shimmer-btn {
+            0% { transform: translateX(-150%) rotate(30deg); }
+            20% { transform: translateX(150%) rotate(30deg); }
+            100% { transform: translateX(150%) rotate(30deg); }
+        }
+
+
+        /* ===== ONGLET BOUTIQUE : animation NEW ===== */
+        nav ul li a.nav-shop::after {
+            content: '✦'; position: absolute; top: -9px; right: -5px; left: auto; bottom: auto;
+            width: auto; height: auto; background: none; color: #fcd34d; font-size: 0.8rem;
+            transition: none; animation: shop-twinkle 2.4s ease-in-out infinite; pointer-events: none;
+        }
+        nav ul li a.nav-shop:hover::after { width: auto; }
+        .nav-shop {
+            position: relative; display: inline-flex; align-items: center; gap: 8px;
+            padding: 7px 14px; border-radius: 999px;
+            font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 0.82rem; letter-spacing: 0.4px;
+            color: #ffffff !important;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.20), rgba(236, 72, 153, 0.20));
+            border: 1px solid rgba(245, 158, 11, 0.6);
+            box-shadow: 0 0 14px rgba(245, 158, 11, 0.28);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+            animation: shop-nudge 5s ease-in-out infinite;
+        }
+        .nav-shop:hover {
+            background: linear-gradient(135deg, #f59e0b, #ec4899);
+            box-shadow: 0 0 22px rgba(245, 158, 11, 0.75);
+            transform: translateY(-2px) scale(1.06);
+            animation: none; color: #ffffff !important;
+        }
+        .nav-shop-icon { display: inline-block; transform-origin: 50% 15%; animation: shop-bag 5s ease-in-out infinite; }
+        .nav-shop-new {
+            position: relative; padding: 2px 7px; border-radius: 6px;
+            font-size: 0.62rem; font-weight: 900; letter-spacing: 1.2px; color: #111;
+            background: linear-gradient(90deg, #f59e0b, #fde68a, #ec4899, #f59e0b);
+            background-size: 250% 100%; animation: shop-shine 2.2s linear infinite;
+        }
+        .nav-shop-new::before {
+            content: ''; position: absolute; inset: -3px; border-radius: 9px;
+            border: 2px solid #f59e0b; opacity: 0; animation: shop-ping 1.8s ease-out infinite;
+        }
+        @keyframes shop-shine { to { background-position: -250% 0; } }
+        @keyframes shop-ping { 0% { transform: scale(0.9); opacity: 0.9; } 100% { transform: scale(1.5); opacity: 0; } }
+        @keyframes shop-twinkle { 0%, 100% { transform: scale(0.6) rotate(0); opacity: 0.4; } 50% { transform: scale(1.3) rotate(25deg); opacity: 1; } }
+        @keyframes shop-nudge {
+            0%, 84%, 100% { transform: none; }
+            87% { transform: rotate(-3deg) scale(1.06); }
+            90% { transform: rotate(3deg) scale(1.06); }
+            93% { transform: rotate(-2deg) scale(1.03); }
+            96% { transform: rotate(1deg); }
+        }
+        @keyframes shop-bag {
+            0%, 82%, 100% { transform: none; }
+            86% { transform: translateY(-4px) rotate(-14deg); }
+            91% { transform: translateY(0) rotate(10deg); }
+            95% { transform: rotate(-5deg); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .nav-shop, .nav-shop-icon, .nav-shop-new, .nav-shop-new::before, nav ul li a.nav-shop::after { animation: none !important; }
+        }
+
+        .menu-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; z-index: 1100; }
+        .menu-toggle span { display: block; width: 25px; height: 3px; background: white; transition: all 0.3s ease; }
+        
+        .lang-switch { display: inline-flex; gap: 4px; padding: 3px; background: #141414; border: 1px solid #2a2a2a; border-radius: 999px; order: 2; flex-shrink: 0; }
+        .lang-btn { font-family: 'Orbitron', sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; color: #aaa; background: transparent; border: none; padding: 6px 12px; border-radius: 999px; cursor: pointer; transition: all 0.25s ease; }
+        .lang-btn:hover { color: #fff; }
+        .lang-btn[aria-pressed="true"] { background: linear-gradient(135deg, #a855f7, #7e22ce); color: #fff; box-shadow: 0 0 12px rgba(168, 85, 247, 0.5); }
+        .lang-btn:focus-visible { outline: 2px solid #a855f7; outline-offset: 2px; }
+        footer { padding: 35px 20px; text-align: center; border-top: 1px solid #1a1a1a; color: #888; font-size: 0.85rem; }
+        footer .footer-links { margin-bottom: 12px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        footer .footer-links a { color: #aaa; text-decoration: none; transition: color 0.2s; }
+        footer .footer-links a:hover { color: #a855f7; }
+        .nav-staff-mobile { display: none; }
+        @media (max-width: 430px) {
+            .logo .nav-staff-link { display: none; }
+            nav ul li.nav-staff-mobile { display: block; }
+        }
+        .tv-adm-tag { font: 600 .6rem 'Orbitron', sans-serif; background: #a855f7; padding: 3px 8px; border-radius: 4px; vertical-align: middle; letter-spacing: 0; }
+        .nav-admin-btn { background: transparent; border: 1px solid #2a2a2a; color: #ddd; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: 600; padding: 6px 14px; border-radius: 20px; cursor: pointer; transition: all .25s; white-space: nowrap; }
+        .nav-admin-btn:hover { border-color: #a855f7; color: #fff; box-shadow: 0 0 10px rgba(168,85,247,.4); }
+        .nav-admin-btn.on { border-color: #a855f7; color: #a855f7; }
+        @media (max-width: 768px) {
+            .lang-switch { order: 0; margin-left: auto; margin-right: 12px; }
+            .lang-btn { padding: 5px 9px; font-size: 0.68rem; }
+            .lang-switch { gap: 2px; padding: 2px; margin-right: 10px; }
+            nav { padding: 12px; gap: 6px; }
+            .logo { gap: 6px; min-width: 0; }
+            .social-links { gap: 8px; margin-left: 4px; }
+            .menu-toggle { display: flex; }
+            nav ul { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; width: 100%; background: rgba(10, 10, 10, 0.98); border-bottom: 2px solid #a855f7; padding: 20px; box-sizing: border-box; gap: 15px; text-align: center; }
+            nav ul.mobile-open { display: flex; }
+            nav ul li a { display: block; padding: 10px 0; font-size: 1.1rem; }
+            nav ul li a::after { display: none; }
+            nav ul li a.btn-animated-join, nav ul li a.nav-shop { display: inline-flex; justify-content: center; }
+            .menu-toggle.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+            .menu-toggle.open span:nth-child(2) { opacity: 0; }
+            .menu-toggle.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+        }
+    </style>
     <style>
         /* ── CONFIGURATION GRAPHIQUE BOUTIQUE ── */
         .shop-container { max-width: 1200px; margin: 0 auto; padding: 140px 20px 60px 20px; }
@@ -84,135 +345,342 @@
             box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); transition: background 0.2s ease;
         }
         .modal-confirm-btn:hover { background: #9333ea; }
+    
+        .shop-container { padding: 36px 20px 60px; }
+        .product-img-box { position: relative; }
+        .sh-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; background: #141414; border: 1px dashed #a855f7; padding: 12px 16px; border-radius: 10px; margin-bottom: 26px; }
+        .sh-st { color: #8a8a9e; font-size: .78rem; }
+        .sh-chips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 26px; }
+        .sh-chip { background: #141414; border: 1px solid #2a2a2a; color: #a0a0b0; padding: 6px 14px; border-radius: 20px; cursor: pointer; font: 600 .7rem 'Orbitron', sans-serif; }
+        .sh-chip.act, .sh-chip:hover { border-color: #a855f7; color: #fff; background: rgba(168,85,247,.2); }
+        .sh-s { padding: 7px 12px; font-size: .72rem; }
+        .sh-ribbon { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(10,10,10,.88); color: #fff; text-align: center; padding: 8px; font: 700 .8rem 'Orbitron', sans-serif; letter-spacing: 1px; }
+        .sh-hid { opacity: .45; }
+        .sh-cc { display: flex; gap: 6px; position: absolute; top: 12px; right: 12px; z-index: 3; }
+        .sh-cb { background: rgba(10,10,10,.92); border: 1px solid #3a3a4c; color: #fff; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; }
+        .sh-cb:hover { background: #a855f7; }
+        .sh-cat { color: #8a8a9e; font: 600 .65rem 'Orbitron', sans-serif; letter-spacing: 1px; margin-bottom: 6px; }
+        .product-old { color: #666; text-decoration: line-through; font-size: .85rem; margin-right: 8px; font-family: 'Inter', sans-serif; }
+        .add-to-cart-btn:disabled { opacity: .4; cursor: not-allowed; background: transparent; box-shadow: none; }
+        .modal-card.wide { max-width: 580px; max-height: 90vh; overflow-y: auto; }
+        .sh-fg { margin-bottom: 12px; }
+        .sh-fg label { display: block; font: .72rem 'Orbitron', sans-serif; color: #a0a0b0; margin-bottom: 5px; }
+        .sh-inp { width: 100%; box-sizing: border-box; background: #0a0a0a; border: 1px solid #2a2a2a; color: #fff; padding: 10px; border-radius: 8px; font: .9rem 'Inter', sans-serif; }
+        .sh-inp:focus { border-color: #a855f7; outline: 0; }
+        .sh-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .sh-row { display: flex; gap: 10px; margin-top: 16px; }
+        .sh-row button { flex: 1; }
+        .modal-confirm-btn.g { background: #141414; border: 1px solid #2a2a2a; box-shadow: none; }
+        #sh-toasts { position: fixed; top: 76px; right: 16px; z-index: 1500; display: flex; flex-direction: column; gap: 10px; }
+        .sh-toast { background: #141414; padding: 13px 20px; border-radius: 10px; font-size: .85rem; border-left: 4px solid #a855f7; box-shadow: 0 10px 25px rgba(0,0,0,.6); }
+        .sh-toast.error { border-color: #ef4444; } .sh-toast.success { border-color: #10b981; }
+        @media (max-width: 520px) { .sh-2 { grid-template-columns: 1fr; } }
     </style>
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://pagead2.googlesyndication.com https://partner.googleadservices.com https://tpc.googlesyndication.com https://www.googletagservices.com https://*.adtrafficquality.google; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; connect-src https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com https://*.firebasedatabase.app wss://*.firebasedatabase.app https://pagead2.googlesyndication.com https://*.adtrafficquality.google; img-src 'self' data: blob: https:; frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://*.safeframe.googlesyndication.com https://www.google.com https://*.adtrafficquality.google; frame-ancestors 'none';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
     <meta name="referrer" content="strict-origin-when-cross-origin">
 </head>
 <body>
-
     <nav>
         <div class="logo">
-            <a href="index.html" class="logo-link">
-                <img src="logo.png" alt="Logo ABYSZ" style="height:30px;">
-                ABYSZ
-            </a>
+            <img src="logo.png" alt="Logo ABYSZ" width="30" height="30" id="tv-logo">
+            ABYSZ
+            <div class="social-links">
+            <a href="https://www.tiktok.com/@abysz_o" target="_blank" rel="noopener noreferrer" aria-label="TikTok ABYSZ"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.76a4.85 4.85 0 0 1-1.01-.07z"/></svg></a>
+            <a href="https://x.com/abysz_o" target="_blank" rel="noopener noreferrer" aria-label="X ABYSZ"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+            <a href="https://www.youtube.com/channel/UCn0XszECC_mr_QfOry6UUsA" target="_blank" rel="noopener noreferrer" aria-label="YouTube ABYSZ"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+            <a href="https://www.twitch.tv/abysz_o" target="_blank" rel="noopener noreferrer" aria-label="Twitch ABYSZ"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg></a>
+            </div>
+            <a href="staffabysz.html" class="nav-staff-link">Staff</a>
         </div>
-        <ul>
-            <li><a href="index.html">Accueil</a></li>
+
+        <div class="lang-switch" role="group" aria-label="Langue / Language" data-i18n-aria="lang_group">
+            <button type="button" class="lang-btn" data-lang="fr" aria-pressed="true" title="Français">FR</button>
+            <button type="button" class="lang-btn" data-lang="en" aria-pressed="false" title="English">EN</button>
+        </div>
+
+        <button class="menu-toggle" id="mobile-menu-toggle" data-i18n-aria="menu_open" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="nav-links-list">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <ul id="nav-links-list">
+            <li><a href="index.html" data-i18n="nav_home">Accueil</a></li>
             <li><a href="roster.html">Roster</a></li>
-            <li><a href="boutique.html" class="active">Boutique</a></li>
-            <li><a href="dashboard.html">📊 Dashboard</a></li>
+            <li><a href="index.html#annonces" data-i18n="nav_planning">Planning</a></li>
+            <li><a href="boutique.html" class="nav-shop"><span class="nav-shop-icon">🛍️</span><span data-i18n="nav_shop">Boutique</span><span class="nav-shop-new">NEW</span></a></li>
+            <li><a href="index.html#rejoindre-commu" class="btn-animated-join" data-i18n="nav_join">🚀 Rejoindre</a></li>
+            <li>
+                <div class="online-counter-badge">
+                    <span class="pulse-dot"></span>
+                    <span id="site-online-count">1 en ligne</span>
+                </div>
+            </li>
+            <li><button type="button" class="nav-admin-btn" id="tv-auth-btn">👤 Admin</button></li>
+            <li class="nav-staff-mobile"><a href="staffabysz.html" style="color:#a855f7;font-weight:bold;">Staff</a></li>
         </ul>
     </nav>
 
     <section class="shop-container">
         <div class="shop-header">
-            <h1>Boutique Officielle</h1>
-            <p>Portez fièrement les couleurs de la structure ABYSZ Esports</p>
+            <h1><span data-i18n="shop_h">Boutique Officielle</span> <span class="tv-adm-tag" id="sh-adm" hidden>ADMIN</span></h1>
+            <p data-i18n="shop_sub">Portez fièrement les couleurs de la structure ABYSZ Esports</p>
         </div>
-
-        <div class="products-grid">
-            
-            <!-- MAILLOT -->
-            <div class="product-card">
-                <div class="product-badge">Nouveau</div>
-                <div class="product-img-box">
-                    <img src="maillot.png" alt="Maillot Legacy 2026 ABYSZ" class="product-img" onerror="this.src='logo.png'">
-                </div>
-                <div class="product-info">
-                    <div>
-                        <h3 class="product-title">Maillot Legacy 2026</h3>
-                        <p class="product-desc">Le maillot officiel porté par nos joueurs pros lors des FNCS et événements officiels. Tissu respirant haut de gamme.</p>
-                    </div>
-                    <div class="product-footer">
-                        <span class="product-price">31.99 €</span>
-                        <button class="add-to-cart-btn" onclick="window.open('https://breakday.shop/products/maillot-abysz-e-sport', '_blank')">Acheter</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAPIS DE SOURIS -->
-            <div class="product-card">
-                <div class="product-badge">Nouveau</div>
-                <div class="product-img-box">
-                    <img src="tdsabz.png" alt="Tapis de souris ABYSZ" class="product-img" onerror="this.src='logo.png'">
-                </div>
-                <div class="product-info">
-                    <div>
-                        <h3 class="product-title">Tapis de Souris ABYSZ</h3>
-                        <p class="product-desc">Tapis de souris gaming haute précision aux couleurs d'ABYSZ. Glisse fluide, base antidérapante et bords cousus ultra-résistants.</p>
-                    </div>
-                    <div class="product-footer">
-                        <span class="product-price">Dès 19.00 €</span>
-                        <button class="add-to-cart-btn" onclick="openOrderModal('Tapis de Souris ABYSZ', 'https://yokoesport.fr/equipes/abysz-esport')">Acheter</button>
-                    </div>
-                </div>
-            </div>
-
+        <div class="sh-bar" id="sh-bar" hidden>
+            <button type="button" class="add-to-cart-btn sh-s" id="sh-add">➕ Ajouter un article</button>
+            <span class="sh-st" id="sh-st"></span>
         </div>
+        <div class="sh-chips" id="sh-chips"></div>
+        <div class="products-grid" id="sh-grid"></div>
 
-        <!-- PUBLICITÉ : masquée tant que le visiteur n'a pas accepté la catégorie "Publicité" -->
         <div class="adsense-container hidden">
-            <ins class="adsbygoogle"
-                 style="display:block"
-                 data-ad-client="ca-pub-1494144032841410"
-                 data-ad-slot="REMPLACE_PAR_TON_ID_DE_BLOC"
-                 data-ad-format="auto"
-                 data-full-width-responsive="true"></ins>
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1494144032841410" data-ad-slot="REMPLACE_PAR_TON_ID_DE_BLOC" data-ad-format="auto" data-full-width-responsive="true"></ins>
         </div>
     </section>
 
-    <!-- POP-UP COMMANDE (MODAL) -->
-    <div class="modal-overlay" id="orderModal">
+    <!-- Pop-up redirection -->
+    <div class="modal-overlay" id="orderModal" role="dialog" aria-modal="true">
         <div class="modal-card">
-            <button class="close-modal-btn" onclick="closeOrderModal()">&times;</button>
-            <div class="modal-header" id="modalProductTitle">Commander le Tapis de Souris ABYSZ</div>
-            <div class="modal-body">
-                Vous allez être redirigé vers la boutique officielle de notre partenaire <strong>YOKO Esports</strong> pour choisir votre taille/modèle et procéder au paiement sécurisé.
-            </div>
-            <button class="modal-confirm-btn" id="confirmOrderBtn">Commander sur YOKO Esports</button>
+            <button class="close-modal-btn" data-close aria-label="Fermer">&times;</button>
+            <div class="modal-header" id="om-h"></div>
+            <div class="modal-body" id="om-b"></div>
+            <button class="modal-confirm-btn" id="om-go"></button>
         </div>
     </div>
 
+    <!-- Connexion admin -->
+    <div class="modal-overlay" id="m-auth" role="dialog" aria-modal="true">
+        <div class="modal-card">
+            <button class="close-modal-btn" data-close aria-label="Fermer">&times;</button>
+            <div class="modal-header">🔑 Espace Admin</div>
+            <div class="sh-fg"><label for="a-mail">Email</label><input class="sh-inp" type="email" id="a-mail" autocomplete="username" maxlength="120"></div>
+            <div class="sh-fg"><label for="a-pw">Mot de passe</label><input class="sh-inp" type="password" id="a-pw" autocomplete="current-password" maxlength="128"></div>
+            <button class="modal-confirm-btn" id="a-ok">Connexion</button>
+        </div>
+    </div>
+
+    <!-- Éditeur d'article -->
+    <div class="modal-overlay" id="m-p" role="dialog" aria-modal="true">
+        <div class="modal-card wide">
+            <button class="close-modal-btn" data-close aria-label="Fermer">&times;</button>
+            <div class="modal-header" id="e-h">Article</div>
+            <div class="sh-2">
+                <div class="sh-fg"><label for="e-t">Nom (FR)</label><input class="sh-inp" id="e-t" maxlength="60"></div>
+                <div class="sh-fg"><label for="e-te">Nom (EN, optionnel)</label><input class="sh-inp" id="e-te" maxlength="60"></div>
+            </div>
+            <div class="sh-2">
+                <div class="sh-fg"><label for="e-d">Description (FR)</label><textarea class="sh-inp" id="e-d" rows="3" maxlength="400"></textarea></div>
+                <div class="sh-fg"><label for="e-de">Description (EN, optionnel)</label><textarea class="sh-inp" id="e-de" rows="3" maxlength="400"></textarea></div>
+            </div>
+            <div class="sh-2">
+                <div class="sh-fg"><label for="e-p">Prix affiché</label><input class="sh-inp" id="e-p" maxlength="24" placeholder="31.99 € · Dès 19.00 €"></div>
+                <div class="sh-fg"><label for="e-o">Ancien prix barré (optionnel)</label><input class="sh-inp" id="e-o" maxlength="24" placeholder="39.99 €"></div>
+            </div>
+            <div class="sh-fg"><label for="e-i">Image (lien https ou fichier du site, ex. maillot.png)</label><input class="sh-inp" id="e-i" maxlength="300"></div>
+            <div class="sh-2">
+                <div class="sh-fg"><label for="e-c">Catégorie (filtre)</label><input class="sh-inp" id="e-c" maxlength="24" placeholder="MAILLOTS"></div>
+                <div class="sh-fg"><label for="e-s">Disponibilité</label><select class="sh-inp" id="e-s"><option value="ok">Disponible</option><option value="soon">Bientôt</option><option value="soldout">Épuisé</option></select></div>
+            </div>
+            <div class="sh-2">
+                <div class="sh-fg"><label for="e-b">Badge (optionnel)</label><input class="sh-inp" id="e-b" maxlength="20" placeholder="Nouveau, -20 %…"></div>
+                <div class="sh-fg"><label for="e-bc">Couleur du badge</label><select class="sh-inp" id="e-bc"><option value="green">Vert</option><option value="purple">Violet</option><option value="red">Rouge</option><option value="amber">Orange</option><option value="blue">Bleu</option></select></div>
+            </div>
+            <div class="sh-2">
+                <div class="sh-fg"><label for="e-bt">Texte du bouton</label><input class="sh-inp" id="e-bt" maxlength="24" placeholder="Acheter"></div>
+                <div class="sh-fg"><label for="e-m">Au clic</label><select class="sh-inp" id="e-m"><option value="direct">Ouvrir le lien directement</option><option value="modal">Pop-up de redirection d'abord</option></select></div>
+            </div>
+            <div class="sh-fg"><label for="e-u">Lien de redirection (https://…)</label><input class="sh-inp" id="e-u" maxlength="400" placeholder="https://"></div>
+            <div class="sh-2">
+                <div class="sh-fg"><label for="e-pa">Partenaire (pop-up)</label><input class="sh-inp" id="e-pa" maxlength="40" placeholder="YOKO Esports"></div>
+                <div class="sh-fg"><label for="e-mt">Texte du pop-up (optionnel)</label><input class="sh-inp" id="e-mt" maxlength="300"></div>
+            </div>
+            <label style="display:flex;gap:8px;align-items:center;color:#ccc;font-size:.85rem"><input type="checkbox" id="e-off"> Masquer cet article (visible uniquement par l'admin)</label>
+            <div class="sh-row"><button type="button" class="modal-confirm-btn" id="e-ok">Enregistrer</button><button type="button" class="modal-confirm-btn g" data-close>Annuler</button></div>
+        </div>
+    </div>
+
+    <div id="sh-toasts" aria-live="polite"></div>
     <footer>
-        <p>© 2026 Abysz Esports • Nous contacter : abyszofficial@gmail.com</p>
-        <p style="margin-top:8px; font-size:0.8rem;">
-            <a href="cookies.html" style="color:#aaa;">Cookies</a> •
-            <a href="#" data-open-cookie-prefs style="color:#aaa;">Gérer mes cookies</a>
-        </p>
+        <div class="footer-links">
+            <a href="mentions-legales.html" data-i18n="f_legal">Mentions Légales</a> •
+            <a href="politique-confidentialite.html" data-i18n="f_privacy">Politique de Confidentialité</a> •
+            <a href="cookies.html">Cookies</a> •
+            <a href="#" data-open-cookie-prefs data-i18n="f_cookie_prefs">Gérer mes cookies</a>
+        </div>
+        <p>© 2026 Abysz Esports • <span data-i18n="f_contact">Nous contacter :</span> abyszofficial@gmail.com</p>
     </footer>
 
-    <script>
-        let currentTargetUrl = "";
-
-        function openOrderModal(productName, redirectUrl) {
-            document.getElementById('modalProductTitle').innerText = productName;
-            currentTargetUrl = redirectUrl;
-            document.getElementById('orderModal').classList.add('active');
-        }
-
-        function closeOrderModal() {
-            document.getElementById('orderModal').classList.remove('active');
-        }
-
-        document.getElementById('confirmOrderBtn').addEventListener('click', function() {
-            if(currentTargetUrl) {
-                window.open(currentTargetUrl, '_blank');
-                closeOrderModal();
-            }
-        });
-
-        // Fermeture si clic à l'extérieur
-        document.getElementById('orderModal').addEventListener('click', function(e) {
-            if(e.target === this) {
-                closeOrderModal();
-            }
-        });
-    </script>
-
     <script src="cookie-consent.js"></script>
+    <script type="module">
+const ADMIN = "abyszofficial@gmail.com", FB_VER = "10.12.0";
+const firebaseConfig = {
+    apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
+    authDomain: "abysz-esports.firebaseapp.com",
+    databaseURL: "https://abysz-esports-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "abysz-esports",
+    storageBucket: "abysz-esports.firebasestorage.app",
+    messagingSenderId: "200968659347",
+    appId: "1:200968659347:web:3a13d1614d00ed29968866"
+};
+const $ = (s) => document.querySelector(s), $$ = (s) => document.querySelectorAll(s);
+const el = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+const clean = (s, n) => String(s ?? "").replace(/[\u0000-\u001f<>]/g, "").trim().slice(0, n);
+const safeUrl = (s) => { try { const u = new URL(s); return u.protocol === "https:" ? u.href : ""; } catch { return ""; } };
+const safeImg = (s) => { s = String(s || "").trim(); if (/^https:\/\//i.test(s)) return safeUrl(s); return /^[\w./-]{1,120}\.(png|jpe?g|webp|gif|svg|avif)$/i.test(s) && !s.includes("..") ? s : ""; };
+
+const D = {
+    fr: { lang_group: "Langue", menu_open: "Ouvrir le menu", nav_home: "Accueil", nav_planning: "Planning", nav_shop: "Boutique", nav_join: "🚀 Rejoindre", online_n: "{n} en ligne",
+        f_legal: "Mentions Légales", f_privacy: "Politique de Confidentialité", f_cookie_prefs: "Gérer mes cookies", f_contact: "Nous contacter :", auth_in: "👤 Admin", auth_out: "👤 Déconnexion",
+        page_title: "ABYSZ | Boutique Officielle", shop_h: "Boutique Officielle", shop_sub: "Portez fièrement les couleurs de la structure ABYSZ Esports",
+        buy: "Acheter", soldout: "ÉPUISÉ", soon: "BIENTÔT", all: "TOUT", empty: "Aucun article pour le moment.",
+        om_body: "Vous allez être redirigé vers la boutique officielle de notre partenaire {p} pour finaliser votre commande en toute sécurité.", om_go: "Continuer vers {p}", om_partner: "notre partenaire",
+        err_url: "Le lien de redirection doit commencer par https://", err_title: "Un nom d'article est requis" },
+    en: { lang_group: "Language", menu_open: "Open menu", nav_home: "Home", nav_planning: "Schedule", nav_shop: "Shop", nav_join: "🚀 Join us", online_n: "{n} online",
+        f_legal: "Legal Notice", f_privacy: "Privacy Policy", f_cookie_prefs: "Manage my cookies", f_contact: "Contact us:", auth_in: "👤 Admin", auth_out: "👤 Log out",
+        page_title: "ABYSZ | Official Shop", shop_h: "Official Shop", shop_sub: "Proudly wear the colours of ABYSZ Esports",
+        buy: "Buy", soldout: "SOLD OUT", soon: "COMING SOON", all: "ALL", empty: "No items yet.",
+        om_body: "You are about to be redirected to the official store of our partner {p} to complete your order securely.", om_go: "Continue to {p}", om_partner: "our partner",
+        err_url: "The redirect link must start with https://", err_title: "An item name is required" }
+};
+let lang = "fr";
+try { const s = localStorage.getItem("abysz_lang"); if (s === "fr" || s === "en") lang = s; } catch {}
+const t = (k, p) => { let s = D[lang]?.[k] ?? D.fr[k] ?? k; if (p) s = s.replace(/\{(\w+)\}/g, (m, x) => p[x] ?? m); return s; };
+let online = 1;
+function applyI18n() {
+    document.documentElement.lang = lang; document.title = t("page_title");
+    $$("[data-i18n]").forEach((e) => { e.textContent = t(e.dataset.i18n); });
+    $$("[data-i18n-aria]").forEach((e) => e.setAttribute("aria-label", t(e.dataset.i18nAria)));
+    $$(".lang-btn").forEach((b) => b.setAttribute("aria-pressed", b.dataset.lang === lang ? "true" : "false"));
+    $("#site-online-count").textContent = t("online_n", { n: online });
+    $("#tv-auth-btn").textContent = isAdmin() ? t("auth_out") : t("auth_in");
+}
+
+/* ---------- Articles ---------- */
+const BC = { green: "#22c55e", purple: "#a855f7", red: "#ef4444", amber: "#f59e0b", blue: "#3b82f6" };
+const BCK = Object.keys(BC), ST = ["ok", "soldout", "soon"];
+const DEF = [
+    { id: "maillot", title: "Maillot Legacy 2026", titleEn: "Legacy 2026 Jersey", desc: "Le maillot officiel porté par nos joueurs pros lors des FNCS et événements officiels. Tissu respirant haut de gamme.", descEn: "The official jersey worn by our pro players at FNCS and official events. Premium breathable fabric.", price: "31.99 €", old: "", img: "maillot.png", cat: "MAILLOTS", badge: "Nouveau", bc: "green", status: "ok", btn: "", url: "https://breakday.shop/products/maillot-abysz-e-sport", mode: "direct", partner: "", mtext: "", off: false },
+    { id: "tapis", title: "Tapis de Souris ABYSZ", titleEn: "ABYSZ Mousepad", desc: "Tapis de souris gaming haute précision aux couleurs d'ABYSZ. Glisse fluide, base antidérapante et bords cousus ultra-résistants.", descEn: "High-precision gaming mousepad in ABYSZ colours. Smooth glide, non-slip base and reinforced stitched edges.", price: "Dès 19.00 €", old: "", img: "tdsabz.png", cat: "ACCESSOIRES", badge: "Nouveau", bc: "green", status: "ok", btn: "", url: "https://yokoesport.fr/equipes/abysz-esport", mode: "modal", partner: "YOKO Esports", mtext: "", off: false }
+];
+function cleanP(r) {
+    const title = clean(r?.title, 60); if (!title) return null;
+    return { id: clean(r.id, 24).replace(/[^\w-]/g, "") || "p" + Date.now().toString(36), title, titleEn: clean(r.titleEn, 60), desc: clean(r.desc, 400), descEn: clean(r.descEn, 400),
+        price: clean(r.price, 24), old: clean(r.old, 24), img: safeImg(r.img), cat: clean(r.cat, 24).toUpperCase(), badge: clean(r.badge, 20), bc: BCK.includes(r.bc) ? r.bc : "green",
+        status: ST.includes(r.status) ? r.status : "ok", btn: clean(r.btn, 24), url: safeUrl(String(r.url || "").trim()), mode: r.mode === "modal" ? "modal" : "direct",
+        partner: clean(r.partner, 40), mtext: clean(r.mtext, 300), off: !!r.off };
+}
+let P = DEF.map(cleanP), tag = "__all__", editI = -1;
+
+function buy(p) {
+    if (!p.url) return;
+    if (p.mode !== "modal") { window.open(p.url, "_blank", "noopener"); return; }
+    const who = p.partner || t("om_partner");
+    $("#om-h").textContent = lang === "en" && p.titleEn ? p.titleEn : p.title;
+    $("#om-b").textContent = p.mtext || t("om_body", { p: who });
+    const go = $("#om-go"); go.textContent = t("om_go", { p: who });
+    go.onclick = () => { window.open(p.url, "_blank", "noopener"); closeAll(); };
+    openM("orderModal");
+}
+function card(p, i) {
+    const en = lang === "en", title = en && p.titleEn ? p.titleEn : p.title, desc = en && p.descEn ? p.descEn : p.desc;
+    const w = el("div", "product-card" + (p.off ? " sh-hid" : ""));
+    if (p.badge) { const b = el("div", "product-badge", p.badge); b.style.background = BC[p.bc]; w.append(b); }
+    const ib = el("div", "product-img-box"), im = el("img", "product-img"); im.alt = title; im.loading = "lazy"; im.src = p.img || "logo.png";
+    im.onerror = () => { im.onerror = null; im.src = "logo.png"; }; ib.append(im);
+    if (p.status !== "ok") ib.append(el("div", "sh-ribbon", t(p.status)));
+    const info = el("div", "product-info"), top = el("div");
+    if (p.cat) top.append(el("div", "sh-cat", p.cat));
+    top.append(el("h3", "product-title", title)); if (desc) top.append(el("p", "product-desc", desc));
+    const ft = el("div", "product-footer"), pr = el("span", "product-price", p.price);
+    if (p.old) pr.prepend(el("span", "product-old", p.old));
+    const bt = el("button", "add-to-cart-btn", p.btn || t("buy")); bt.type = "button"; bt.disabled = p.status !== "ok" || !p.url;
+    bt.addEventListener("click", () => buy(p)); ft.append(pr, bt); info.append(top, ft); w.append(ib, info);
+    if (isAdmin()) {
+        const cc = el("div", "sh-cc");
+        [["⬆", () => mv(i, -1)], ["⬇", () => mv(i, 1)], [p.off ? "🙈" : "👁", () => { P[i].off = !P[i].off; save(); }], ["✏️", () => edit(i)],
+         ["🗑️", () => { if (confirm("Supprimer cet article ?")) { P.splice(i, 1); save(); } }]].forEach(([ic, f]) => { const b = el("button", "sh-cb", ic); b.type = "button"; b.addEventListener("click", f); cc.append(b); });
+        w.append(cc);
+    }
+    return w;
+}
+function render() {
+    const adm = isAdmin(), list = P.map((p, i) => ({ p, i })).filter((x) => adm || !x.p.off);
+    const cats = [...new Set(list.map((x) => x.p.cat).filter(Boolean))], ch = $("#sh-chips"); ch.replaceChildren();
+    if (tag !== "__all__" && !cats.includes(tag)) tag = "__all__";
+    if (cats.length > 1) ["__all__", ...cats].forEach((c) => { const b = el("button", "sh-chip" + (c === tag ? " act" : ""), c === "__all__" ? t("all") : c); b.type = "button"; b.addEventListener("click", () => { tag = c; render(); }); ch.append(b); });
+    const g = $("#sh-grid"); g.replaceChildren();
+    list.filter((x) => tag === "__all__" || x.p.cat === tag).forEach((x) => g.append(card(x.p, x.i)));
+    if (!g.children.length) g.append(el("p", "shop-header", t("empty")));
+}
+
+/* ---------- Édition (admin) ---------- */
+const F = { title: "e-t", titleEn: "e-te", desc: "e-d", descEn: "e-de", price: "e-p", old: "e-o", img: "e-i", cat: "e-c", status: "e-s", badge: "e-b", bc: "e-bc", btn: "e-bt", mode: "e-m", url: "e-u", partner: "e-pa", mtext: "e-mt" };
+function edit(i) {
+    if (!isAdmin()) return;
+    editI = i; const p = P[i] || cleanP({ title: "x", status: "ok", mode: "direct", bc: "green" });
+    $("#e-h").textContent = i < 0 ? "➕ Nouvel article" : "✏️ Modifier l'article";
+    for (const [k, id] of Object.entries(F)) $("#" + id).value = i < 0 && k === "title" ? "" : p[k] || "";
+    $("#e-off").checked = !!p.off; openM("m-p");
+}
+$("#sh-add").addEventListener("click", () => edit(-1));
+$("#e-ok").addEventListener("click", async () => {
+    if (!isAdmin()) return;
+    const r = { id: P[editI]?.id, off: $("#e-off").checked }; for (const [k, id] of Object.entries(F)) r[k] = $("#" + id).value;
+    if (r.url.trim() && !safeUrl(r.url.trim())) return toast(t("err_url"), "error");
+    const p = cleanP(r); if (!p) return toast(t("err_title"), "error");
+    editI < 0 ? P.push(p) : (P[editI] = p); P = P.slice(0, 60); closeAll(); save();
+});
+function mv(i, d) { const j = i + d; if (j < 0 || j >= P.length) return; [P[i], P[j]] = [P[j], P[i]]; save(); }
+async function save() {
+    render();
+    if (!isAdmin() || !db) return toast("Accès refusé", "error");
+    try { await FS.setDoc(FS.doc(db, "shop_config", "main"), { products: P }); toast("Enregistré ✔", "success"); }
+    catch (e) { console.error(e); toast("Échec de l'enregistrement (règles Firestore ?)", "error"); }
+}
+
+/* ---------- Modales / toasts ---------- */
+function toast(m, type = "") { const e = el("div", "sh-toast " + type, m); $("#sh-toasts").append(e); setTimeout(() => e.remove(), 3800); }
+const openM = (id) => $("#" + id).classList.add("active");
+const closeAll = () => $$(".modal-overlay.active").forEach((m) => m.classList.remove("active"));
+$$("[data-close]").forEach((b) => b.addEventListener("click", closeAll));
+$$(".modal-overlay").forEach((m) => m.addEventListener("click", (e) => { if (e.target === m) closeAll(); }));
+addEventListener("keydown", (e) => { if (e.key === "Escape") closeAll(); });
+$$(".lang-btn").forEach((b) => b.addEventListener("click", () => { lang = b.dataset.lang === "en" ? "en" : "fr"; try { localStorage.setItem("abysz_lang", lang); } catch {} applyI18n(); render(); }));
+const mb = $("#mobile-menu-toggle"), ml = $("#nav-links-list");
+mb.addEventListener("click", () => { const o = !ml.classList.contains("mobile-open"); ml.classList.toggle("mobile-open", o); mb.classList.toggle("open", o); mb.setAttribute("aria-expanded", String(o)); });
+
+/* ---------- Firebase (facultatif : la boutique s'affiche même sans) ---------- */
+let auth = null, db = null, FS = null, AU = null;
+const isAdmin = () => auth?.currentUser?.email === ADMIN;
+async function initFirebase() {
+    try {
+        const base = `https://www.gstatic.com/firebasejs/${FB_VER}/`;
+        const [A, Au, F2, R] = await Promise.all([import(base + "firebase-app.js"), import(base + "firebase-auth.js"), import(base + "firebase-firestore.js"), import(base + "firebase-database.js")]);
+        const app = A.initializeApp(firebaseConfig); auth = Au.getAuth(app); db = F2.getFirestore(app); AU = Au; FS = F2;
+        AU.onAuthStateChanged(auth, (u) => { const a = u?.email === ADMIN; $("#sh-adm").hidden = $("#sh-bar").hidden = !a; $("#sh-st").textContent = "Les modifications sont enregistrées dans Firestore (shop_config/main)."; applyI18n(); render(); });
+        R.onValue(R.ref(R.getDatabase(app), "online_users"), (snap) => {
+            const now = Date.now(); let n = 0;
+            for (const ss of Object.values(snap.val() || {})) { if (!ss || typeof ss !== "object") continue; let alive = false; for (const x of Object.values(ss)) { if (x && typeof x === "object") { if (typeof x.lastSeen === "number" && now - x.lastSeen > 75000) continue; } alive = true; } if (alive) n++; }
+            online = Math.max(1, n); $("#site-online-count").textContent = t("online_n", { n: online });
+        });
+        const s = await FS.getDoc(FS.doc(db, "shop_config", "main"));
+        if (s.exists() && Array.isArray(s.data().products)) { P = s.data().products.slice(0, 60).map(cleanP).filter(Boolean); render(); }
+    } catch (e) { console.warn("Firebase indisponible :", e); }
+}
+let fails = 0, lock = 0;
+$("#tv-auth-btn").addEventListener("click", async () => { if (isAdmin()) { await AU.signOut(auth); toast("Déconnecté"); return; } if (!auth) return toast("Connexion indisponible pour le moment", "error"); openM("m-auth"); });
+async function login() {
+    if (Date.now() < lock) return toast("Trop de tentatives, patiente 1 minute", "error");
+    try { await AU.signInWithEmailAndPassword(auth, $("#a-mail").value.trim(), $("#a-pw").value); fails = 0; if (!isAdmin()) return toast("Ce compte n'a pas les droits admin", "error"); closeAll(); toast("Session admin ouverte", "success"); }
+    catch { if (++fails >= 5) { lock = Date.now() + 60000; fails = 0; } toast("Identifiants incorrects", "error"); }
+    $("#a-pw").value = "";
+}
+$("#a-ok").addEventListener("click", login);
+$("#a-pw").addEventListener("keydown", (e) => { if (e.key === "Enter") login(); });
+
+applyI18n(); render(); initFirebase();
+    </script>
     <script>
         // Le tracker ne démarre qu'après consentement "Mesure d'audience"
         window.AbyszConsent.on("analytics", function () { import("./abysz-tracker.js").catch(function (e) { console.error(e); }); });

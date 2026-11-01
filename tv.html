@@ -1,306 +1,1399 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="google-adsense-account" content="ca-pub-1494144032841410">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-JT2xlXAfRrNX1BBBuOZPfQ/FersOTEhCA9aq6Km8S8s=' https://www.gstatic.com; style-src 'sha256-xgsjmGFut7v6P5QXICSjTZNXviVzj1PxHnKtNb6okkk=' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://i.ytimg.com https://www.dailymotion.com; frame-src https://www.youtube-nocookie.com https://player.twitch.tv https://clips.twitch.tv https://player.kick.com https://player.vimeo.com https://www.dailymotion.com; connect-src https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com https://decapi.me; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
-<meta name="referrer" content="strict-origin-when-cross-origin">
-<title>ABYSZ TV — Lives & Vidéos Officielles</title>
-<link rel="icon" type="image/png" href="logo.png">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@600;700;900&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-[hidden]{display:none!important}
-:root{--p:#a855f7;--bg:#08080c;--c:#12121a;--b:#222230;--t:#8a8a9e;--r:#ef4444}
-body{background:var(--bg);color:#fff;font-family:Inter,sans-serif;min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden}
-.o{font-family:Orbitron,sans-serif}
-nav{display:flex;justify-content:space-between;align-items:center;padding:14px 28px;background:rgba(10,10,15,.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(168,85,247,.15);position:sticky;top:0;z-index:100}
-.logo{display:flex;align-items:center;gap:10px;color:#fff;font-family:Orbitron,sans-serif;font-weight:900;text-decoration:none;letter-spacing:1px}
-.logo b{color:var(--p)}
-.adm-tag{font:600 .6rem Inter,sans-serif;background:var(--p);padding:3px 8px;border-radius:4px}
-.nav-r{display:flex;gap:10px}
-.btn{display:inline-flex;align-items:center;gap:8px;background:var(--p);color:#fff;border:0;text-decoration:none;padding:9px 18px;border-radius:8px;font:700 .78rem Orbitron,sans-serif;cursor:pointer;transition:.25s}
-.btn:hover{background:#9333ea;box-shadow:0 0 18px rgba(168,85,247,.5);transform:translateY(-2px)}
-.btn.g{background:var(--c);border:1px solid var(--b)}
-.btn.g:hover{border-color:var(--p);background:var(--c)}
-.btn.s{padding:6px 12px;font-size:.7rem}
-main{max-width:1180px;width:100%;margin:28px auto;padding:0 20px;flex:1}
-.hero{text-align:center;margin-bottom:22px}
-h1{font:900 2.4rem Orbitron,sans-serif;text-shadow:0 0 22px rgba(168,85,247,.6);letter-spacing:2px}
-h1 span{color:var(--p)}
-.sub{color:var(--t);font-size:.92rem;margin-top:6px}
-.badge{display:inline-flex;align-items:center;gap:8px;font:600 .75rem Orbitron,sans-serif;padding:7px 18px;border-radius:20px;margin-top:14px;background:var(--c);border:1px solid var(--b)}
-.badge.on{border-color:var(--r);color:var(--r);background:rgba(239,68,68,.1)}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--r);box-shadow:0 0 10px var(--r);animation:pl 1.4s infinite}
-@keyframes pl{50%{opacity:.35}}
-.rail{display:flex;gap:10px;margin:0 0 16px;overflow-x:auto;padding:4px 2px 8px}
-.tab{position:relative;flex:none;display:flex;align-items:center;gap:8px;background:var(--c);border:1px solid var(--b);color:#b0b0c0;padding:10px 18px;border-radius:10px;cursor:pointer;font:600 .78rem Orbitron,sans-serif;transition:.2s}
-.tab:hover{border-color:var(--p);color:#fff}
-.tab.act{background:var(--p);border-color:var(--p);color:#fff;box-shadow:0 0 20px rgba(168,85,247,.4)}
-.tab .dot{width:7px;height:7px}
-.tab .x{display:none;position:absolute;top:-7px;right:-7px;background:var(--r);color:#fff;border:0;width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:.65rem}
-.admin .tab .x{display:block}
-.tv{background:#0e0e14;border:1px solid rgba(168,85,247,.3);border-radius:16px;padding:10px;box-shadow:0 10px 40px rgba(0,0,0,.8)}
-.ar{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;background:#000}
-.ar iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-.screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;background:radial-gradient(circle,#1b1b2b,#08080c);z-index:2}
-.screen .ic{font-size:2.6rem;margin-bottom:10px}
-.screen h3{font:700 1.2rem Orbitron,sans-serif;color:var(--p);margin-bottom:8px}
-.screen p{color:var(--t);font-size:.9rem;max-width:460px;margin-bottom:18px;line-height:1.5}
-.info{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px 6px 4px;font-size:.88rem;color:#d8d8e4;min-height:38px}
-.info span:last-child{color:var(--r);font-weight:600;white-space:nowrap}
-.bar{display:none;gap:10px;flex-wrap:wrap;background:var(--c);border:1px dashed var(--p);padding:12px 16px;border-radius:10px;margin-top:14px}
-.admin .bar{display:flex}
-.sec{font:700 1.25rem Orbitron,sans-serif;margin:44px 0 16px;display:flex;align-items:center;gap:14px}
-.sec::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(168,85,247,.4),rgba(255,255,255,.04))}
-.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
-.chip{background:var(--c);border:1px solid var(--b);color:#a0a0b0;padding:6px 14px;border-radius:20px;cursor:pointer;font:600 .7rem Orbitron,sans-serif}
-.chip.act,.chip:hover{border-color:var(--p);color:#fff;background:rgba(168,85,247,.2)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
-.card{position:relative;background:#101018;border:1px solid #1a1a26;border-radius:14px;overflow:hidden;cursor:pointer;transition:.3s;display:flex;flex-direction:column;text-align:left;color:#fff;padding:0;font:inherit}
-.card:hover{transform:translateY(-6px);border-color:var(--p);box-shadow:0 12px 30px rgba(168,85,247,.25)}
-.card.big{grid-column:span 2}
-.th{position:relative;aspect-ratio:16/9;background:radial-gradient(circle,#1a1a26,#0d0d14);display:flex;align-items:center;justify-content:center}
-.th img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.pl{position:relative;width:50px;height:50px;border-radius:50%;background:rgba(168,85,247,.92);border:2px solid #fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(168,85,247,.8);transition:.3s}
-.card:hover .pl{transform:scale(1.15)}
-.vi{padding:14px 16px}
-.vt{font:700 .68rem Orbitron,sans-serif;color:var(--p);letter-spacing:1px}
-.vn{font-weight:600;font-size:.95rem;line-height:1.4;margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.warn{color:#f59e0b;font-size:.75rem;margin-top:6px}
-.empty{grid-column:1/-1;text-align:center;padding:40px 20px;background:#101018;border:1px dashed var(--b);border-radius:14px;color:#666680;font:.85rem Orbitron,sans-serif}
-.cc{display:none;position:absolute;top:10px;right:10px;gap:6px;z-index:5}
-.admin .cc{display:flex}
-.cb{background:rgba(10,10,15,.92);border:1px solid #3a3a4c;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer}
-.cb:hover{background:var(--p)}
-.modal{display:none;position:fixed;inset:0;background:rgba(5,5,8,.88);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
-.modal.on{display:flex}
-.box{background:var(--c);border:1px solid var(--p);border-radius:16px;width:92%;max-width:440px;padding:24px;box-shadow:0 0 40px rgba(168,85,247,.3)}
-.box.w{max-width:900px;background:#0d0d14;padding:18px}
-.box h2{font:700 1.15rem Orbitron,sans-serif;color:var(--p);margin-bottom:16px;text-align:center}
-.fg{margin-bottom:14px}
-.fg label{display:block;font:.72rem Orbitron,sans-serif;color:#a0a0b0;margin-bottom:6px}
-.fg input,.fg select{width:100%;background:var(--bg);border:1px solid var(--b);color:#fff;padding:11px;border-radius:8px;font-size:.9rem}
-.fg input:focus,.fg select:focus{border-color:var(--p);outline:0}
-.row{display:flex;gap:10px;margin-top:18px}.row .btn{flex:1;justify-content:center}
-.ph{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
-.ph b{font:700 1rem Orbitron,sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ph div{display:flex;gap:8px;align-items:center}
-#toasts{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px}
-.toast{background:var(--c);padding:13px 20px;border-radius:10px;font-size:.85rem;border-left:4px solid var(--p);box-shadow:0 10px 25px rgba(0,0,0,.6)}
-.toast.success{border-color:#10b981}.toast.error{border-color:var(--r)}
-footer{padding:28px;text-align:center;border-top:1px solid #151520;color:#666680;font:.8rem Orbitron,sans-serif;margin-top:50px}
-@media(max-width:640px){.card.big{grid-column:auto}h1{font-size:1.8rem}nav{padding:12px 16px}}
-.txt{max-width:900px;margin:50px auto 0;padding:0 20px;color:#b8b8c8;line-height:1.7;font-size:.95rem}.txt h2{font-family:Orbitron,sans-serif;color:#fff;font-size:1.3rem}.txt a,footer a{color:#a855f7;text-decoration:none}footer a{margin:0 6px}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-adsense-account" content="ca-pub-1494144032841410">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'; form-action 'self'">
+    <title>ABYSZ TV — Lives &amp; Vidéos Officielles</title>
+    <meta name="description" content="ABYSZ TV : regardez les lives de la team Abysz Esports, les vidéos officielles et n'importe quel stream Twitch, Kick, YouTube, Vimeo ou Dailymotion.">
+
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#0a0a0a">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+    <!-- ===== Styles communs avec index.html (nav, langue, footer) ===== -->
+    <style>
+        html { scroll-behavior: smooth; scrollbar-gutter: stable; }
+        body { background-color: #0a0a0a; color: #ffffff; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
+        nav [hidden], main [hidden], .tv-modal [hidden] { display: none !important; }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; position: relative; z-index: 1000; background: #0a0a0a; border-bottom: 1px solid #1a1a1a; }
+        nav ul { display: flex; list-style: none; gap: 20px; margin: 0; padding: 0; align-items: center; }
+        nav ul li a { position: relative; transition: color 0.3s ease; text-decoration: none; color: white; }
+        nav ul li a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: #a855f7; transition: width 0.3s ease; }
+        nav ul li a:hover { color: #a855f7; }
+        nav ul li a:hover::after { width: 100%; }
+        
+        .logo { display: flex; align-items: center; gap: 10px; color: white; font-family: 'Orbitron', sans-serif; font-weight: bold; }
+        .social-links { display: flex; gap: 10px; margin-left: 10px; }
+        .social-links a { color: #ccc; transition: color 0.2s; }
+        .social-links a:hover { color: #a855f7; }
+
+        .nav-staff-link {
+            color: #a855f7;
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.35);
+            transition: all 0.25s ease;
+            white-space: nowrap;
+        }
+        .nav-staff-link:hover {
+            background: #a855f7;
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .abysz-tv-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, rgba(145, 70, 255, 0.2), rgba(168, 85, 247, 0.15));
+            border: 1px solid #9146FF;
+            padding: 6px 14px;
+            border-radius: 20px;
+            color: #ffffff !important;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 0 10px rgba(145, 70, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .abysz-tv-badge::after { display: none !important; }
+
+        .abysz-tv-badge:hover {
+            background: linear-gradient(135deg, #9146FF, #a855f7);
+            box-shadow: 0 0 20px rgba(145, 70, 255, 0.7);
+            transform: translateY(-2px) scale(1.03);
+            color: #ffffff !important;
+        }
+
+        .live-dot-tv {
+            width: 8px;
+            height: 8px;
+            background-color: #ff4444;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #ff4444;
+            animation: pulse-live-tv 1.5s infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes pulse-live-tv {
+            0% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 4px #ff4444; }
+            50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 12px #ff4444; }
+            100% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 4px #ff4444; }
+        }
+
+        .online-counter-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid #2a2a2a;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.78rem;
+            color: #e0e0e0;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10b981;
+            animation: pulse-live 1.8s infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes pulse-live {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        nav ul li a.btn-animated-join::after { display: none !important; }
+        .btn-animated-join {
+            position: relative;
+            background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
+            color: #ffffff;
+            padding: 8px 20px;
+            border-radius: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 800;
+            font-size: 0.82rem;
+            text-decoration: none;
+            letter-spacing: 1px;
+            display: inline-block;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+            animation: pulse-btn-glow 2.5s infinite alternate;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .btn-animated-join::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                60deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.35) 50%,
+                transparent 70%
+            );
+            transform: rotate(30deg);
+            animation: shimmer-btn 3.5s infinite;
+        }
+
+        .btn-animated-join:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.9), 0 0 50px rgba(168, 85, 247, 0.5);
+            background: linear-gradient(135deg, #b975ff 0%, #a855f7 100%);
+        }
+
+        @keyframes pulse-btn-glow {
+            0% { box-shadow: 0 0 12px rgba(168, 85, 247, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(168, 85, 247, 0.8), 0 0 35px rgba(168, 85, 247, 0.4); }
+            100% { box-shadow: 0 0 12px rgba(168, 85, 247, 0.4); }
+        }
+
+        @keyframes shimmer-btn {
+            0% { transform: translateX(-150%) rotate(30deg); }
+            20% { transform: translateX(150%) rotate(30deg); }
+            100% { transform: translateX(150%) rotate(30deg); }
+        }
+
+
+        /* ===== ONGLET BOUTIQUE : animation NEW ===== */
+        nav ul li a.nav-shop::after {
+            content: '✦'; position: absolute; top: -9px; right: -5px; left: auto; bottom: auto;
+            width: auto; height: auto; background: none; color: #fcd34d; font-size: 0.8rem;
+            transition: none; animation: shop-twinkle 2.4s ease-in-out infinite; pointer-events: none;
+        }
+        nav ul li a.nav-shop:hover::after { width: auto; }
+        .nav-shop {
+            position: relative; display: inline-flex; align-items: center; gap: 8px;
+            padding: 7px 14px; border-radius: 999px;
+            font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 0.82rem; letter-spacing: 0.4px;
+            color: #ffffff !important;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.20), rgba(236, 72, 153, 0.20));
+            border: 1px solid rgba(245, 158, 11, 0.6);
+            box-shadow: 0 0 14px rgba(245, 158, 11, 0.28);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+            animation: shop-nudge 5s ease-in-out infinite;
+        }
+        .nav-shop:hover {
+            background: linear-gradient(135deg, #f59e0b, #ec4899);
+            box-shadow: 0 0 22px rgba(245, 158, 11, 0.75);
+            transform: translateY(-2px) scale(1.06);
+            animation: none; color: #ffffff !important;
+        }
+        .nav-shop-icon { display: inline-block; transform-origin: 50% 15%; animation: shop-bag 5s ease-in-out infinite; }
+        .nav-shop-new {
+            position: relative; padding: 2px 7px; border-radius: 6px;
+            font-size: 0.62rem; font-weight: 900; letter-spacing: 1.2px; color: #111;
+            background: linear-gradient(90deg, #f59e0b, #fde68a, #ec4899, #f59e0b);
+            background-size: 250% 100%; animation: shop-shine 2.2s linear infinite;
+        }
+        .nav-shop-new::before {
+            content: ''; position: absolute; inset: -3px; border-radius: 9px;
+            border: 2px solid #f59e0b; opacity: 0; animation: shop-ping 1.8s ease-out infinite;
+        }
+        @keyframes shop-shine { to { background-position: -250% 0; } }
+        @keyframes shop-ping { 0% { transform: scale(0.9); opacity: 0.9; } 100% { transform: scale(1.5); opacity: 0; } }
+        @keyframes shop-twinkle { 0%, 100% { transform: scale(0.6) rotate(0); opacity: 0.4; } 50% { transform: scale(1.3) rotate(25deg); opacity: 1; } }
+        @keyframes shop-nudge {
+            0%, 84%, 100% { transform: none; }
+            87% { transform: rotate(-3deg) scale(1.06); }
+            90% { transform: rotate(3deg) scale(1.06); }
+            93% { transform: rotate(-2deg) scale(1.03); }
+            96% { transform: rotate(1deg); }
+        }
+        @keyframes shop-bag {
+            0%, 82%, 100% { transform: none; }
+            86% { transform: translateY(-4px) rotate(-14deg); }
+            91% { transform: translateY(0) rotate(10deg); }
+            95% { transform: rotate(-5deg); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .nav-shop, .nav-shop-icon, .nav-shop-new, .nav-shop-new::before, nav ul li a.nav-shop::after { animation: none !important; }
+        }
+
+        .menu-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; z-index: 1100; }
+        .menu-toggle span { display: block; width: 25px; height: 3px; background: white; transition: all 0.3s ease; }
+        
+        .hero { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 100px 20px; background-size: cover; background-position: center; min-height: 40vh; }
+        .hero h1 { font-family: 'Orbitron', sans-serif; font-size: 3.5rem; margin: 0; text-shadow: 0 0 20px rgba(168, 85, 247, 0.6); }
+        .hero .slogan { font-size: 1.2rem; color: #ccc; margin: 10px 0 25px 0; }
+
+        .btn { transition: transform 0.2s ease, box-shadow 0.3s ease; display: inline-block; text-decoration: none; background: #a855f7; color: white; padding: 12px 28px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-weight: bold; }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 0 20px rgba(168, 85, 247, 0.6); background: #b975ff; }
+        
+        .about-section { max-width: 1000px; margin: 0 auto; padding: 40px 20px 10px 20px; line-height: 1.7; color: #ccc; }
+        .about-section h2 { font-family: 'Orbitron', sans-serif; color: #fff; font-size: 1.8rem; margin-bottom: 15px; }
+
+        .edit-home-btn { background: #3b82f6; border: none; color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-family: 'Orbitron', sans-serif; font-weight: bold; cursor: pointer; transition: all 0.2s ease; margin-left: 10px; }
+        .edit-home-btn:hover { background: #2563eb; transform: scale(1.05); }
+
+        .section-header { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 25px; }
+        .title-area { display: flex; align-items: center; gap: 12px; }
+        .title-area h2 { font-family: 'Orbitron', sans-serif; font-size: 1.6rem; margin: 0; letter-spacing: 0.5px; }
+        
+        .add-btn { background: #a855f7; border: none; color: white; width: 34px; height: 34px; border-radius: 50%; font-size: 1.3rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; box-shadow: 0 0 10px rgba(168, 85, 247, 0.3); flex-shrink: 0; }
+        .add-btn:hover { background: #b975ff; transform: scale(1.08); box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
+        
+        .admin-gate-btn { background: transparent; border: 1px solid #a855f7; color: #a855f7; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-family: 'Orbitron', sans-serif; transition: all 0.3s ease; font-size: 0.9rem; white-space: nowrap; }
+        .admin-gate-btn:hover { background: #a855f7; color: white; box-shadow: 0 0 15px #a855f7; }
+        .admin-gate-btn.logged-in { border-color: #ff4444; color: #ff4444; }
+        .admin-gate-btn.logged-in:hover { background: #ff4444; color: white; box-shadow: 0 0 15px #ff4444; }
+
+        .announcements-container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+        .carousel-wrapper { position: relative; width: 100%; border-radius: 16px; background: #141414; border: 1px solid #2a2a2a; box-sizing: border-box; padding: 0 65px; }
+        .carousel-track-container { overflow: hidden; width: 100%; border-radius: 8px; }
+        .carousel-track { display: flex; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); width: 100%; }
+        
+        .announcement-card { min-width: 100%; box-sizing: border-box; padding: 30px; border-left: 5px solid #a855f7; position: relative; display: flex; flex-direction: column; gap: 14px; background: #1a1a1a; }
+        .announcement-card.priority-urgent { border-left-color: #ff4444; background: linear-gradient(90deg, rgba(255,68,68,0.05) 0%, #1a1a1a 100%); }
+        
+        .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: #1a1a1a; border: 1px solid #a855f7; color: white; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; z-index: 20; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        .carousel-btn:hover { background: #a855f7; box-shadow: 0 0 12px #a855f7; }
+        .carousel-btn.prev { left: 12px; }
+        .carousel-btn.next { right: 12px; }
+        
+        .carousel-dots { display: flex; justify-content: center; gap: 8px; margin-top: 15px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: #333; cursor: pointer; transition: all 0.3s ease; }
+        .dot.active { background: #a855f7; box-shadow: 0 0 8px #a855f7; width: 24px; border-radius: 10px; }
+
+        .announcement-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-right: 180px; }
+        .badge { font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: bold; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .badge-general { background: #a855f7; color: white; }
+        .badge-match { background: #3b82f6; color: white; }
+        .badge-recrutement { background: #10b981; color: white; }
+        .badge-evenement { background: #f59e0b; color: white; }
+        .badge-urgent { background: #ff4444; color: white; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+        
+        .announcement-card h3 { font-family: 'Orbitron', sans-serif; color: #ffffff; margin: 0; font-size: 1.4rem; line-height: 1.4; word-break: break-word; }
+        .announcement-card p { color: #ccc; font-size: 0.95rem; line-height: 1.6; margin: 0; white-space: pre-wrap; word-break: break-word; }
+        .announcement-img { max-width: 100%; max-height: 350px; object-fit: cover; border-radius: 8px; border: 1px solid #2a2a2a; margin-top: 4px; width: 100%; }
+        .announcement-action-btn { background: #a855f7; color: white; text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: bold; padding: 10px 20px; border-radius: 6px; align-self: flex-start; transition: all 0.2s ease; margin-top: 4px; text-align: center; }
+        .announcement-action-btn:hover { background: #b975ff; box-shadow: 0 0 10px rgba(168, 85, 247, 0.4); }
+        .announcement-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; flex-wrap: wrap; gap: 10px; }
+        .announcement-date { font-size: 0.8rem; color: #777; }
+
+        /* BOUTON LIKE ANNONCE */
+        .like-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #dddddd;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+            user-select: none;
+        }
+        .like-btn:hover {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: #ef4444;
+            color: #ef4444;
+            transform: translateY(-2px);
+        }
+        .like-btn.liked {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+            color: #ef4444;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
+        }
+        .like-heart { font-size: 0.95rem; transition: transform 0.2s ease; }
+        .like-btn.liked .like-heart { transform: scale(1.2); }
+
+        /* Lightbox */
+        .announcement-img, .custom-card-img { cursor: zoom-in; }
+        .img-lightbox {
+            position: fixed; inset: 0; z-index: 3000;
+            background: rgba(0, 0, 0, 0.92);
+            display: none; align-items: center; justify-content: center;
+            padding: 30px; box-sizing: border-box;
+            opacity: 0; transition: opacity 0.25s ease;
+        }
+        .img-lightbox.active { display: flex; opacity: 1; }
+        .img-lightbox img {
+            max-width: 90vw; max-height: 90vh;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 0 40px rgba(168, 85, 247, 0.3);
+            transform: scale(0.95); transition: transform 0.25s ease;
+        }
+        .img-lightbox.active img { transform: scale(1); }
+        .img-lightbox-close {
+            position: absolute; top: 20px; right: 25px;
+            background: #1a1a1a; border: 1px solid #a855f7; color: white;
+            width: 42px; height: 42px; border-radius: 50%; cursor: pointer;
+            font-size: 1.3rem; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease; z-index: 3001;
+        }
+        .img-lightbox-close:hover { background: #a855f7; box-shadow: 0 0 12px #a855f7; }
+        .abysz-tv-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, rgba(145, 70, 255, 0.2), rgba(168, 85, 247, 0.15));
+            border: 1px solid #9146FF;
+            padding: 6px 14px;
+            border-radius: 20px;
+            color: #ffffff !important;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 0 10px rgba(145, 70, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .abysz-tv-badge::after { display: none !important; }
+
+        .abysz-tv-badge:hover {
+            background: linear-gradient(135deg, #9146FF, #a855f7);
+            box-shadow: 0 0 20px rgba(145, 70, 255, 0.7);
+            transform: translateY(-2px) scale(1.03);
+            color: #ffffff !important;
+        }
+
+        .live-dot-tv {
+            width: 8px;
+            height: 8px;
+            background-color: #ff4444;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #ff4444;
+            animation: pulse-live-tv 1.5s infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes pulse-live-tv {
+            0% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 4px #ff4444; }
+            50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 12px #ff4444; }
+            100% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 4px #ff4444; }
+        }
+
+        .online-counter-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid #2a2a2a;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.78rem;
+            color: #e0e0e0;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10b981;
+            animation: pulse-live 1.8s infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes pulse-live {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        nav ul li a.btn-animated-join::after { display: none !important; }
+        .btn-animated-join {
+            position: relative;
+            background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
+            color: #ffffff;
+            padding: 8px 20px;
+            border-radius: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 800;
+            font-size: 0.82rem;
+            text-decoration: none;
+            letter-spacing: 1px;
+            display: inline-block;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+            animation: pulse-btn-glow 2.5s infinite alternate;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .btn-animated-join::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                60deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.35) 50%,
+                transparent 70%
+            );
+            transform: rotate(30deg);
+            animation: shimmer-btn 3.5s infinite;
+        }
+
+        .btn-animated-join:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.9), 0 0 50px rgba(168, 85, 247, 0.5);
+            background: linear-gradient(135deg, #b975ff 0%, #a855f7 100%);
+        }
+
+        @keyframes pulse-btn-glow {
+            0% { box-shadow: 0 0 12px rgba(168, 85, 247, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(168, 85, 247, 0.8), 0 0 35px rgba(168, 85, 247, 0.4); }
+            100% { box-shadow: 0 0 12px rgba(168, 85, 247, 0.4); }
+        }
+
+        @keyframes shimmer-btn {
+            0% { transform: translateX(-150%) rotate(30deg); }
+            20% { transform: translateX(150%) rotate(30deg); }
+            100% { transform: translateX(150%) rotate(30deg); }
+        }
+
+
+        /* ===== ONGLET BOUTIQUE : animation NEW ===== */
+        nav ul li a.nav-shop::after {
+            content: '✦'; position: absolute; top: -9px; right: -5px; left: auto; bottom: auto;
+            width: auto; height: auto; background: none; color: #fcd34d; font-size: 0.8rem;
+            transition: none; animation: shop-twinkle 2.4s ease-in-out infinite; pointer-events: none;
+        }
+        nav ul li a.nav-shop:hover::after { width: auto; }
+        .nav-shop {
+            position: relative; display: inline-flex; align-items: center; gap: 8px;
+            padding: 7px 14px; border-radius: 999px;
+            font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 0.82rem; letter-spacing: 0.4px;
+            color: #ffffff !important;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.20), rgba(236, 72, 153, 0.20));
+            border: 1px solid rgba(245, 158, 11, 0.6);
+            box-shadow: 0 0 14px rgba(245, 158, 11, 0.28);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+            animation: shop-nudge 5s ease-in-out infinite;
+        }
+        .nav-shop:hover {
+            background: linear-gradient(135deg, #f59e0b, #ec4899);
+            box-shadow: 0 0 22px rgba(245, 158, 11, 0.75);
+            transform: translateY(-2px) scale(1.06);
+            animation: none; color: #ffffff !important;
+        }
+        .nav-shop-icon { display: inline-block; transform-origin: 50% 15%; animation: shop-bag 5s ease-in-out infinite; }
+        .nav-shop-new {
+            position: relative; padding: 2px 7px; border-radius: 6px;
+            font-size: 0.62rem; font-weight: 900; letter-spacing: 1.2px; color: #111;
+            background: linear-gradient(90deg, #f59e0b, #fde68a, #ec4899, #f59e0b);
+            background-size: 250% 100%; animation: shop-shine 2.2s linear infinite;
+        }
+        .nav-shop-new::before {
+            content: ''; position: absolute; inset: -3px; border-radius: 9px;
+            border: 2px solid #f59e0b; opacity: 0; animation: shop-ping 1.8s ease-out infinite;
+        }
+        @keyframes shop-shine { to { background-position: -250% 0; } }
+        @keyframes shop-ping { 0% { transform: scale(0.9); opacity: 0.9; } 100% { transform: scale(1.5); opacity: 0; } }
+        @keyframes shop-twinkle { 0%, 100% { transform: scale(0.6) rotate(0); opacity: 0.4; } 50% { transform: scale(1.3) rotate(25deg); opacity: 1; } }
+        @keyframes shop-nudge {
+            0%, 84%, 100% { transform: none; }
+            87% { transform: rotate(-3deg) scale(1.06); }
+            90% { transform: rotate(3deg) scale(1.06); }
+            93% { transform: rotate(-2deg) scale(1.03); }
+            96% { transform: rotate(1deg); }
+        }
+        @keyframes shop-bag {
+            0%, 82%, 100% { transform: none; }
+            86% { transform: translateY(-4px) rotate(-14deg); }
+            91% { transform: translateY(0) rotate(10deg); }
+            95% { transform: rotate(-5deg); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .nav-shop, .nav-shop-icon, .nav-shop-new, .nav-shop-new::before, nav ul li a.nav-shop::after { animation: none !important; }
+        }
+
+        .menu-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; z-index: 1100; }
+        .menu-toggle span { display: block; width: 25px; height: 3px; background: white; transition: all 0.3s ease; }
+        
+        .lang-switch { display: inline-flex; gap: 4px; padding: 3px; background: #141414; border: 1px solid #2a2a2a; border-radius: 999px; order: 2; flex-shrink: 0; }
+        .lang-btn { font-family: 'Orbitron', sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; color: #aaa; background: transparent; border: none; padding: 6px 12px; border-radius: 999px; cursor: pointer; transition: all 0.25s ease; }
+        .lang-btn:hover { color: #fff; }
+        .lang-btn[aria-pressed="true"] { background: linear-gradient(135deg, #a855f7, #7e22ce); color: #fff; box-shadow: 0 0 12px rgba(168, 85, 247, 0.5); }
+        footer { padding: 35px 20px; text-align: center; border-top: 1px solid #1a1a1a; color: #888; font-size: 0.85rem; }
+        footer .footer-links { margin-bottom: 12px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        footer .footer-links a { color: #aaa; text-decoration: none; transition: color 0.2s; }
+        footer .footer-links a:hover { color: #a855f7; }
+        .lang-btn:focus-visible { outline: 2px solid #a855f7; outline-offset: 2px; }
+        .nav-staff-mobile { display: none; }
+        @media (max-width: 430px) {
+            .logo .nav-staff-link { display: none; }
+            nav ul li.nav-staff-mobile { display: block; }
+        }
+        .tv-adm-tag { font: 600 .6rem 'Orbitron', sans-serif; background: #a855f7; padding: 3px 8px; border-radius: 4px; vertical-align: middle; letter-spacing: 0; }
+        .abysz-tv-badge[aria-current="page"] { box-shadow: 0 0 20px rgba(145, 70, 255, 0.55); }
+        .nav-admin-btn { background: transparent; border: 1px solid #2a2a2a; color: #ddd; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: 600; padding: 6px 14px; border-radius: 20px; cursor: pointer; transition: all .25s; white-space: nowrap; }
+        .nav-admin-btn:hover { border-color: #a855f7; color: #fff; box-shadow: 0 0 10px rgba(168,85,247,.4); }
+        .nav-admin-btn.on { border-color: #a855f7; color: #a855f7; }
+        @media (max-width: 768px) {
+            .lang-switch { order: 0; margin-left: auto; margin-right: 12px; }
+            .lang-btn { padding: 5px 9px; font-size: 0.68rem; }
+            .lang-switch { gap: 2px; padding: 2px; margin-right: 10px; }
+            nav { padding: 12px; gap: 6px; }
+            .logo { gap: 6px; min-width: 0; }
+            .social-links { gap: 8px; margin-left: 4px; }
+            .menu-toggle { display: flex; }
+            nav ul { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; width: 100%; background: rgba(10, 10, 10, 0.98); border-bottom: 2px solid #a855f7; padding: 20px; box-sizing: border-box; gap: 15px; text-align: center; }
+            nav ul.mobile-open { display: flex; }
+            nav ul li a { display: block; padding: 10px 0; font-size: 1.1rem; }
+            nav ul li a::after { display: none; }
+            nav ul li a.abysz-tv-badge, nav ul li a.btn-animated-join, nav ul li a.nav-shop { display: inline-flex; justify-content: center; }
+            .menu-toggle.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+            .menu-toggle.open span:nth-child(2) { opacity: 0; }
+            .menu-toggle.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+        }
+    </style>
+
+    <!-- ===== Styles propres à ABYSZ TV (tout est préfixé « tv- » pour ne jamais entrer en conflit avec le bandeau cookies) ===== -->
+    <style>
+        :root { --tv-p: #a855f7; --tv-bg: #0a0a0a; --tv-c: #141414; --tv-b: #2a2a2a; --tv-t: #8a8a9e; --tv-r: #ef4444; }
+        .tv-main, .tv-main *, .tv-modal, .tv-modal *, #tv-toasts, #tv-toasts * { box-sizing: border-box; }
+        .tv-main { max-width: 1180px; width: 100%; margin: 28px auto 0; padding: 0 20px; min-height: 60vh; }
+        :where(.tv-main) :is(h1, h2, h3, p) { margin: 0; }
+
+        .tv-hero { text-align: center; margin-bottom: 22px; }
+        .tv-hero h1 { font: 900 2.4rem 'Orbitron', sans-serif; text-shadow: 0 0 22px rgba(168,85,247,.6); letter-spacing: 2px; }
+        .tv-hero h1 span { color: var(--tv-p); }
+        .tv-sub { color: var(--tv-t); font-size: .92rem; margin-top: 6px; }
+        .tv-badge { display: inline-flex; align-items: center; gap: 8px; font: 600 .75rem 'Orbitron', sans-serif; padding: 7px 18px; border-radius: 20px; margin-top: 14px; background: var(--tv-c); border: 1px solid var(--tv-b); }
+        .tv-badge.on { border-color: var(--tv-r); color: var(--tv-r); background: rgba(239,68,68,.1); }
+        .tv-dot { display: inline-block; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--tv-r); box-shadow: 0 0 10px var(--tv-r); animation: tv-pl 1.4s infinite; }
+        @keyframes tv-pl { 50% { opacity: .35; } }
+
+        .tv-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--tv-p); color: #fff; border: 0; text-decoration: none; padding: 10px 20px; border-radius: 8px; font: 700 .78rem 'Orbitron', sans-serif; cursor: pointer; transition: transform .2s ease, box-shadow .3s ease, background .2s; }
+        .tv-btn:hover { background: #b975ff; box-shadow: 0 0 18px rgba(168,85,247,.55); transform: translateY(-2px); }
+        .tv-btn.g { background: var(--tv-c); border: 1px solid var(--tv-b); }
+        .tv-btn.g:hover { border-color: var(--tv-p); background: var(--tv-c); }
+        .tv-btn.s { padding: 7px 12px; font-size: .7rem; }
+        .tv-btn:focus-visible, .tv-tab:focus-visible, .tv-chip:focus-visible, .tv-card:focus-visible { outline: 2px solid var(--tv-p); outline-offset: 2px; }
+
+        .tv-rail { display: flex; gap: 10px; margin: 0 0 16px; overflow-x: auto; padding: 8px 6px 10px; scrollbar-width: thin; }
+        .tv-tabw { position: relative; flex: none; }
+        .tv-tab { display: flex; align-items: center; gap: 8px; background: var(--tv-c); border: 1px solid var(--tv-b); color: #b0b0c0; padding: 10px 18px; border-radius: 10px; cursor: pointer; font: 600 .78rem 'Orbitron', sans-serif; transition: .2s; }
+        .tv-tab:hover { border-color: var(--tv-p); color: #fff; }
+        .tv-tab.act { background: var(--tv-p); border-color: var(--tv-p); color: #fff; box-shadow: 0 0 20px rgba(168,85,247,.4); }
+        .tv-tab .tv-dot { width: 7px; height: 7px; }
+        .tv-x { position: absolute; top: -7px; right: -7px; background: var(--tv-r); color: #fff; border: 0; width: 20px; height: 20px; border-radius: 50%; cursor: pointer; font-size: .65rem; line-height: 1; padding: 0; }
+
+        .tv-tv { background: #0e0e14; border: 1px solid rgba(168,85,247,.3); border-radius: 16px; padding: 10px; box-shadow: 0 10px 40px rgba(0,0,0,.8); }
+        .tv-ar { position: relative; aspect-ratio: 16/9; width: 100%; overflow: hidden; border-radius: 12px; background: #000; }
+        .tv-ar iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+        .tv-ar:fullscreen { border-radius: 0; }
+        .tv-screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; background: radial-gradient(circle, #1b1b2b, #0a0a0a); z-index: 2; }
+        .tv-screen .tv-ic { font-size: 2.6rem; margin-bottom: 10px; }
+        .tv-screen h3 { font: 700 1.2rem 'Orbitron', sans-serif; color: var(--tv-p); margin-bottom: 8px; }
+        .tv-screen p { color: var(--tv-t); font-size: .9rem; max-width: 460px; margin-bottom: 18px; line-height: 1.5; }
+        .tv-info { display: flex; justify-content: space-between; gap: 12px; align-items: center; flex-wrap: wrap; padding: 12px 6px 4px; font-size: .88rem; color: #d8d8e4; min-height: 38px; }
+        .tv-info-l { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; min-width: 0; }
+        .tv-info-l span:last-child { color: var(--tv-r); font-weight: 600; white-space: nowrap; }
+        #tv-i-t { overflow: hidden; text-overflow: ellipsis; }
+        .tv-acts { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        .tv-sec { font: 700 1.25rem 'Orbitron', sans-serif; margin: 44px 0 16px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+        .tv-sec::after { content: ''; flex: 1; min-width: 40px; height: 1px; background: linear-gradient(90deg, rgba(168,85,247,.4), rgba(255,255,255,.04)); }
+        .tv-find { display: flex; gap: 10px; flex-wrap: wrap; }
+        .tv-find input { flex: 1 1 320px; min-width: 0; }
+        .tv-find select { flex: 0 0 150px; }
+        .tv-inp { background: var(--tv-bg); border: 1px solid var(--tv-b); color: #fff; padding: 12px; border-radius: 8px; font: .9rem 'Inter', sans-serif; width: 100%; }
+        .tv-inp:focus { border-color: var(--tv-p); outline: 0; box-shadow: 0 0 0 3px rgba(168,85,247,.18); }
+        .tv-hint { color: var(--tv-t); font-size: .82rem; line-height: 1.6; margin-top: 12px; }
+        .tv-plats { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+
+        .tv-bar { display: none; gap: 10px; flex-wrap: wrap; background: var(--tv-c); border: 1px dashed var(--tv-p); padding: 12px 16px; border-radius: 10px; margin-top: 14px; }
+        .tv-admin .tv-bar { display: flex; }
+
+        .tv-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+        .tv-chip { background: var(--tv-c); border: 1px solid var(--tv-b); color: #a0a0b0; padding: 6px 14px; border-radius: 20px; cursor: pointer; font: 600 .7rem 'Orbitron', sans-serif; }
+        .tv-chip.act, .tv-chip:hover { border-color: var(--tv-p); color: #fff; background: rgba(168,85,247,.2); }
+
+        .tv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .tv-cardw { position: relative; }
+        .tv-cardw.big { grid-column: span 2; }
+        .tv-card { width: 100%; height: 100%; background: #101018; border: 1px solid #1a1a26; border-radius: 14px; overflow: hidden; cursor: pointer; transition: .3s; display: flex; flex-direction: column; text-align: left; color: #fff; padding: 0; font: inherit; }
+        .tv-card:hover { transform: translateY(-6px); border-color: var(--tv-p); box-shadow: 0 12px 30px rgba(168,85,247,.25); }
+        .tv-card.cur { border-color: var(--tv-p); box-shadow: 0 0 22px rgba(168,85,247,.45); }
+        .tv-th { position: relative; aspect-ratio: 16/9; width: 100%; background: radial-gradient(circle, #1a1a26, #0d0d14); display: flex; align-items: center; justify-content: center; }
+        .tv-th img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+        .tv-th .tv-pf { position: absolute; left: 10px; bottom: 8px; font-size: 1.1rem; filter: drop-shadow(0 0 4px #000); }
+        .tv-pl { position: relative; width: 50px; height: 50px; border-radius: 50%; background: rgba(168,85,247,.92); border: 2px solid #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(168,85,247,.8); transition: .3s; font-size: 1rem; }
+        .tv-card:hover .tv-pl { transform: scale(1.15); }
+        .tv-vi { padding: 14px 16px; }
+        .tv-vt { font: 700 .68rem 'Orbitron', sans-serif; color: var(--tv-p); letter-spacing: 1px; }
+        .tv-vn { font-weight: 600; font-size: .95rem; line-height: 1.4; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .tv-warn { color: #f59e0b; font-size: .75rem; margin-top: 6px; }
+        .tv-empty { grid-column: 1/-1; text-align: center; padding: 40px 20px; background: #101018; border: 1px dashed var(--tv-b); border-radius: 14px; color: #666680; font: .85rem 'Orbitron', sans-serif; }
+        .tv-cc { display: none; position: absolute; top: 10px; right: 10px; gap: 6px; z-index: 5; }
+        .tv-admin .tv-cc { display: flex; }
+        .tv-cb { background: rgba(10,10,10,.92); border: 1px solid #3a3a4c; color: #fff; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; }
+        .tv-cb:hover { background: var(--tv-p); }
+
+        .tv-modal { display: none; position: fixed; inset: 0; background: rgba(5,5,8,.88); z-index: 1200; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+        .tv-modal.on { display: flex; }
+        .tv-box { background: var(--tv-c); border: 1px solid var(--tv-p); border-radius: 16px; width: 92%; max-width: 440px; padding: 24px; box-shadow: 0 0 40px rgba(168,85,247,.3); max-height: 92vh; overflow-y: auto; }
+        .tv-box h2 { font: 700 1.15rem 'Orbitron', sans-serif; color: var(--tv-p); margin-bottom: 16px; text-align: center; }
+        .tv-fg { margin-bottom: 14px; }
+        .tv-fg label { display: block; font: .72rem 'Orbitron', sans-serif; color: #a0a0b0; margin-bottom: 6px; }
+        .tv-row { display: flex; gap: 10px; margin-top: 18px; }
+        .tv-row .tv-btn { flex: 1; }
+
+        #tv-toasts { position: fixed; top: 76px; right: 16px; z-index: 1500; display: flex; flex-direction: column; gap: 10px; max-width: calc(100vw - 32px); }
+        .tv-toast { background: var(--tv-c); padding: 13px 20px; border-radius: 10px; font-size: .85rem; border-left: 4px solid var(--tv-p); box-shadow: 0 10px 25px rgba(0,0,0,.6); }
+        .tv-toast.success { border-color: #10b981; }
+        .tv-toast.error { border-color: var(--tv-r); }
+
+        .tv-foot-space { height: 50px; }
+        @media (max-width: 640px) {
+            .tv-cardw.big { grid-column: auto; }
+            .tv-hero h1 { font-size: 1.8rem; }
+            .tv-find select { flex: 1 1 100%; }
+            .tv-find .tv-btn { flex: 1 1 100%; }
+            .tv-main { padding: 0 12px; }
+        }
+        @media (prefers-reduced-motion: reduce) { .tv-dot { animation: none; } .tv-card, .tv-btn { transition: none; } }
+    </style>
 </head>
 <body>
-<nav>
-  <a href="index.html" class="logo"><img src="logo.png" alt="" width="30" height="30" id="logo-img">ABYSZ <b>TV</b> <span class="adm-tag" id="adm-tag" hidden>ADMIN</span></a>
-  <div class="nav-r"><a href="index.html" class="btn g">⬅ Retour</a><button class="btn g" id="auth-btn">👤 Admin</button></div>
-</nav>
-<main>
-  <div class="hero">
-    <h1>ABYSZ <span>TV</span></h1>
-    <p class="sub">Lives de la team en direct et vidéos officielles</p>
-    <div class="badge" id="badge">🔍 Synchronisation…</div>
-  </div>
-  <div class="rail" id="rail"></div>
-  <div class="tv">
-    <div class="ar" id="stage"><div class="screen" id="screen" hidden><div class="ic" id="s-ic"></div><h3 id="s-h"></h3><p id="s-p"></p><a class="btn" id="s-a" target="_blank" rel="noopener noreferrer" hidden></a><button class="btn" id="s-b" hidden>🎬 Voir les vidéos</button></div></div>
-    <div class="info"><span id="i-t"></span><span id="i-v"></span></div>
-  </div>
-  <div class="bar"><button class="btn s" id="add-ch">➕ Chaîne</button><button class="btn s g" id="set-key">🔑 Clé API YouTube</button></div>
 
-  <h2 class="sec" id="videos">🎬 Vidéos de la Team <button class="btn s" id="add-v" hidden>➕ Ajouter</button></h2>
-  <div class="chips" id="chips"></div>
-  <div class="grid" id="grid"></div>
-</main>
+    <nav>
+        <div class="logo">
+            <img src="logo.png" alt="Logo ABYSZ" width="30" height="30" id="tv-logo">
+            ABYSZ
+            <div class="social-links">
+            <a href="https://www.tiktok.com/@abysz_o" target="_blank" rel="noopener noreferrer" aria-label="TikTok ABYSZ"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.76a4.85 4.85 0 0 1-1.01-.07z"/></svg></a>
+            <a href="https://x.com/abysz_o" target="_blank" rel="noopener noreferrer" aria-label="X ABYSZ"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+            <a href="https://www.youtube.com/channel/UCn0XszECC_mr_QfOry6UUsA" target="_blank" rel="noopener noreferrer" aria-label="YouTube ABYSZ"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+            <a href="https://www.twitch.tv/abysz_o" target="_blank" rel="noopener noreferrer" aria-label="Twitch ABYSZ"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg></a>
+            </div>
+            <a href="staffabysz.html" class="nav-staff-link">Staff</a>
+        </div>
 
-<div class="modal" id="m-auth"><div class="box"><h2>🔑 Espace Admin</h2>
-  <div class="fg"><label for="a-mail">Email</label><input type="email" id="a-mail" autocomplete="username" maxlength="120"></div>
-  <div class="fg"><label for="a-pw">Mot de passe</label><input type="password" id="a-pw" autocomplete="current-password" maxlength="128"></div>
-  <div class="row"><button class="btn" id="a-ok">Connexion</button><button class="btn g" data-close>Annuler</button></div></div></div>
+        <div class="lang-switch" role="group" aria-label="Langue / Language" data-i18n-aria="lang_group">
+            <button type="button" class="lang-btn" data-lang="fr" aria-pressed="true" title="Français">FR</button>
+            <button type="button" class="lang-btn" data-lang="en" aria-pressed="false" title="English">EN</button>
+        </div>
 
-<div class="modal" id="m-ch"><div class="box"><h2>📡 Ajouter une chaîne</h2>
-  <div class="fg"><label for="c-pf">Plateforme</label><select id="c-pf"><option value="twitch">Twitch</option><option value="youtube">YouTube (ID de chaîne UC…)</option><option value="kick">Kick</option><option value="tiktok">TikTok</option><option value="link">Lien externe (https)</option></select></div>
-  <div class="fg"><label for="c-name">Nom affiché</label><input id="c-name" maxlength="40"></div>
-  <div class="fg"><label for="c-id" id="c-idl">Identifiant</label><input id="c-id" maxlength="200"></div>
-  <div class="row"><button class="btn" id="c-ok">Ajouter</button><button class="btn g" data-close>Annuler</button></div></div></div>
+        <button class="menu-toggle" id="mobile-menu-toggle" data-i18n-aria="menu_open" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="nav-links-list">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
 
-<div class="modal" id="m-v"><div class="box"><h2 id="v-h">Vidéo</h2>
-  <div class="fg"><label for="v-t">Titre</label><input id="v-t" maxlength="120"></div>
-  <div class="fg"><label for="v-g">Catégorie</label><input id="v-g" maxlength="24" placeholder="HIGHLIGHT, TRAILER…"></div>
-  <div class="fg"><label for="v-u">Lien (YouTube, Shorts, Twitch VOD/clip, Vimeo, Dailymotion)</label><input id="v-u" maxlength="300"></div>
-  <div class="row"><button class="btn" id="v-ok">Enregistrer</button><button class="btn g" data-close>Annuler</button></div></div></div>
+        <ul id="nav-links-list">
+            <li><a href="index.html" data-i18n="nav_home">Accueil</a></li>
+            <li><a href="tv.html" class="abysz-tv-badge" aria-current="page"><span class="live-dot-tv"></span><span>📺 ABYSZ TV</span></a></li>
+            <li><a href="roster.html">Roster</a></li>
+            <li><a href="index.html#annonces" data-i18n="nav_planning">Planning</a></li>
+            <li><a href="boutique.html" class="nav-shop"><span class="nav-shop-icon">🛍️</span><span data-i18n="nav_shop">Boutique</span><span class="nav-shop-new">NEW</span></a></li>
+            <li><a href="index.html#rejoindre-commu" class="btn-animated-join" data-i18n="nav_join">🚀 Rejoindre</a></li>
+            <li><button type="button" class="nav-admin-btn" id="tv-auth-btn">👤 Admin</button></li>
+            <li class="nav-staff-mobile"><a href="staffabysz.html" style="color:#a855f7;font-weight:bold;">Staff</a></li>
+        </ul>
+    </nav>
 
-<div class="modal" id="m-p"><div class="box w"><div class="ph"><b id="p-t"></b><div><a class="btn s g" id="p-a" target="_blank" rel="noopener noreferrer">Ouvrir ↗</a><button class="btn s g" data-close>✕</button></div></div><div class="ar" id="p-body"></div></div></div>
+    <main class="tv-main">
+        <header class="tv-hero">
+            <h1>ABYSZ <span>TV</span> <span class="tv-adm-tag" id="tv-adm-tag" hidden>ADMIN</span></h1>
+            <p class="tv-sub" data-i18n="sub">Lives de la team en direct, vidéos officielles et n'importe quel stream</p>
+            <div class="tv-badge" id="tv-badge" role="status" aria-live="polite">🔍 Synchronisation…</div>
+        </header>
 
-<div id="toasts"></div>
-<footer>© 2026 ABYSZ ESPORTS • TOUS DROITS RÉSERVÉS<br><a href="mentions-legales.html">Mentions légales</a> • <a href="politique-confidentialite.html">Confidentialité</a> • <a href="cookies.html">Cookies</a> • <a href="#" data-open-cookie-prefs>Gérer mes cookies</a></footer>
+        <div class="tv-rail" id="tv-rail"></div>
 
-<script src="cookie-consent.js"></script>
-<script type="module">
-import {initializeApp} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import {getAuth,setPersistence,browserSessionPersistence,signInWithEmailAndPassword,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import {getFirestore,doc,getDoc,setDoc} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        <div class="tv-tv">
+            <div class="tv-ar" id="tv-stage">
+                <div class="tv-screen" id="tv-screen" hidden>
+                    <div class="tv-ic" id="tv-s-ic"></div>
+                    <h3 id="tv-s-h"></h3>
+                    <p id="tv-s-p"></p>
+                    <a class="tv-btn" id="tv-s-a" target="_blank" rel="noopener noreferrer" hidden></a>
+                    <button type="button" class="tv-btn" id="tv-s-b" data-i18n="btn_videos" hidden>🎬 Voir les vidéos</button>
+                </div>
+            </div>
+            <div class="tv-info">
+                <div class="tv-info-l"><span id="tv-i-t"></span><span id="tv-i-v"></span></div>
+                <div class="tv-acts">
+                    <a class="tv-btn s g" id="tv-open" target="_blank" rel="noopener noreferrer" data-i18n="act_open" hidden>Ouvrir ↗</a>
+                    <button type="button" class="tv-btn s g" id="tv-share" data-i18n="act_share">🔗 Partager</button>
+                    <button type="button" class="tv-btn s g" id="tv-fs" data-i18n="act_fs">⛶ Plein écran</button>
+                </div>
+            </div>
+        </div>
 
-if(top!==self){document.documentElement.textContent="";throw new Error("frame")}
-const ADMIN="abyszofficial@gmail.com",HOST=location.hostname||"localhost";
-const app=initializeApp({apiKey:"AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",authDomain:"abyszofficial.firebaseapp.com",projectId:"abyszofficial",storageBucket:"abyszofficial.appspot.com",messagingSenderId:"1023849201948",appId:"1:1023849201948:web:abcdef123456789"});
-const auth=getAuth(app),db=getFirestore(app);
-setPersistence(auth,browserSessionPersistence).catch(()=>{});
+        <div class="tv-bar">
+            <button type="button" class="tv-btn s" id="tv-add-ch">➕ Chaîne</button>
+            <button type="button" class="tv-btn s g" id="tv-set-key">🔑 Clé API YouTube</button>
+        </div>
 
-const S={ch:[{platform:"twitch",id:"abysz_o",name:"Twitch"},{platform:"tiktok",id:"abysz_o",name:"TikTok"}],vid:[],live:{},sel:0,manual:false,tag:"TOUT",key:"",edit:-1};
-const $=s=>document.querySelector(s);
-const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
-const isAdmin=()=>auth.currentUser?.email===ADMIN;
-const ICON={twitch:"💜",youtube:"🔴",kick:"🟢",tiktok:"🎵",link:"⚡"};
-const open=id=>$("#"+id).classList.add("on"),close=id=>$("#"+id).classList.remove("on");
-$("#logo-img").addEventListener("error",e=>e.target.hidden=true);
+        <h2 class="tv-sec" id="finder" data-i18n="find_h">🔎 Regarder n'importe quel stream</h2>
+        <div class="tv-find">
+            <input class="tv-inp" id="tv-in" type="text" maxlength="300" autocomplete="off" spellcheck="false" data-i18n-placeholder="find_ph" placeholder="twitch.tv/pseudo · kick.com/pseudo · youtube.com/watch?v=…" aria-label="Lien ou pseudo">
+            <select class="tv-inp" id="tv-pf" aria-label="Plateforme">
+                <option value="auto" data-i18n="pf_auto">Auto (lien)</option>
+                <option value="twitch">Twitch</option>
+                <option value="kick">Kick</option>
+                <option value="youtube">YouTube</option>
+            </select>
+            <button type="button" class="tv-btn" id="tv-go" data-i18n="find_go">▶ Regarder</button>
+        </div>
+        <div class="tv-plats">
+            <button type="button" class="tv-chip" data-pf="twitch">💜 Twitch</button>
+            <button type="button" class="tv-chip" data-pf="kick">🟢 Kick</button>
+            <button type="button" class="tv-chip" data-pf="youtube">🔴 YouTube</button>
+            <button type="button" class="tv-chip" data-pf="auto">🎞️ Vimeo · Dailymotion</button>
+        </div>
+        <p class="tv-hint" data-i18n="find_hint">Colle un lien de live ou de vidéo, ou un pseudo avec la plateforme choisie. TikTok s'ouvre directement dans son app.</p>
 
-function toast(m,t=""){const e=el("div","toast "+t,m);$("#toasts").append(e);setTimeout(()=>e.remove(),3500)}
-const clean=(s,n)=>String(s??"").replace(/[\u0000-\u001f<>]/g,"").trim().slice(0,n);
-const safeUrl=s=>{try{const u=new URL(s);return u.protocol==="https:"?u.href:null}catch{return null}};
+        <h2 class="tv-sec" id="videos"><span data-i18n="vid_h">🎬 Vidéos de la Team</span> <button type="button" class="tv-btn s" id="tv-add-v" hidden>➕ Ajouter</button></h2>
+        <div class="tv-chips" id="tv-chips"></div>
+        <div class="tv-grid" id="tv-grid"></div>
+        <div class="tv-foot-space"></div>
+    </main>
 
-const RX={twitch:/^[A-Za-z0-9_]{3,25}$/,youtube:/^UC[\w-]{22}$/,kick:/^[A-Za-z0-9_-]{3,25}$/,tiktok:/^[A-Za-z0-9_.]{2,30}$/};
-function cleanCh(c){if(!c)return null;const p=c.platform,name=clean(c.name,40);
-  if(p==="link"){const url=safeUrl(c.url);return url&&name?{platform:p,name,url}:null}
-  const id=clean(c.id,40);return RX[p]?.test(id)?{platform:p,id,name:name||p.toUpperCase()}:null}
-const cleanVid=v=>({title:clean(v?.title,120),tag:clean(v?.tag,24).toUpperCase()||"OFFICIEL",url:clean(v?.url,300)});
+    <!-- Modales admin -->
+    <div class="tv-modal" id="m-auth" role="dialog" aria-modal="true" aria-label="Espace Admin"><div class="tv-box"><h2>🔑 Espace Admin</h2>
+        <div class="tv-fg"><label for="a-mail">Email</label><input class="tv-inp" type="email" id="a-mail" autocomplete="username" maxlength="120"></div>
+        <div class="tv-fg"><label for="a-pw">Mot de passe</label><input class="tv-inp" type="password" id="a-pw" autocomplete="current-password" maxlength="128"></div>
+        <div class="tv-row"><button type="button" class="tv-btn" id="a-ok">Connexion</button><button type="button" class="tv-btn g" data-close>Annuler</button></div></div></div>
 
-function parseVideo(raw){let u;try{u=new URL(raw)}catch{return null}
-  if(u.protocol!=="https:")return null;
-  const h=u.hostname.replace(/^(www|m)\./,""),p=u.pathname.split("/").filter(Boolean),q=u.searchParams;let id;
-  if(h==="youtu.be")id=p[0];
-  else if(/^youtube(-nocookie)?\.com$/.test(h))id=p[0]==="watch"?q.get("v"):["shorts","live","embed","v"].includes(p[0])?p[1]:null;
-  if(id&&/^[\w-]{11}$/.test(id))return{id,embed:`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`,thumb:`https://i.ytimg.com/vi/${id}/hqdefault.jpg`,watch:`https://www.youtube.com/watch?v=${id}`};
-  if(h==="twitch.tv"&&p[0]==="videos"&&/^\d+$/.test(p[1]||""))return{embed:`https://player.twitch.tv/?video=v${p[1]}&parent=${HOST}&autoplay=true`,watch:u.href};
-  const slug=h==="clips.twitch.tv"?p[0]:(h==="twitch.tv"&&p[1]==="clip"?p[2]:null);
-  if(slug&&/^[\w-]{5,100}$/.test(slug))return{embed:`https://clips.twitch.tv/embed?clip=${slug}&parent=${HOST}&autoplay=true`,watch:u.href};
-  if(h==="vimeo.com"&&/^\d+$/.test(p[0]||""))return{embed:`https://player.vimeo.com/video/${p[0]}?autoplay=1`,watch:u.href};
-  const dm=h==="dailymotion.com"&&p[0]==="video"?p[1]:(h==="dai.ly"?p[0]:null);
-  if(dm&&/^[a-z0-9]+$/i.test(dm))return{embed:`https://www.dailymotion.com/embed/video/${dm}?autoplay=1`,thumb:`https://www.dailymotion.com/thumbnail/video/${dm}`,watch:u.href};
-  return null}
+    <div class="tv-modal" id="m-ch" role="dialog" aria-modal="true" aria-label="Ajouter une chaîne"><div class="tv-box"><h2>📡 Ajouter une chaîne</h2>
+        <div class="tv-fg"><label for="c-pf">Plateforme</label><select class="tv-inp" id="c-pf"><option value="twitch">Twitch</option><option value="youtube">YouTube (ID de chaîne UC…)</option><option value="kick">Kick</option><option value="tiktok">TikTok</option><option value="link">Lien externe (https)</option></select></div>
+        <div class="tv-fg"><label for="c-name">Nom affiché</label><input class="tv-inp" id="c-name" maxlength="40"></div>
+        <div class="tv-fg"><label for="c-id" id="c-idl">Identifiant / pseudo</label><input class="tv-inp" id="c-id" maxlength="200"></div>
+        <div class="tv-row"><button type="button" class="tv-btn" id="c-ok">Ajouter</button><button type="button" class="tv-btn g" data-close>Annuler</button></div></div></div>
 
-function frame(src){const f=document.createElement("iframe");
-  f.setAttribute("sandbox","allow-scripts allow-same-origin allow-popups allow-forms allow-presentation");
-  f.allow="autoplay; fullscreen; picture-in-picture; encrypted-media";f.allowFullscreen=true;
-  f.referrerPolicy="strict-origin-when-cross-origin";f.title="Lecteur ABYSZ TV";f.src=src;return f}
+    <div class="tv-modal" id="m-v" role="dialog" aria-modal="true" aria-label="Vidéo"><div class="tv-box"><h2 id="v-h">Vidéo</h2>
+        <div class="tv-fg"><label for="v-t">Titre</label><input class="tv-inp" id="v-t" maxlength="120"></div>
+        <div class="tv-fg"><label for="v-g">Catégorie</label><input class="tv-inp" id="v-g" maxlength="24" placeholder="HIGHLIGHT, TRAILER…"></div>
+        <div class="tv-fg"><label for="v-u">Lien (YouTube, Shorts, Twitch VOD/clip, Vimeo, Dailymotion)</label><input class="tv-inp" id="v-u" maxlength="300"></div>
+        <div class="tv-row"><button type="button" class="tv-btn" id="v-ok">Enregistrer</button><button type="button" class="tv-btn g" data-close>Annuler</button></div></div></div>
 
-/* ---------- Détection des lives ---------- */
-const get=async u=>{const r=await fetch(u,{referrerPolicy:"no-referrer"});if(!r.ok)throw 0;return(await r.text()).trim()};
-async function chkTwitch(c){try{const up=await get(`https://decapi.me/twitch/uptime/${c.id}`);
-  if(/is offline/i.test(up))return{live:false};
-  if(!/^\d+\s+(second|minute|hour|day)/i.test(up))return null;
-  const [t,g,v]=await Promise.allSettled(["title","game","viewercount"].map(k=>get(`https://decapi.me/twitch/${k}/${c.id}`)));
-  const ok=r=>r.status==="fulfilled"?clean(r.value,120):"";
-  return{live:true,up,title:ok(t),game:ok(g),viewers:ok(v)}}catch{return null}}
-async function chkYT(c){if(!S.key)return null;try{const b="https://www.googleapis.com/youtube/v3/";
-  const pl=await(await fetch(`${b}playlistItems?part=contentDetails&maxResults=5&playlistId=UU${c.id.slice(2)}&key=${S.key}`)).json();
-  const ids=(pl.items||[]).map(i=>i.contentDetails.videoId).join(",");if(!ids)return{live:false};
-  const v=await(await fetch(`${b}videos?part=snippet&id=${ids}&key=${S.key}`)).json();
-  const x=(v.items||[]).find(i=>i.snippet.liveBroadcastContent==="live");
-  return x?{live:true,vid:x.id,title:clean(x.snippet.title,120)}:{live:false}}catch{return null}}
+    <div id="tv-toasts" aria-live="polite"></div>
 
-async function poll(){const prev=S.live[S.sel]?.live;
-  const res=await Promise.all(S.ch.map(c=>c.platform==="twitch"?chkTwitch(c):c.platform==="youtube"?chkYT(c):null));
-  S.live={};res.forEach((r,i)=>{if(r)S.live[i]=r});
-  renderRail();renderBadge();
-  const first=S.ch.findIndex((_,i)=>S.live[i]?.live);
-  if(!S.manual&&first>=0&&first!==S.sel){S.sel=first;renderRail();show()}
-  else if(!prev&&S.live[S.sel]?.live)show();
-  else if(!$("#stage iframe")&&!$("#screen").hidden&&S.live[S.sel]===undefined)show();
-  renderInfo()}
+    <footer>
+        <div class="footer-links">
+            <a href="mentions-legales.html" data-i18n="f_legal">Mentions Légales</a> •
+            <a href="politique-confidentialite.html" data-i18n="f_privacy">Politique de Confidentialité</a> •
+            <a href="cookies.html">Cookies</a> •
+            <a href="#" data-open-cookie-prefs data-i18n="f_cookie_prefs">Gérer mes cookies</a>
+        </div>
+        <p>© 2026 Abysz Esports • <span data-i18n="f_contact">Nous contacter :</span> abyszofficial@gmail.com</p>
+    </footer>
+
+    <script src="cookie-consent.js"></script>
+    <script type="module">
+/* =====================================================================
+   ABYSZ TV — lecteur universel (lives de la team, vidéos, n'importe quel stream)
+   ===================================================================== */
+if (top !== self) { document.documentElement.textContent = ""; throw new Error("frame"); }
+
+const ADMIN = "abyszofficial@gmail.com";
+const HOST = location.hostname || "localhost";
+const FB_VER = "10.12.0";
+const firebaseConfig = {
+    apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
+    authDomain: "abysz-esports.firebaseapp.com",
+    databaseURL: "https://abysz-esports-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "abysz-esports",
+    storageBucket: "abysz-esports.firebasestorage.app",
+    messagingSenderId: "200968659347",
+    appId: "1:200968659347:web:3a13d1614d00ed29968866"
+};
+
+/* ---------- Petits utilitaires ---------- */
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
+const el = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+const clean = (s, n) => String(s ?? "").replace(/[\u0000-\u001f<>]/g, "").trim().slice(0, n);
+const safeUrl = (s) => { try { const u = new URL(s); return u.protocol === "https:" ? u.href : null; } catch { return null; } };
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const ICON = { twitch: "💜", youtube: "🔴", kick: "🟢", tiktok: "🎵", vimeo: "🔵", dailymotion: "🔷", link: "⚡" };
+const ALL = "__all__";
+
+/* ---------- Langue FR / EN (même clé que index.html) ---------- */
+const D = {
+    fr: {
+        lang_group: "Langue", menu_open: "Ouvrir le menu",
+        nav_home: "Accueil", nav_planning: "Planning", nav_shop: "Boutique", nav_join: "🚀 Rejoindre",
+        page_title: "ABYSZ TV — Lives & Vidéos Officielles",
+        sub: "Lives de la team en direct, vidéos officielles et n'importe quel stream",
+        badge_sync: "🔍 Synchronisation…", badge_none: "● AUCUN LIVE POUR LE MOMENT", badge_live: "EN DIRECT · {names}",
+        viewers: "👁 {n} spectateurs", live_now: "EN DIRECT",
+        scr_none_h: "Aucune chaîne", scr_none_p: "Aucune chaîne n'est configurée. Colle un lien ci-dessous pour regarder n'importe quel stream.",
+        scr_off_h: "{name} EST HORS LIGNE", scr_off_p: "Le live démarrera automatiquement ici dès que la chaîne sera en direct. En attendant, regarde nos vidéos ou un autre stream !",
+        scr_yt_h: "AUCUN LIVE YOUTUBE", scr_yt_p: "Pas de direct en cours pour le moment.",
+        scr_tt_h: "TIKTOK LIVE @{id}", scr_tt_p: "TikTok n'autorise pas l'intégration des lives : rejoins-nous directement sur l'app.", scr_tt_a: "🔴 Ouvrir TikTok Live ↗",
+        scr_link_p: "Accède à la page via le lien ci-dessous.",
+        scr_ext_p: "Cette plateforme n'autorise pas l'intégration : ouvre le lien dans un nouvel onglet.",
+        btn_videos: "🎬 Voir les vidéos",
+        act_open: "Ouvrir ↗", act_share: "🔗 Partager", act_fs: "⛶ Plein écran",
+        find_h: "🔎 Regarder n'importe quel stream",
+        find_ph: "twitch.tv/pseudo · kick.com/pseudo · youtube.com/watch?v=…",
+        find_go: "▶ Regarder", pf_auto: "Auto (lien)",
+        find_hint: "Colle un lien de live ou de vidéo (Twitch, Kick, YouTube, Vimeo, Dailymotion), ou un simple pseudo avec la plateforme choisie. TikTok s'ouvre directement dans son app.",
+        err_src: "Lien ou pseudo non reconnu", err_platform: "Pour un simple pseudo, choisis Twitch, Kick ou YouTube dans la liste",
+        err_handle: "Pour une chaîne YouTube @pseudo, colle plutôt le lien d'un live / d'une vidéo ou l'ID de chaîne (UC…)",
+        copied: "Lien copié ✔", copy_prompt: "Copie ce lien :",
+        vid_h: "🎬 Vidéos de la Team", chip_all: "TOUT", vid_empty: "📹 Aucune vidéo pour le moment.", vid_untitled: "Sans titre",
+        vid_unsup: "⚠ Lien non supporté (visible admin uniquement)",
+        auth_in: "👤 Admin", auth_out: "👤 Déconnexion",
+        f_legal: "Mentions Légales", f_privacy: "Politique de Confidentialité", f_cookie_prefs: "Gérer mes cookies", f_contact: "Nous contacter :"
+    },
+    en: {
+        lang_group: "Language", menu_open: "Open menu",
+        nav_home: "Home", nav_planning: "Schedule", nav_shop: "Shop", nav_join: "🚀 Join us",
+        page_title: "ABYSZ TV — Live Streams & Official Videos",
+        sub: "The team's live streams, official videos and any stream you want",
+        badge_sync: "🔍 Syncing…", badge_none: "● NO LIVE RIGHT NOW", badge_live: "LIVE · {names}",
+        viewers: "👁 {n} viewers", live_now: "LIVE",
+        scr_none_h: "No channel", scr_none_p: "No channel is configured. Paste a link below to watch any stream.",
+        scr_off_h: "{name} IS OFFLINE", scr_off_p: "The live will start here automatically as soon as the channel goes live. Meanwhile, watch our videos or another stream!",
+        scr_yt_h: "NO YOUTUBE LIVE", scr_yt_p: "Nothing is live at the moment.",
+        scr_tt_h: "TIKTOK LIVE @{id}", scr_tt_p: "TikTok doesn't allow embedded lives: join us directly in the app.", scr_tt_a: "🔴 Open TikTok Live ↗",
+        scr_link_p: "Open the page with the link below.",
+        scr_ext_p: "This platform doesn't allow embedding: open the link in a new tab.",
+        btn_videos: "🎬 Watch videos",
+        act_open: "Open ↗", act_share: "🔗 Share", act_fs: "⛶ Fullscreen",
+        find_h: "🔎 Watch any stream",
+        find_ph: "twitch.tv/name · kick.com/name · youtube.com/watch?v=…",
+        find_go: "▶ Watch", pf_auto: "Auto (link)",
+        find_hint: "Paste a live or video link (Twitch, Kick, YouTube, Vimeo, Dailymotion), or just a username with the platform selected. TikTok opens directly in its app.",
+        err_src: "Unrecognised link or username", err_platform: "For a plain username, pick Twitch, Kick or YouTube in the list",
+        err_handle: "For a YouTube @handle, paste a live / video link or the channel ID (UC…) instead",
+        copied: "Link copied ✔", copy_prompt: "Copy this link:",
+        vid_h: "🎬 Team Videos", chip_all: "ALL", vid_empty: "📹 No videos yet.", vid_untitled: "Untitled",
+        vid_unsup: "⚠ Unsupported link (admin only)",
+        auth_in: "👤 Admin", auth_out: "👤 Log out",
+        f_legal: "Legal Notice", f_privacy: "Privacy Policy", f_cookie_prefs: "Manage my cookies", f_contact: "Contact us:"
+    }
+};
+let lang = "fr";
+try { const s = localStorage.getItem("abysz_lang"); if (s === "fr" || s === "en") lang = s; } catch {}
+const t = (k, p) => {
+    let s = D[lang]?.[k] ?? D.fr[k] ?? k;
+    if (p) s = s.replace(/\{(\w+)\}/g, (m, x) => (p[x] !== undefined ? p[x] : m));
+    return s;
+};
+function applyI18n() {
+    document.documentElement.lang = lang;
+    document.title = t("page_title");
+    $$("[data-i18n]").forEach((e) => { e.textContent = t(e.dataset.i18n); });
+    $$("[data-i18n-aria]").forEach((e) => e.setAttribute("aria-label", t(e.dataset.i18nAria)));
+    $$("[data-i18n-placeholder]").forEach((e) => e.setAttribute("placeholder", t(e.dataset.i18nPlaceholder)));
+    $$(".lang-btn").forEach((b) => b.setAttribute("aria-pressed", b.dataset.lang === lang ? "true" : "false"));
+    paintAuthBtn();
+}
+
+/* ---------- État ---------- */
+const S = {
+    ch: [{ platform: "twitch", id: "abysz_o", name: "Twitch" }, { platform: "tiktok", id: "abysz_o", name: "TikTok" }],
+    vid: [], live: {}, key: "",
+    mode: "channel",   // channel | custom | video
+    sel: 0, manual: false, cur: null, vidIdx: -1,
+    tag: ALL, edit: -1, scr: null
+};
+
+/* ---------- Analyse des liens / pseudos (toutes plateformes) ---------- */
+const RX = { twitch: /^[A-Za-z0-9_]{3,25}$/, youtube: /^UC[\w-]{22}$/, kick: /^[A-Za-z0-9_-]{3,25}$/, tiktok: /^[A-Za-z0-9_.]{2,30}$/ };
+const TW_RESERVED = new Set(["videos", "directory", "downloads", "jobs", "turbo", "settings", "subscriptions", "friends", "wallet", "p", "moderator", "popout", "embed", "u", "search", "drops", "inventory", "store", "prime"]);
+const KICK_RESERVED = new Set(["video", "videos", "categories", "category", "browse", "dashboard", "following", "search", "clips", "terms-of-service", "privacy-policy"]);
+const URLISH = /^(https?:\/\/|(www\.|m\.|clips\.|vm\.)?(twitch\.tv|kick\.com|youtube\.com|youtu\.be|vimeo\.com|dailymotion\.com|dai\.ly|tiktok\.com)\b)/i;
+
+const mk = {
+    twLive: (id, m) => ({ kind: "live", platform: "twitch", label: "Twitch · " + id, watch: `https://www.twitch.tv/${id}`, embed: `https://player.twitch.tv/?channel=${id}&parent=${HOST}&autoplay=true&muted=${m ? "true" : "false"}` }),
+    twVod: (id) => ({ kind: "video", platform: "twitch", label: "Twitch VOD", watch: `https://www.twitch.tv/videos/${id}`, embed: `https://player.twitch.tv/?video=v${id}&parent=${HOST}&autoplay=true` }),
+    twClip: (slug, w) => ({ kind: "video", platform: "twitch", label: "Twitch Clip", watch: w, embed: `https://clips.twitch.tv/embed?clip=${slug}&parent=${HOST}&autoplay=true` }),
+    kickLive: (id, m) => ({ kind: "live", platform: "kick", label: "Kick · " + id, watch: `https://kick.com/${id}`, embed: `https://player.kick.com/${id}?autoplay=true&muted=${m ? "true" : "false"}` }),
+    ytVideo: (id) => ({ kind: "video", platform: "youtube", label: "YouTube", watch: `https://www.youtube.com/watch?v=${id}`, thumb: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`, embed: `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0` }),
+    ytLive: (ch, m) => ({ kind: "live", platform: "youtube", label: "YouTube Live", watch: `https://www.youtube.com/channel/${ch}/live`, embed: `https://www.youtube-nocookie.com/embed/live_stream?channel=${ch}&autoplay=1&rel=0${m ? "&mute=1" : ""}` }),
+    vimeo: (id, w) => ({ kind: "video", platform: "vimeo", label: "Vimeo", watch: w, embed: `https://player.vimeo.com/video/${id}?autoplay=1` }),
+    dm: (id, w) => ({ kind: "video", platform: "dailymotion", label: "Dailymotion", watch: w, thumb: `https://www.dailymotion.com/thumbnail/video/${id}`, embed: `https://www.dailymotion.com/embed/video/${id}?autoplay=1` }),
+    ext: (platform, label, w) => ({ kind: "external", platform, label, watch: w })
+};
+
+function byName(pf, name, muted) {
+    if (pf === "twitch") return RX.twitch.test(name) && !TW_RESERVED.has(name.toLowerCase()) ? mk.twLive(name, muted) : null;
+    if (pf === "kick") return RX.kick.test(name) ? mk.kickLive(name, muted) : null;
+    if (pf === "youtube") {
+        if (RX.youtube.test(name)) return mk.ytLive(name, muted);
+        if (/^[\w-]{11}$/.test(name) && !/^@/.test(name)) return mk.ytVideo(name);
+        return /^[\w.-]{1,60}$/.test(name) ? { handle: name } : null;
+    }
+    return null;
+}
+
+function parseSource(input, hint = "auto", muted = false) {
+    const raw = clean(input, 300);
+    if (!raw) return null;
+
+    // Pseudo seul, ou « twitch:pseudo », « kick pseudo », « yt:ID »…
+    if (!URLISH.test(raw)) {
+        const m = raw.match(/^(twitch|kick|youtube|yt)\s*[:\s]\s*@?([\w.-]{2,60})$/i);
+        let pf = hint, name;
+        if (m) { pf = m[1].toLowerCase() === "yt" ? "youtube" : m[1].toLowerCase(); name = m[2]; }
+        else if (/^@?[\w.-]{2,60}$/.test(raw)) name = raw.replace(/^@/, "");
+        else return null;
+        if (pf === "auto") return { need: true };
+        return byName(pf, name, muted);
+    }
+
+    let u;
+    try { u = new URL(/^https?:\/\//i.test(raw) ? raw : "https://" + raw); } catch { return null; }
+    if (u.protocol === "http:") u.protocol = "https:";
+    if (u.protocol !== "https:") return null;
+    const h = u.hostname.toLowerCase().replace(/^(www|m)\./, "");
+    const p = u.pathname.split("/").filter(Boolean), q = u.searchParams;
+
+    // Twitch
+    if (h === "twitch.tv") {
+        if (p[0] === "videos" && /^\d+$/.test(p[1] || "")) return mk.twVod(p[1]);
+        if (p[1] === "clip" && /^[\w-]{5,100}$/.test(p[2] || "")) return mk.twClip(p[2], u.href);
+        if (p[0] && RX.twitch.test(p[0]) && !TW_RESERVED.has(p[0].toLowerCase())) return mk.twLive(p[0], muted);
+        return null;
+    }
+    if (h === "clips.twitch.tv") return /^[\w-]{5,100}$/.test(p[0] || "") ? mk.twClip(p[0], u.href) : null;
+
+    // Kick
+    if (h === "kick.com") {
+        if (p[0] && RX.kick.test(p[0]) && !KICK_RESERVED.has(p[0].toLowerCase())) return mk.kickLive(p[0], muted);
+        return mk.ext("kick", "Kick", u.href);   // VOD / clips : pas d'intégration officielle
+    }
+
+    // YouTube
+    if (h === "youtu.be" || /^youtube(-nocookie)?\.com$/.test(h)) {
+        let id = null;
+        if (h === "youtu.be") id = p[0];
+        else {
+            if (p[0] === "channel" && RX.youtube.test(p[1] || "")) return mk.ytLive(p[1], muted);
+            if (p[0] && p[0][0] === "@" && /^[\w.-]{1,60}$/.test(p[0].slice(1))) return { handle: p[0].slice(1) };
+            id = p[0] === "watch" ? q.get("v") : ["shorts", "live", "embed", "v"].includes(p[0]) ? p[1] : null;
+        }
+        return id && /^[\w-]{11}$/.test(id) ? mk.ytVideo(id) : null;
+    }
+
+    // Vimeo / Dailymotion
+    if (h === "vimeo.com") return /^\d+$/.test(p[0] || "") ? mk.vimeo(p[0], u.href) : null;
+    const dm = h === "dailymotion.com" && p[0] === "video" ? p[1] : h === "dai.ly" ? p[0] : null;
+    if (dm && /^[a-z0-9]+$/i.test(dm)) return mk.dm(dm, u.href);
+
+    // TikTok : pas d'intégration possible
+    if (/(^|\.)tiktok\.com$/.test(h)) return mk.ext("tiktok", "TikTok", u.href);
+    return null;
+}
+
+/* ---------- Lecteur ---------- */
+function frame(src) {
+    const f = document.createElement("iframe");
+    f.setAttribute("sandbox", "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms allow-presentation");
+    f.allow = "autoplay; fullscreen; picture-in-picture; encrypted-media";
+    f.allowFullscreen = true;
+    f.referrerPolicy = "strict-origin-when-cross-origin";
+    f.title = "Lecteur ABYSZ TV";
+    f.src = src;
+    return f;
+}
+function mount(src) { S.scr = null; paintScreen(); $("#tv-stage iframe")?.remove(); $("#tv-stage").append(frame(src)); }
+function screen(spec) { $("#tv-stage iframe")?.remove(); S.scr = spec; paintScreen(); }
+function paintScreen() {
+    const s = S.scr, sc = $("#tv-screen");
+    sc.hidden = !s;
+    if (!s) return;
+    $("#tv-s-ic").textContent = s.ic;
+    $("#tv-s-h").textContent = s.hraw ?? t(s.h, s.params);
+    $("#tv-s-p").textContent = t(s.p, s.params);
+    const a = $("#tv-s-a");
+    a.hidden = !s.link;
+    if (s.link) { a.href = s.link; a.textContent = t(s.a || "act_open"); }
+    $("#tv-s-b").hidden = !s.vids;
+}
+
+const chanUrl = (c) => !c ? "" : c.platform === "twitch" ? `https://www.twitch.tv/${c.id}` : c.platform === "kick" ? `https://kick.com/${c.id}`
+    : c.platform === "youtube" ? `https://www.youtube.com/channel/${c.id}` : c.platform === "tiktok" ? `https://www.tiktok.com/@${c.id}/live` : c.url;
+const baseUrl = () => location.href.split("#")[0];
+const shareUrl = () => (S.mode === "channel" || !S.cur?.watch) ? baseUrl() : baseUrl() + "#w=" + encodeURIComponent(S.cur.watch);
+
+function renderInfo() {
+    let left = "", right = "", open = "";
+    if (S.mode === "channel") {
+        const c = S.ch[S.sel], s = S.live[S.sel];
+        left = s?.live ? [s.title, s.game].filter(Boolean).join(" · ") : (c?.name || "");
+        right = s?.live ? (s.viewers ? t("viewers", { n: s.viewers }) : t("live_now")) : "";
+        open = chanUrl(c);
+    } else if (S.cur) {
+        left = S.cur.title || S.cur.p.label;
+        right = S.mode === "video" ? (S.cur.tag || "") : (S.cur.p.kind === "live" ? t("live_now") : "");
+        open = S.cur.p.watch;
+    }
+    $("#tv-i-t").textContent = left;
+    $("#tv-i-v").textContent = right;
+    const o = $("#tv-open");
+    o.hidden = !safeUrl(open);
+    if (!o.hidden) o.href = safeUrl(open);
+}
+
+function setHash() {
+    try {
+        const h = (S.mode !== "channel" && S.cur?.watch) ? "#w=" + encodeURIComponent(S.cur.watch) : "";
+        history.replaceState(null, "", location.pathname + location.search + h);
+    } catch {}
+}
+function scrollToPlayer() { $("#tv-stage").scrollIntoView({ behavior: "smooth", block: "center" }); }
+
+/* --- Chaînes de la team (détection automatique des lives) --- */
+function showChannel() {
+    const c = S.ch[S.sel], st = S.live[S.sel];
+    renderInfo();
+    if (!c) return screen({ ic: "📡", h: "scr_none_h", p: "scr_none_p", vids: true });
+    if (c.platform === "twitch") {
+        if (st && !st.live) screen({ ic: "📡", h: "scr_off_h", p: "scr_off_p", params: { name: c.name.toUpperCase() }, vids: true });
+        else mount(`https://player.twitch.tv/?channel=${c.id}&parent=${HOST}&autoplay=true&muted=true`);
+    } else if (c.platform === "youtube") {
+        if (st?.live) mount(`https://www.youtube-nocookie.com/embed/${st.vid}?autoplay=1&mute=1&rel=0`);
+        else if (st) screen({ ic: "🔴", h: "scr_yt_h", p: "scr_yt_p", vids: true });
+        else mount(`https://www.youtube-nocookie.com/embed/live_stream?channel=${c.id}&autoplay=1&mute=1`);
+    } else if (c.platform === "kick") mount(`https://player.kick.com/${c.id}?autoplay=true&muted=true`);
+    else if (c.platform === "tiktok") screen({ ic: "🎵", h: "scr_tt_h", p: "scr_tt_p", params: { id: c.id }, link: chanUrl(c), a: "scr_tt_a" });
+    else screen({ ic: "⚡", hraw: c.name, p: "scr_link_p", link: c.url });
+}
+
+/* --- N'importe quel stream / vidéo --- */
+async function ytHandle(h) {
+    if (!S.key) return null;
+    try {
+        const r = await (await fetch(`https://www.googleapis.com/youtube/v3/channels?part=id&forHandle=${encodeURIComponent("@" + h)}&key=${S.key}`)).json();
+        return r.items?.[0]?.id || null;
+    } catch { return null; }
+}
+
+async function watch(input, hint = "auto", opts = {}) {
+    let p = parseSource(input, hint);
+    if (p?.need) { toast(t("err_platform"), "error"); return false; }
+    if (p?.handle) {
+        const id = await ytHandle(p.handle);
+        if (!id) { toast(t("err_handle"), "error"); return false; }
+        p = mk.ytLive(id, false);
+    }
+    if (!p) { toast(t("err_src"), "error"); return false; }
+    S.mode = "custom"; S.cur = { p, title: opts.title || "", watch: p.watch }; S.cur.watch = p.watch; S.sel = -1; S.vidIdx = -1; S.manual = true;
+    if (p.kind === "external") screen({ ic: ICON[p.platform] || "⚡", hraw: p.label, p: "scr_ext_p", link: p.watch });
+    else mount(p.embed);
+    renderRail(); renderVideos(); renderInfo(); setHash();
+    if (!opts.silent) scrollToPlayer();
+    return true;
+}
+
+function playVideo(i) {
+    const v = S.vid[i], p = parseSource(v?.url);
+    if (!p || p.kind !== "video") return;
+    S.mode = "video"; S.cur = { p, title: v.title, tag: v.tag, watch: p.watch }; S.vidIdx = i; S.sel = -1; S.manual = true;
+    mount(p.embed);
+    renderRail(); renderVideos(); renderInfo(); setHash(); scrollToPlayer();
+}
+
+function selectChannel(i) {
+    S.mode = "channel"; S.sel = i; S.manual = true; S.cur = null; S.vidIdx = -1;
+    renderRail(); renderVideos(); showChannel(); setHash();
+}
+
+/* ---------- Détection des lives de la team ---------- */
+const get = async (u) => { const r = await fetch(u, { referrerPolicy: "no-referrer" }); if (!r.ok) throw 0; return (await r.text()).trim(); };
+async function chkTwitch(c) {
+    try {
+        const up = await get(`https://decapi.me/twitch/uptime/${c.id}`);
+        if (/is offline/i.test(up)) return { live: false };
+        if (!/^\d+\s+(second|minute|hour|day)/i.test(up)) return null;
+        const [ti, ga, vw] = await Promise.allSettled(["title", "game", "viewercount"].map((k) => get(`https://decapi.me/twitch/${k}/${c.id}`)));
+        const ok = (r) => r.status === "fulfilled" ? clean(r.value, 120) : "";
+        return { live: true, up, title: ok(ti), game: ok(ga), viewers: ok(vw) };
+    } catch { return null; }
+}
+async function chkYT(c) {
+    if (!S.key) return null;
+    try {
+        const b = "https://www.googleapis.com/youtube/v3/";
+        const pl = await (await fetch(`${b}playlistItems?part=contentDetails&maxResults=5&playlistId=UU${c.id.slice(2)}&key=${S.key}`)).json();
+        const ids = (pl.items || []).map((i) => i.contentDetails.videoId).join(",");
+        if (!ids) return { live: false };
+        const v = await (await fetch(`${b}videos?part=snippet&id=${ids}&key=${S.key}`)).json();
+        const x = (v.items || []).find((i) => i.snippet.liveBroadcastContent === "live");
+        return x ? { live: true, vid: x.id, title: clean(x.snippet.title, 120) } : { live: false };
+    } catch { return null; }
+}
+let polling = false;
+async function poll() {
+    if (polling) return;
+    polling = true;
+    try {
+        const wasLive = S.live[S.sel]?.live;
+        const res = await Promise.all(S.ch.map((c) => c.platform === "twitch" ? chkTwitch(c) : c.platform === "youtube" ? chkYT(c) : null));
+        S.live = {};
+        res.forEach((r, i) => { if (r) S.live[i] = r; });
+        renderRail(); renderBadge();
+        if (S.mode !== "channel") return;              // l'utilisateur regarde autre chose : on ne le dérange pas
+        const first = S.ch.findIndex((_, i) => S.live[i]?.live);
+        if (!S.manual && first >= 0 && first !== S.sel) { S.sel = first; renderRail(); showChannel(); }
+        else if (!wasLive && S.live[S.sel]?.live) showChannel();
+        else if (!$("#tv-stage iframe") && S.scr && S.live[S.sel] === undefined) showChannel();
+        else renderInfo();
+    } finally { polling = false; }
+}
 
 /* ---------- Rendu ---------- */
-function renderBadge(){const on=S.ch.filter((_,i)=>S.live[i]?.live),b=$("#badge");b.replaceChildren();
-  if(on.length){b.className="badge on";b.append(el("span","dot"),el("span","",`EN DIRECT · ${on.map(c=>c.name).join(", ")}`))}
-  else{b.className="badge";b.textContent="● AUCUN LIVE POUR LE MOMENT"}}
-function renderRail(){const r=$("#rail");r.replaceChildren();
-  S.ch.forEach((c,i)=>{const b=el("button","tab"+(i===S.sel?" act":""));b.append(el("span","",ICON[c.platform]),el("span","",c.name));
-    if(S.live[i]?.live)b.append(el("span","dot"));
-    b.addEventListener("click",()=>{S.sel=i;S.manual=true;renderRail();show()});
-    const x=el("button","x","✕");x.addEventListener("click",e=>{e.stopPropagation();if(isAdmin()&&confirm("Supprimer cette chaîne ?")){S.ch.splice(i,1);S.sel=0;save()}});b.append(x);r.append(b)})}
-function renderInfo(){const s=S.live[S.sel];$("#i-t").textContent=s?.live?[s.title,s.game].filter(Boolean).join(" · "):"";$("#i-v").textContent=s?.live&&s.viewers?`👁 ${s.viewers} spectateurs`:""}
-function screen(ic,h,p,link,label,vids){$("#stage iframe")?.remove();$("#screen").hidden=false;
-  $("#s-ic").textContent=ic;$("#s-h").textContent=h;$("#s-p").textContent=p;
-  const a=$("#s-a");a.hidden=!link;if(link){a.href=link;a.textContent=label}$("#s-b").hidden=!vids}
-function show(){const c=S.ch[S.sel],st=S.live[S.sel];$("#stage iframe")?.remove();$("#screen").hidden=true;renderInfo();
-  if(!c)return screen("📡","Aucune chaîne","Ajoutez une chaîne depuis le mode admin.",null,"",true);
-  const play=src=>$("#stage").append(frame(src));
-  if(c.platform==="twitch"){st&&!st.live?screen("📡",`${c.name.toUpperCase()} EST HORS LIGNE`,"Le live démarrera automatiquement ici dès que la chaîne sera en direct. En attendant, regardez nos vidéos !",null,"",true):play(`https://player.twitch.tv/?channel=${c.id}&parent=${HOST}&autoplay=true&muted=true`)}
-  else if(c.platform==="youtube"){st?.live?play(`https://www.youtube-nocookie.com/embed/${st.vid}?autoplay=1&mute=1&rel=0`):st?screen("🔴","AUCUN LIVE YOUTUBE","Pas de direct en cours pour le moment.",null,"",true):play(`https://www.youtube-nocookie.com/embed/live_stream?channel=${c.id}&autoplay=1&mute=1`)}
-  else if(c.platform==="kick")play(`https://player.kick.com/${c.id}?autoplay=true&muted=true`);
-  else if(c.platform==="tiktok")screen("🎵",`TIKTOK LIVE @${c.id}`,"TikTok n'autorise pas l'intégration des lives : rejoignez-nous directement sur l'app.",`https://www.tiktok.com/@${c.id}/live`,"🔴 Ouvrir TikTok Live ↗");
-  else screen("⚡",c.name,"Accédez à la page via le lien ci-dessous.",c.url,"Ouvrir ↗")}
+function renderBadge() {
+    const on = S.ch.filter((_, i) => S.live[i]?.live), b = $("#tv-badge");
+    b.replaceChildren();
+    if (on.length) { b.className = "tv-badge on"; b.append(el("span", "tv-dot"), el("span", "", t("badge_live", { names: on.map((c) => c.name).join(", ") }))); }
+    else { b.className = "tv-badge"; b.textContent = t("badge_none"); }
+}
+function renderRail() {
+    const r = $("#tv-rail"); r.replaceChildren();
+    S.ch.forEach((c, i) => {
+        const w = el("div", "tv-tabw");
+        const b = el("button", "tv-tab" + (S.mode === "channel" && i === S.sel ? " act" : "")); b.type = "button";
+        b.append(el("span", "", ICON[c.platform] || "⚡"), el("span", "", c.name));
+        if (S.live[i]?.live) b.append(el("span", "tv-dot"));
+        b.addEventListener("click", () => selectChannel(i));
+        w.append(b);
+        if (isAdmin()) {
+            const x = el("button", "tv-x", "✕"); x.type = "button"; x.setAttribute("aria-label", "Supprimer");
+            x.addEventListener("click", () => { if (confirm("Supprimer cette chaîne ?")) { S.ch.splice(i, 1); S.sel = 0; S.mode = "channel"; save(); } });
+            w.append(x);
+        }
+        r.append(w);
+    });
+}
+function renderVideos() {
+    const tags = [ALL, ...new Set(S.vid.map((v) => v.tag))], ch = $("#tv-chips"); ch.replaceChildren();
+    if (!tags.includes(S.tag)) S.tag = ALL;
+    if (tags.length > 2) tags.forEach((tg) => {
+        const b = el("button", "tv-chip" + (tg === S.tag ? " act" : ""), tg === ALL ? t("chip_all") : tg); b.type = "button";
+        b.addEventListener("click", () => { S.tag = tg; renderVideos(); });
+        ch.append(b);
+    });
+    const g = $("#tv-grid"); g.replaceChildren();
+    const adm = isAdmin(); let n = 0;
+    S.vid.forEach((v, i) => {
+        if (S.tag !== ALL && v.tag !== S.tag) return;
+        const pv = parseSource(v.url), ok = pv && pv.kind === "video";
+        if (!ok && !adm) return;
+        const w = el("div", "tv-cardw" + (n++ === 0 && S.tag === ALL ? " big" : ""));
+        const card = el("button", "tv-card" + (S.mode === "video" && S.vidIdx === i ? " cur" : "")); card.type = "button";
+        const th = el("div", "tv-th");
+        if (ok && pv.thumb) { const im = el("img"); im.loading = "lazy"; im.alt = ""; im.referrerPolicy = "no-referrer"; im.src = pv.thumb; th.append(im); }
+        if (ok) th.append(el("span", "tv-pf", ICON[pv.platform] || ""));
+        th.append(el("div", "tv-pl", "▶"));
+        const vi = el("div", "tv-vi"); vi.append(el("div", "tv-vt", v.tag), el("div", "tv-vn", v.title || t("vid_untitled")));
+        if (!ok) vi.append(el("div", "tv-warn", t("vid_unsup")));
+        card.append(th, vi);
+        if (ok) card.addEventListener("click", () => playVideo(i)); else card.disabled = true;
+        w.append(card);
+        if (adm) {
+            const cc = el("div", "tv-cc");
+            [["✏️", () => editVid(i)], ["🗑️", () => { if (confirm("Supprimer cette vidéo ?")) { S.vid.splice(i, 1); save(); } }]].forEach(([ic, f]) => {
+                const b = el("button", "tv-cb", ic); b.type = "button"; b.addEventListener("click", f); cc.append(b);
+            });
+            w.append(cc);
+        }
+        g.append(w);
+    });
+    if (!g.children.length) g.append(el("div", "tv-empty", t("vid_empty")));
+}
+function rerender() { applyI18n(); renderBadge(); renderRail(); renderVideos(); renderInfo(); paintScreen(); }
 
-function renderVideos(){const tags=["TOUT",...new Set(S.vid.map(v=>v.tag))],ch=$("#chips");ch.replaceChildren();
-  if(!tags.includes(S.tag))S.tag="TOUT";
-  if(tags.length>2)tags.forEach(t=>{const b=el("button","chip"+(t===S.tag?" act":""),t);b.addEventListener("click",()=>{S.tag=t;renderVideos()});ch.append(b)});
-  const g=$("#grid");g.replaceChildren();const adm=isAdmin();let n=0;
-  S.vid.forEach((v,i)=>{if(S.tag!=="TOUT"&&v.tag!==S.tag)return;const pv=parseVideo(v.url);if(!pv&&!adm)return;
-    const card=el("div","card"+(n++===0&&S.tag==="TOUT"?" big":""));card.tabIndex=0;
-    const th=el("div","th");if(pv?.thumb){const im=el("img");im.loading="lazy";im.alt="";im.referrerPolicy="no-referrer";im.src=pv.thumb;th.append(im)}
-    th.append(el("div","pl","▶"));const vi=el("div","vi");vi.append(el("div","vt",v.tag),el("div","vn",v.title||"Sans titre"));
-    if(!pv)vi.append(el("div","warn","⚠ Lien non supporté (visible admin uniquement)"));
-    const cc=el("div","cc");[["✏️",()=>editVid(i)],["🗑️",()=>{if(confirm("Supprimer cette vidéo ?")){S.vid.splice(i,1);save()}}]].forEach(([t,f])=>{const b=el("button","cb",t);b.addEventListener("click",e=>{e.stopPropagation();f()});cc.append(b)});
-    card.append(cc,th,vi);if(pv){const go=()=>play(i);card.addEventListener("click",go);card.addEventListener("keydown",e=>{if(e.key==="Enter")go()})}
-    g.append(card)});
-  if(!g.children.length)g.append(el("div","empty","📹 Aucune vidéo pour le moment."))}
+/* ---------- Toasts / modales ---------- */
+function toast(m, type = "") { const e = el("div", "tv-toast " + type, m); $("#tv-toasts").append(e); setTimeout(() => e.remove(), 3800); }
+const openM = (id) => $("#" + id).classList.add("on");
+const closeAll = () => $$(".tv-modal.on").forEach((m) => m.classList.remove("on"));
+async function copy(text) { try { await navigator.clipboard.writeText(text); toast(t("copied"), "success"); } catch { prompt(t("copy_prompt"), text); } }
 
-function play(i){const v=S.vid[i],pv=parseVideo(v?.url);if(!pv)return;
-  $("#p-t").textContent=v.title;$("#p-a").href=pv.watch;$("#p-body").replaceChildren(frame(pv.embed));open("m-p")}
-function closeAll(){document.querySelectorAll(".modal.on").forEach(m=>m.classList.remove("on"));$("#p-body").replaceChildren()}
+/* ---------- Évènements publics ---------- */
+$("#tv-logo").addEventListener("error", (e) => { e.target.hidden = true; });
+$$(".lang-btn").forEach((b) => b.addEventListener("click", () => {
+    lang = b.dataset.lang === "en" ? "en" : "fr";
+    try { localStorage.setItem("abysz_lang", lang); } catch {}
+    rerender();
+}));
+const menuBtn = $("#mobile-menu-toggle"), menuList = $("#nav-links-list");
+menuBtn.addEventListener("click", () => {
+    const open = !menuList.classList.contains("mobile-open");
+    menuList.classList.toggle("mobile-open", open);
+    menuBtn.classList.toggle("open", open);
+    menuBtn.setAttribute("aria-expanded", String(open));
+});
+$("#tv-go").addEventListener("click", () => watch($("#tv-in").value, $("#tv-pf").value));
+$("#tv-in").addEventListener("keydown", (e) => { if (e.key === "Enter") watch($("#tv-in").value, $("#tv-pf").value); });
+$$("[data-pf]").forEach((b) => b.addEventListener("click", () => { $("#tv-pf").value = b.dataset.pf; $("#tv-in").focus(); }));
+$("#tv-share").addEventListener("click", () => copy(shareUrl()));
+$("#tv-fs").addEventListener("click", () => { const s = $("#tv-stage"); (s.requestFullscreen || s.webkitRequestFullscreen)?.call(s); });
+$("#tv-s-b").addEventListener("click", () => $("#videos").scrollIntoView({ behavior: "smooth" }));
+$$("[data-close]").forEach((b) => b.addEventListener("click", closeAll));
+$$(".tv-modal").forEach((m) => m.addEventListener("click", (e) => { if (e.target === m) closeAll(); }));
+addEventListener("keydown", (e) => { if (e.key === "Escape") closeAll(); });
+function fromHash() {
+    const m = location.hash.match(/^#w=(.+)$/);
+    if (!m) return false;
+    let v; try { v = decodeURIComponent(m[1]); } catch { return false; }
+    return !!parseSource(v) && (watch(v, "auto", { silent: true }), true);
+}
+addEventListener("hashchange", fromHash);
+
+/* ---------- Firebase (facultatif : le lecteur marche même sans) ---------- */
+let auth = null, db = null, FS = null, AU = null;
+const isAdmin = () => auth?.currentUser?.email === ADMIN;
+function paintAuthBtn() {
+    const b = $("#tv-auth-btn"), a = isAdmin();
+    b.textContent = a ? t("auth_out") : t("auth_in"); b.classList.toggle("on", a);
+}
+async function initFirebase() {
+    try {
+        const base = `https://www.gstatic.com/firebasejs/${FB_VER}/`;
+        const [A, Au, F] = await Promise.all([import(base + "firebase-app.js"), import(base + "firebase-auth.js"), import(base + "firebase-firestore.js")]);
+        const app = A.initializeApp(firebaseConfig);
+        auth = Au.getAuth(app); db = F.getFirestore(app); AU = Au; FS = F;
+        AU.onAuthStateChanged(auth, (u) => {
+            const a = u?.email === ADMIN;
+            document.body.classList.toggle("tv-admin", a);
+            $("#tv-adm-tag").hidden = !a; $("#tv-add-v").hidden = !a;
+            paintAuthBtn(); renderRail(); renderVideos();
+        });
+    } catch (e) { console.warn("Firebase indisponible :", e); }
+}
+async function loadConfig() {
+    if (!db) return;
+    try {
+        const s = await FS.getDoc(FS.doc(db, "tv_config", "main"));
+        if (!s.exists()) return;
+        const d = s.data();
+        const raw = Array.isArray(d.channels) ? d.channels : [{ platform: "twitch", id: d.twitchChannel || "abysz_o", name: "Twitch" }, { platform: "tiktok", id: "abysz_o", name: "TikTok" }, ...(Array.isArray(d.customTabs) ? d.customTabs : []).map((x) => ({ platform: "link", name: x.name, url: x.url }))];
+        S.ch = raw.slice(0, 20).map(cleanCh).filter(Boolean);
+        S.vid = (Array.isArray(d.customVideos) ? d.customVideos : []).slice(0, 100).map(cleanVid);
+        S.key = /^[\w-]{30,60}$/.test(d.ytKey || "") ? d.ytKey : "";
+        if (S.sel >= S.ch.length) S.sel = 0;
+    } catch (e) { console.warn(e); }
+}
 
 /* ---------- Admin ---------- */
-function editVid(i){if(!isAdmin())return;S.edit=i;const v=S.vid[i]||{};
-  $("#v-h").textContent=i<0?"➕ Ajouter une vidéo":"✏️ Modifier";$("#v-t").value=v.title||"";$("#v-g").value=v.tag||"";$("#v-u").value=v.url||"";open("m-v")}
-$("#add-v").addEventListener("click",()=>editVid(-1));
-$("#v-ok").addEventListener("click",()=>{if(!isAdmin())return;const v=cleanVid({title:$("#v-t").value,tag:$("#v-g").value,url:$("#v-u").value});
-  if(!v.title||!parseVideo(v.url))return toast("Titre requis et lien YouTube / Twitch / Vimeo / Dailymotion valide","error");
-  S.edit<0?S.vid.push(v):S.vid[S.edit]=v;if(S.vid.length>100)S.vid.length=100;closeAll();save()});
-$("#add-ch").addEventListener("click",()=>{$("#c-name").value=$("#c-id").value="";open("m-ch")});
-$("#c-pf").addEventListener("change",e=>$("#c-idl").textContent=e.target.value==="link"?"URL https://…":e.target.value==="youtube"?"ID de chaîne (UC…)":"Identifiant / pseudo");
-$("#c-ok").addEventListener("click",()=>{if(!isAdmin())return;const p=$("#c-pf").value,v=$("#c-id").value.trim();
-  const c=cleanCh(p==="link"?{platform:p,name:$("#c-name").value,url:v}:{platform:p,id:v.replace(/^@/,""),name:$("#c-name").value});
-  if(!c)return toast("Identifiant ou lien invalide","error");if(S.ch.length>=20)return toast("Maximum 20 chaînes","error");
-  S.ch.push(c);closeAll();save()});
-$("#set-key").addEventListener("click",()=>{if(!isAdmin())return;const k=prompt("Clé API YouTube Data v3 (restreinte à ton domaine) — vide pour retirer :",S.key);
-  if(k===null)return;if(k&&!/^[\w-]{30,60}$/.test(k.trim()))return toast("Clé invalide","error");S.key=k.trim();save()});
+function cleanCh(c) {
+    if (!c) return null;
+    const p = c.platform, name = clean(c.name, 40);
+    if (p === "link") { const url = safeUrl(c.url); return url && name ? { platform: p, name, url } : null; }
+    const id = clean(c.id, 40);
+    return RX[p]?.test(id) ? { platform: p, id, name: name || p.toUpperCase() } : null;
+}
+const cleanVid = (v) => ({ title: clean(v?.title, 120), tag: clean(v?.tag, 24).toUpperCase() || "OFFICIEL", url: clean(v?.url, 300) });
 
-async function save(){if(!isAdmin())return toast("Accès refusé","error");
-  try{await setDoc(doc(db,"tv_config","main"),{channels:S.ch,customVideos:S.vid,ytKey:S.key,twitchChannel:S.ch.find(c=>c.platform==="twitch")?.id||""});toast("Enregistré ✔","success")}
-  catch(e){console.error(e);toast("Échec de l'enregistrement","error")}
-  renderRail();renderVideos();show();poll()}
+function editVid(i) {
+    if (!isAdmin()) return;
+    S.edit = i; const v = S.vid[i] || {};
+    $("#v-h").textContent = i < 0 ? "➕ Ajouter une vidéo" : "✏️ Modifier";
+    $("#v-t").value = v.title || ""; $("#v-g").value = v.tag || ""; $("#v-u").value = v.url || "";
+    openM("m-v");
+}
+$("#tv-add-v").addEventListener("click", () => editVid(-1));
+$("#v-ok").addEventListener("click", () => {
+    if (!isAdmin()) return;
+    const v = cleanVid({ title: $("#v-t").value, tag: $("#v-g").value, url: $("#v-u").value });
+    const p = parseSource(v.url);
+    if (!v.title || !p || p.kind !== "video") return toast("Titre requis et lien vidéo valide (YouTube / Twitch VOD ou clip / Vimeo / Dailymotion)", "error");
+    S.edit < 0 ? S.vid.push(v) : (S.vid[S.edit] = v);
+    if (S.vid.length > 100) S.vid.length = 100;
+    closeAll(); save();
+});
+$("#tv-add-ch").addEventListener("click", () => { $("#c-name").value = $("#c-id").value = ""; openM("m-ch"); });
+$("#c-pf").addEventListener("change", (e) => { $("#c-idl").textContent = e.target.value === "link" ? "URL https://…" : e.target.value === "youtube" ? "ID de chaîne (UC…)" : "Identifiant / pseudo"; });
+$("#c-ok").addEventListener("click", () => {
+    if (!isAdmin()) return;
+    const p = $("#c-pf").value, v = $("#c-id").value.trim();
+    const c = cleanCh(p === "link" ? { platform: p, name: $("#c-name").value, url: v } : { platform: p, id: v.replace(/^@/, ""), name: $("#c-name").value });
+    if (!c) return toast("Identifiant ou lien invalide", "error");
+    if (S.ch.length >= 20) return toast("Maximum 20 chaînes", "error");
+    S.ch.push(c); closeAll(); save();
+});
+$("#tv-set-key").addEventListener("click", () => {
+    if (!isAdmin()) return;
+    const k = prompt("Clé API YouTube Data v3 (restreinte à ton domaine) — vide pour retirer :", S.key);
+    if (k === null) return;
+    if (k && !/^[\w-]{30,60}$/.test(k.trim())) return toast("Clé invalide", "error");
+    S.key = k.trim(); save();
+});
+async function save() {
+    if (!isAdmin() || !db) return toast("Accès refusé", "error");
+    try {
+        await FS.setDoc(FS.doc(db, "tv_config", "main"), { channels: S.ch, customVideos: S.vid, ytKey: S.key, twitchChannel: S.ch.find((c) => c.platform === "twitch")?.id || "" });
+        toast("Enregistré ✔", "success");
+    } catch (e) { console.error(e); toast("Échec de l'enregistrement", "error"); }
+    renderRail(); renderVideos(); if (S.mode === "channel") showChannel(); poll();
+}
 
-/* ---------- Auth ---------- */
-let fails=0,lock=0,idle;
-const resetIdle=()=>{clearTimeout(idle);if(auth.currentUser)idle=setTimeout(()=>{signOut(auth);toast("Session admin expirée")},30*60*1000)};
-["click","keydown"].forEach(e=>addEventListener(e,resetIdle,{passive:true}));
-onAuthStateChanged(auth,u=>{const a=u?.email===ADMIN;if(u&&!a)signOut(auth);
-  document.body.classList.toggle("admin",a);$("#adm-tag").hidden=!a;$("#add-v").hidden=!a;
-  $("#auth-btn").textContent=a?"👤 Déconnexion":"👤 Admin";resetIdle();renderVideos()});
-$("#auth-btn").addEventListener("click",()=>auth.currentUser?signOut(auth):open("m-auth"));
-$("#a-ok").addEventListener("click",async()=>{if(Date.now()<lock)return toast("Trop de tentatives, patientez 1 minute","error");
-  try{await signInWithEmailAndPassword(auth,$("#a-mail").value.trim(),$("#a-pw").value);fails=0;closeAll();toast("Session admin ouverte","success")}
-  catch{if(++fails>=5){lock=Date.now()+60000;fails=0}toast("Identifiants incorrects","error")}
-  $("#a-pw").value=""});
-document.querySelectorAll("[data-close]").forEach(b=>b.addEventListener("click",closeAll));
-document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)closeAll()}));
-addEventListener("keydown",e=>{if(e.key==="Escape")closeAll()});
-$("#s-b").addEventListener("click",()=>$("#videos").scrollIntoView({behavior:"smooth"}));
+/* ---------- Connexion admin ---------- */
+let fails = 0, lock = 0;
+$("#tv-auth-btn").addEventListener("click", async () => {
+    if (isAdmin()) { await AU.signOut(auth); toast("Déconnecté"); return; }
+    if (!auth) return toast("Connexion indisponible pour le moment", "error");
+    openM("m-auth");
+});
+async function login() {
+    if (Date.now() < lock) return toast("Trop de tentatives, patiente 1 minute", "error");
+    try {
+        await AU.signInWithEmailAndPassword(auth, $("#a-mail").value.trim(), $("#a-pw").value);
+        fails = 0;
+        if (!isAdmin()) { toast("Ce compte n'a pas les droits admin", "error"); return; }
+        closeAll(); toast("Session admin ouverte", "success");
+    } catch { if (++fails >= 5) { lock = Date.now() + 60000; fails = 0; } toast("Identifiants incorrects", "error"); }
+    $("#a-pw").value = "";
+}
+$("#a-ok").addEventListener("click", login);
+$("#a-pw").addEventListener("keydown", (e) => { if (e.key === "Enter") login(); });
 
 /* ---------- Démarrage ---------- */
-(async()=>{try{const s=await getDoc(doc(db,"tv_config","main"));
-  if(s.exists()){const d=s.data();
-    const raw=Array.isArray(d.channels)?d.channels:[{platform:"twitch",id:d.twitchChannel||"abysz_o",name:"Twitch"},{platform:"tiktok",id:"abysz_o",name:"TikTok"},...(Array.isArray(d.customTabs)?d.customTabs:[]).map(t=>({platform:"link",name:t.name,url:t.url}))];
-    S.ch=raw.slice(0,20).map(cleanCh).filter(Boolean);
-    S.vid=(Array.isArray(d.customVideos)?d.customVideos:[]).slice(0,100).map(cleanVid);
-    S.key=/^[\w-]{30,60}$/.test(d.ytKey||"")?d.ytKey:""}}
-  catch(e){console.error(e)}
-  renderRail();renderVideos();await poll();show();setInterval(poll,60000)})();
-</script>
+applyI18n(); renderBadge(); renderRail(); renderVideos();
+const hashed = fromHash();
+(async () => {
+    await initFirebase();
+    await Promise.race([loadConfig(), sleep(5000)]);
+    renderRail(); renderVideos();
+    await Promise.race([poll(), sleep(4000)]);
+    if (S.mode === "channel" && !$("#tv-stage iframe") && !S.scr) showChannel();
+    setInterval(() => { if (!document.hidden) poll(); }, 60000);
+})();
+    </script>
 </body>
 </html>

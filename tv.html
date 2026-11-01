@@ -241,326 +241,21 @@
         .menu-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; z-index: 1100; }
         .menu-toggle span { display: block; width: 25px; height: 3px; background: white; transition: all 0.3s ease; }
         
-        .hero { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 100px 20px; background-size: cover; background-position: center; min-height: 40vh; }
-        .hero h1 { font-family: 'Orbitron', sans-serif; font-size: 3.5rem; margin: 0; text-shadow: 0 0 20px rgba(168, 85, 247, 0.6); }
-        .hero .slogan { font-size: 1.2rem; color: #ccc; margin: 10px 0 25px 0; }
-
-        .btn { transition: transform 0.2s ease, box-shadow 0.3s ease; display: inline-block; text-decoration: none; background: #a855f7; color: white; padding: 12px 28px; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-weight: bold; }
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 0 20px rgba(168, 85, 247, 0.6); background: #b975ff; }
-        
-        .about-section { max-width: 1000px; margin: 0 auto; padding: 40px 20px 10px 20px; line-height: 1.7; color: #ccc; }
-        .about-section h2 { font-family: 'Orbitron', sans-serif; color: #fff; font-size: 1.8rem; margin-bottom: 15px; }
-
-        .edit-home-btn { background: #3b82f6; border: none; color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-family: 'Orbitron', sans-serif; font-weight: bold; cursor: pointer; transition: all 0.2s ease; margin-left: 10px; }
-        .edit-home-btn:hover { background: #2563eb; transform: scale(1.05); }
-
-        .section-header { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 25px; }
-        .title-area { display: flex; align-items: center; gap: 12px; }
-        .title-area h2 { font-family: 'Orbitron', sans-serif; font-size: 1.6rem; margin: 0; letter-spacing: 0.5px; }
-        
-        .add-btn { background: #a855f7; border: none; color: white; width: 34px; height: 34px; border-radius: 50%; font-size: 1.3rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; box-shadow: 0 0 10px rgba(168, 85, 247, 0.3); flex-shrink: 0; }
-        .add-btn:hover { background: #b975ff; transform: scale(1.08); box-shadow: 0 0 15px rgba(168, 85, 247, 0.5); }
-        
-        .admin-gate-btn { background: transparent; border: 1px solid #a855f7; color: #a855f7; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-family: 'Orbitron', sans-serif; transition: all 0.3s ease; font-size: 0.9rem; white-space: nowrap; }
-        .admin-gate-btn:hover { background: #a855f7; color: white; box-shadow: 0 0 15px #a855f7; }
-        .admin-gate-btn.logged-in { border-color: #ff4444; color: #ff4444; }
-        .admin-gate-btn.logged-in:hover { background: #ff4444; color: white; box-shadow: 0 0 15px #ff4444; }
-
-        .announcements-container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
-        .carousel-wrapper { position: relative; width: 100%; border-radius: 16px; background: #141414; border: 1px solid #2a2a2a; box-sizing: border-box; padding: 0 65px; }
-        .carousel-track-container { overflow: hidden; width: 100%; border-radius: 8px; }
-        .carousel-track { display: flex; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); width: 100%; }
-        
-        .announcement-card { min-width: 100%; box-sizing: border-box; padding: 30px; border-left: 5px solid #a855f7; position: relative; display: flex; flex-direction: column; gap: 14px; background: #1a1a1a; }
-        .announcement-card.priority-urgent { border-left-color: #ff4444; background: linear-gradient(90deg, rgba(255,68,68,0.05) 0%, #1a1a1a 100%); }
-        
-        .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: #1a1a1a; border: 1px solid #a855f7; color: white; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; z-index: 20; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
-        .carousel-btn:hover { background: #a855f7; box-shadow: 0 0 12px #a855f7; }
-        .carousel-btn.prev { left: 12px; }
-        .carousel-btn.next { right: 12px; }
-        
-        .carousel-dots { display: flex; justify-content: center; gap: 8px; margin-top: 15px; }
-        .dot { width: 10px; height: 10px; border-radius: 50%; background: #333; cursor: pointer; transition: all 0.3s ease; }
-        .dot.active { background: #a855f7; box-shadow: 0 0 8px #a855f7; width: 24px; border-radius: 10px; }
-
-        .announcement-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-right: 180px; }
-        .badge { font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: bold; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .badge-general { background: #a855f7; color: white; }
-        .badge-match { background: #3b82f6; color: white; }
-        .badge-recrutement { background: #10b981; color: white; }
-        .badge-evenement { background: #f59e0b; color: white; }
-        .badge-urgent { background: #ff4444; color: white; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-        
-        .announcement-card h3 { font-family: 'Orbitron', sans-serif; color: #ffffff; margin: 0; font-size: 1.4rem; line-height: 1.4; word-break: break-word; }
-        .announcement-card p { color: #ccc; font-size: 0.95rem; line-height: 1.6; margin: 0; white-space: pre-wrap; word-break: break-word; }
-        .announcement-img { max-width: 100%; max-height: 350px; object-fit: cover; border-radius: 8px; border: 1px solid #2a2a2a; margin-top: 4px; width: 100%; }
-        .announcement-action-btn { background: #a855f7; color: white; text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 0.85rem; font-weight: bold; padding: 10px 20px; border-radius: 6px; align-self: flex-start; transition: all 0.2s ease; margin-top: 4px; text-align: center; }
-        .announcement-action-btn:hover { background: #b975ff; box-shadow: 0 0 10px rgba(168, 85, 247, 0.4); }
-        .announcement-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; flex-wrap: wrap; gap: 10px; }
-        .announcement-date { font-size: 0.8rem; color: #777; }
-
-        /* BOUTON LIKE ANNONCE */
-        .like-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #dddddd;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
-            user-select: none;
-        }
-        .like-btn:hover {
-            background: rgba(239, 68, 68, 0.15);
-            border-color: #ef4444;
-            color: #ef4444;
-            transform: translateY(-2px);
-        }
-        .like-btn.liked {
-            background: rgba(239, 68, 68, 0.2);
-            border-color: #ef4444;
-            color: #ef4444;
-            box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
-        }
-        .like-heart { font-size: 0.95rem; transition: transform 0.2s ease; }
-        .like-btn.liked .like-heart { transform: scale(1.2); }
-
-        /* Lightbox */
-        .announcement-img, .custom-card-img { cursor: zoom-in; }
-        .img-lightbox {
-            position: fixed; inset: 0; z-index: 3000;
-            background: rgba(0, 0, 0, 0.92);
-            display: none; align-items: center; justify-content: center;
-            padding: 30px; box-sizing: border-box;
-            opacity: 0; transition: opacity 0.25s ease;
-        }
-        .img-lightbox.active { display: flex; opacity: 1; }
-        .img-lightbox img {
-            max-width: 90vw; max-height: 90vh;
-            object-fit: contain;
-            border-radius: 8px;
-            box-shadow: 0 0 40px rgba(168, 85, 247, 0.3);
-            transform: scale(0.95); transition: transform 0.25s ease;
-        }
-        .img-lightbox.active img { transform: scale(1); }
-        .img-lightbox-close {
-            position: absolute; top: 20px; right: 25px;
-            background: #1a1a1a; border: 1px solid #a855f7; color: white;
-            width: 42px; height: 42px; border-radius: 50%; cursor: pointer;
-            font-size: 1.3rem; display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s ease; z-index: 3001;
-        }
-        .img-lightbox-close:hover { background: #a855f7; box-shadow: 0 0 12px #a855f7; }
-        .abysz-tv-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: linear-gradient(135deg, rgba(145, 70, 255, 0.2), rgba(168, 85, 247, 0.15));
-            border: 1px solid #9146FF;
-            padding: 6px 14px;
-            border-radius: 20px;
-            color: #ffffff !important;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-decoration: none;
-            letter-spacing: 0.5px;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: 0 0 10px rgba(145, 70, 255, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .abysz-tv-badge::after { display: none !important; }
-
-        .abysz-tv-badge:hover {
-            background: linear-gradient(135deg, #9146FF, #a855f7);
-            box-shadow: 0 0 20px rgba(145, 70, 255, 0.7);
-            transform: translateY(-2px) scale(1.03);
-            color: #ffffff !important;
-        }
-
-        .live-dot-tv {
-            width: 8px;
-            height: 8px;
-            background-color: #ff4444;
-            border-radius: 50%;
-            box-shadow: 0 0 8px #ff4444;
-            animation: pulse-live-tv 1.5s infinite;
-            flex-shrink: 0;
-        }
-
-        @keyframes pulse-live-tv {
-            0% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 4px #ff4444; }
-            50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 12px #ff4444; }
-            100% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 4px #ff4444; }
-        }
-
-        .online-counter-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(20, 20, 20, 0.8);
-            border: 1px solid #2a2a2a;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.78rem;
-            color: #e0e0e0;
-        }
-
-        .pulse-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #10b981;
-            border-radius: 50%;
-            box-shadow: 0 0 8px #10b981;
-            animation: pulse-live 1.8s infinite;
-            flex-shrink: 0;
-        }
-
-        @keyframes pulse-live {
-            0% { transform: scale(0.95); opacity: 0.8; }
-            50% { transform: scale(1.2); opacity: 1; }
-            100% { transform: scale(0.95); opacity: 0.8; }
-        }
-
-        nav ul li a.btn-animated-join::after { display: none !important; }
-        .btn-animated-join {
-            position: relative;
-            background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
-            color: #ffffff;
-            padding: 8px 20px;
-            border-radius: 10px;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 800;
-            font-size: 0.82rem;
-            text-decoration: none;
-            letter-spacing: 1px;
-            display: inline-block;
-            overflow: hidden;
-            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
-            animation: pulse-btn-glow 2.5s infinite alternate;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-
-        .btn-animated-join::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                60deg,
-                transparent 30%,
-                rgba(255, 255, 255, 0.35) 50%,
-                transparent 70%
-            );
-            transform: rotate(30deg);
-            animation: shimmer-btn 3.5s infinite;
-        }
-
-        .btn-animated-join:hover {
-            transform: translateY(-4px) scale(1.05);
-            box-shadow: 0 0 30px rgba(168, 85, 247, 0.9), 0 0 50px rgba(168, 85, 247, 0.5);
-            background: linear-gradient(135deg, #b975ff 0%, #a855f7 100%);
-        }
-
-        @keyframes pulse-btn-glow {
-            0% { box-shadow: 0 0 12px rgba(168, 85, 247, 0.4); }
-            50% { box-shadow: 0 0 25px rgba(168, 85, 247, 0.8), 0 0 35px rgba(168, 85, 247, 0.4); }
-            100% { box-shadow: 0 0 12px rgba(168, 85, 247, 0.4); }
-        }
-
-        @keyframes shimmer-btn {
-            0% { transform: translateX(-150%) rotate(30deg); }
-            20% { transform: translateX(150%) rotate(30deg); }
-            100% { transform: translateX(150%) rotate(30deg); }
-        }
-
-
-        /* ===== ONGLET BOUTIQUE : animation NEW ===== */
-        nav ul li a.nav-shop::after {
-            content: '✦'; position: absolute; top: -9px; right: -5px; left: auto; bottom: auto;
-            width: auto; height: auto; background: none; color: #fcd34d; font-size: 0.8rem;
-            transition: none; animation: shop-twinkle 2.4s ease-in-out infinite; pointer-events: none;
-        }
-        nav ul li a.nav-shop:hover::after { width: auto; }
-        .nav-shop {
-            position: relative; display: inline-flex; align-items: center; gap: 8px;
-            padding: 7px 14px; border-radius: 999px;
-            font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 0.82rem; letter-spacing: 0.4px;
-            color: #ffffff !important;
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.20), rgba(236, 72, 153, 0.20));
-            border: 1px solid rgba(245, 158, 11, 0.6);
-            box-shadow: 0 0 14px rgba(245, 158, 11, 0.28);
-            transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-            animation: shop-nudge 5s ease-in-out infinite;
-        }
-        .nav-shop:hover {
-            background: linear-gradient(135deg, #f59e0b, #ec4899);
-            box-shadow: 0 0 22px rgba(245, 158, 11, 0.75);
-            transform: translateY(-2px) scale(1.06);
-            animation: none; color: #ffffff !important;
-        }
-        .nav-shop-icon { display: inline-block; transform-origin: 50% 15%; animation: shop-bag 5s ease-in-out infinite; }
-        .nav-shop-new {
-            position: relative; padding: 2px 7px; border-radius: 6px;
-            font-size: 0.62rem; font-weight: 900; letter-spacing: 1.2px; color: #111;
-            background: linear-gradient(90deg, #f59e0b, #fde68a, #ec4899, #f59e0b);
-            background-size: 250% 100%; animation: shop-shine 2.2s linear infinite;
-        }
-        .nav-shop-new::before {
-            content: ''; position: absolute; inset: -3px; border-radius: 9px;
-            border: 2px solid #f59e0b; opacity: 0; animation: shop-ping 1.8s ease-out infinite;
-        }
-        @keyframes shop-shine { to { background-position: -250% 0; } }
-        @keyframes shop-ping { 0% { transform: scale(0.9); opacity: 0.9; } 100% { transform: scale(1.5); opacity: 0; } }
-        @keyframes shop-twinkle { 0%, 100% { transform: scale(0.6) rotate(0); opacity: 0.4; } 50% { transform: scale(1.3) rotate(25deg); opacity: 1; } }
-        @keyframes shop-nudge {
-            0%, 84%, 100% { transform: none; }
-            87% { transform: rotate(-3deg) scale(1.06); }
-            90% { transform: rotate(3deg) scale(1.06); }
-            93% { transform: rotate(-2deg) scale(1.03); }
-            96% { transform: rotate(1deg); }
-        }
-        @keyframes shop-bag {
-            0%, 82%, 100% { transform: none; }
-            86% { transform: translateY(-4px) rotate(-14deg); }
-            91% { transform: translateY(0) rotate(10deg); }
-            95% { transform: rotate(-5deg); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-            .nav-shop, .nav-shop-icon, .nav-shop-new, .nav-shop-new::before, nav ul li a.nav-shop::after { animation: none !important; }
-        }
-
-        .menu-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; z-index: 1100; }
-        .menu-toggle span { display: block; width: 25px; height: 3px; background: white; transition: all 0.3s ease; }
-        
         .lang-switch { display: inline-flex; gap: 4px; padding: 3px; background: #141414; border: 1px solid #2a2a2a; border-radius: 999px; order: 2; flex-shrink: 0; }
         .lang-btn { font-family: 'Orbitron', sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; color: #aaa; background: transparent; border: none; padding: 6px 12px; border-radius: 999px; cursor: pointer; transition: all 0.25s ease; }
         .lang-btn:hover { color: #fff; }
         .lang-btn[aria-pressed="true"] { background: linear-gradient(135deg, #a855f7, #7e22ce); color: #fff; box-shadow: 0 0 12px rgba(168, 85, 247, 0.5); }
+        .lang-btn:focus-visible { outline: 2px solid #a855f7; outline-offset: 2px; }
         footer { padding: 35px 20px; text-align: center; border-top: 1px solid #1a1a1a; color: #888; font-size: 0.85rem; }
         footer .footer-links { margin-bottom: 12px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
         footer .footer-links a { color: #aaa; text-decoration: none; transition: color 0.2s; }
         footer .footer-links a:hover { color: #a855f7; }
-        .lang-btn:focus-visible { outline: 2px solid #a855f7; outline-offset: 2px; }
         .nav-staff-mobile { display: none; }
         @media (max-width: 430px) {
             .logo .nav-staff-link { display: none; }
             nav ul li.nav-staff-mobile { display: block; }
         }
         .tv-adm-tag { font: 600 .6rem 'Orbitron', sans-serif; background: #a855f7; padding: 3px 8px; border-radius: 4px; vertical-align: middle; letter-spacing: 0; }
-        .abysz-tv-badge[aria-current="page"] { box-shadow: 0 0 20px rgba(145, 70, 255, 0.55); }
         .nav-admin-btn { background: transparent; border: 1px solid #2a2a2a; color: #ddd; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; font-weight: 600; padding: 6px 14px; border-radius: 20px; cursor: pointer; transition: all .25s; white-space: nowrap; }
         .nav-admin-btn:hover { border-color: #a855f7; color: #fff; box-shadow: 0 0 10px rgba(168,85,247,.4); }
         .nav-admin-btn.on { border-color: #a855f7; color: #a855f7; }
@@ -576,7 +271,7 @@
             nav ul.mobile-open { display: flex; }
             nav ul li a { display: block; padding: 10px 0; font-size: 1.1rem; }
             nav ul li a::after { display: none; }
-            nav ul li a.abysz-tv-badge, nav ul li a.btn-animated-join, nav ul li a.nav-shop { display: inline-flex; justify-content: center; }
+            nav ul li a.btn-animated-join, nav ul li a.nav-shop { display: inline-flex; justify-content: center; }
             .menu-toggle.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
             .menu-toggle.open span:nth-child(2) { opacity: 0; }
             .menu-toggle.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
@@ -719,11 +414,16 @@
 
         <ul id="nav-links-list">
             <li><a href="index.html" data-i18n="nav_home">Accueil</a></li>
-            <li><a href="tv.html" class="abysz-tv-badge" aria-current="page"><span class="live-dot-tv"></span><span>📺 ABYSZ TV</span></a></li>
             <li><a href="roster.html">Roster</a></li>
             <li><a href="index.html#annonces" data-i18n="nav_planning">Planning</a></li>
             <li><a href="boutique.html" class="nav-shop"><span class="nav-shop-icon">🛍️</span><span data-i18n="nav_shop">Boutique</span><span class="nav-shop-new">NEW</span></a></li>
             <li><a href="index.html#rejoindre-commu" class="btn-animated-join" data-i18n="nav_join">🚀 Rejoindre</a></li>
+            <li>
+                <div class="online-counter-badge">
+                    <span class="pulse-dot"></span>
+                    <span id="site-online-count">1 en ligne</span>
+                </div>
+            </li>
             <li><button type="button" class="nav-admin-btn" id="tv-auth-btn">👤 Admin</button></li>
             <li class="nav-staff-mobile"><a href="staffabysz.html" style="color:#a855f7;font-weight:bold;">Staff</a></li>
         </ul>
@@ -856,6 +556,7 @@ const D = {
         page_title: "ABYSZ TV — Lives & Vidéos Officielles",
         sub: "Lives de la team en direct, vidéos officielles et n'importe quel stream",
         badge_sync: "🔍 Synchronisation…", badge_none: "● AUCUN LIVE POUR LE MOMENT", badge_live: "EN DIRECT · {names}",
+        online_n: "{n} en ligne",
         viewers: "👁 {n} spectateurs", live_now: "EN DIRECT",
         scr_none_h: "Aucune chaîne", scr_none_p: "Aucune chaîne n'est configurée. Colle un lien ci-dessous pour regarder n'importe quel stream.",
         scr_off_h: "{name} EST HORS LIGNE", scr_off_p: "Le live démarrera automatiquement ici dès que la chaîne sera en direct. En attendant, regarde nos vidéos ou un autre stream !",
@@ -883,6 +584,7 @@ const D = {
         page_title: "ABYSZ TV — Live Streams & Official Videos",
         sub: "The team's live streams, official videos and any stream you want",
         badge_sync: "🔍 Syncing…", badge_none: "● NO LIVE RIGHT NOW", badge_live: "LIVE · {names}",
+        online_n: "{n} online",
         viewers: "👁 {n} viewers", live_now: "LIVE",
         scr_none_h: "No channel", scr_none_p: "No channel is configured. Paste a link below to watch any stream.",
         scr_off_h: "{name} IS OFFLINE", scr_off_p: "The live will start here automatically as soon as the channel goes live. Meanwhile, watch our videos or another stream!",
@@ -1236,7 +938,7 @@ function renderVideos() {
     });
     if (!g.children.length) g.append(el("div", "tv-empty", t("vid_empty")));
 }
-function rerender() { applyI18n(); renderBadge(); renderRail(); renderVideos(); renderInfo(); paintScreen(); }
+function rerender() { applyI18n(); renderOnline(); renderBadge(); renderRail(); renderVideos(); renderInfo(); paintScreen(); }
 
 /* ---------- Toasts / modales ---------- */
 function toast(m, type = "") { const e = el("div", "tv-toast " + type, m); $("#tv-toasts").append(e); setTimeout(() => e.remove(), 3800); }
@@ -1276,7 +978,7 @@ function fromHash() {
 addEventListener("hashchange", fromHash);
 
 /* ---------- Firebase (facultatif : le lecteur marche même sans) ---------- */
-let auth = null, db = null, FS = null, AU = null;
+let auth = null, db = null, FS = null, AU = null, rtdb = null, RT = null;
 const isAdmin = () => auth?.currentUser?.email === ADMIN;
 function paintAuthBtn() {
     const b = $("#tv-auth-btn"), a = isAdmin();
@@ -1285,16 +987,91 @@ function paintAuthBtn() {
 async function initFirebase() {
     try {
         const base = `https://www.gstatic.com/firebasejs/${FB_VER}/`;
-        const [A, Au, F] = await Promise.all([import(base + "firebase-app.js"), import(base + "firebase-auth.js"), import(base + "firebase-firestore.js")]);
+        const [A, Au, F, R] = await Promise.all([import(base + "firebase-app.js"), import(base + "firebase-auth.js"), import(base + "firebase-firestore.js"), import(base + "firebase-database.js")]);
         const app = A.initializeApp(firebaseConfig);
-        auth = Au.getAuth(app); db = F.getFirestore(app); AU = Au; FS = F;
+        auth = Au.getAuth(app); db = F.getFirestore(app); AU = Au; FS = F; RT = R; rtdb = R.getDatabase(app);
         AU.onAuthStateChanged(auth, (u) => {
             const a = u?.email === ADMIN;
             document.body.classList.toggle("tv-admin", a);
             $("#tv-adm-tag").hidden = !a; $("#tv-add-v").hidden = !a;
             paintAuthBtn(); renderRail(); renderVideos();
         });
+        startOnlineCounter();
     } catch (e) { console.warn("Firebase indisponible :", e); }
+}
+
+/* ---------- Visiteurs en ligne (même système que index.html) ---------- */
+const HEARTBEAT_MS = 25000, STALE_MS = 75000;
+function getVisitorId() {
+    try {
+        let id = localStorage.getItem("abysz_visitor_id");
+        if (!id) { id = "usr_" + (crypto.randomUUID ? crypto.randomUUID().replace(/-/g, "") : Math.random().toString(36).slice(2) + Date.now().toString(36)); localStorage.setItem("abysz_visitor_id", id); }
+        return id;
+    } catch { return "usr_anon"; }
+}
+// Visiteurs uniques (pas onglets), les sessions sans battement depuis 75 s sont ignorées
+function computeOnline(val, now) {
+    let total = 0;
+    for (const sessions of Object.values(val || {})) {
+        if (!sessions || typeof sessions !== "object") continue;
+        let alive = false;
+        for (const s of Object.values(sessions)) {
+            if (s && typeof s === "object") { if (typeof s.lastSeen === "number" && now - s.lastSeen > STALE_MS) continue; alive = true; }
+            else alive = true;   // ancien format
+        }
+        if (alive) total++;
+    }
+    return { total };
+}
+let onlineN = 1;
+const renderOnline = () => { $("#site-online-count").textContent = t("online_n", { n: onlineN }); };
+function startOnlineCounter() {
+    // Lecture seule (aucun traceur) : toujours actif
+    RT.onValue(RT.ref(rtdb, "online_users"), (snap) => { onlineN = Math.max(1, computeOnline(snap.val() || {}, Date.now()).total); renderOnline(); });
+    // La présence (écriture) ne démarre qu'après consentement « Mesure d'audience »
+    if (window.AbyszConsent?.on) window.AbyszConsent.on("analytics", startPresence);
+}
+let presenceOn = false;
+function startPresence() {
+    if (presenceOn || !rtdb) return;
+    presenceOn = true;
+    const { ref, set, update, remove, onValue, onDisconnect, serverTimestamp, increment, runTransaction } = RT;
+    const visitorId = getVisitorId();
+    const pageKey = "tv";
+    const device = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? "mobile" : "desktop";
+    const today = new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Paris" });
+    const sessionRef = ref(rtdb, `online_users/${visitorId}/s_${Math.random().toString(36).substring(2, 9)}`);
+    const isVisible = () => document.visibilityState === "visible";
+    let connected = false, serverOffset = 0, lastVal = null, peakSent = 0;
+
+    const register = () => set(sessionRef, { page: pageKey, device, visible: isVisible(), joinedAt: serverTimestamp(), lastSeen: serverTimestamp() });
+    const heartbeat = () => { if (connected) update(sessionRef, { lastSeen: serverTimestamp(), visible: isVisible(), page: pageKey }).catch(() => {}); };
+
+    onValue(ref(rtdb, ".info/serverTimeOffset"), (s) => { serverOffset = s.val() || 0; });
+    onValue(ref(rtdb, ".info/connected"), async (snap) => {
+        connected = snap.val() === true;
+        if (!connected) return;
+        try { await onDisconnect(sessionRef).remove(); await register(); } catch (e) { console.warn("Présence indisponible :", e.message); }
+    });
+    setInterval(heartbeat, HEARTBEAT_MS);
+    document.addEventListener("visibilitychange", heartbeat);
+    addEventListener("pagehide", () => { remove(sessionRef).catch(() => {}); });
+    addEventListener("pageshow", (e) => { if (e.persisted && connected) register().catch(() => {}); });
+
+    const refresh = () => {
+        if (lastVal === null) return;
+        const { total } = computeOnline(lastVal, Date.now() + serverOffset);
+        onlineN = Math.max(1, total); renderOnline();
+        if (total > peakSent) { peakSent = total; runTransaction(ref(rtdb, `stats/daily/${today}/peakOnline`), (cur) => ((cur || 0) >= total ? undefined : total)).catch(() => {}); }
+    };
+    onValue(ref(rtdb, "online_users"), (snap) => { lastVal = snap.val() || {}; refresh(); });
+    setInterval(refresh, 15000);
+
+    // Compteurs du jour (1 fois par chargement de page)
+    const base = `stats/daily/${today}`;
+    const updates = { [`${base}/visits`]: increment(1), [`${base}/pages/${pageKey}`]: increment(1), [`${base}/devices/${device}`]: increment(1) };
+    try { if (localStorage.getItem("abysz_last_day") !== today) { updates[`${base}/uniqueVisitors`] = increment(1); localStorage.setItem("abysz_last_day", today); } } catch {}
+    update(ref(rtdb), updates).catch(() => {});
 }
 async function loadConfig() {
     if (!db) return;
@@ -1384,7 +1161,7 @@ $("#a-ok").addEventListener("click", login);
 $("#a-pw").addEventListener("keydown", (e) => { if (e.key === "Enter") login(); });
 
 /* ---------- Démarrage ---------- */
-applyI18n(); renderBadge(); renderRail(); renderVideos();
+applyI18n(); renderOnline(); renderBadge(); renderRail(); renderVideos();
 const hashed = fromHash();
 (async () => {
     await initFirebase();

@@ -710,6 +710,24 @@
             .sub-submit { width: 100%; }
         }
     </style>
+    <style>
+        /* ===== Diffusion Discord (panneau admin) ===== */
+        .dc-box { margin-top: 6px; }
+        .dc-check { display: flex; align-items: center; gap: 10px; cursor: pointer; color: #ddd; font-family: 'Inter', sans-serif; font-size: 0.9rem; }
+        .dc-check input { width: auto; margin: 0; cursor: pointer; }
+        .dc-hint { color: #8f8f8f; font-size: 0.78rem; margin: 6px 0 0; font-family: 'Inter', sans-serif; line-height: 1.4; }
+        .dc-hint.err { color: #ff6b6b; }
+        .dc-msg { font-size: 0.85rem; min-height: 1.2em; margin: 10px 0 0; font-family: 'Inter', sans-serif; word-break: break-word; line-height: 1.45; }
+        .dc-msg.ok { color: #22c55e; } .dc-msg.err { color: #ff6b6b; } .dc-msg.info { color: #aaa; }
+        .dc-config { margin-top: 22px; border: 1px solid #2a2a2a; border-radius: 10px; padding: 14px 16px; background: #0a0a0a; }
+        .dc-config summary { cursor: pointer; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; color: #8b94ff; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .dc-chip { font-family: 'Inter', sans-serif; font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; border: 1px solid rgba(255,68,68,.5); color: #ff6b6b; background: rgba(255,68,68,.12); }
+        .dc-chip.on { border-color: rgba(34,197,94,.5); color: #22c55e; background: rgba(34,197,94,.1); }
+        .dc-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+        .dc-actions .form-btn { width: auto; flex: 1 1 140px; margin-top: 0; }
+        .dc-ghost { background: #050505 !important; border: 1px solid #2a2a2a !important; }
+        .dc-danger { background: #050505 !important; color: #ff6b6b !important; border: 1px solid rgba(255,68,68,.5) !important; }
+    </style>
 </head>
 <body>
  
@@ -1020,8 +1038,33 @@
                             <textarea id="annonce-content" rows="4" placeholder="Écrivez le contenu de l'annonce..." required></textarea>
                         </div>
 
+                        <div class="input-group dc-box">
+                            <label class="dc-check"><input type="checkbox" id="annonce-discord"><span>💬 Diffuser aussi sur Discord</span></label>
+                            <p class="dc-hint" id="annonce-discord-hint"></p>
+                        </div>
+                        <p id="annonce-msg" class="dc-msg" role="status"></p>
+
                         <button type="submit" class="form-btn" id="publish-btn">Enregistrer l'annonce</button>
                     </form>
+
+                    <details class="dc-config" id="discord-config">
+                        <summary>⚙️ Webhook Discord <span class="dc-chip" id="discord-chip">non configuré</span></summary>
+                        <p class="dc-hint" style="margin:12px 0;">Dans Discord : Paramètres du salon → Intégrations → Webhooks → Nouveau webhook → Copier l'URL. Cette URL est un secret : elle est stockée uniquement dans ce navigateur, n'est jamais réaffichée et n'est envoyée qu'à Discord.</p>
+                        <div class="input-group">
+                            <label for="discord-url">URL du webhook</label>
+                            <input type="password" id="discord-url" autocomplete="off" spellcheck="false" data-lpignore="true" placeholder="https://discord.com/api/webhooks/…">
+                        </div>
+                        <div class="input-group">
+                            <label for="discord-name">Nom affiché du bot (optionnel)</label>
+                            <input type="text" id="discord-name" maxlength="80" autocomplete="off" placeholder="ABYSZ">
+                        </div>
+                        <div class="dc-actions">
+                            <button type="button" class="form-btn" id="discord-save">Enregistrer</button>
+                            <button type="button" class="form-btn dc-ghost" id="discord-test">Message test</button>
+                            <button type="button" class="form-btn dc-danger" id="discord-remove">Supprimer</button>
+                        </div>
+                        <p id="discord-msg" class="dc-msg" role="status"></p>
+                    </details>
                 </div>
 
                 <div id="form-partner-wrapper" class="hidden">
@@ -1294,6 +1337,15 @@
         // ---------- Helpers sécurité ----------
         const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
         const safeUrl = (u) => { try { const x = new URL(u, location.href); return (x.protocol === "http:" || x.protocol === "https:") ? x.href : ""; } catch { return ""; } };
+        const fbErr = (e) => {
+            console.error("Firebase :", e);
+            const c = String((e && e.code) || "").toLowerCase().replace(/_/g, "-");
+            if (c.includes("permission-denied")) return "accès refusé par les règles Firebase (règles à jour ? connecté en admin ?)";
+            if (c.includes("unauthenticated")) return "session expirée : reconnecte-toi";
+            if (c.includes("unavailable") || c.includes("network") || c.includes("deadline")) return "Firebase injoignable (connexion réseau)";
+            if (c.includes("resource-exhausted") || c.includes("quota")) return "quota Firebase dépassé";
+            return "erreur Firebase inattendue (détail dans la console du navigateur)";
+        };
         const safeColor = (c, d) => /^#[0-9a-f]{6}$/i.test(c || "") ? c : d;
         const ALLOWED_TAGS = new Set(["STRONG", "B", "EM", "I", "BR", "P", "UL", "OL", "LI"]);
         function sanitizeHtml(html) {
@@ -2043,7 +2095,7 @@
                 modal.classList.remove('active');
                 alert("Section mise à jour !");
             } catch (err) {
-                alert("Erreur lors de l'enregistrement : " + err.message);
+                alert("Erreur lors de l'enregistrement : " + fbErr(err));
             }
         });
 
@@ -2064,17 +2116,99 @@
                 modal.classList.remove('active');
                 alert("Textes de la page d'accueil mis à jour !");
             } catch (err) {
-                alert("Erreur lors de l'enregistrement : " + err.message);
+                alert("Erreur lors de l'enregistrement : " + fbErr(err));
             }
         });
+
+        /* ============================================================
+           WEBHOOK DISCORD : config locale + diffusion des annonces
+           ============================================================ */
+        const dcEl = (id) => document.getElementById(id);
+        const dcSay = (el, text, cls) => { if (!el) return; el.className = (el.classList.contains("dc-hint") ? "dc-hint" : "dc-msg") + (cls ? " " + cls : ""); el.textContent = text || ""; };
+        const LS_DISCORD = "abysz_discord_cfg";
+        const DISCORD_RE = /^https:\/\/(?:(?:ptb|canary)\.)?discord(?:app)?\.com\/api\/webhooks\/\d{15,25}\/[\w-]{20,120}$/;
+        const discordCfg = () => {
+            try { const c = JSON.parse(localStorage.getItem(LS_DISCORD) || "{}"); return { url: DISCORD_RE.test(c.url || "") ? c.url : "", name: String(c.name || "").slice(0, 80) }; }
+            catch { return { url: "", name: "" }; }
+        };
+        const dcCut = (v, n) => { const x = String(v ?? ""); return x.length > n ? x.slice(0, n - 1) + "…" : x; };
+        const dcMask = (u) => { const k = /\/webhooks\/(\d+)\//.exec(u || ""); return k ? "Webhook enregistré (n° " + k[1].slice(0, 4) + "••••) — colle une nouvelle URL pour le remplacer" : ""; };
+        const dcHttps = (u) => { try { const x = new URL(String(u || "").trim()); return x.protocol === "https:" ? x.href : ""; } catch { return ""; } };
+        const DC_CAT = { general: "Général", match: "Match / Tournoi", recrutement: "Recrutement", evenement: "Événement" };
+
+        async function discordPost(embed) {
+            const c = discordCfg();
+            if (!c.url) throw new Error("aucun webhook enregistré : colle l'URL puis clique sur « Enregistrer ».");
+            const body = { username: c.name || "ABYSZ", allowed_mentions: { parse: [] }, embeds: [{ ...embed, footer: { text: "ABYSZ Esports" }, timestamp: new Date().toISOString() }] };
+            let r;
+            try { r = await fetch(c.url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), referrerPolicy: "no-referrer", credentials: "omit" }); }
+            catch (e) { throw new Error("Discord injoignable (réseau coupé, bloqueur de publicités ou règle de sécurité du navigateur)."); }
+            if (!r.ok) {
+                let d = ""; try { d = String((await r.json()).message || ""); } catch (e) { /* ignore */ }
+                const known = { 400: "message refusé par Discord (contenu ou image invalide)", 401: "webhook invalide ou révoqué", 403: "webhook invalide ou révoqué", 404: "webhook introuvable (supprimé sur Discord ?)", 429: "limite d'envois Discord atteinte, réessaie dans un instant" };
+                throw new Error((known[r.status] || ("Discord a répondu " + r.status)) + (d ? " (« " + dcCut(d.replace(/https?:\/\/\S+/g, "…"), 120) + " »)" : "") + ".");
+            }
+        }
+        function dcEmbedAnnonce(a) {
+            const img = dcHttps(a.imageUrl), url = dcHttps(a.btnLink), urgent = a.priority === "urgent";
+            const link = (url && a.btnText) ? "\n\n[" + dcCut(String(a.btnText).replace(/[\[\]]/g, ""), 80) + "](" + url.replace(/\)/g, "%29") + ")" : "";
+            return { title: (urgent ? "🚨 " : "📢 ") + dcCut(a.title, 240), description: dcCut(String(a.content || "").replace(/\r/g, ""), 3700) + link,
+                color: urgent ? 0xff4444 : 0xa855f7, fields: [{ name: "Catégorie", value: DC_CAT[a.category] || "Général", inline: true }],
+                ...(url ? { url } : {}), ...(img ? { image: { url: img } } : {}) };
+        }
+        function dcRefresh() {
+            const c = discordCfg(), chip = dcEl("discord-chip"), hint = dcEl("annonce-discord-hint"), on = dcEl("annonce-discord").checked;
+            chip.className = "dc-chip" + (c.url ? " on" : ""); chip.textContent = c.url ? "✅ configuré" : "non configuré";
+            dcEl("discord-url").placeholder = c.url ? dcMask(c.url) : "https://discord.com/api/webhooks/…";
+            hint.className = "dc-hint" + (!c.url && on ? " err" : "");
+            hint.textContent = !c.url ? (on ? "⚠️ Aucun webhook configuré : l'enregistrement sera bloqué tant que cette case est cochée (voir « ⚙️ Webhook Discord » plus bas)." : "Webhook Discord non configuré (voir « ⚙️ Webhook Discord » plus bas).")
+                : (on ? "L'annonce sera aussi publiée dans ton salon Discord (sans mention @everyone)." : "Case décochée : rien ne sera publié sur Discord.");
+        }
+        (function wireDiscord() {
+            const msg = dcEl("discord-msg");
+            dcEl("discord-name").value = discordCfg().name; dcEl("discord-url").value = "";
+            dcRefresh();
+            dcEl("annonce-discord").addEventListener("change", dcRefresh);
+            announcementForm.addEventListener("reset", () => setTimeout(() => { dcSay(dcEl("annonce-msg"), ""); dcRefresh(); }, 0));
+            dcEl("discord-save").addEventListener("click", () => {
+                if (!isUserAdmin) return;
+                const typed = dcEl("discord-url").value.trim(), cur = discordCfg();
+                if (typed && !DISCORD_RE.test(typed)) { dcSay(msg, "URL invalide : elle doit ressembler à https://discord.com/api/webhooks/…", "err"); return; }
+                try { localStorage.setItem(LS_DISCORD, JSON.stringify({ url: typed || cur.url, name: dcEl("discord-name").value.trim().slice(0, 80) })); }
+                catch (e) { dcSay(msg, "Impossible d'enregistrer (stockage du navigateur bloqué).", "err"); return; }
+                dcEl("discord-url").value = ""; dcRefresh();
+                dcSay(msg, (typed || cur.url) ? "✅ Réglages enregistrés. Clique sur « Message test »." : "Réglages enregistrés (aucun webhook).", "ok");
+            });
+            dcEl("discord-test").addEventListener("click", async () => {
+                if (!isUserAdmin) return;
+                const b = dcEl("discord-test"); b.disabled = true; dcSay(msg, "Envoi du test…", "info");
+                try { await discordPost({ title: "✅ Webhook connecté", description: "Les annonces publiées depuis le site seront diffusées dans ce salon.", color: 0x22c55e }); dcSay(msg, "✅ Message test envoyé : vérifie ton salon Discord.", "ok"); }
+                catch (e) { dcSay(msg, "❌ " + e.message, "err"); }
+                b.disabled = false;
+            });
+            dcEl("discord-remove").addEventListener("click", () => {
+                if (!isUserAdmin || !confirm("Supprimer le webhook enregistré dans ce navigateur ?\n\n(Pense aussi à le supprimer côté Discord s'il a pu fuiter.)")) return;
+                try { localStorage.removeItem(LS_DISCORD); } catch (e) { /* ignore */ }
+                dcEl("discord-url").value = ""; dcRefresh(); dcSay(msg, "Webhook supprimé de ce navigateur.", "ok");
+            });
+        })();
 
         announcementForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!isUserAdmin) return alert("Droits insuffisants.");
 
+            const msg = dcEl("annonce-msg"), btn = dcEl("publish-btn");
             const annonceId = document.getElementById("annonce-id").value;
             const expiresVal = document.getElementById("annonce-expires").value;
-            
+            const wantDiscord = dcEl("annonce-discord").checked;
+            dcSay(msg, "");
+
+            if (wantDiscord && !discordCfg().url) {
+                dcEl("discord-config").open = true;
+                dcSay(msg, "❌ Diffusion Discord impossible : aucun webhook n'est configuré. Renseigne-le dans « ⚙️ Webhook Discord » ci-dessous ou décoche la case. Rien n'a été enregistré.", "err");
+                return;
+            }
+
             const payload = {
                 title: document.getElementById("annonce-title").value,
                 category: document.getElementById("annonce-category").value,
@@ -2086,6 +2220,8 @@
                 expiresAt: expiresVal ? new Date(expiresVal).getTime() : null
             };
 
+            btn.disabled = true;
+            let docId = annonceId;
             try {
                 if (annonceId) {
                     await updateDoc(doc(db, "announcements", annonceId), payload);
@@ -2093,13 +2229,32 @@
                     payload.createdAt = Date.now();
                     payload.likes = 0;
                     payload.likedBy = [];
-                    await addDoc(collection(db, "announcements"), payload);
+                    const created = await addDoc(collection(db, "announcements"), payload);
+                    docId = created.id;
                 }
-                modal.classList.remove('active');
-                announcementForm.reset();
             } catch (err) {
-                alert("Erreur lors de l'enregistrement : " + err.message);
+                dcSay(msg, "❌ Enregistrement impossible : " + fbErr(err), "err");
+                btn.disabled = false;
+                return;
             }
+
+            if (wantDiscord) {
+                try { await discordPost(dcEmbedAnnonce(payload)); }
+                catch (err) {
+                    document.getElementById("annonce-id").value = docId; // un nouvel envoi mettra à jour au lieu de dupliquer
+                    dcSay(msg, "✅ Annonce enregistrée sur le site. ❌ Diffusion Discord échouée : " + err.message + " Corrige puis clique de nouveau sur « Enregistrer l'annonce » pour réessayer (pas de doublon sur le site).", "err");
+                    btn.disabled = false;
+                    return;
+                }
+                dcSay(msg, "✅ Annonce enregistrée et diffusée sur Discord.", "ok");
+                btn.disabled = false;
+                setTimeout(() => { modal.classList.remove('active'); announcementForm.reset(); }, 1200);
+                return;
+            }
+
+            btn.disabled = false;
+            modal.classList.remove('active');
+            announcementForm.reset();
         });
 
         partnerForm.addEventListener('submit', async (e) => {
@@ -2131,7 +2286,7 @@
                 modal.classList.remove('active');
                 partnerForm.reset();
             } catch (err) {
-                alert("Erreur enregistrement partenaire : " + err.message);
+                alert("Erreur enregistrement partenaire : " + fbErr(err));
             }
         });
 

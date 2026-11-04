@@ -6,7 +6,11 @@
     <meta name="description" content="Dashboard de gestion ABYSZ Esports">
     <meta name="robots" content="noindex, nofollow">
     <meta name="referrer" content="no-referrer">
-    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'; form-action 'self'">
+    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'; form-action 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdnjs.cloudflare.com">
+    <script>
+        /* Anti-clickjacking (frame-ancestors est ignoré en <meta> : à doubler par un en-tête HTTP) */
+        if (window.top !== window.self) { document.documentElement.style.display = "none"; try { window.top.location = window.self.location; } catch (e) { /* ignore */ } }
+    </script>
     <title>ABYSZ | Dashboard Admin</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
@@ -604,6 +608,36 @@
         </div>
         </details>
 
+        <details class="dash-details" id="sec-discord">
+        <summary class="section-title"><span>💬 Webhook Discord</span> <span class="chip chip-on" id="discord-chip">non configuré</span></summary>
+        <div class="admin-edit-box" style="border-color:#5865f2;">
+            <p class="muted" style="margin-top:0;">Reçois une alerte dans un salon Discord quand tu envoies une newsletter, une notification push ou que tu modifies le mode maintenance. Dans Discord : Paramètres du salon → Intégrations → Webhooks → Nouveau webhook → Copier l'URL.</p>
+            <p class="muted" style="margin-top:0;">⚠️ Cette URL est un secret : toute personne qui la possède peut écrire dans ton salon. Elle est stockée uniquement dans ce navigateur et n'est jamais envoyée ailleurs qu'à Discord.</p>
+            <div class="search-row">
+                <div class="input-group" style="margin-bottom:0;">
+                    <label for="discord-url">URL du webhook</label>
+                    <input type="password" id="discord-url" placeholder="https://discord.com/api/webhooks/…" autocomplete="off" spellcheck="false">
+                </div>
+                <button type="button" class="btn-admin" id="discord-save" style="background:#5865f2;">Enregistrer</button>
+            </div>
+            <div class="box-title">Alertes à envoyer</div>
+            <div class="chk-row">
+                <label class="chk-chip"><input type="checkbox" id="discord-on-nl" checked><span>📧 Newsletter envoyée</span></label>
+                <label class="chk-chip"><input type="checkbox" id="discord-on-push" checked><span>🔔 Notification push envoyée</span></label>
+                <label class="chk-chip"><input type="checkbox" id="discord-on-maint" checked><span>🚧 Mode maintenance modifié</span></label>
+            </div>
+            <div class="input-group">
+                <label for="discord-name">Nom affiché du bot (facultatif)</label>
+                <input type="text" id="discord-name" maxlength="80" placeholder="ABYSZ Dashboard" autocomplete="off">
+            </div>
+            <div class="btn-row">
+                <button type="button" class="btn-ghost" id="discord-test">Envoyer un message test</button>
+                <button type="button" class="btn-danger" id="discord-remove">Supprimer le webhook</button>
+            </div>
+            <p id="discord-msg" class="comms-msg"></p>
+        </div>
+        </details>
+
         <details class="dash-details" id="sec-newsletter" open>
         <summary class="section-title">📧 Newsletter</summary>
         <div class="admin-edit-box" style="border-color:#a855f7;">
@@ -760,7 +794,7 @@
         const ADMIN_EMAIL = "abyszofficial@gmail.com";
         // Re-vérification au moment de chaque action sensible (en plus du contrôle d'affichage)
         const isAdmin = () => !!(auth.currentUser && auth.currentUser.email && auth.currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
-        const safeUrl = (u) => { if (!u) return ""; try { const x = new URL(u); return (x.protocol === "http:" || x.protocol === "https:") ? x.href : ""; } catch { return ""; } };
+        const safeUrl = (u) => { if (!u) return ""; try { const x = new URL(u); return x.protocol === "https:" ? x.href : ""; } catch { return ""; } };
 
         const accessDeniedSec = document.getElementById('access-denied');
         const dashboardContentSec = document.getElementById('dashboard-content');
@@ -1603,6 +1637,7 @@
                     }, { merge: true });
 
                     maintSuccess.classList.remove('hidden');
+                    window.dispatchEvent(new CustomEvent("abysz:discord", { detail: { type: "maint", active: maintToggle.checked, pages: pagesArray, message: maintMsgInput.value.trim().slice(0, 300) } }));
                 } catch (err) {
                     console.error("Erreur maintenance :", err);
                     alert("Erreur lors de la mise à jour : " + err.message);
@@ -1807,6 +1842,8 @@
                 let ok = false;
                 try { const u = new URL(v); ok = u.protocol === "https:" || (u.protocol === "http:" && u.hostname === "localhost"); } catch (e) { /* invalide */ }
                 if (!ok) { say($("worker-msg"), "Adresse invalide : elle doit commencer par https://", "err"); return; }
+                const wh = new URL(v).hostname;
+                if (!wh.endsWith(".workers.dev") && wh !== "localhost" && !confirm("Ce domaine (" + wh + ") n'est pas en .workers.dev.\n\nTon jeton d'administrateur lui sera envoyé à chaque envoi. N'enregistre cette adresse que si tu en es le propriétaire. Continuer ?")) return;
                 try { localStorage.setItem(LS_URL, v); } catch (e) { /* ignore */ }
                 checkSender();
             });
@@ -1996,6 +2033,7 @@
                 $("nl-retry").classList.toggle("hidden", !res.failedEmails.length);
                 progress("nl", recipients.length, recipients.length, `Terminé : ${res.sent} envoyé(s), ${res.failed} échec(s).`);
                 say($("nl-msg"), res.failed ? `⚠️ ${res.sent} envoyé(s), ${res.failed} échec(s). Détails ci-dessous.` : `✅ Newsletter envoyée à ${res.sent} personne(s) !`, res.failed ? "err" : "ok");
+                discordNotify("nl", { title: "📧 Newsletter envoyée", description: cut(n.subject, 200), color: 0xa855f7, fields: [{ name: "Envoyés", value: String(res.sent), inline: true }, { name: "Échecs", value: String(res.failed), inline: true }] });
             } catch (e) { say($("nl-msg"), "Erreur : " + e.message, "err"); }
             setBusy(false);
         }
@@ -2162,6 +2200,7 @@
             }
             progress("pn", targets.length, targets.length, `Terminé : ${sent} envoyée(s), ${failed} échec(s)` + (removed ? `, ${removed} appareil(s) inactif(s) retiré(s).` : "."));
             say(m, failed ? `⚠️ ${sent} envoyée(s), ${failed} échec(s).` : `✅ Notification envoyée à ${sent} appareil(s) !`, failed ? "err" : "ok");
+            discordNotify("push", { title: "🔔 Notification push envoyée", description: cut(p.title, 200) + (p.body ? "\n" + cut(p.body, 300) : ""), color: 0xa855f7, fields: [{ name: "Envoyées", value: String(sent), inline: true }, { name: "Échecs", value: String(failed), inline: true }] });
             try { await addDoc(collection(db, "push_history"), { title: p.title, body: p.body, link: safeHttps(p.link) || "", lang: p.lang, total: targets.length, sent, failed, removed, createdAt: serverTimestamp() }); } catch (e) { log("pn", "Historique non enregistré (règles Firestore ?) : " + e.message, "err"); }
             setBusy(false);
         }
@@ -2187,6 +2226,85 @@
             refreshDeviceBtn(); updatePushPreview();
         }
 
+
+        /* ============================================================
+           WEBHOOK DISCORD (stocké localement, envoi direct vers Discord)
+           ============================================================ */
+        const LS_DISCORD = "abysz_discord_cfg";
+        const DISCORD_RE = /^https:\/\/(?:(?:ptb|canary)\.)?discord(?:app)?\.com\/api\/webhooks\/\d{15,25}\/[\w-]{20,120}$/;
+        const discordCfg = () => {
+            try { const c = JSON.parse(localStorage.getItem(LS_DISCORD) || "{}"); return { url: DISCORD_RE.test(c.url || "") ? c.url : "", name: String(c.name || "").slice(0, 80), nl: c.nl !== false, push: c.push !== false, maint: c.maint !== false }; }
+            catch { return { url: "", name: "", nl: true, push: true, maint: true }; }
+        };
+        const discordSave = (c) => { try { localStorage.setItem(LS_DISCORD, JSON.stringify(c)); return true; } catch { return false; } };
+        const cut = (v, n) => { const t = String(v ?? ""); return t.length > n ? t.slice(0, n - 1) + "…" : t; };
+
+        async function discordPost(embed) {
+            const c = discordCfg();
+            if (!c.url) throw new Error("Webhook Discord non configuré.");
+            const body = { username: c.name || "ABYSZ Dashboard", allowed_mentions: { parse: [] }, embeds: [{ ...embed, footer: { text: "ABYSZ Dashboard" }, timestamp: new Date().toISOString() }] };
+            const r = await fetch(c.url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), referrerPolicy: "no-referrer", credentials: "omit" });
+            if (!r.ok) throw new Error(r.status === 404 ? "Webhook introuvable (supprimé sur Discord ?)" : r.status === 429 ? "Discord limite les envois, réessaie dans un instant." : "Discord a répondu " + r.status);
+        }
+
+        /* Notification automatique : n'interrompt jamais l'action principale */
+        async function discordNotify(kind, embed) {
+            if (!isAdmin()) return;
+            const c = discordCfg();
+            if (!c.url || !c[kind]) return;
+            try { await discordPost(embed); } catch (e) { console.warn("Discord :", e.message); }
+        }
+
+        function refreshDiscordChip() {
+            const c = discordCfg(), chip = $("discord-chip");
+            chip.className = "chip " + (c.url ? "chip-off" : "chip-on");
+            chip.textContent = c.url ? "✅ configuré" : "non configuré";
+        }
+
+        function wireDiscord() {
+            const c = discordCfg(), msg = $("discord-msg");
+            $("discord-url").value = c.url; $("discord-name").value = c.name;
+            $("discord-on-nl").checked = c.nl; $("discord-on-push").checked = c.push; $("discord-on-maint").checked = c.maint;
+            refreshDiscordChip();
+
+            $("discord-save").addEventListener("click", () => {
+                if (!isAdmin()) return;
+                const url = $("discord-url").value.trim();
+                if (url && !DISCORD_RE.test(url)) { say(msg, "URL invalide : elle doit ressembler à https://discord.com/api/webhooks/…", "err"); return; }
+                const ok = discordSave({ url, name: $("discord-name").value.trim().slice(0, 80), nl: $("discord-on-nl").checked, push: $("discord-on-push").checked, maint: $("discord-on-maint").checked });
+                refreshDiscordChip();
+                say(msg, !ok ? "Impossible d'enregistrer (stockage du navigateur bloqué)." : url ? "✅ Réglages enregistrés. Clique sur « Envoyer un message test »." : "Réglages enregistrés (aucun webhook).", ok ? "ok" : "err");
+            });
+            ["discord-on-nl", "discord-on-push", "discord-on-maint"].forEach((id) => $(id).addEventListener("change", () => {
+                const cur = discordCfg(); if (!cur.url) return;
+                discordSave({ ...cur, nl: $("discord-on-nl").checked, push: $("discord-on-push").checked, maint: $("discord-on-maint").checked });
+            }));
+            $("discord-test").addEventListener("click", async () => {
+                if (!isAdmin()) return;
+                const btn = $("discord-test"); btn.disabled = true; say(msg, "Envoi du test…", "info");
+                try {
+                    await discordPost({ title: "✅ Webhook connecté", description: "Les alertes du dashboard ABYSZ arriveront dans ce salon.", color: 0x22c55e });
+                    say(msg, "✅ Message test envoyé : vérifie ton salon Discord.", "ok");
+                } catch (e) { say(msg, "❌ " + e.message, "err"); }
+                btn.disabled = false;
+            });
+            $("discord-remove").addEventListener("click", () => {
+                if (!isAdmin() || !confirm("Supprimer le webhook enregistré dans ce navigateur ?\n\n(Pense aussi à le supprimer côté Discord s'il a pu fuiter.)")) return;
+                try { localStorage.removeItem(LS_DISCORD); } catch (e) { /* ignore */ }
+                $("discord-url").value = ""; refreshDiscordChip(); say(msg, "Webhook supprimé de ce navigateur.", "ok");
+            });
+            window.addEventListener("abysz:discord", (e) => {
+                const d = e.detail || {};
+                if (d.type !== "maint") return;
+                discordNotify("maint", {
+                    title: d.active ? "🚧 Maintenance ACTIVÉE" : "✅ Maintenance désactivée",
+                    description: cut(d.message || "—", 500),
+                    color: d.active ? 0xff4444 : 0x22c55e,
+                    fields: d.pages && d.pages.length ? [{ name: "Pages bloquées", value: cut(d.pages.join(", "), 900) }] : []
+                });
+            });
+        }
+
         /* ============================================================
            DÉMARRAGE (uniquement pour l'administrateur connecté)
            ============================================================ */
@@ -2194,7 +2312,7 @@
             onSnapshot(collection(db, name), (snap) => onData(snap), (err) => onErr && onErr(err));
         }
         function init() {
-            wireSender(); wireSubs(); wireNewsletter(); wirePush(); checkSender();
+            wireSender(); wireDiscord(); wireSubs(); wireNewsletter(); wirePush(); checkSender();
 
             watch("subscribers", (snap) => {
                 subs = snap.docs.map((d) => { const x = d.data(); return { id: d.id, email: String(x.email || d.id).toLowerCase(), topics: Array.isArray(x.topics) ? x.topics.filter((t) => TOPICS.includes(t)) : [], lang: x.lang === "en" ? "en" : "fr", createdAt: tsMs(x.createdAt) }; })

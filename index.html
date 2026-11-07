@@ -775,19 +775,23 @@
     </nav>
 
     <section id="accueil" class="hero" style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7)), url('./baniere.png');">
-        <h1 id="hero-title">ABYSZ</h1>
-        <p class="slogan" id="hero-slogan">The beginning of every legend</p>
+        <!--SSR:hero--><h1 id="hero-title">ABYSZ</h1><!--/SSR:hero-->
+        <!--SSR:slogan--><p class="slogan" id="hero-slogan">The beginning of every legend</p><!--/SSR:slogan-->
         <a href="roster.html" class="btn" data-i18n="hero_cta">Découvrir le roster</a>
     </section>
 
     <section class="about-section reveal">
         <div style="display: flex; align-items: center; justify-content: space-between;">
-            <h2 id="about-title" data-i18n="about_title">À Propos d'Abysz Esports</h2>
+            <!--SSR:atitle--><h2 id="about-title">Abysz Esports</h2><!--/SSR:atitle-->
             <button class="edit-home-btn hidden" id="quick-edit-home-btn" title="Modifier les textes">✏️ Modifier les textes</button>
         </div>
-        <p id="about-text" data-i18n-html="about_text">
-            Bienvenue sur la plateforme officielle d'<strong>Abysz Esports</strong>. Structure esport passionnée et ambitieuse, nous réunissons des joueurs de haut niveau, une équipe encadrante dédiée et une communauté passionnée de gaming. Suivez nos matchs en direct, découvrez nos rosters officiels et rejoignez l'aventure compétitive dès aujourd'hui.
-        </p>
+        <!--SSR:atext--><p id="about-text"><strong>Abysz Esports</strong> est une structure fondée par deux amis partageant une même passion pour le jeu vidéo, la compétition et la création de contenu. Dès le départ, l’objectif était clair : construire un projet authentique, ambitieux et humain, capable de rassembler une communauté autour des mêmes valeurs.
+
+Même si la structure est encore en développement, chaque étape est franchie avec sérieux, détermination et passion. Derrière chaque joueur, chaque projet et chaque contenu publié se trouve une réelle volonté de progresser, d’innover et de représenter l’identité d’Abysz de la meilleure manière possible.
+
+Au-delà de l’esport, Abysz représente une aventure collective basée sur le travail, la créativité et l’esprit d’équipe. Nous avançons avec l’ambition de grandir durablement tout en conservant ce qui fait l’essence du projet depuis le premier jour : la passion, l’authenticité et le partage.
+
+Abysz ne se construit pas seul. Chaque personne qui soutient le projet participe à écrire son histoire.</p><!--/SSR:atext-->
     </section>
 
     <div class="abysz-ad" data-ad="haut"></div>
@@ -804,13 +808,111 @@
         <div class="carousel-wrapper" id="carousel-wrapper">
             <button class="carousel-btn prev" id="prev-slide" aria-label="Annonce précédente" data-i18n-aria="ann_prev">❮</button>
             <div class="carousel-track-container">
-                <div class="carousel-track" id="announcements-feed">
-                    <p class="loading-text" data-i18n="ann_loading">Connexion à la base de données Abysz...</p>
+                <div class="carousel-track" id="announcements-feed"><!--SSR:feed--><div class="announcement-card ">
+                    <div class="announcement-meta">
+                        <span class="badge badge-general" data-i18n="cat_general">Général</span>
+                        
+                    </div>
+                    <h3>THANK YOU ZEYTO</h3>
+                    <p>(ENG)・THANK YOU, ZEYTO — ABYSZ ESPORT
+ ENGLISH
+
+Today, with a heavy heart, we announce the departure of Zeyto from ABYSZ ESPORT.
+
+Some departures are harder than others, especially when it comes to people who have played an important role in our journey.
+
+Beyond the player, Zeyto has been part of our story, sharing unforgettable moments and contributing to the growth of our organization.
+
+Thank you for your dedication, your trust and every memory we have built together. You will always be remembered as part of the ABYSZ family.
+
+We sincerely wish you the very best in your future, both in Fortnite and in life. We hope to see you achieve great things and continue chasing your dreams.
+
+You will always have a place in ABYSZ history.
+
+Once ABYSZ, always ABYSZ. 
+
+━━━━━━━━━━━━━━━━━━━━
+
+(FR) MERCI POUR TOUT, ZEYTO
+
+C’est avec beaucoup d’émotion que nous annonçons aujourd’hui le départ de Zeyto de ABYSZ ESPORT.
+
+Certains départs sont plus difficiles que d’autres, surtout lorsqu’il s’agit de personnes qui ont marqué notre aventure.
+
+Au-delà du joueur, Zeyto a fait partie de notre histoire, partageant avec nous des moments inoubliables et contribuant au développement de notre structure.
+
+Merci pour ton investissement, ta confiance et tous les souvenirs construits ensemble. Tu garderas toujours ta place au sein de la famille ABYSZ.
+
+Nous te souhaitons sincèrement le meilleur pour la suite, aussi bien sur Fortnite que dans ta vie personnelle. Nous espérons te voir accomplir de grandes choses et continuer à poursuivre tes rêves.
+
+Tu feras toujours partie de l’histoire de ABYSZ.
+
+Une fois ABYSZ, toujours ABYSZ. 
+
+━━━━━━━━━━━━━━━━━━━━
+
+#ABZWIN #ABYSZESPORT </p>
+                    <img src="https://i.postimg.cc/wTP5kwWg/WELCOME.png" class="announcement-img" alt="THANK YOU ZEYTO" loading="lazy" decoding="async" referrerpolicy="no-referrer">
+                    
+                    <div class="announcement-footer">
+                        <span class="announcement-date"><span data-i18n="published_on">Publié le</span> <span data-date="1793832611224">4 novembre 2026</span></span>
+                        <button class="like-btn" data-id="driaooSRxjCJQMph7K2t"><span class="like-heart">🤍</span><span class="like-count">1</span></button>
+                    </div>
                 </div>
+<div class="announcement-card priority-urgent">
+                    <div class="announcement-meta">
+                        <span class="badge badge-general" data-i18n="cat_general">Général</span>
+                        <span class="badge badge-urgent">URGENT</span>
+                    </div>
+                    <h3>Planning de la semaine 26 au 1er Novembre</h3>
+                    <p>Voici le planning de la semaine calme cette semaine pour le repos de nos joueurs !!</p>
+                    <img src="https://i.postimg.cc/mkjCpfwB/Planning-abysz.png" class="announcement-img" alt="Planning de la semaine 26 au 1er Novembre" loading="lazy" decoding="async" referrerpolicy="no-referrer">
+                    <a href="https://absyzesport.fr/boutique.html" target="_blank" rel="noopener noreferrer" class="announcement-action-btn">Découvre la boutique</a>
+                    <div class="announcement-footer">
+                        <span class="announcement-date"><span data-i18n="published_on">Publié le</span> <span data-date="1793121211169">27 octobre 2026</span></span>
+                        <button class="like-btn" data-id="oDrPhSxWMXNxgpND9q3g"><span class="like-heart">🤍</span><span class="like-count">1</span></button>
+                    </div>
+                </div>
+<div class="announcement-card ">
+                    <div class="announcement-meta">
+                        <span class="badge badge-recrutement" data-i18n="cat_recruit">Recrutement</span>
+                        
+                    </div>
+                    <h3> WELCOME OCHMI</h3>
+                    <p> WELCOME OCHMI 
+
+Nous sommes fiers d’accueillir ochmikkk en tant que Manager Fortnite au sein de la famille Abysz ! 
+
+Un nouveau chapitre commence aujourd’hui. 
+
+Bienvenue dans la famille, Ochmi ! 
+
+#ABZWIN </p>
+                    <img src="https://i.postimg.cc/PxSLbrxY/HVpk-CBd-XAAAAKfy.jpg" class="announcement-img" alt=" WELCOME OCHMI" loading="lazy" decoding="async" referrerpolicy="no-referrer">
+                    
+                    <div class="announcement-footer">
+                        <span class="announcement-date"><span data-i18n="published_on">Publié le</span> <span data-date="1793117955413">27 octobre 2026</span></span>
+                        <button class="like-btn" data-id="OT24BZC3NhNKBHRoZAzz"><span class="like-heart">🤍</span><span class="like-count">1</span></button>
+                    </div>
+                </div>
+<div class="announcement-card priority-urgent">
+                    <div class="announcement-meta">
+                        <span class="badge badge-general" data-i18n="cat_general">Général</span>
+                        <span class="badge badge-urgent">URGENT</span>
+                    </div>
+                    <h3>Ouverture Officiel</h3>
+                    <p>Bienvenue sur le site officiel Abysz, de grande choses arrive rester connecter . Un nouveau joueur est arriver va vite voir dans roster en cliquant sur le bouton ci dessous !</p>
+                    <img src="https://images-ext-1.discordapp.net/external/uxHYuP5Kp75ORv3EBVar29xuA7HMsFfNY3icmRc9M_A/https/pbs.twimg.com/media/HP1-9UAWcAAL-el.jpg?format=webp&amp;width=724&amp;height=1024" class="announcement-img" alt="Ouverture Officiel" loading="lazy" decoding="async" referrerpolicy="no-referrer">
+                    <a href="https://absyzesport.fr/roster.html" target="_blank" rel="noopener noreferrer" class="announcement-action-btn">Roster</a>
+                    <div class="announcement-footer">
+                        <span class="announcement-date"><span data-i18n="published_on">Publié le</span> <span data-date="1786884017579">16 août 2026</span></span>
+                        <button class="like-btn" data-id="Kss9br2LFqT6S57aQE63"><span class="like-heart">🤍</span><span class="like-count">1</span></button>
+                    </div>
+                </div><!--/SSR:feed--></div>
             </div>
             <button class="carousel-btn next" id="next-slide" aria-label="Annonce suivante" data-i18n-aria="ann_next">❯</button>
         </div>
-        <div class="carousel-dots" id="carousel-dots"></div>
+        <div class="carousel-dots" id="carousel-dots"><!--SSR:dots--><div class="dot active"></div><div class="dot "></div><div class="dot "></div><div class="dot "></div><!--/SSR:dots--></div>
     </section>
 
     <section id="partenaires" class="partners-container reveal">
@@ -821,9 +923,17 @@
             </div>
         </div>
         
-        <div class="partners-grid" id="partners-feed">
-            <p class="loading-text" data-i18n="partners_loading">Chargement des partenaires...</p>
-        </div>
+        <div class="partners-grid" id="partners-feed"><!--SSR:partners--><div class="partner-card" style="--partner-color: #f23131; --partner-btn-text: #ffffff; --partner-glow: #f2313133;">
+                    <span class="partner-tier-badge">Partenaire Technique</span>
+                    <div class="partner-logo-wrapper"><img src="https://i.postimg.cc/8PV3ZCd5/6EGb1f-Qw-400x400.jpg" alt="Redcase" class="partner-logo" loading="lazy" decoding="async" referrerpolicy="no-referrer"></div>
+                    <h3 class="partner-name">Redcase</h3>
+                    <div class="partner-role">Personnalisation gaming &amp; eSport 🇫🇷</div>
+                    
+                    <p class="partner-desc">Redcase, c’est notamment la possibilité de personnaliser différents produits autour de l’univers gaming et eSport. Cette collaboration nous permettra également de développer de nouvelles idées autour de notre image et de nos projets futurs.
+
+Nous tenons à remercier sincèrement Redcase pour leur confiance envers ABYSZ et pour leur volonté de construire cette collaboration avec nous. </p>
+                    <a href="https://x.com/redcaseFR" target="_blank" rel="noopener noreferrer" class="partner-link-btn">Leur X</a>
+                </div><!--/SSR:partners--></div>
     </section>
 
     <div class="abysz-ad" data-ad="milieu"></div>
@@ -831,14 +941,14 @@
     <section id="custom-section" class="custom-section-container reveal">
         <div class="section-header">
             <div class="title-area">
-                <h2 id="custom-section-title" data-i18n="custom_title">À la Une</h2>
+                <!--SSR:ctitle--><h2 id="custom-section-title">Planning de la semaine</h2><!--/SSR:ctitle-->
                 <button class="edit-home-btn hidden" id="quick-edit-custom-btn" title="Modifier cette section">✏️ Modifier la section</button>
             </div>
         </div>
         <div class="custom-card">
-            <img src="" id="custom-section-img" class="custom-card-img hidden" alt="Illustration">
+            <!--SSR:cimg--><img src="" id="custom-section-img" class="custom-card-img hidden" alt="Illustration"><!--/SSR:cimg-->
             <div class="custom-card-content">
-                <p id="custom-section-text" data-i18n="custom_loading">Chargement des informations...</p>
+                <!--SSR:ctext--><p id="custom-section-text">Le planning arrive....</p><!--/SSR:ctext-->
             </div>
         </div>
     </section>

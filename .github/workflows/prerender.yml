@@ -1,0 +1,33 @@
+name: Prerender Firebase
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"   # toutes les 30 minutes
+  workflow_dispatch:          # bouton « Run workflow » pour lancer à la main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: prerender
+  cancel-in-progress: false
+
+jobs:
+  prerender:
+    runs-on: ubuntu-latest
+    env:
+      TZ: Europe/Paris
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Écrire le contenu Firebase dans index.html
+        run: node prerender.mjs index.html
+      - name: Publier si le contenu a changé
+        run: |
+          if git diff --quiet; then echo "Aucun changement"; exit 0; fi
+          git config user.name "prerender-bot"
+          git config user.email "prerender-bot@users.noreply.github.com"
+          git commit -am "Prérendu automatique du contenu Firebase"
+          git push

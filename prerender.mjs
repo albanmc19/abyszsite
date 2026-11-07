@@ -115,12 +115,37 @@ const blocks = {
   feed, dots, partners,
 };
 
-// ---------- injection entre les marqueurs ----------
+// ---------- pose des marqueurs (si absents) puis injection ----------
+// Éléments entiers à entourer, ou contenu d'un conteneur (clé "in").
+const TARGETS = {
+  hero: /<h1[^>]*id="hero-title"[^>]*>[\s\S]*?<\/h1>/,
+  slogan: /<p[^>]*id="hero-slogan"[^>]*>[\s\S]*?<\/p>/,
+  atitle: /<h2[^>]*id="about-title"[^>]*>[\s\S]*?<\/h2>/,
+  atext: /<p[^>]*id="about-text"[^>]*>[\s\S]*?<\/p>/,
+  ctitle: /<h2[^>]*id="custom-section-title"[^>]*>[\s\S]*?<\/h2>/,
+  ctext: /<p[^>]*id="custom-section-text"[^>]*>[\s\S]*?<\/p>/,
+  cimg: /<img[^>]*id="custom-section-img"[^>]*>/,
+  feed: { in: /(<div[^>]*id="announcements-feed"[^>]*>)([\s\S]*?)(<\/div>)/ },
+  dots: { in: /(<div[^>]*id="carousel-dots"[^>]*>)([\s\S]*?)(<\/div>)/ },
+  partners: { in: /(<div[^>]*id="partners-feed"[^>]*>)([\s\S]*?)(<\/div>)/ },
+};
 let html = fs.readFileSync(file, "utf8");
+let done = 0;
 for (const [name, content] of Object.entries(blocks)) {
-  const re = new RegExp(`(<!--SSR:${name}-->)[\\s\\S]*?(<!--/SSR:${name}-->)`);
-  if (!re.test(html)) { console.error(`Marqueur manquant : ${name}`); process.exit(1); }
-  html = html.replace(re, (_, a, b) => a + content + b);
+  const marked = new RegExp(`(<!--SSR:${name}-->)[\\s\\S]*?(<!--/SSR:${name}-->)`);
+  if (!marked.test(html)) {
+    const t = TARGETS[name];
+    if (t.in) {
+      if (!t.in.test(html)) { console.warn(`Ignoré (élément introuvable) : ${name}`); continue; }
+      html = html.replace(t.in, (_, o, inner, c) => `${o}<!--SSR:${name}--><!--/SSR:${name}-->${c}`);
+    } else {
+      if (!t.test(html)) { console.warn(`Ignoré (élément introuvable) : ${name}`); continue; }
+      html = html.replace(t, (m) => `<!--SSR:${name}-->${m}<!--/SSR:${name}-->`);
+    }
+  }
+  html = html.replace(marked, (_, a, b) => a + content + b);
+  done++;
 }
+if (!done) { console.error("Aucun élément reconnu dans " + file + " : est-ce bien la page d'accueil ?"); process.exit(1); }
 fs.writeFileSync(file, html);
-console.log(`OK : ${anns.length} annonce(s), ${(data.partners || []).length} partenaire(s), section « ${c.title || "À la Une"} » écrits dans ${file}`);
+console.log(`OK : ${anns.length} annonce(s), ${(data.partners || []).length} partenaire(s), ${done}/${Object.keys(blocks).length} blocs écrits dans ${file}`);

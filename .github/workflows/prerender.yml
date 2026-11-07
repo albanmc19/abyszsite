@@ -2,8 +2,8 @@ name: Prerender Firebase
 
 on:
   schedule:
-    - cron: "*/30 * * * *"   # toutes les 30 minutes
-  workflow_dispatch:          # bouton « Run workflow » pour lancer à la main
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -17,14 +17,15 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TZ: Europe/Paris
+      GH_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
+      - name: Récupérer le dépôt
+        run: git clone --depth 1 "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" site
       - name: Écrire le contenu Firebase dans index.html
+        working-directory: site
         run: node prerender.mjs index.html
       - name: Publier si le contenu a changé
+        working-directory: site
         run: |
           if git diff --quiet; then echo "Aucun changement"; exit 0; fi
           git config user.name "prerender-bot"

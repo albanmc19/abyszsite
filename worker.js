@@ -3,9 +3,11 @@
    - POST /api/push            : envoie des notifications push (Firebase Cloud Messaging)
    - POST /api/email           : envoie des e-mails (Brevo)
    - GET/POST /unsubscribe/... : désabonnement en un clic (lien dans chaque e-mail)
+   - POST /api/pr              : récupère le PR Fortnite d'un joueur (Fortnite Tracker)
+   - Cron (toutes les heures)  : actualise automatiquement le PR de chaque joueur ayant un pseudo Epic
    - GET  /api/health          : état de la configuration (aucun secret renvoyé)
 
-   Seul l'administrateur (ADMIN_EMAIL) peut utiliser /api/push et /api/email :
+   Seul l'administrateur (ADMIN_EMAIL) peut utiliser /api/push, /api/email et /api/pr :
    le Worker vérifie à chaque appel le jeton Firebase de la personne connectée.
 
    Variables / secrets à définir dans Cloudflare (Settings > Variables and Secrets) :
@@ -16,6 +18,7 @@
      SENDER_NAME      (texte)   ex : Abysz Esports
      SITE_URL         (texte)   ex : https://www.ton-site.fr   (sans / final)
      ALLOWED_ORIGIN   (texte)   identique à SITE_URL (autorise uniquement ton dashboard)
+     TRN_API_KEY      (secret)  clé API Fortnite Tracker (pour /api/pr)
    Optionnelles : ADMIN_EMAIL, FIREBASE_API_KEY (valeurs par défaut ci-dessous)
    ============================================================================ */
 
@@ -225,6 +228,131 @@ async function handleEmail(env, body, origin) {
     };
 }
 
+/* ---------- PR Fortnite (Fortnite Tracker) ---------- */
+const TRN_PR_BASE = "https://api.fortnitetracker.com/v1/powerrankings";
+
+// Le format exact de la réponse n'étant pas garanti, on cherche les points à plusieurs endroits connus.
+function extractPoints(d) {
+    const pick = (o) => (o && typeof o === "object") ? (o.points ?? o.pr ?? o.powerRanking ?? o.value) : undefined;
+    const cand = pick(d) ?? pick(d && d.data) ?? (Array.isArray(d) ? pick(d[0]) : undefined);
+    const n = Number(cand);
+    return Number.isFinite(n) && n >= 0 ? Math.round(n) : null;
+}
+
+async function handlePr(env, body) {
+    if (!env.TRN_API_KEY) throw httpErr(500, "TRN_API_KEY non configurée sur le serveur");
+
+    const epicName = String(body.epicName || "").trim();
+    const platform = String(body.platform || "pc").toLowerCase();
+    const region = String(body.region || "EU").toUpperCase();
+    if (!epicName || epicName.length > 64) throw httpErr(400, "Pseudo Epic invalide");
+    if (!/^[a-z]{2,10}$/.test(platform) || !/^[A-Z]{2,6}$/.test(region)) throw httpErr(400, "Plateforme ou région invalide");
+
+    let r;
+    try {
+        r = await fetch(`${TRN_PR_BASE}/${platform}/${region}/${encodeURIComponent(epicName)}`, {
+            headers: { "TRN-Api-Key": env.TRN_API_KEY, "Accept": "application/json" }
+        });
+    } catch (e) {
+        throw httpErr(502, "Fortnite Tracker injoignable");
+    }
+    if (r.status === 404) throw httpErr(404, "Joueur introuvable (pseudo, plateforme ou région incorrects, ou pas encore classé)");
+    if (r.status === 429) throw httpErr(429, "Limite de requêtes Fortnite Tracker atteinte, réessaie dans une minute");
+    if (r.status === 401 || r.status === 403) throw httpErr(502, "Clé Fortnite Tracker refusée");
+    if (!r.ok) throw httpErr(502, "Erreur Fortnite Tracker (" + r.status + ")");
+
+    const data = await r.json().catch(() => null);
+    const points = extractPoints(data);
+    if (points === null) throw httpErr(502, "Format de réponse inattendu : " + JSON.stringify(data).slice(0, 300));
+    return { ok: true, points };
+}
+
+/* ---------- Actualisation automatique du PR (Cron Trigger) ---------- */
+const PR_STALE_MS = 12 * 3600 * 1000;   // un joueur n'est ré-interrogé que s'il n'a pas été actualisé depuis 12 h
+const PR_MAX_PER_RUN = 20;              // offre gratuite : 50 appels sortants max par exécution (2 par joueur)
+const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
+
+function fsParsePlayer(d) {
+    const f = d.fields || {};
+    const str = (x) => (x && x.stringValue) || "";
+    const vals = (f.prHistory && f.prHistory.arrayValue && f.prHistory.arrayValue.values) || [];
+    return {
+        id: d.name.split("/").pop(),
+        updateTime: d.updateTime,
+        pseudo: str(f.pseudo),
+        epicName: str(f.epicName).trim(),
+        platform: str(f.prPlatform) || "pc",
+        region: str(f.prRegion) || "EU",
+        history: vals.map((v) => {
+            const m = (v.mapValue && v.mapValue.fields) || {};
+            const n = m.value ? (m.value.integerValue ?? m.value.doubleValue) : 0;
+            return { date: str(m.date), label: str(m.label) || "Tournoi", value: Number(n) || 0 };
+        }),
+        syncedAt: f.prSyncedAt && f.prSyncedAt.timestampValue ? Date.parse(f.prSyncedAt.timestampValue) : 0
+    };
+}
+
+// Ajoute (ou met à jour) le point du jour. Retourne null si le PR n'a pas changé.
+function mergePrPoint(history, points) {
+    const list = history.map((r) => ({ ...r }));
+    const today = new Date().toISOString().slice(0, 10);
+    const last = list[list.length - 1];
+    if (last && Number(last.value) === points) return null;
+    if (last && last.date === today && last.label === "Fortnite Tracker") last.value = points;
+    else list.push({ date: today, label: "Fortnite Tracker", value: points });
+    list.sort((a, b) => new Date(a.date) - new Date(b.date));
+    return list;
+}
+
+async function runPrSync(env) {
+    if (!env.TRN_API_KEY || !env.SERVICE_ACCOUNT) return { skipped: "TRN_API_KEY ou SERVICE_ACCOUNT manquant" };
+
+    const access = await googleToken(env);
+    const root = `https://firestore.googleapis.com/v1/projects/${serviceAccount(env).project_id}/databases/(default)/documents`;
+    const auth = { "Authorization": "Bearer " + access };
+
+    const list = await fetch(`${root}/roster?pageSize=300`, { headers: auth });
+    if (!list.ok) throw new Error("Lecture du roster impossible (HTTP " + list.status + ")");
+    const docs = ((await list.json()).documents || []).map(fsParsePlayer);
+
+    const now = Date.now();
+    const todo = docs
+        .filter((p) => p.epicName && now - p.syncedAt > PR_STALE_MS)
+        .sort((a, b) => a.syncedAt - b.syncedAt)    // les jamais synchronisés d'abord
+        .slice(0, PR_MAX_PER_RUN);
+
+    const out = { checked: todo.length, updated: 0, unchanged: 0, failed: 0 };
+    for (let i = 0; i < todo.length; i++) {
+        const p = todo[i];
+        try {
+            const { points } = await handlePr(env, { epicName: p.epicName, platform: p.platform, region: p.region });
+            const next = mergePrPoint(p.history, points);
+            const fields = { prSyncedAt: { timestampValue: new Date().toISOString() } };
+            const mask = ["prSyncedAt"];
+            if (next) {
+                mask.push("prHistory");
+                fields.prHistory = { arrayValue: { values: next.map((r) => ({ mapValue: { fields: {
+                    date: { stringValue: String(r.date) },
+                    label: { stringValue: String(r.label) },
+                    value: { integerValue: String(Math.round(Number(r.value) || 0)) }
+                } } })) } };
+            }
+            // Précondition : si l'admin a modifié la fiche entre-temps, on ne l'écrase pas (réessai à la prochaine exécution)
+            const url = `${root}/roster/${encodeURIComponent(p.id)}?` + mask.map((m) => "updateMask.fieldPaths=" + m).join("&") +
+                "&currentDocument.updateTime=" + encodeURIComponent(p.updateTime);
+            const w = await fetch(url, { method: "PATCH", headers: { ...auth, "Content-Type": "application/json" }, body: JSON.stringify({ fields }) });
+            if (!w.ok) throw new Error("Écriture Firestore HTTP " + w.status);
+            if (next) out.updated++; else out.unchanged++;
+        } catch (e) {
+            out.failed++;
+            console.error("PR " + (p.pseudo || p.epicName) + " : " + e.message);
+            if (e.status === 429 || /Clé/.test(e.message)) break;   // inutile d'insister
+        }
+        if (i < todo.length - 1) await sleep(1200);
+    }
+    return out;
+}
+
 /* ---------- Désabonnement ---------- */
 function page(title, inner) {
     return new Response(
@@ -265,6 +393,11 @@ async function handleUnsubscribe(env, request, url) {
 
 /* ---------- Routeur ---------- */
 export default {
+    // Cron Trigger : actualisation automatique du PR
+    async scheduled(event, env, ctx) {
+        ctx.waitUntil(runPrSync(env).then((r) => console.log("PR sync", JSON.stringify(r))).catch((e) => console.error("PR sync", e.message)));
+    },
+
     async fetch(request, env) {
         const url = new URL(request.url);
         const cors = corsHeaders(env, request);
@@ -277,7 +410,8 @@ export default {
                     ok: true,
                     push: !!env.SERVICE_ACCOUNT,
                     email: !!(env.BREVO_API_KEY && env.SENDER_EMAIL),
-                    unsub: !!env.UNSUB_SECRET
+                    unsub: !!env.UNSUB_SECRET,
+                    pr: !!env.TRN_API_KEY
                 }, 200, cors);
             }
 
@@ -286,13 +420,13 @@ export default {
                 return await handleUnsubscribe(env, request, url);
             }
 
-            if (request.method === "POST" && (url.pathname === "/api/push" || url.pathname === "/api/email")) {
+            if (request.method === "POST" && (url.pathname === "/api/push" || url.pathname === "/api/email" || url.pathname === "/api/pr")) {
                 const body = await request.json().catch(() => null);
                 if (!body || typeof body !== "object") throw httpErr(400, "Requête invalide");
                 await verifyAdmin(env, body.idToken);
-                const data = url.pathname === "/api/push"
-                    ? await handlePush(env, body)
-                    : await handleEmail(env, body, url.origin);
+                const data = url.pathname === "/api/push" ? await handlePush(env, body)
+                    : url.pathname === "/api/email" ? await handleEmail(env, body, url.origin)
+                    : await handlePr(env, body);
                 return json(data, 200, cors);
             }
 

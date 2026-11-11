@@ -4,6 +4,7 @@
    - POST /api/email           : envoie des e-mails (Brevo)
    - GET/POST /unsubscribe/... : désabonnement en un clic (lien dans chaque e-mail)
    - POST /api/pr              : récupère le PR Fortnite d'un joueur (Fortnite Tracker)
+   - POST /api/pr-key          : lit / enregistre / supprime la clé Fortnite Tracker (admin)
    - Cron (toutes les heures)  : actualise automatiquement le PR de chaque joueur ayant un pseudo Epic
    - GET  /api/health          : état de la configuration (aucun secret renvoyé)
 
@@ -18,7 +19,8 @@
      SENDER_NAME      (texte)   ex : Abysz Esports
      SITE_URL         (texte)   ex : https://www.ton-site.fr   (sans / final)
      ALLOWED_ORIGIN   (texte)   identique à SITE_URL (autorise uniquement ton dashboard)
-     TRN_API_KEY      (secret)  clé API Fortnite Tracker (pour /api/pr)
+     TRN_API_KEY      (secret, OPTIONNEL) clé Fortnite Tracker. Sinon, saisis-la dans le dashboard
+                      (Serveur d'envoi > Clé Fortnite Tracker) : elle est alors stockée côté serveur.
    Optionnelles : ADMIN_EMAIL, FIREBASE_API_KEY (valeurs par défaut ci-dessous)
    ============================================================================ */
 
@@ -228,6 +230,62 @@ async function handleEmail(env, body, origin) {
     };
 }
 
+/* ---------- Clé Fortnite Tracker : secret Cloudflare OU enregistrée depuis le dashboard ---------- */
+// Stockée dans Firestore (server_config/trn) par le compte de service. Les règles Firestore doivent
+// interdire toute lecture/écriture côté navigateur sur « server_config » (accès par défaut refusé).
+const TRN_KEY_DOC = "server_config/trn";
+let trnKeyCache = { key: null, exp: 0 };
+const fsRoot = (env) => `https://firestore.googleapis.com/v1/projects/${serviceAccount(env).project_id}/databases/(default)/documents`;
+
+async function getTrnKey(env) {
+    if (env.TRN_API_KEY) return env.TRN_API_KEY;
+    if (Date.now() < trnKeyCache.exp) return trnKeyCache.key;
+    if (!env.SERVICE_ACCOUNT) return null;
+    const access = await googleToken(env);
+    const r = await fetch(`${fsRoot(env)}/${TRN_KEY_DOC}`, { headers: { "Authorization": "Bearer " + access } });
+    let key = null;
+    if (r.ok) {
+        const d = await r.json().catch(() => ({}));
+        key = (d.fields && d.fields.apiKey && d.fields.apiKey.stringValue) || null;
+    } else if (r.status !== 404) {
+        throw httpErr(500, "Lecture de la clé impossible (HTTP " + r.status + ")");
+    }
+    trnKeyCache = { key, exp: Date.now() + (key ? 300000 : 30000) };
+    return key;
+}
+
+async function handlePrKey(env, body) {
+    const action = String(body.action || "status");
+    if (action === "status") {
+        const key = await getTrnKey(env);
+        return { ok: true, configured: !!key, source: env.TRN_API_KEY ? "secret" : (key ? "dashboard" : null) };
+    }
+    if (env.TRN_API_KEY) throw httpErr(409, "Une clé est déjà définie comme secret Cloudflare (TRN_API_KEY) et elle est prioritaire. Supprime-la dans Cloudflare pour gérer la clé ici.");
+    if (!env.SERVICE_ACCOUNT) throw httpErr(500, "SERVICE_ACCOUNT non configuré sur le serveur d'envoi");
+    const access = await googleToken(env);
+    const url = `${fsRoot(env)}/${TRN_KEY_DOC}`;
+    const auth = { "Authorization": "Bearer " + access, "Content-Type": "application/json" };
+
+    if (action === "set") {
+        const key = String(body.key || "").trim();
+        if (!/^[A-Za-z0-9._-]{8,200}$/.test(key)) throw httpErr(400, "Clé invalide (8 à 200 caractères : lettres, chiffres, - _ .)");
+        const r = await fetch(url, {
+            method: "PATCH", headers: auth,
+            body: JSON.stringify({ fields: { apiKey: { stringValue: key }, updatedAt: { timestampValue: new Date().toISOString() } } })
+        });
+        if (!r.ok) throw httpErr(500, "Enregistrement impossible (HTTP " + r.status + ")");
+        trnKeyCache = { key, exp: Date.now() + 300000 };
+        return { ok: true, configured: true, source: "dashboard" };
+    }
+    if (action === "delete") {
+        const r = await fetch(url, { method: "DELETE", headers: auth });
+        if (!r.ok && r.status !== 404) throw httpErr(500, "Suppression impossible (HTTP " + r.status + ")");
+        trnKeyCache = { key: null, exp: 0 };
+        return { ok: true, configured: false, source: null };
+    }
+    throw httpErr(400, "Action inconnue");
+}
+
 /* ---------- PR Fortnite (Fortnite Tracker) ---------- */
 const TRN_PR_BASE = "https://api.fortnitetracker.com/v1/powerrankings";
 
@@ -240,7 +298,8 @@ function extractPoints(d) {
 }
 
 async function handlePr(env, body) {
-    if (!env.TRN_API_KEY) throw httpErr(500, "TRN_API_KEY non configurée sur le serveur");
+    const trnKey = await getTrnKey(env);
+    if (!trnKey) throw httpErr(500, "Clé Fortnite Tracker non configurée (dashboard > Serveur d'envoi)");
 
     const epicName = String(body.epicName || "").trim();
     const platform = String(body.platform || "pc").toLowerCase();
@@ -251,7 +310,7 @@ async function handlePr(env, body) {
     let r;
     try {
         r = await fetch(`${TRN_PR_BASE}/${platform}/${region}/${encodeURIComponent(epicName)}`, {
-            headers: { "TRN-Api-Key": env.TRN_API_KEY, "Accept": "application/json" }
+            headers: { "TRN-Api-Key": trnKey, "Accept": "application/json" }
         });
     } catch (e) {
         throw httpErr(502, "Fortnite Tracker injoignable");
@@ -305,7 +364,8 @@ function mergePrPoint(history, points) {
 }
 
 async function runPrSync(env) {
-    if (!env.TRN_API_KEY || !env.SERVICE_ACCOUNT) return { skipped: "TRN_API_KEY ou SERVICE_ACCOUNT manquant" };
+    if (!env.SERVICE_ACCOUNT) return { skipped: "SERVICE_ACCOUNT manquant" };
+    if (!(await getTrnKey(env))) return { skipped: "clé Fortnite Tracker non configurée" };
 
     const access = await googleToken(env);
     const root = `https://firestore.googleapis.com/v1/projects/${serviceAccount(env).project_id}/databases/(default)/documents`;
@@ -420,12 +480,13 @@ export default {
                 return await handleUnsubscribe(env, request, url);
             }
 
-            if (request.method === "POST" && (url.pathname === "/api/push" || url.pathname === "/api/email" || url.pathname === "/api/pr")) {
+            if (request.method === "POST" && (url.pathname === "/api/push" || url.pathname === "/api/email" || url.pathname === "/api/pr" || url.pathname === "/api/pr-key")) {
                 const body = await request.json().catch(() => null);
                 if (!body || typeof body !== "object") throw httpErr(400, "Requête invalide");
                 await verifyAdmin(env, body.idToken);
                 const data = url.pathname === "/api/push" ? await handlePush(env, body)
                     : url.pathname === "/api/email" ? await handleEmail(env, body, url.origin)
+                    : url.pathname === "/api/pr-key" ? await handlePrKey(env, body)
                     : await handlePr(env, body);
                 return json(data, 200, cors);
             }

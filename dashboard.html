@@ -262,6 +262,7 @@
             <a href="#sec-subs">📬 Abonnés</a>
             <a href="#sec-newsletter">📧 Newsletter</a>
             <a href="#sec-push">🔔 Push</a>
+            <a href="#sec-pr">🎯 Clé PR</a>
         </div>
 
         <div class="section-title" id="sec-live">
@@ -605,20 +606,22 @@
                 <button type="button" class="btn-admin" id="worker-save">Enregistrer &amp; tester</button>
             </div>
             <p id="worker-msg" class="comms-msg"></p>
+        </div>
+        </details>
 
-            <div style="border-top:1px solid #222; margin-top:18px; padding-top:16px;">
-                <p class="muted" style="margin-top:0;"><strong style="color:#fff;">🎯 Clé Fortnite Tracker</strong> <span class="chip chip-on" id="trn-chip" style="margin-left:6px;">non configurée</span><br>
-                Sert à mettre à jour automatiquement le PR des joueurs sur la page Roster. Une fois enregistrée, la clé reste sur le serveur et n'est plus jamais affichée ici.</p>
-                <div class="search-row">
-                    <div class="input-group" style="margin-bottom:0;">
-                        <label for="trn-key">Clé API (TRN-Api-Key)</label>
-                        <input type="password" id="trn-key" placeholder="Colle ta clé ici" autocomplete="off" spellcheck="false">
-                    </div>
-                    <button type="button" class="btn-admin" id="trn-save">Enregistrer</button>
-                    <button type="button" class="btn-admin" id="trn-remove" style="display:none;">Supprimer</button>
+        <details class="dash-details" id="sec-pr">
+        <summary class="section-title"><span>🎯 Clé PR Fortnite</span> <span class="chip chip-on" id="trn-chip">non configurée</span></summary>
+        <div class="admin-edit-box">
+            <p class="muted" style="margin-top:0;">Clé de l'API Fortnite Tracker, utilisée pour actualiser automatiquement le PR des joueurs sur la page Roster. Une fois enregistrée, elle reste sur le serveur et n'est plus jamais affichée ici. L'adresse du serveur se règle dans la section « ⚙️ Serveur d'envoi ».</p>
+            <div class="search-row">
+                <div class="input-group" style="margin-bottom:0;">
+                    <label for="trn-key">Clé API (TRN-Api-Key)</label>
+                    <input type="password" id="trn-key" placeholder="Colle ta clé ici" autocomplete="off" spellcheck="false">
                 </div>
-                <p id="trn-msg" class="comms-msg"></p>
+                <button type="button" class="btn-admin" id="trn-save">Enregistrer</button>
+                <button type="button" class="btn-admin" id="trn-remove" style="display:none;">Supprimer</button>
             </div>
+            <p id="trn-msg" class="comms-msg"></p>
         </div>
         </details>
 
@@ -1876,7 +1879,7 @@
         }
         async function checkTrn() {
             const msg = $("trn-msg");
-            if (!workerUrl()) { trnShow(null); say(msg, "Configure d'abord l'adresse du serveur d'envoi ci-dessus.", "info"); return; }
+            if (!workerUrl()) { trnShow(null); say(msg, "Configure d'abord l'adresse du serveur dans la section « ⚙️ Serveur d'envoi ».", "info"); return; }
             try { trnShow(await callWorker("/api/pr-key", { action: "status" })); say(msg, "", ""); }
             catch (e) { trnShow(null); say(msg, e.message, "err"); }
         }

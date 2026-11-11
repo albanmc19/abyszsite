@@ -215,6 +215,10 @@
         .sub-tools input[type="search"]:focus { border-color: #a855f7; outline: none; }
         .tbl-scroll { max-height: 360px; overflow: auto; }
         .tbl-scroll .db-table th { position: sticky; top: 0; z-index: 1; }
+        .stk-name { min-width: 150px; background: #050505; border: 1px solid #222; border-radius: 6px; padding: 7px 10px; color: #fff; font-family: 'Inter', sans-serif; font-size: 0.82rem; width: 100%; box-sizing: border-box; }
+        .stk-name:focus { border-color: #a855f7; outline: none; }
+        .stk-ok { color: #22c55e; } .stk-ko { color: #ff6b6b; }
+        .stk-cell-small { font-size: 0.76rem; color: #aaa; line-height: 1.4; }
         .topic-tag { display: inline-block; font-size: 0.68rem; padding: 2px 8px; border-radius: 999px; background: rgba(168, 85, 247, .12); border: 1px solid rgba(168, 85, 247, .35); color: #c9a0ff; margin-right: 4px; font-family: 'Inter', sans-serif; }
         @media (max-width: 980px) { .comms-grid { grid-template-columns: 1fr; } .preview-wrap { position: static; } .nl-preview { height: 520px; } }
     </style>
@@ -262,7 +266,7 @@
             <a href="#sec-subs">📬 Abonnés</a>
             <a href="#sec-newsletter">📧 Newsletter</a>
             <a href="#sec-push">🔔 Push</a>
-            <a href="#sec-pr">🎯 Clé PR</a>
+            <a href="#sec-pr">🎯 Clé API &amp; Stats</a>
         </div>
 
         <div class="section-title" id="sec-live">
@@ -610,7 +614,7 @@
         </details>
 
         <details class="dash-details" id="sec-pr">
-        <summary class="section-title"><span>🎯 Clé PR Fortnite</span> <span class="chip chip-on" id="trn-chip">non configurée</span></summary>
+        <summary class="section-title"><span>🎯 Clé API &amp; Stats joueurs</span> <span class="chip chip-on" id="trn-chip">non configurée</span></summary>
         <div class="admin-edit-box">
             <p class="muted" style="margin-top:0;">Clé de l'API Fortnite Tracker, utilisée pour actualiser automatiquement le PR des joueurs sur la page Roster. Une fois enregistrée, elle reste sur le serveur et n'est plus jamais affichée ici. L'adresse du serveur se règle dans la section « ⚙️ Serveur d'envoi ».</p>
             <div class="search-row">
@@ -622,6 +626,44 @@
                 <button type="button" class="btn-admin" id="trn-remove" style="display:none;">Supprimer</button>
             </div>
             <p id="trn-msg" class="comms-msg"></p>
+
+            <div class="box-title" style="margin-top:28px;">Planning d'actualisation</div>
+            <p class="muted" style="margin-top:0;">Choisis les jours où les stats des joueurs sont récupérées automatiquement avec la clé. Le tableau se met à jour à l'ouverture du dashboard, une seule fois par jour coché.</p>
+            <div class="chk-row" id="stk-days">
+                <label class="chk-chip"><input type="checkbox" name="stk-day" value="1"><span>Lun</span></label>
+                <label class="chk-chip"><input type="checkbox" name="stk-day" value="2"><span>Mar</span></label>
+                <label class="chk-chip"><input type="checkbox" name="stk-day" value="3"><span>Mer</span></label>
+                <label class="chk-chip"><input type="checkbox" name="stk-day" value="4"><span>Jeu</span></label>
+                <label class="chk-chip"><input type="checkbox" name="stk-day" value="5"><span>Ven</span></label>
+                <label class="chk-chip"><input type="checkbox" name="stk-day" value="6"><span>Sam</span></label>
+                <label class="chk-chip"><input type="checkbox" name="stk-day" value="7"><span>Dim</span></label>
+            </div>
+            <div class="form-grid">
+                <div class="input-group"><label for="stk-platform">Plateforme des comptes</label>
+                    <select id="stk-platform"><option value="epic">Epic Games</option><option value="psn">PlayStation</option><option value="xbl">Xbox</option></select>
+                </div>
+                <div class="input-group"><label>Actualisation automatique</label>
+                    <label class="chk-chip"><input type="checkbox" id="stk-auto"><span>⏱️ Activée les jours cochés</span></label>
+                </div>
+            </div>
+            <div class="btn-row"><button type="button" class="btn-ghost" id="stk-save-cfg">💾 Enregistrer le planning</button></div>
+            <p id="stk-cfg-msg" class="comms-msg"></p>
+
+            <div class="box-title" style="margin-top:28px;">Stats des joueurs</div>
+            <p class="muted" style="margin-top:0;">1) Vérifie le pseudo de chaque joueur sur la plateforme. 2) Récupère les stats avec la clé. 3) Envoie-les au Roster, qui les affichera dans la fiche du joueur.</p>
+            <div class="btn-row" style="margin-bottom:12px;">
+                <button type="button" class="btn-ghost" id="stk-toggle-all">☑️ Tout cocher / décocher</button>
+                <button type="button" class="btn-admin" id="stk-fetch">🔍 Récupérer les stats</button>
+                <button type="button" class="btn-admin btn-send" id="stk-send" disabled>📤 Envoyer au Roster</button>
+            </div>
+            <p id="stk-msg" class="comms-msg"></p>
+            <div class="db-table-wrapper tbl-scroll">
+                <table class="db-table" style="min-width:680px;">
+                    <thead><tr><th></th><th>Joueur</th><th>Pseudo sur la plateforme</th><th>Stats envoyées</th><th>Résultat</th></tr></thead>
+                    <tbody id="stk-rows"><tr><td colspan="5" style="text-align:center;color:#666;font-style:italic;padding:24px;">Chargement…</td></tr></tbody>
+                </table>
+            </div>
+            <p class="muted" id="stk-last" style="margin-top:10px;"></p>
         </div>
         </details>
 
@@ -2360,13 +2402,156 @@
         }
 
         /* ============================================================
+           STATS JOUEURS : récupération via le serveur d'envoi, envoi vers le Roster
+           ============================================================ */
+        const STK_CHUNK = 5;
+        let stkRoster = [];                      // joueurs du roster { id, pseudo, epicName, stats }
+        let stkCfg = { days: [1], auto: false, platform: "epic", lastRun: "" };
+        let stkCfgLoaded = false, stkRosterLoaded = false, stkAutoTried = false, stkBusy = false;
+        const stkDraft = {};                     // id -> { ok, items, error }
+        const stkNames = {};                     // id -> pseudo saisi
+        const stkPicked = new Set();
+        const parisDay = () => new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Paris" });
+        const parisDow = () => ({ Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6, Sun: 7 })[new Intl.DateTimeFormat("en-US", { weekday: "short", timeZone: "Europe/Paris" }).format(new Date())];
+        const stkName = (p) => (stkNames[p.id] !== undefined ? stkNames[p.id] : (p.epicName || p.pseudo || "")).trim();
+
+        function stkRender() {
+            const tb = $("stk-rows");
+            if (!stkRoster.length) { tb.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#666;font-style:italic;padding:24px;">Aucun joueur dans le roster</td></tr>'; return; }
+            tb.innerHTML = stkRoster.map((p) => {
+                const s = p.stats && Array.isArray(p.stats.items) ? p.stats : null;
+                const sent = s ? `<span class="stk-cell-small">${esc(fmtDate(Number(s.updatedAt) || 0))}<br>${s.items.length} stat(s)</span>` : '<span class="stk-cell-small">jamais</span>';
+                const dr = stkDraft[p.id];
+                const res = !dr ? "—" : dr.ok
+                    ? `<span class="stk-ok">✔ prêt</span><div class="stk-cell-small">${esc(dr.items.slice(0, 4).map((i) => i.label + " " + i.value).join(" · "))}</div>`
+                    : `<span class="stk-ko">✗ ${esc(dr.error || "échec")}</span>`;
+                return `<tr><td><input type="checkbox" data-stk-pick="${esc(p.id)}" ${stkPicked.has(p.id) ? "checked" : ""} aria-label="Sélectionner ${esc(p.pseudo)}"></td>
+                    <td>${esc(p.pseudo || "Inconnu")}</td>
+                    <td><input type="text" class="stk-name" maxlength="60" data-stk-name="${esc(p.id)}" value="${esc(stkName(p))}" autocomplete="off"></td>
+                    <td>${sent}</td><td>${res}</td></tr>`;
+            }).join("");
+            $("stk-send").disabled = stkBusy || !Object.values(stkDraft).some((x) => x && x.ok);
+        }
+
+        function stkSetBusy(v) { stkBusy = v; ["stk-fetch", "stk-save-cfg", "stk-toggle-all"].forEach((id) => { $(id).disabled = v; }); $("stk-send").disabled = v || !Object.values(stkDraft).some((x) => x && x.ok); }
+
+        function stkFillCfg() {
+            document.querySelectorAll('input[name="stk-day"]').forEach((i) => { i.checked = stkCfg.days.includes(Number(i.value)); });
+            $("stk-auto").checked = !!stkCfg.auto;
+            $("stk-platform").value = stkCfg.platform;
+            $("stk-last").textContent = stkCfg.lastRun ? "Dernière actualisation automatique : " + stkCfg.lastRun : "";
+        }
+
+        async function stkFetch(ids) {
+            const players = stkRoster.filter((p) => ids.includes(p.id));
+            const platform = stkCfg.platform;
+            let ok = 0, ko = 0, fatal = false;
+            const parts = chunk(players, STK_CHUNK);
+            for (let i = 0; i < parts.length && !fatal; i++) {
+                say($("stk-msg"), `Récupération… ${Math.min(i * STK_CHUNK, players.length)} / ${players.length}`, "info");
+                try {
+                    const res = await callWorker("/api/player-stats", { platform, players: parts[i].map((p) => ({ id: p.id, name: stkName(p) })) });
+                    const byId = {}; (res.results || []).forEach((r) => { byId[r.id] = r; });
+                    parts[i].forEach((p) => {
+                        const r = byId[p.id];
+                        if (r && r.ok && Array.isArray(r.items) && r.items.length) {
+                            stkDraft[p.id] = { ok: true, items: r.items.slice(0, 24).map((x) => ({ label: String(x.label).slice(0, 40), value: String(x.value).slice(0, 40) })) }; ok++;
+                        } else { stkDraft[p.id] = { ok: false, error: (r && r.error) || "aucune donnée" }; ko++; }
+                    });
+                } catch (e) {
+                    parts[i].forEach((p) => { stkDraft[p.id] = { ok: false, error: e.message }; ko++; });
+                    if (e.fatal) fatal = true;
+                }
+                stkRender();
+                if (i < parts.length - 1) await sleep(500);
+            }
+            return { ok, ko, fatal };
+        }
+
+        async function stkSend(ids) {
+            let n = 0, err = 0;
+            for (const id of ids) {
+                const dr = stkDraft[id], p = stkRoster.find((x) => x.id === id);
+                if (!dr || !dr.ok || !p) continue;
+                try {
+                    await setDoc(doc(db, "roster", id), { epicName: stkName(p), stats: { items: dr.items, updatedAt: Date.now(), platform: stkCfg.platform } }, { merge: true });
+                    delete stkDraft[id]; n++;
+                } catch (e) { err++; stkDraft[id] = { ok: false, error: "écriture refusée (" + (e.code || e.message) + ")" }; }
+            }
+            stkRender();
+            return { n, err };
+        }
+
+        async function stkMaybeAuto() {
+            if (stkAutoTried || !stkCfgLoaded || !stkRosterLoaded || !isAdmin()) return;
+            if (!stkCfg.auto || !stkCfg.days.includes(parisDow()) || stkCfg.lastRun === parisDay() || !workerUrl() || !stkRoster.length) return;
+            stkAutoTried = true; stkSetBusy(true);
+            say($("stk-msg"), "⏱️ Actualisation automatique du jour en cours…", "info");
+            const r = await stkFetch(stkRoster.map((p) => p.id));
+            const s = await stkSend(stkRoster.map((p) => p.id));
+            if (!r.fatal) { stkCfg.lastRun = parisDay(); try { await setDoc(doc(db, "system", "statsConfig"), { lastRun: stkCfg.lastRun }, { merge: true }); } catch (e) { /* ignore */ } }
+            say($("stk-msg"), `⏱️ Actualisation auto : ${s.n} joueur(s) mis à jour, ${r.ko + s.err} échec(s).`, r.ko + s.err ? "err" : "ok");
+            stkSetBusy(false);
+        }
+
+        function wireStats() {
+            onSnapshot(collection(db, "roster"), (snap) => {
+                stkRoster = snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => String(a.pseudo || "").localeCompare(String(b.pseudo || "")));
+                stkRosterLoaded = true; stkRender(); stkMaybeAuto();
+            }, () => say($("stk-msg"), "Lecture du roster impossible.", "err"));
+            onSnapshot(doc(db, "system", "statsConfig"), (snap) => {
+                const x = snap.exists() ? snap.data() : {};
+                stkCfg = { days: Array.isArray(x.days) ? x.days.map(Number).filter((n) => n >= 1 && n <= 7) : [1], auto: !!x.auto, platform: ["epic", "psn", "xbl"].includes(x.platform) ? x.platform : "epic", lastRun: String(x.lastRun || "") };
+                stkCfgLoaded = true; stkFillCfg(); stkMaybeAuto();
+            }, () => say($("stk-cfg-msg"), "Planning illisible : ajoute la règle Firestore pour « system/statsConfig ».", "err"));
+
+            $("stk-save-cfg").addEventListener("click", async () => {
+                if (!isAdmin()) return;
+                const days = [...document.querySelectorAll('input[name="stk-day"]:checked')].map((i) => Number(i.value));
+                if ($("stk-auto").checked && !days.length) { say($("stk-cfg-msg"), "Coche au moins un jour pour activer l'actualisation automatique.", "err"); return; }
+                try {
+                    await setDoc(doc(db, "system", "statsConfig"), { days, auto: $("stk-auto").checked, platform: $("stk-platform").value, updatedAt: Date.now() }, { merge: true });
+                    say($("stk-cfg-msg"), "✅ Planning enregistré.", "ok");
+                } catch (e) { say($("stk-cfg-msg"), "Erreur : " + e.message + " (règles Firestore à jour ?)", "err"); }
+            });
+            $("stk-rows").addEventListener("input", (e) => { const t = e.target.closest("[data-stk-name]"); if (t) stkNames[t.getAttribute("data-stk-name")] = t.value; });
+            $("stk-rows").addEventListener("change", (e) => {
+                const t = e.target.closest("[data-stk-pick]"); if (!t) return;
+                const id = t.getAttribute("data-stk-pick"); if (t.checked) stkPicked.add(id); else stkPicked.delete(id);
+            });
+            $("stk-toggle-all").addEventListener("click", () => {
+                if (stkPicked.size === stkRoster.length) stkPicked.clear(); else stkRoster.forEach((p) => stkPicked.add(p.id));
+                stkRender();
+            });
+            $("stk-fetch").addEventListener("click", async () => {
+                if (stkBusy || !isAdmin()) return;
+                const ids = stkRoster.filter((p) => stkPicked.has(p.id)).map((p) => p.id);
+                if (!ids.length) { say($("stk-msg"), "Coche au moins un joueur.", "err"); return; }
+                if (!workerUrl()) { say($("stk-msg"), "Configure d'abord le serveur d'envoi (section ⚙️).", "err"); return; }
+                stkSetBusy(true);
+                const r = await stkFetch(ids);
+                say($("stk-msg"), `${r.ok} joueur(s) récupéré(s), ${r.ko} échec(s).` + (r.ok ? " Clique sur « Envoyer au Roster » pour les publier." : ""), r.ko ? "err" : "ok");
+                stkSetBusy(false);
+            });
+            $("stk-send").addEventListener("click", async () => {
+                if (stkBusy || !isAdmin()) return;
+                const ids = Object.keys(stkDraft).filter((id) => stkDraft[id] && stkDraft[id].ok);
+                if (!ids.length || !confirm("Publier les stats de " + ids.length + " joueur(s) sur la page Roster ?")) return;
+                stkSetBusy(true);
+                const s = await stkSend(ids);
+                say($("stk-msg"), s.err ? `⚠️ ${s.n} envoyé(s), ${s.err} échec(s).` : `✅ Stats envoyées au Roster pour ${s.n} joueur(s).`, s.err ? "err" : "ok");
+                stkSetBusy(false);
+            });
+        }
+
+        /* ============================================================
            DÉMARRAGE (uniquement pour l'administrateur connecté)
            ============================================================ */
         function watch(name, onData, onErr) {
             onSnapshot(collection(db, name), (snap) => onData(snap), (err) => onErr && onErr(err));
         }
         function init() {
-            wireSender(); wireTrn(); wireDiscord(); wireSubs(); wireNewsletter(); wirePush(); checkSender(); checkTrn();
+            wireSender(); wireTrn(); wireStats(); wireDiscord(); wireSubs(); wireNewsletter(); wirePush(); checkSender(); checkTrn();
 
             watch("subscribers", (snap) => {
                 subs = snap.docs.map((d) => { const x = d.data(); return { id: d.id, email: String(x.email || d.id).toLowerCase(), topics: Array.isArray(x.topics) ? x.topics.filter((t) => TOPICS.includes(t)) : [], lang: x.lang === "en" ? "en" : "fr", createdAt: tsMs(x.createdAt) }; })

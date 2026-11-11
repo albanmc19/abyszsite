@@ -110,6 +110,11 @@
 
         /* ── HISTORIQUE PR ── */
         .pr-history-section { background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 12px; padding: 16px; margin: 16px 0; }
+        .stats-grid-roster { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; }
+        .stat-box-roster { background: #141414; border: 1px solid #222; border-radius: 8px; padding: 10px 8px; text-align: center; }
+        .stat-box-roster b { display: block; font-family: 'Orbitron', sans-serif; color: #fff; font-size: 1rem; }
+        .stat-box-roster span { color: #9a9a9a; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Inter', sans-serif; }
+        .stats-updated { color: #666; font-size: 0.7rem; text-align: right; margin-top: 10px; font-family: 'Inter', sans-serif; }
         .pr-history-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 15px; }
         
         .pr-table { width: 100%; border-collapse: collapse; font-family: 'Inter', sans-serif; font-size: 0.85rem; text-align: left; }
@@ -118,7 +123,7 @@
         .pr-table tr:last-child td { border-bottom: none; }
         .pr-table td.pr-val-col { color: #b975ff; font-weight: 700; font-family: 'Orbitron', sans-serif; }
     </style>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://pagead2.googlesyndication.com https://partner.googleadservices.com https://tpc.googlesyndication.com https://www.googletagservices.com https://*.adtrafficquality.google; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; connect-src https://*.workers.dev https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com https://*.firebasedatabase.app wss://*.firebasedatabase.app https://pagead2.googlesyndication.com https://*.adtrafficquality.google; img-src 'self' data: blob: https:; frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://*.safeframe.googlesyndication.com https://www.google.com https://*.adtrafficquality.google; frame-ancestors 'none';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://pagead2.googlesyndication.com https://partner.googleadservices.com https://tpc.googlesyndication.com https://www.googletagservices.com https://*.adtrafficquality.google; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com; connect-src https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com wss://*.firebaseio.com https://*.firebasedatabase.app wss://*.firebasedatabase.app https://pagead2.googlesyndication.com https://*.adtrafficquality.google; img-src 'self' data: blob: https:; frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://*.safeframe.googlesyndication.com https://www.google.com https://*.adtrafficquality.google; frame-ancestors 'none';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -147,7 +152,6 @@
                 <span id="user-welcome-msg" style="font-family:'Inter', sans-serif; color:#aaa; font-size:0.9rem; margin-right:10px;"></span>
                 <button class="admin-gate-btn hidden" id="edit-intro-btn">✏️ Modifier le texte</button>
                 <button class="admin-gate-btn hidden" id="add-player-btn">➕ Nouveau Joueur</button>
-                <button class="admin-gate-btn hidden" id="sync-pr-btn" title="Met à jour le PR de tous les joueurs ayant un pseudo Epic">🔄 Synchroniser les PR</button>
                                 <button class="admin-gate-btn logout-btn hidden" id="logout-btn">🔒 Déconnexion</button>
             </div>
         </div>
@@ -438,8 +442,6 @@
                 if (navDashboard) navDashboard.classList.toggle("hidden", !estAdmin);
                 const editIntroBtn = document.getElementById("edit-intro-btn");
                 if (editIntroBtn) editIntroBtn.classList.toggle("hidden", !estAdmin);
-                const syncPrBtn = document.getElementById("sync-pr-btn");
-                if (syncPrBtn) syncPrBtn.classList.toggle("hidden", !estAdmin);
 
                 renderRosters(localPlayersList);
             });
@@ -456,7 +458,6 @@
             ecouterIntroFirestore();
             setupIntroEditor();
             setupAddPlayerButton();
-            setupSyncAllButton();
         });
 
         // ── CONNEXION ──
@@ -579,81 +580,6 @@
             });
         }
 
-        // ── SYNCHRONISATION DU PR (Fortnite Tracker, via le Cloudflare Worker) ──
-        // Adresse du Worker qui contient /api/pr. Si vide, on réutilise celle déjà enregistrée dans le dashboard.
-        const PR_API_URL = "";
-        const PR_LABEL = "Fortnite Tracker";
-
-        function prApiBase() {
-            let b = PR_API_URL;
-            if (!b) { try { b = localStorage.getItem("abysz_worker_url") || ""; } catch (_) { b = ""; } }
-            return String(b).replace(/\/+$/, "");
-        }
-
-        async function fetchPrFromApi({ epicName, platform, region }) {
-            const base = prApiBase();
-            if (!base) throw new Error("Serveur PR non configuré (renseigne PR_API_URL dans roster.html).");
-            if (!estAdmin || !auth.currentUser) throw new Error("Accès réservé à l'administrateur.");
-            const idToken = await auth.currentUser.getIdToken();
-            let r;
-            try {
-                r = await fetch(base + "/api/pr", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ idToken, epicName, platform, region })
-                });
-            } catch (_) { throw new Error("Serveur injoignable (vérifie l'adresse et ALLOWED_ORIGIN)."); }
-            const data = await r.json().catch(() => ({}));
-            if (!r.ok || !data.ok) throw new Error(data.error || ("Erreur " + r.status));
-            return data;   // { ok:true, points:Number }
-        }
-
-        // Ajoute (ou met à jour) le point du jour. Retourne null si le PR n'a pas changé.
-        function mergePrPoint(history, points) {
-            const list = Array.isArray(history) ? history.map((r) => ({ ...r })) : [];
-            const today = new Date().toISOString().slice(0, 10);
-            const last = list[list.length - 1];
-            if (last && Number(last.value) === points) return null;
-            if (last && last.date === today && last.label === PR_LABEL) last.value = points;
-            else list.push({ date: today, label: PR_LABEL, value: points });
-            list.sort((a, b) => new Date(a.date) - new Date(b.date));
-            return list;
-        }
-
-        function setupSyncAllButton() {
-            const btn = document.getElementById("sync-pr-btn");
-            if (!btn) return;
-            btn.addEventListener("click", async () => {
-                if (!estAdmin) return;
-                const targets = localPlayersList.filter((p) => p.epicName);
-                if (!targets.length) { alert("Aucun joueur n'a de pseudo Epic. Ouvre une fiche → Éditer → renseigne « Pseudo Epic Games »."); return; }
-                if (!prApiBase()) { alert("Serveur PR non configuré : renseigne PR_API_URL dans roster.html (ou l'adresse du serveur dans le dashboard)."); return; }
-
-                const original = btn.textContent;
-                btn.disabled = true;
-                let updated = 0, unchanged = 0;
-                const failed = [];
-                for (let i = 0; i < targets.length; i++) {
-                    const p = targets[i];
-                    btn.textContent = `⏳ ${i + 1}/${targets.length}…`;
-                    try {
-                        const r = await fetchPrFromApi({ epicName: p.epicName, platform: p.prPlatform || "pc", region: p.prRegion || "EU" });
-                        const next = mergePrPoint(p.prHistory, r.points);
-                        if (next === null) { await setDoc(doc(db, "roster", p.id), { prSyncedAt: serverTimestamp() }, { merge: true }); unchanged++; }
-                        else { await setDoc(doc(db, "roster", p.id), { prHistory: next, prSyncedAt: serverTimestamp() }, { merge: true }); updated++; }
-                    } catch (err) {
-                        failed.push(`${p.pseudo || p.epicName} : ${err.message}`);
-                    }
-                    if (i < targets.length - 1) await new Promise((res) => setTimeout(res, 1200));   // évite le rate-limit (429)
-                }
-                btn.disabled = false;
-                btn.textContent = original;
-                let msg = `PR synchronisés : ${updated} mis à jour, ${unchanged} inchangé(s).`;
-                if (failed.length) msg += `\n\nÉchecs (${failed.length}) :\n- ` + failed.join("\n- ");
-                alert(msg);
-            });
-        }
-
         function setupAddPlayerButton() {
             const addBtn = document.getElementById("add-player-btn");
             if (addBtn) {
@@ -661,7 +587,7 @@
                     if (!estAdmin) return;
                     openPlayerPopup({
                         pseudo: "", team: "main", role: "", earnings: "", image: "logo.png",
-                        prHistory: [], epicName: "", prPlatform: "pc", prRegion: "EU", twitter: "", twitch: "", youtube: "", tiktok: ""
+                        prHistory: [], twitter: "", twitch: "", youtube: "", tiktok: ""
                     }, true);
                 });
             }
@@ -693,10 +619,14 @@
                 }
             }
 
-            const syncedDate = (player.prSyncedAt && typeof player.prSyncedAt.toDate === "function") ? player.prSyncedAt.toDate() : null;
-            const syncedHtml = syncedDate
-                ? `<p style="text-align:center; color:#777; font-size:0.75rem; font-family:'Inter', sans-serif; margin:4px 0 0 0;">🔄 Dernière actualisation : ${esc(syncedDate.toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }))}</p>`
-                : (player.epicName ? `<p style="text-align:center; color:#777; font-size:0.75rem; font-family:'Inter', sans-serif; margin:4px 0 0 0;">🔄 En attente de la première actualisation</p>` : "");
+            let statsHtml = "";
+            const stItems = (player.stats && Array.isArray(player.stats.items)) ? player.stats.items.filter(i => i && i.label !== undefined && i.value !== undefined).slice(0, 24) : [];
+            if (!isNewPlayer && stItems.length) {
+                const stDate = Number(player.stats.updatedAt) ? new Date(Number(player.stats.updatedAt)).toLocaleDateString('fr-FR') : "";
+                statsHtml = `<div class="pr-history-section"><div class="pr-history-title">Statistiques Fortnite</div>
+                    <div class="stats-grid-roster">${stItems.map(i => `<div class="stat-box-roster"><b>${esc(i.value)}</b><span>${esc(i.label)}</span></div>`).join('')}</div>
+                    ${stDate ? `<div class="stats-updated">Mis à jour le ${esc(stDate)}</div>` : ''}</div>`;
+            }
 
             let socialHtml = "";
             if (!isNewPlayer && (player.twitter || player.twitch || player.youtube || player.tiktok)) {
@@ -717,13 +647,13 @@
                             <img src="${esc(avatar)}" class="popup-avatar-img" id="view-avatar-${playerId}" alt="">
                             <h3 class="popup-pseudo">${esc(player.pseudo || 'Nouveau Joueur')}</h3>
                             <div style="text-align:center; margin-bottom:5px;">${trendHtml}</div>
-                            ${localPrHistory.length ? `<p style="text-align:center; color:#b975ff; font-family:'Orbitron', sans-serif; font-weight:700; margin:8px 0 0 0;">PR actuel : ${(Number(localPrHistory[localPrHistory.length - 1].value) || 0).toLocaleString('fr-FR')}</p>` : ''}
-                            ${syncedHtml}
                             ${socialHtml}
                             <p style="text-align:center; color:#aaa; margin-top:5px; margin-bottom:10px; font-family:'Inter', sans-serif;">${esc(player.role || 'Rôle non défini')}</p>
                             <p style="text-align:center; color:#22c55e; font-weight:600; font-family:'Orbitron', sans-serif; margin-bottom:15px;">Earnings : ${esc(player.earnings || '0 €')}</p>
                             
                             <button class="form-btn edit-toggle-btn ${estAdmin ? '' : 'hidden'}" id="btn-to-edit-${playerId}">✏️ Éditer le profil / PR</button>
+
+                            ${statsHtml}
 
                             <div class="chart-container" id="chart-box-${playerId}">
                                 <canvas id="canvas-${playerId}"></canvas>
@@ -771,23 +701,6 @@
                                 <div class="input-group">
                                     <label>Earnings</label>
                                     <input type="text" id="input-earnings-${playerId}" value="${esc(player.earnings || '')}">
-                                </div>
-
-                                <div class="input-group" style="border-top:1px solid #222; padding-top:15px;">
-                                    <label style="color:#fff;">🎯 Suivi automatique du PR (Fortnite Tracker)</label>
-                                    <input type="text" id="input-epic-${playerId}" value="${esc(player.epicName || '')}" placeholder="Pseudo Epic Games (exact)" style="margin-bottom:8px;" maxlength="64">
-                                    <div class="pr-editor-inputs">
-                                        <select id="input-prplatform-${playerId}" style="width:50%;">
-                                            <option value="pc" ${(player.prPlatform || 'pc') === 'pc' ? 'selected' : ''}>PC</option>
-                                            <option value="console" ${player.prPlatform === 'console' ? 'selected' : ''}>Console</option>
-                                            <option value="mobile" ${player.prPlatform === 'mobile' ? 'selected' : ''}>Mobile</option>
-                                        </select>
-                                        <select id="input-prregion-${playerId}" style="width:50%;">
-                                            ${["EU","NAE","NAC","NAW","BR","ASIA","ME","OCE"].map(rg => `<option value="${rg}" ${(player.prRegion || 'EU') === rg ? 'selected' : ''}>${rg}</option>`).join("")}
-                                        </select>
-                                    </div>
-                                    <button type="button" class="form-btn" id="btn-fetch-pr-${playerId}" style="padding:6px; font-size:0.75rem; margin:0; background:#333; border:1px solid #a855f7;">🔄 Récupérer le PR maintenant</button>
-                                    <p class="field-hint" id="pr-fetch-msg-${playerId}">Une fois le pseudo enregistré, le PR est actualisé automatiquement par le serveur (environ toutes les 12 h). Ce bouton force une mise à jour immédiate : sauvegarde ensuite le profil.</p>
                                 </div>
 
                                 <div class="input-group">
@@ -922,26 +835,6 @@
                 renderEditPrList();
             });
 
-            document.getElementById(`btn-fetch-pr-${playerId}`).addEventListener("click", async (e) => {
-                const btn = e.currentTarget;
-                const msg = document.getElementById(`pr-fetch-msg-${playerId}`);
-                const epicName = document.getElementById(`input-epic-${playerId}`).value.trim();
-                const platform = document.getElementById(`input-prplatform-${playerId}`).value;
-                const region = document.getElementById(`input-prregion-${playerId}`).value;
-                if (!epicName) { msg.style.color = "#ef4444"; msg.textContent = "Renseigne d'abord le pseudo Epic."; return; }
-                btn.disabled = true; msg.style.color = "#aaa"; msg.textContent = "⏳ Interrogation de Fortnite Tracker…";
-                try {
-                    const r = await fetchPrFromApi({ epicName, platform, region });
-                    const next = mergePrPoint(localPrHistory, r.points);
-                    prFetchedNow = true;
-                    if (next === null) { msg.style.color = "#22c55e"; msg.textContent = `PR déjà à jour (${r.points.toLocaleString("fr-FR")}).`; }
-                    else { localPrHistory = next; renderEditPrList(); msg.style.color = "#22c55e"; msg.textContent = `PR récupéré : ${r.points.toLocaleString("fr-FR")}. Pense à sauvegarder le profil.`; }
-                } catch (err) {
-                    msg.style.color = "#ef4444"; msg.textContent = err.message;
-                } finally { btn.disabled = false; }
-            });
-
-            let prFetchedNow = false;
             let imageProcessing = null;   // promesse en cours (le submit l'attend)
             const fileInput = document.getElementById(`file-input-${playerId}`);
             fileInput.addEventListener("change", (e) => {
@@ -1004,9 +897,6 @@
                 const twitch = document.getElementById(`input-twitch-${playerId}`).value.trim();
                 const youtube = document.getElementById(`input-youtube-${playerId}`).value.trim();
                 const tiktok = document.getElementById(`input-tiktok-${playerId}`).value.trim();
-                const epicName = document.getElementById(`input-epic-${playerId}`).value.trim();
-                const prPlatform = document.getElementById(`input-prplatform-${playerId}`).value;
-                const prRegion = document.getElementById(`input-prregion-${playerId}`).value;
 
                 try {
                     if (String(imageBase64String).length > 900000) {
@@ -1019,8 +909,6 @@
                         pseudo, team, role, earnings,
                         image: imageBase64String,
                         prHistory: localPrHistory,
-                        epicName, prPlatform, prRegion,
-                        ...(prFetchedNow ? { prSyncedAt: serverTimestamp() } : {}),
                         twitter, twitch, youtube, tiktok
                     };
                     if (isNewPlayer) dataToSave.createdAt = serverTimestamp();

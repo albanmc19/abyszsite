@@ -605,6 +605,20 @@
                 <button type="button" class="btn-admin" id="worker-save">Enregistrer &amp; tester</button>
             </div>
             <p id="worker-msg" class="comms-msg"></p>
+
+            <div style="border-top:1px solid #222; margin-top:18px; padding-top:16px;">
+                <p class="muted" style="margin-top:0;"><strong style="color:#fff;">🎯 Clé Fortnite Tracker</strong> <span class="chip chip-on" id="trn-chip" style="margin-left:6px;">non configurée</span><br>
+                Sert à mettre à jour automatiquement le PR des joueurs sur la page Roster. Une fois enregistrée, la clé reste sur le serveur et n'est plus jamais affichée ici.</p>
+                <div class="search-row">
+                    <div class="input-group" style="margin-bottom:0;">
+                        <label for="trn-key">Clé API (TRN-Api-Key)</label>
+                        <input type="password" id="trn-key" placeholder="Colle ta clé ici" autocomplete="off" spellcheck="false">
+                    </div>
+                    <button type="button" class="btn-admin" id="trn-save">Enregistrer</button>
+                    <button type="button" class="btn-admin" id="trn-remove" style="display:none;">Supprimer</button>
+                </div>
+                <p id="trn-msg" class="comms-msg"></p>
+            </div>
         </div>
         </details>
 
@@ -1845,7 +1859,44 @@
                 const wh = new URL(v).hostname;
                 if (!wh.endsWith(".workers.dev") && wh !== "localhost" && !confirm("Ce domaine (" + wh + ") n'est pas en .workers.dev.\n\nTon jeton d'administrateur lui sera envoyé à chaque envoi. N'enregistre cette adresse que si tu en es le propriétaire. Continuer ?")) return;
                 try { localStorage.setItem(LS_URL, v); } catch (e) { /* ignore */ }
-                checkSender();
+                checkSender(); checkTrn();
+            });
+        }
+
+        /* ---------- Clé Fortnite Tracker (stockée côté serveur) ---------- */
+        function trnShow(d) {
+            const chip = $("trn-chip"), rm = $("trn-remove");
+            if (d && d.configured) {
+                chip.className = "chip chip-off";
+                chip.textContent = d.source === "secret" ? "✅ configurée (secret Cloudflare)" : "✅ configurée";
+                rm.style.display = d.source === "secret" ? "none" : "";
+            } else {
+                chip.className = "chip chip-on"; chip.textContent = "non configurée"; rm.style.display = "none";
+            }
+        }
+        async function checkTrn() {
+            const msg = $("trn-msg");
+            if (!workerUrl()) { trnShow(null); say(msg, "Configure d'abord l'adresse du serveur d'envoi ci-dessus.", "info"); return; }
+            try { trnShow(await callWorker("/api/pr-key", { action: "status" })); say(msg, "", ""); }
+            catch (e) { trnShow(null); say(msg, e.message, "err"); }
+        }
+        function wireTrn() {
+            $("trn-save").addEventListener("click", async () => {
+                const key = $("trn-key").value.trim(), msg = $("trn-msg"), btn = $("trn-save");
+                if (!key) { say(msg, "Colle d'abord ta clé.", "err"); return; }
+                btn.disabled = true; say(msg, "Enregistrement…", "info");
+                try {
+                    trnShow(await callWorker("/api/pr-key", { action: "set", key }));
+                    $("trn-key").value = "";
+                    say(msg, "Clé enregistrée. Le PR des joueurs s'actualisera automatiquement (au plus tard dans l'heure).", "ok");
+                } catch (e) { say(msg, e.message, "err"); }
+                finally { btn.disabled = false; }
+            });
+            $("trn-remove").addEventListener("click", async () => {
+                if (!confirm("Supprimer la clé Fortnite Tracker ? Le PR ne sera plus actualisé automatiquement.")) return;
+                const msg = $("trn-msg");
+                try { trnShow(await callWorker("/api/pr-key", { action: "delete" })); say(msg, "Clé supprimée.", "ok"); }
+                catch (e) { say(msg, e.message, "err"); }
             });
         }
 
@@ -2312,7 +2363,7 @@
             onSnapshot(collection(db, name), (snap) => onData(snap), (err) => onErr && onErr(err));
         }
         function init() {
-            wireSender(); wireDiscord(); wireSubs(); wireNewsletter(); wirePush(); checkSender();
+            wireSender(); wireTrn(); wireDiscord(); wireSubs(); wireNewsletter(); wirePush(); checkSender(); checkTrn();
 
             watch("subscribers", (snap) => {
                 subs = snap.docs.map((d) => { const x = d.data(); return { id: d.id, email: String(x.email || d.id).toLowerCase(), topics: Array.isArray(x.topics) ? x.topics.filter((t) => TOPICS.includes(t)) : [], lang: x.lang === "en" ? "en" : "fr", createdAt: tsMs(x.createdAt) }; })

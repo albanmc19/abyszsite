@@ -266,7 +266,7 @@
             <a href="#sec-subs">📬 Abonnés</a>
             <a href="#sec-newsletter">📧 Newsletter</a>
             <a href="#sec-push">🔔 Push</a>
-            <a href="#sec-pr">🎯 Clé API &amp; Stats</a>
+            <a href="#sec-stats">🎯 Clé API &amp; Stats</a>
         </div>
 
         <div class="section-title" id="sec-live">
@@ -613,59 +613,7 @@
         </div>
         </details>
 
-        <details class="dash-details" id="sec-pr">
-        <summary class="section-title"><span>🎯 Clé API &amp; Stats joueurs</span> <span class="chip chip-on" id="trn-chip">non configurée</span></summary>
-        <div class="admin-edit-box">
-            <p class="muted" style="margin-top:0;">Clé de l'API Fortnite Tracker, utilisée pour actualiser automatiquement le PR des joueurs sur la page Roster. Une fois enregistrée, elle reste sur le serveur et n'est plus jamais affichée ici. L'adresse du serveur se règle dans la section « ⚙️ Serveur d'envoi ».</p>
-            <div class="search-row">
-                <div class="input-group" style="margin-bottom:0;">
-                    <label for="trn-key">Clé API (TRN-Api-Key)</label>
-                    <input type="password" id="trn-key" placeholder="Colle ta clé ici" autocomplete="off" spellcheck="false">
-                </div>
-                <button type="button" class="btn-admin" id="trn-save">Enregistrer</button>
-                <button type="button" class="btn-admin" id="trn-remove" style="display:none;">Supprimer</button>
-            </div>
-            <p id="trn-msg" class="comms-msg"></p>
-
-            <div class="box-title" style="margin-top:28px;">Planning d'actualisation</div>
-            <p class="muted" style="margin-top:0;">Choisis les jours où les stats des joueurs sont récupérées automatiquement avec la clé. Le tableau se met à jour à l'ouverture du dashboard, une seule fois par jour coché.</p>
-            <div class="chk-row" id="stk-days">
-                <label class="chk-chip"><input type="checkbox" name="stk-day" value="1"><span>Lun</span></label>
-                <label class="chk-chip"><input type="checkbox" name="stk-day" value="2"><span>Mar</span></label>
-                <label class="chk-chip"><input type="checkbox" name="stk-day" value="3"><span>Mer</span></label>
-                <label class="chk-chip"><input type="checkbox" name="stk-day" value="4"><span>Jeu</span></label>
-                <label class="chk-chip"><input type="checkbox" name="stk-day" value="5"><span>Ven</span></label>
-                <label class="chk-chip"><input type="checkbox" name="stk-day" value="6"><span>Sam</span></label>
-                <label class="chk-chip"><input type="checkbox" name="stk-day" value="7"><span>Dim</span></label>
-            </div>
-            <div class="form-grid">
-                <div class="input-group"><label for="stk-platform">Plateforme des comptes</label>
-                    <select id="stk-platform"><option value="epic">Epic Games</option><option value="psn">PlayStation</option><option value="xbl">Xbox</option></select>
-                </div>
-                <div class="input-group"><label>Actualisation automatique</label>
-                    <label class="chk-chip"><input type="checkbox" id="stk-auto"><span>⏱️ Activée les jours cochés</span></label>
-                </div>
-            </div>
-            <div class="btn-row"><button type="button" class="btn-ghost" id="stk-save-cfg">💾 Enregistrer le planning</button></div>
-            <p id="stk-cfg-msg" class="comms-msg"></p>
-
-            <div class="box-title" style="margin-top:28px;">Stats des joueurs</div>
-            <p class="muted" style="margin-top:0;">1) Vérifie le pseudo de chaque joueur sur la plateforme. 2) Récupère les stats avec la clé. 3) Envoie-les au Roster, qui les affichera dans la fiche du joueur.</p>
-            <div class="btn-row" style="margin-bottom:12px;">
-                <button type="button" class="btn-ghost" id="stk-toggle-all">☑️ Tout cocher / décocher</button>
-                <button type="button" class="btn-admin" id="stk-fetch">🔍 Récupérer les stats</button>
-                <button type="button" class="btn-admin btn-send" id="stk-send" disabled>📤 Envoyer au Roster</button>
-            </div>
-            <p id="stk-msg" class="comms-msg"></p>
-            <div class="db-table-wrapper tbl-scroll">
-                <table class="db-table" style="min-width:680px;">
-                    <thead><tr><th></th><th>Joueur</th><th>Pseudo sur la plateforme</th><th>Stats envoyées</th><th>Résultat</th></tr></thead>
-                    <tbody id="stk-rows"><tr><td colspan="5" style="text-align:center;color:#666;font-style:italic;padding:24px;">Chargement…</td></tr></tbody>
-                </table>
-            </div>
-            <p class="muted" id="stk-last" style="margin-top:10px;"></p>
-        </div>
-        </details>
+        
 
         <details class="dash-details" id="sec-discord">
         <summary class="section-title"><span>💬 Webhook Discord</span> <span class="chip chip-on" id="discord-chip">non configuré</span></summary>
@@ -825,6 +773,61 @@
                     </table>
                 </div>
             </div>
+        </div>
+        </details>
+
+        <!-- ============ CLÉ API & STATS JOUEURS (tout en bas) ============ -->
+        <details class="dash-details" id="sec-stats" open>
+        <summary class="section-title"><span>🎯 Clé API &amp; Stats joueurs</span> <span class="chip chip-on" id="trn-chip">non configurée</span></summary>
+        <div class="admin-edit-box">
+            <p class="muted" style="margin-top:0;">Clé de l'API Fortnite Tracker, utilisée pour actualiser automatiquement le PR des joueurs sur la page Roster. Une fois enregistrée, elle reste sur le serveur et n'est plus jamais affichée ici. L'adresse du serveur se règle dans la section « ⚙️ Serveur d'envoi ».</p>
+            <div class="search-row">
+                <div class="input-group" style="margin-bottom:0;">
+                    <label for="trn-key">Clé API (TRN-Api-Key)</label>
+                    <input type="password" id="trn-key" placeholder="Colle ta clé ici" autocomplete="off" spellcheck="false">
+                </div>
+                <button type="button" class="btn-admin" id="trn-save">Enregistrer</button>
+                <button type="button" class="btn-admin" id="trn-remove" style="display:none;">Supprimer</button>
+            </div>
+            <p id="trn-msg" class="comms-msg"></p>
+
+            <div class="box-title" style="margin-top:28px;">Planning d'actualisation</div>
+            <p class="muted" style="margin-top:0;">Choisis les jours où les stats des joueurs sont récupérées automatiquement avec la clé. Le tableau se met à jour à l'ouverture du dashboard, une seule fois par jour coché.</p>
+            <div class="chk-row" id="stk-days">
+                <label class="chk-chip"><input type="checkbox" name="stk-day" value="1"><span>Lun</span></label>
+                <label class="chk-chip"><input type="checkbox" name="stk-day" value="2"><span>Mar</span></label>
+                <label class="chk-chip"><input type="checkbox" name="stk-day" value="3"><span>Mer</span></label>
+                <label class="chk-chip"><input type="checkbox" name="stk-day" value="4"><span>Jeu</span></label>
+                <label class="chk-chip"><input type="checkbox" name="stk-day" value="5"><span>Ven</span></label>
+                <label class="chk-chip"><input type="checkbox" name="stk-day" value="6"><span>Sam</span></label>
+                <label class="chk-chip"><input type="checkbox" name="stk-day" value="7"><span>Dim</span></label>
+            </div>
+            <div class="form-grid">
+                <div class="input-group"><label for="stk-platform">Plateforme des comptes</label>
+                    <select id="stk-platform"><option value="epic">Epic Games</option><option value="psn">PlayStation</option><option value="xbl">Xbox</option></select>
+                </div>
+                <div class="input-group"><label>Actualisation automatique</label>
+                    <label class="chk-chip"><input type="checkbox" id="stk-auto"><span>⏱️ Activée les jours cochés</span></label>
+                </div>
+            </div>
+            <div class="btn-row"><button type="button" class="btn-ghost" id="stk-save-cfg">💾 Enregistrer le planning</button></div>
+            <p id="stk-cfg-msg" class="comms-msg"></p>
+
+            <div class="box-title" style="margin-top:28px;">Stats des joueurs</div>
+            <p class="muted" style="margin-top:0;">1) Vérifie le pseudo de chaque joueur sur la plateforme. 2) Récupère les stats avec la clé. 3) Envoie-les au Roster, qui les affichera dans la fiche du joueur.</p>
+            <div class="btn-row" style="margin-bottom:12px;">
+                <button type="button" class="btn-ghost" id="stk-toggle-all">☑️ Tout cocher / décocher</button>
+                <button type="button" class="btn-admin" id="stk-fetch">🔍 Récupérer les stats</button>
+                <button type="button" class="btn-admin btn-send" id="stk-send" disabled>📤 Envoyer au Roster</button>
+            </div>
+            <p id="stk-msg" class="comms-msg"></p>
+            <div class="db-table-wrapper tbl-scroll">
+                <table class="db-table" style="min-width:680px;">
+                    <thead><tr><th></th><th>Joueur</th><th>Pseudo sur la plateforme</th><th>Stats envoyées</th><th>Résultat</th></tr></thead>
+                    <tbody id="stk-rows"><tr><td colspan="5" style="text-align:center;color:#666;font-style:italic;padding:24px;">Chargement…</td></tr></tbody>
+                </table>
+            </div>
+            <p class="muted" id="stk-last" style="margin-top:10px;"></p>
         </div>
         </details>
     </main>

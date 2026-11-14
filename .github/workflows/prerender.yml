@@ -26,6 +26,8 @@ jobs:
       TZ: Europe/Paris
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 20
 
       - uses: actions/setup-node@v4
         with:
@@ -55,7 +57,16 @@ jobs:
             const logFile = process.env.RUNNER_TEMP + "/prerender.log";
             const log = fs.existsSync(logFile) ? fs.readFileSync(logFile, "utf8") : "";
             const m = log.match(/OK : (\d+) annonce\(s\), (\d+) partenaire\(s\)/);
+            let changes = [];
+            try {
+              const out = require("child_process").execFileSync("git", ["log", "-15", "--name-only", "--pretty=format:@@%h|%cI|%an|%s"], { encoding: "utf8" });
+              changes = out.split("@@").filter(Boolean).map((blk) => {
+                const l = blk.trim().split("\n"), [sha, date, author, ...msg] = l[0].split("|");
+                return { sha, date, author, msg: msg.join("|").slice(0, 120), files: l.slice(1).filter(Boolean).slice(0, 10) };
+              });
+            } catch (e) {}
             fs.writeFileSync("_site/build.json", JSON.stringify({
+              changes,
               builtAt: new Date().toISOString(),
               commit: process.env.COMMIT_SHA.slice(0, 7),
               trigger: process.env.TRIGGER,

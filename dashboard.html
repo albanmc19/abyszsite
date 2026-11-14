@@ -6,7 +6,7 @@
     <meta name="description" content="Dashboard de gestion ABYSZ Esports">
     <meta name="robots" content="noindex, nofollow">
     <meta name="referrer" content="no-referrer">
-    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'; form-action 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdnjs.cloudflare.com">
+    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'; form-action 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdnjs.cloudflare.com https://apis.google.com">
     <script>
         /* Anti-clickjacking (frame-ancestors est ignoré en <meta> : à doubler par un en-tête HTTP) */
         if (window.top !== window.self) { document.documentElement.style.display = "none"; try { window.top.location = window.self.location; } catch (e) { /* ignore */ } }
@@ -155,6 +155,17 @@
             .btn-admin { width: 100%; }
             .graph-header { flex-direction: column; align-items: flex-start; }
         }
+        /* ---- Pastille de santé du déploiement ---- */
+        .deploy-status { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: center; margin: 0 auto 18px; padding: 9px 16px; max-width: 760px; border: 1px solid #222; border-radius: 12px; background: #0b0b0b; font-family: 'Inter', sans-serif; font-size: 0.78rem; color: #bbb; }
+        .deploy-status .ds-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; background: #8f8f8f; }
+        .deploy-status.ok { border-color: rgba(34,197,94,.45); }
+        .deploy-status.ok .ds-dot { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+        .deploy-status.warn { border-color: rgba(234,179,8,.5); }
+        .deploy-status.warn .ds-dot { background: #eab308; box-shadow: 0 0 8px #eab308; }
+        .deploy-status.bad { border-color: rgba(255,68,68,.55); }
+        .deploy-status.bad .ds-dot { background: #ff4444; box-shadow: 0 0 8px #ff4444; }
+        .deploy-status b { color: #fff; font-weight: 600; }
+        .deploy-status .ds-muted { color: #8f8f8f; }
     </style>
     <style>
         /* ===== Communication : newsletter & push ===== */
@@ -267,6 +278,10 @@
             <a href="#sec-newsletter">📧 Newsletter</a>
             <a href="#sec-push">🔔 Push</a>
             <a href="#sec-stats">🎯 Clé API &amp; Stats</a>
+        </div>
+
+        <div class="deploy-status" id="deploy-status" role="status" aria-live="polite">
+            <span><span class="ds-dot"></span>Déploiement : <b id="ds-when">vérification…</b></span>
         </div>
 
         <div class="section-title" id="sec-live">
@@ -2580,6 +2595,57 @@
 
         let started = false;
         onAuthStateChanged(auth, (user) => { if (started || !isAdminUser(user)) return; started = true; init(); });
+    </script>
+    <script>
+        /* Pastille de santé du déploiement : lit build.json écrit par le workflow GitHub à chaque publication */
+        (function () {
+            var box = document.getElementById("deploy-status");
+            if (!box) return;
+            var info = null, failed = false;
+            var TRIGGERS = { push: "modification du code", schedule: "mise à jour automatique", workflow_dispatch: "lancement manuel" };
+            function esc(v) { return String(v == null ? "" : v).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+            function ago(ms) {
+                var m = Math.max(0, Math.round(ms / 60000));
+                if (m < 1) return "à l'instant";
+                if (m < 60) return "il y a " + m + " min";
+                var h = Math.floor(m / 60);
+                if (h < 24) return "il y a " + h + " h " + (m % 60 ? (m % 60) + " min" : "");
+                var d = Math.floor(h / 24);
+                return "il y a " + d + " jour" + (d > 1 ? "s" : "");
+            }
+            function render() {
+                if (failed || !info) {
+                    box.className = "deploy-status";
+                    box.innerHTML = '<span><span class="ds-dot"></span>Déploiement : <b>information indisponible</b></span>' +
+                        '<span class="ds-muted">' + (failed ? "build.json introuvable : il apparaît après le prochain déploiement du workflow mis à jour." : "vérification…") + "</span>";
+                    return;
+                }
+                var t = Date.parse(info.builtAt);
+                if (isNaN(t)) { failed = true; render(); return; }
+                var age = Date.now() - t;
+                // le workflow tourne toutes les 30 min : au-delà de 45 min, il y a un retard ; au-delà de 2 h, c'est anormal
+                var level = age <= 45 * 60000 ? "ok" : (age <= 120 * 60000 ? "warn" : "bad");
+                if (info.prerender === "error" && level === "ok") level = "warn";
+                var date = new Date(t).toLocaleString("fr-FR", { timeZone: "Europe/Paris", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+                var pre = info.prerender === "ok"
+                    ? "Prérendu : <b>OK</b>" + (info.announcements != null ? ' <span class="ds-muted">(' + esc(info.announcements) + " annonce(s), " + esc(info.partners) + " partenaire(s))</span>" : "")
+                    : "Prérendu : <b>ÉCHEC</b> <span class=\"ds-muted\">(Firebase illisible : le site est publié sans le contenu à jour pour Google)</span>";
+                var how = TRIGGERS[info.trigger] || info.trigger || "";
+                box.className = "deploy-status " + level;
+                box.innerHTML = '<span><span class="ds-dot"></span>Dernier déploiement : <b>' + ago(age) + '</b> <span class="ds-muted">(' + esc(date) + ")</span></span>" +
+                    "<span>" + pre + "</span>" +
+                    '<span class="ds-muted">' + esc(how) + (info.commit ? " · commit " + esc(info.commit) : "") + "</span>";
+            }
+            function load() {
+                fetch("build.json?_=" + Date.now(), { cache: "no-store" })
+                    .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+                    .then(function (j) { info = j; failed = false; render(); })
+                    .catch(function () { failed = true; render(); });
+            }
+            load();
+            setInterval(load, 5 * 60000);   // relit le fichier toutes les 5 min
+            setInterval(render, 30000);     // met à jour le « il y a X min »
+        })();
     </script>
 </body>
 </html>

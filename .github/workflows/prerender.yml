@@ -33,13 +33,37 @@ jobs:
 
       # Si Firebase est injoignable, on déploie quand même ton code
       - name: Prérendu Firebase
+        id: prerender
         continue-on-error: true
-        run: node prerender.mjs index.html
+        shell: bash
+        run: node prerender.mjs index.html 2>&1 | tee "$RUNNER_TEMP/prerender.log"
 
       - name: Préparer le site
         run: |
           mkdir _site
           rsync -a --exclude='.git' --exclude='.github' --exclude='functions' --exclude='_site' ./ _site/
+
+      # Fichier lu par la pastille « Déploiement » du dashboard
+      - name: Écrire build.json
+        env:
+          PRERENDER_OUTCOME: ${{ steps.prerender.outcome }}
+          COMMIT_SHA: ${{ github.sha }}
+          TRIGGER: ${{ github.event_name }}
+        run: |
+          node -e '
+            const fs = require("fs");
+            const logFile = process.env.RUNNER_TEMP + "/prerender.log";
+            const log = fs.existsSync(logFile) ? fs.readFileSync(logFile, "utf8") : "";
+            const m = log.match(/OK : (\d+) annonce\(s\), (\d+) partenaire\(s\)/);
+            fs.writeFileSync("_site/build.json", JSON.stringify({
+              builtAt: new Date().toISOString(),
+              commit: process.env.COMMIT_SHA.slice(0, 7),
+              trigger: process.env.TRIGGER,
+              prerender: process.env.PRERENDER_OUTCOME === "success" ? "ok" : "error",
+              announcements: m ? Number(m[1]) : null,
+              partners: m ? Number(m[2]) : null
+            }));
+          '
 
       - uses: actions/upload-pages-artifact@v3
         with:

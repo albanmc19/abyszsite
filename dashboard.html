@@ -166,6 +166,11 @@
         .deploy-status.bad .ds-dot { background: #ff4444; box-shadow: 0 0 8px #ff4444; }
         .deploy-status b { color: #fff; font-weight: 600; }
         .deploy-status .ds-muted { color: #8f8f8f; }
+        .sec-filters { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; font-family: 'Inter', sans-serif; font-size: 0.8rem; color: #bbb; }
+        .sev { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 0.7rem; font-weight: 700; }
+        .sev.high { background: rgba(255,68,68,.18); color: #ff6b6b; } .sev.medium { background: rgba(234,179,8,.18); color: #eab308; } .sev.info { background: rgba(143,143,143,.18); color: #aaa; }
+        #sec-rows td { font-size: 0.78rem; padding: 9px 12px; border-bottom: 1px solid #1c1c1c; color: #ccc; vertical-align: top; }
+        .chg { padding: 6px 0; border-bottom: 1px solid #1c1c1c; color: #bbb; } .chg b { color: #fff; } .chg small { color: #8f8f8f; display: block; word-break: break-all; }
     </style>
     <style>
         /* ===== Communication : newsletter & push ===== */
@@ -278,6 +283,7 @@
             <a href="#sec-newsletter">📧 Newsletter</a>
             <a href="#sec-push">🔔 Push</a>
             <a href="#sec-stats">🎯 Clé API &amp; Stats</a>
+            <a href="#sec-security">🛡️ Sécurité</a>
         </div>
 
         <div class="deploy-status" id="deploy-status" role="status" aria-live="polite">
@@ -843,6 +849,20 @@
                 </table>
             </div>
             <p class="muted" id="stk-last" style="margin-top:10px;"></p>
+        </div>
+        </details>
+        <details class="dash-details" id="sec-security" open>
+        <summary class="section-title"><span>🛡️ Sécurité du site</span> <span class="last-update" id="sec-summary">chargement…</span></summary>
+        <div class="admin-edit-box" style="border-color:#a855f7;">
+            <div class="sec-filters">
+                <label>Sévérité <select id="sec-sev" class="page-selector"><option value="">Toutes</option><option value="high">Haute</option><option value="medium">Moyenne</option><option value="info">Info</option></select></label>
+                <span class="last-update" id="sec-count"></span>
+            </div>
+            <div class="db-table-wrapper" style="max-height:420px;overflow-y:auto;margin-top:12px;">
+                <table class="db-table" style="min-width:680px;"><thead><tr><th>Date</th><th>Niveau</th><th>Événement</th><th>Page</th><th>Détail</th><th>Visiteur</th></tr></thead><tbody id="sec-rows"><tr><td colspan="6" style="text-align:center;color:#666;padding:20px;">Chargement…</td></tr></tbody></table>
+            </div>
+            <h3 style="margin:22px 0 8px;color:#a855f7;font-size:0.95rem;">📝 Dernières modifications du site</h3>
+            <div id="sec-changes" class="last-update">Disponible après le prochain déploiement.</div>
         </div>
         </details>
     </main>
@@ -1456,7 +1476,7 @@
             deniedError.classList.add('hidden');
             btn.disabled = true;
             try { await signInWithEmailAndPassword(auth, document.getElementById('denied-email').value, pw.value); }
-            catch (err) { deniedError.textContent = "Échec de connexion : identifiants invalides."; deniedError.classList.remove('hidden'); }
+            catch (err) { window.dispatchEvent(new CustomEvent("abysz:security", { detail: { type: "login_failed", detail: "échec de connexion au dashboard (" + ((err && err.code) || "erreur") + ")", severity: "medium" } })); deniedError.textContent = "Échec de connexion : identifiants invalides."; deniedError.classList.remove('hidden'); }
             finally { btn.disabled = false; pw.value = ''; }
         });
         if (deniedLogout) deniedLogout.addEventListener('click', () => signOut(auth));
@@ -1488,6 +1508,7 @@
                 if (dashboardStarted) { location.reload(); return; }
                 if(accessDeniedSec) accessDeniedSec.classList.remove('hidden');
                 if(dashboardContentSec) dashboardContentSec.classList.add('hidden');
+                window.dispatchEvent(new CustomEvent("abysz:security", { detail: { type: "admin_page_visit", detail: user ? "compte connecté non administrateur sur le dashboard" : "visiteur non connecté sur le dashboard", severity: user ? "medium" : "info" } }));
                 if (deniedInfo) deniedInfo.textContent = user
                     ? "Connecté avec " + (user.email || "un compte sans e-mail") + " : ce compte n'est pas administrateur."
                     : "Vous n'êtes pas connecté.";
@@ -2646,6 +2667,46 @@
             setInterval(load, 5 * 60000);   // relit le fichier toutes les 5 min
             setInterval(render, 30000);     // met à jour le « il y a X min »
         })();
+    </script>
+    <script type="module" src="security-logger.js"></script>
+    <script type="module">
+        import { getApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        const app = getApp(), auth = getAuth(app), db = getFirestore(app);
+        const ADMIN_EMAIL = "abyszofficial@gmail.com";
+        const $ = (id) => document.getElementById(id);
+        const esc = (v) => String(v == null ? "" : v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+        const LABEL = { csp_violation: "Script bloqué", firebase_denied: "Accès Firebase refusé", script_injected: "Injection détectée", devtools_open: "Console ouverte", login_failed: "Connexion échouée", admin_page_visit: "Dashboard sans droits" };
+        const SEV = { high: "Haute", medium: "Moyenne", info: "Info" };
+        const fmt = (d) => d.toLocaleString("fr-FR", { timeZone: "Europe/Paris", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit" });
+        let logs = [];
+        function render() {
+            const f = $("sec-sev").value, rows = logs.filter((l) => !f || l.severity === f);
+            $("sec-count").textContent = rows.length + " événement(s) affiché(s) sur les 200 derniers";
+            $("sec-rows").innerHTML = rows.length ? rows.map((l) => "<tr><td>" + esc(l.ts ? fmt(l.ts) : "…") + '</td><td><span class="sev ' + esc(l.severity) + '">' + esc(SEV[l.severity] || l.severity) + "</span></td><td>" + esc(LABEL[l.type] || l.type) + "</td><td>" + esc(l.page) + "</td><td>" + esc(l.detail) + "</td><td>" + esc(l.visitor) + "</td></tr>").join("")
+                : '<tr><td colspan="6" style="text-align:center;color:#22c55e;padding:20px;">Aucun événement : tout est calme ✅</td></tr>';
+            const day = Date.now() - 864e5, h = logs.filter((l) => l.ts && l.ts.getTime() > day);
+            const high = h.filter((l) => l.severity === "high").length, med = h.filter((l) => l.severity === "medium").length;
+            const el = $("sec-summary"); el.textContent = "24 h : " + high + " haute(s), " + med + " moyenne(s)"; el.style.color = high ? "#ff6b6b" : (med ? "#eab308" : "#22c55e");
+        }
+        function loadChanges() {
+            fetch("build.json?_=" + Date.now(), { cache: "no-store" }).then((r) => r.json()).then((j) => {
+                if (!Array.isArray(j.changes) || !j.changes.length) return;
+                $("sec-changes").innerHTML = j.changes.map((c) => '<div class="chg"><b>' + esc(c.msg) + "</b> · " + esc(c.author) + " · " + esc(fmt(new Date(c.date))) + " · " + esc(c.sha) + "<small>" + esc((c.files || []).join(", ")) + "</small></div>").join("");
+            }).catch(() => {});
+        }
+        let started = false;
+        onAuthStateChanged(auth, (user) => {
+            if (started || !user || !user.email || user.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
+            started = true;
+            $("sec-sev").addEventListener("change", render);
+            onSnapshot(query(collection(db, "security_logs"), orderBy("ts", "desc"), limit(200)), (snap) => {
+                logs = snap.docs.map((d) => { const x = d.data(); return { ...x, ts: x.ts && x.ts.toDate ? x.ts.toDate() : null }; });
+                render();
+            }, () => { $("sec-rows").innerHTML = '<tr><td colspan="6" style="color:#ff6b6b;padding:20px;">Lecture refusée : ajoute les règles Firestore pour « security_logs ».</td></tr>'; $("sec-summary").textContent = "règles manquantes"; });
+            loadChanges(); setInterval(loadChanges, 5 * 60000);
+        });
     </script>
 </body>
 </html>

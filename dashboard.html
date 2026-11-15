@@ -250,6 +250,7 @@
             <li><a href="boutique.html">Boutique</a></li>
             <li><a href="espace-joueur.html" style="color: #a855f7; font-weight: bold;">👤 Espace Joueur</a></li>
             <li id="nav-dashboard" class="nav-dashboard-link hidden"><a href="dashboard.html">📊 Dashboard</a></li>
+            <li id="nav-database" class="nav-dashboard-link hidden"><a href="base-de-donnees.html">🗄️ Base de données</a></li>
         </ul>
     </nav>
 
@@ -284,6 +285,7 @@
             <a href="#sec-push">🔔 Push</a>
             <a href="#sec-stats">🎯 Clé API &amp; Stats</a>
             <a href="#sec-security">🛡️ Sécurité</a>
+            <a href="base-de-donnees.html">🗄️ Base de données</a>
         </div>
 
         <div class="deploy-status" id="deploy-status" role="status" aria-live="polite">
@@ -1488,6 +1490,8 @@
                 if(dashboardContentSec) dashboardContentSec.classList.remove('hidden');
                 const navDash = document.getElementById('nav-dashboard');
                 if (navDash) navDash.classList.remove('hidden');
+                const navDb = document.getElementById('nav-database');
+                if (navDb) navDb.classList.remove('hidden');
                 
                 if (dashboardStarted) return;
                 dashboardStarted = true;

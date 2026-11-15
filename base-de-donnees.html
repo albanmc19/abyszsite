@@ -94,6 +94,14 @@ if (window.top !== window.self) { document.documentElement.style.display = "none
   </ul>
 </nav>
 
+<div id="boot-msg" style="padding:160px 20px 0; text-align:center; color:#aaa; font-family:'Inter',sans-serif;">Chargement…</div>
+<script>
+setTimeout(function () {
+  var b = document.getElementById("boot-msg");
+  if (b && !window.__dbReady) { b.style.color = "#ff6b6b"; b.textContent = "La page n'a pas pu se charger (erreur de script ou connexion). Ouvre la console du navigateur (F12) pour voir le détail."; }
+}, 6000);
+</script>
+
 <!-- Zone affichée à tout le monde sauf à l'administrateur connecté -->
 <div id="access-denied" class="restricted-zone hidden">
   <h2>🔒 ACCÈS RESTREINT</h2>
@@ -171,7 +179,7 @@ if (window.top !== window.self) { document.documentElement.style.display = "none
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, query, orderBy, onSnapshot, addDoc, deleteDoc, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getStorage, ref as sRef, uploadBytesResumable, getDownloadURL, deleteObject, setMaxUploadRetryTime, setMaxOperationRetryTime } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import { getStorage, ref as sRef, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -188,8 +196,8 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 // Sans cela, un problème de configuration reste « bloqué à 0 % » jusqu'à 10 minutes au lieu d'afficher une erreur.
-setMaxUploadRetryTime(storage, 20000);
-setMaxOperationRetryTime(storage, 20000);
+storage.maxUploadRetryTime = 20000;
+storage.maxOperationRetryTime = 20000;
 
 const ADMIN_EMAIL = "abyszofficial@gmail.com";
 const COLLECTION = "database_files";
@@ -236,6 +244,8 @@ function showDenied(info, canLogout) {
 }
 
 onAuthStateChanged(auth, (user) => {
+  window.__dbReady = true;
+  const boot = document.getElementById("boot-msg"); if (boot) boot.remove();
   stopListening();
   if (!user) { showDenied("", false); return; }
   if (!user.email || user.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {

@@ -171,7 +171,7 @@ if (window.top !== window.self) { document.documentElement.style.display = "none
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, query, orderBy, onSnapshot, addDoc, deleteDoc, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getStorage, ref as sRef, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import { getStorage, ref as sRef, uploadBytesResumable, getDownloadURL, deleteObject, setMaxUploadRetryTime, setMaxOperationRetryTime } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -187,6 +187,9 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
+// Sans cela, un problème de configuration reste « bloqué à 0 % » jusqu'à 10 minutes au lieu d'afficher une erreur.
+setMaxUploadRetryTime(storage, 20000);
+setMaxOperationRetryTime(storage, 20000);
 
 const ADMIN_EMAIL = "abyszofficial@gmail.com";
 const COLLECTION = "database_files";
@@ -415,7 +418,19 @@ function uploadOne(file, folder) {
 
   task.on("state_changed",
     (s) => { const p = Math.round((s.bytesTransferred / s.totalBytes) * 100); fill.style.width = p + "%"; st.textContent = p + " %"; },
-    () => fail("Échec de l'envoi"),
+    (err) => {
+      console.error("Envoi Storage :", err);
+      const code = (err && err.code) || "inconnu";
+      const hints = {
+        "storage/unauthorized": "refusé par les règles Storage (règles non publiées ou compte non admin)",
+        "storage/unauthenticated": "non connecté",
+        "storage/retry-limit-exceeded": "Storage injoignable : service non activé, mauvais bucket ou réseau",
+        "storage/bucket-not-found": "bucket introuvable : Storage n'est pas activé sur le projet",
+        "storage/project-not-found": "projet introuvable",
+        "storage/quota-exceeded": "quota dépassé"
+      };
+      fail("Échec : " + (hints[code] || code));
+    },
     async () => {
       try {
         await addDoc(collection(db, COLLECTION), {

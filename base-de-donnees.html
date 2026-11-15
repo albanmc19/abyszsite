@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Base de données ABYSZ Esports (accès administrateur)">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'; form-action 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com">
+<script>
+/* Anti-clickjacking (frame-ancestors est ignoré en <meta> : à doubler par un en-tête HTTP) */
+if (window.top !== window.self) { document.documentElement.style.display = "none"; try { window.top.location = window.self.location; } catch (e) { /* ignore */ } }
+</script>
+<title>ABYSZ | Base de données</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+.logo-link { display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; }
+.hidden { display: none !important; }
+.restricted-zone { text-align: center; padding: 60px 20px; background: #0a0a0a; border: 2px dashed #ff4444; border-radius: 16px; max-width: 600px; margin: 100px auto; }
+.restricted-zone h2 { font-family: 'Orbitron', sans-serif; color: #ff4444; margin-bottom: 15px; }
+.wrapper { max-width: 1200px; margin: 0 auto 80px auto; padding: 0 20px; }
+.main-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: 2.2rem; font-weight: 700; margin-bottom: 10px; text-shadow: 0 0 10px rgba(168,85,247,.3); text-align: center; }
+.sub-title { text-align: center; color: #8f8f8f; font-family: 'Inter', sans-serif; font-size: .9rem; margin-bottom: 36px; }
+.section-title { font-family: 'Orbitron', sans-serif; color: #a855f7; font-size: .9rem; letter-spacing: 2px; text-transform: uppercase; margin: 40px 0 20px; border-bottom: 1px solid #2a2a2a; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 10px; }
+.stat-card { background: #0b0b0b; border: 1px solid #1a1a1a; border-radius: 12px; padding: 22px 15px; text-align: center; }
+.stat-card .num { font-family: 'Orbitron', sans-serif; font-size: 2rem; font-weight: 700; color: #a855f7; margin-bottom: 8px; }
+.stat-card .label { color: #9a9a9a; font-size: .75rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+.box { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; padding: 26px; }
+.input-group { display: flex; flex-direction: column; gap: 6px; flex: 1; text-align: left; margin-bottom: 15px; }
+.input-group label { color: #888; font-family: 'Orbitron', sans-serif; font-size: .75rem; letter-spacing: .5px; }
+.input-group input, .input-group select { background: #050505; border: 1px solid #222; border-radius: 8px; padding: 12px; color: #fff; font-family: 'Inter', sans-serif; font-size: .9rem; width: 100%; box-sizing: border-box; }
+.input-group input:focus, .input-group select:focus { border-color: #a855f7; outline: none; }
+.btn-admin { background: #a855f7; color: #fff; font-family: 'Orbitron', sans-serif; font-weight: bold; font-size: .85rem; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; transition: all .2s; text-transform: uppercase; letter-spacing: .5px; }
+.btn-admin:hover:not(:disabled) { background: #b975ff; box-shadow: 0 0 15px rgba(168,85,247,.3); }
+.btn-ghost { background: #050505; color: #ddd; border: 1px solid #2a2a2a; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: .78rem; padding: 11px 18px; border-radius: 8px; cursor: pointer; transition: all .2s; }
+.btn-ghost:hover:not(:disabled) { border-color: #a855f7; color: #fff; background: rgba(168,85,247,.1); }
+.btn-admin:disabled, .btn-ghost:disabled { opacity: .45; cursor: not-allowed; }
+.mini-btn { background: #050505; color: #ddd; border: 1px solid #2a2a2a; padding: 6px 11px; border-radius: 6px; cursor: pointer; font-size: .75rem; font-family: 'Inter', sans-serif; font-weight: 600; margin-left: 4px; }
+.mini-btn:hover { border-color: #a855f7; color: #fff; }
+.mini-btn.del:hover { border-color: #ff4444; color: #ff6b6b; }
+.error-message { color: #ff4444; font-size: .85rem; margin-top: 10px; font-family: 'Inter', sans-serif; }
+.msg { margin-top: 10px; font-size: .85rem; font-family: 'Inter', sans-serif; min-height: 1.2em; }
+.msg.ok { color: #22c55e; } .msg.err { color: #ff6b6b; } .msg.info { color: #aaa; }
+.muted { color: #8f8f8f; font-size: .85rem; line-height: 1.5; font-family: 'Inter', sans-serif; }
+
+/* Zone de dépôt */
+.dropzone { border: 2px dashed #3a2a55; border-radius: 14px; background: #0a0a0a; padding: 34px 20px; text-align: center; cursor: pointer; transition: border-color .2s, background .2s; }
+.dropzone:hover, .dropzone.drag { border-color: #a855f7; background: rgba(168,85,247,.07); }
+.dropzone:focus-visible { outline: 2px solid #a855f7; outline-offset: 3px; }
+.dropzone .dz-main { font-family: 'Orbitron', sans-serif; color: #fff; font-size: 1rem; margin-bottom: 8px; }
+.upload-opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 18px; }
+.queue { margin-top: 18px; display: grid; gap: 10px; }
+.q-item { background: #0a0a0a; border: 1px solid #1f1f1f; border-radius: 10px; padding: 12px 14px; font-family: 'Inter', sans-serif; font-size: .82rem; color: #ccc; }
+.q-top { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.q-name { color: #fff; font-weight: 600; word-break: break-all; }
+.q-status.ok { color: #22c55e; } .q-status.err { color: #ff6b6b; }
+.bar-track { height: 8px; background: #151515; border-radius: 6px; overflow: hidden; }
+.bar-fill { height: 100%; width: 0; border-radius: 6px; background: linear-gradient(90deg, #a855f7, #22c55e); transition: width .2s ease; }
+
+/* Liste */
+.toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+.toolbar input[type="search"], .toolbar select { background: #050505; border: 1px solid #222; border-radius: 8px; padding: 10px 14px; color: #fff; font-family: 'Inter', sans-serif; font-size: .88rem; }
+.toolbar input[type="search"] { flex: 1; min-width: 220px; max-width: 380px; }
+.toolbar input:focus, .toolbar select:focus { border-color: #a855f7; outline: none; }
+.db-table-wrapper { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; overflow: auto; max-height: 560px; -webkit-overflow-scrolling: touch; }
+.db-table { width: 100%; min-width: 700px; border-collapse: collapse; font-family: 'Inter', sans-serif; text-align: left; }
+.db-table th { background: #0a0a0a; color: #a855f7; font-family: 'Orbitron', sans-serif; font-size: .75rem; padding: 14px 16px; letter-spacing: 1px; border-bottom: 2px solid #2a2a2a; white-space: nowrap; text-transform: uppercase; position: sticky; top: 0; z-index: 1; }
+.db-table td { padding: 12px 16px; color: #ccc; border-bottom: 1px solid #1a1a1a; vertical-align: middle; font-size: .88rem; }
+.db-table tbody tr:hover td { background: rgba(168,85,247,.07); }
+.db-table td:first-child { color: #fff; font-weight: 600; word-break: break-word; }
+.db-table td.nowrap, .db-table th:last-child, .db-table td:last-child { white-space: nowrap; }
+.db-table td:last-child, .db-table th:last-child { text-align: right; }
+.folder-tag { display: inline-block; font-size: .7rem; padding: 2px 9px; border-radius: 999px; background: rgba(168,85,247,.12); border: 1px solid rgba(168,85,247,.35); color: #c9a0ff; font-family: 'Inter', sans-serif; font-weight: 700; }
+.empty-row td { text-align: center !important; color: #666 !important; font-style: italic; padding: 30px !important; }
+.session-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; background: #0b0b0b; border: 1px solid #1a1a1a; border-radius: 12px; padding: 10px 16px; margin-bottom: 26px; font-family: 'Inter', sans-serif; font-size: .8rem; color: #aaa; }
+.session-bar b { color: #22c55e; font-weight: 600; }
+@media (max-width: 700px) { .main-title { font-size: 1.6rem; } .toolbar input[type="search"] { max-width: none; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo"><a href="index.html" class="logo-link"><img src="logo.png" alt="Logo ABYSZ"> ABYSZ</a></div>
+  <ul>
+    <li><a href="index.html">Accueil</a></li>
+    <li><a href="roster.html">Roster</a></li>
+    <li><a href="boutique.html">Boutique</a></li>
+    <li><a href="espace-joueur.html" style="color: #a855f7; font-weight: bold;">👤 Espace Joueur</a></li>
+    <li id="nav-dashboard" class="nav-dashboard-link hidden"><a href="dashboard.html">📊 Dashboard</a></li>
+    <li id="nav-database" class="nav-dashboard-link hidden"><a href="base-de-donnees.html">🗄️ Base de données</a></li>
+  </ul>
+</nav>
+
+<!-- Zone affichée à tout le monde sauf à l'administrateur connecté -->
+<div id="access-denied" class="restricted-zone hidden">
+  <h2>🔒 ACCÈS RESTREINT</h2>
+  <p style="color:#aaa; margin-bottom:25px;">Cette page est réservée à l'administrateur du site.</p>
+  <p id="denied-info" style="color:#ccc; font-size:.9rem; margin-bottom:20px;"></p>
+  <form id="denied-login-form" style="max-width:340px; margin:0 auto 20px;">
+    <div class="input-group"><label for="denied-email">Adresse e-mail</label><input type="email" id="denied-email" autocomplete="username" required></div>
+    <div class="input-group"><label for="denied-password">Mot de passe</label><input type="password" id="denied-password" autocomplete="current-password" required></div>
+    <button type="submit" class="btn-admin" id="denied-submit">Se connecter</button>
+    <p id="denied-error" class="error-message hidden"></p>
+  </form>
+  <button type="button" id="denied-logout" class="btn-admin hidden" style="margin-bottom:20px;">Changer de compte</button>
+  <div><a href="index.html" class="btn">Retour à l'accueil</a></div>
+</div>
+
+<!-- Contenu : n'est affiché (et aucune donnée n'est chargée) qu'après vérification de l'admin -->
+<main id="db-content" class="wrapper hidden" style="padding-top:140px;">
+  <h1 class="main-title">🗄️ Base de données</h1>
+  <p class="sub-title">Stockage privé des gros documents · accessible uniquement à l'administrateur</p>
+
+  <div class="session-bar">
+    <span>🔐 Connecté en tant que <b id="session-email">—</b> · déconnexion automatique après 30 min d'inactivité</span>
+    <button type="button" class="btn-ghost" id="btn-logout">Se déconnecter</button>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="num" id="st-count">0</div><div class="label">Fichiers</div></div>
+    <div class="stat-card"><div class="num" id="st-size">0 o</div><div class="label">Espace utilisé</div></div>
+    <div class="stat-card"><div class="num" id="st-folders">0</div><div class="label">Dossiers</div></div>
+  </div>
+
+  <div class="section-title"><span>📤 Ajouter des documents</span></div>
+  <div class="box">
+    <div class="upload-opts">
+      <div class="input-group" style="margin-bottom:0;">
+        <label for="up-folder">Dossier</label>
+        <input type="text" id="up-folder" list="folder-list" maxlength="40" placeholder="Ex : contrats, vidéos, sauvegardes" value="general" autocomplete="off">
+        <datalist id="folder-list"></datalist>
+      </div>
+      <div class="input-group" style="margin-bottom:0;">
+        <label>Limites</label>
+        <p class="muted" style="margin:0; padding-top:6px;">500 Mo maximum par fichier. Les fichiers exécutables et les pages web (.exe, .bat, .js, .html…) sont refusés.</p>
+      </div>
+    </div>
+    <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Choisir des fichiers à envoyer">
+      <div class="dz-main">Glisse tes fichiers ici</div>
+      <div class="muted">ou clique pour les choisir</div>
+      <input type="file" id="file-input" multiple class="hidden">
+    </div>
+    <div class="queue" id="queue"></div>
+    <p id="up-msg" class="msg"></p>
+  </div>
+
+  <div class="section-title"><span>📁 Documents stockés</span></div>
+  <div class="toolbar">
+    <input type="search" id="search" placeholder="Rechercher un fichier…" aria-label="Rechercher un fichier" autocomplete="off">
+    <select id="filter-folder" aria-label="Filtrer par dossier"><option value="">Tous les dossiers</option></select>
+    <select id="sort" aria-label="Trier">
+      <option value="date-desc">Plus récents</option>
+      <option value="date-asc">Plus anciens</option>
+      <option value="size-desc">Plus gros</option>
+      <option value="name-asc">Nom (A → Z)</option>
+    </select>
+  </div>
+  <p id="list-msg" class="msg"></p>
+  <div class="db-table-wrapper">
+    <table class="db-table">
+      <thead><tr><th>Nom</th><th>Dossier</th><th>Taille</th><th>Ajouté le</th><th>Actions</th></tr></thead>
+      <tbody id="rows"><tr class="empty-row"><td colspan="5">Chargement…</td></tr></tbody>
+    </table>
+  </div>
+</main>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, query, orderBy, onSnapshot, addDoc, deleteDoc, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage, ref as sRef, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
+  authDomain: "abysz-esports.firebaseapp.com",
+  databaseURL: "https://abysz-esports-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "abysz-esports",
+  storageBucket: "abysz-esports.firebasestorage.app",
+  messagingSenderId: "200968659347",
+  appId: "1:200968659347:web:3a13d1614d00ed29968866"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
+
+const ADMIN_EMAIL = "abyszofficial@gmail.com";
+const COLLECTION = "database_files";
+const STORAGE_ROOT = "database";
+const MAX_SIZE = 500 * 1024 * 1024; // 500 Mo (doit rester <= à la limite des règles Storage)
+const BLOCKED_EXT = ["exe","msi","bat","cmd","com","scr","vbs","ps1","sh","js","mjs","html","htm","svg","jar","apk"];
+const IDLE_MS = 30 * 60 * 1000;
+
+/* L'affichage est contrôlé ici, mais la VRAIE protection ce sont les règles Firebase (voir firebase-rules.md). */
+const isAdmin = () => {
+  const u = auth.currentUser;
+  return !!(u && u.email && u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
+};
+
+const $ = (id) => document.getElementById(id);
+const denied = $("access-denied"), content = $("db-content");
+const rowsEl = $("rows"), listMsg = $("list-msg"), upMsg = $("up-msg");
+
+let files = [];            // documents Firestore
+let unsubscribe = null;    // écoute Firestore
+let idleTimer = null;
+
+/* ---------- Utilitaires ---------- */
+const fmtSize = (n) => {
+  if (!n) return "0 o";
+  const u = ["o","Ko","Mo","Go","To"]; let i = Math.min(Math.floor(Math.log(n)/Math.log(1024)), u.length-1);
+  return (n/Math.pow(1024,i)).toFixed(i ? 1 : 0).replace(".", ",") + " " + u[i];
+};
+const fmtDate = (ts) => ts && ts.toDate ? ts.toDate().toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Paris" }) : "à l'instant";
+const slug = (s) => (s || "general").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "general";
+const safeName = (s) => s.normalize("NFC").replace(/[\\/:*?"<>|\u0000-\u001f]/g, "_").replace(/\s+/g, " ").trim().slice(0, 150) || "fichier";
+const extOf = (n) => (n.split(".").pop() || "").toLowerCase();
+const setMsg = (el, text, kind) => { el.textContent = text || ""; el.className = "msg " + (kind || ""); };
+
+/* ---------- Affichage selon l'état de connexion ---------- */
+function showDenied(info, canLogout) {
+  content.classList.add("hidden");
+  denied.classList.remove("hidden");
+  $("denied-info").textContent = info || "";
+  $("denied-logout").classList.toggle("hidden", !canLogout);
+  $("denied-login-form").classList.toggle("hidden", canLogout);
+  $("nav-database").classList.add("hidden");
+  $("nav-dashboard").classList.add("hidden");
+}
+
+onAuthStateChanged(auth, (user) => {
+  stopListening();
+  if (!user) { showDenied("", false); return; }
+  if (!user.email || user.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+    showDenied("Le compte connecté n'a pas les droits d'administrateur.", true); return;
+  }
+  denied.classList.add("hidden");
+  content.classList.remove("hidden");
+  $("nav-database").classList.remove("hidden");
+  $("nav-dashboard").classList.remove("hidden");
+  $("session-email").textContent = user.email;
+  startListening();
+  resetIdle();
+});
+
+$("denied-login-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const err = $("denied-error"), btn = $("denied-submit");
+  err.classList.add("hidden"); btn.disabled = true;
+  try {
+    await signInWithEmailAndPassword(auth, $("denied-email").value.trim(), $("denied-password").value);
+    $("denied-password").value = "";
+  } catch (ex) {
+    err.textContent = "Connexion impossible. Vérifie tes identifiants.";
+    err.classList.remove("hidden");
+  } finally { btn.disabled = false; }
+});
+$("denied-logout").addEventListener("click", () => signOut(auth));
+$("btn-logout").addEventListener("click", () => signOut(auth));
+
+/* ---------- Déconnexion automatique après inactivité ---------- */
+function resetIdle() {
+  clearTimeout(idleTimer);
+  if (!auth.currentUser) return;
+  idleTimer = setTimeout(() => signOut(auth), IDLE_MS);
+}
+["mousemove","keydown","click","touchstart","scroll"].forEach((ev) => window.addEventListener(ev, resetIdle, { passive: true }));
+
+/* ---------- Lecture Firestore (uniquement si admin vérifié) ---------- */
+function startListening() {
+  if (!isAdmin()) return;
+  const q = query(collection(db, COLLECTION), orderBy("uploadedAt", "desc"));
+  unsubscribe = onSnapshot(q, (snap) => {
+    files = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    setMsg(listMsg, "");
+    refreshFolders();
+    render();
+  }, () => {
+    setMsg(listMsg, "Lecture refusée ou impossible. Vérifie que les règles Firestore sont bien publiées.", "err");
+    rowsEl.replaceChildren(emptyRow("Impossible de charger les documents."));
+  });
+}
+function stopListening() {
+  if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+  files = [];
+  rowsEl.replaceChildren(emptyRow("Chargement…"));
+  clearTimeout(idleTimer);
+}
+
+/* ---------- Rendu (aucun innerHTML : tout passe par textContent) ---------- */
+function emptyRow(text) {
+  const tr = document.createElement("tr"); tr.className = "empty-row";
+  const td = document.createElement("td"); td.colSpan = 5; td.textContent = text;
+  tr.appendChild(td); return tr;
+}
+function refreshFolders() {
+  const folders = [...new Set(files.map((f) => f.folder || "general"))].sort();
+  const sel = $("filter-folder"), cur = sel.value;
+  sel.replaceChildren(new Option("Tous les dossiers", ""));
+  folders.forEach((f) => sel.appendChild(new Option(f, f)));
+  sel.value = folders.includes(cur) ? cur : "";
+  $("folder-list").replaceChildren(...folders.map((f) => { const o = document.createElement("option"); o.value = f; return o; }));
+  $("st-folders").textContent = folders.length;
+}
+function btn(label, cls, onClick) {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "mini-btn " + (cls || ""); b.textContent = label;
+  b.addEventListener("click", onClick); return b;
+}
+function render() {
+  $("st-count").textContent = files.length;
+  $("st-size").textContent = fmtSize(files.reduce((s, f) => s + (f.size || 0), 0));
+
+  const term = $("search").value.trim().toLowerCase();
+  const folder = $("filter-folder").value;
+  const sort = $("sort").value;
+  let list = files.filter((f) => (!folder || (f.folder || "general") === folder) && (!term || (f.name || "").toLowerCase().includes(term)));
+  const ms = (f) => (f.uploadedAt && f.uploadedAt.toMillis ? f.uploadedAt.toMillis() : Date.now());
+  list.sort({
+    "date-desc": (a, b) => ms(b) - ms(a),
+    "date-asc":  (a, b) => ms(a) - ms(b),
+    "size-desc": (a, b) => (b.size || 0) - (a.size || 0),
+    "name-asc":  (a, b) => (a.name || "").localeCompare(b.name || "", "fr")
+  }[sort]);
+
+  if (!list.length) { rowsEl.replaceChildren(emptyRow(files.length ? "Aucun résultat." : "Aucun document pour l'instant. Ajoute-en ci-dessus.")); return; }
+
+  rowsEl.replaceChildren(...list.map((f) => {
+    const tr = document.createElement("tr");
+    const tdName = document.createElement("td"); tdName.textContent = f.name || "(sans nom)";
+    const tdFolder = document.createElement("td");
+    const tag = document.createElement("span"); tag.className = "folder-tag"; tag.textContent = f.folder || "general"; tdFolder.appendChild(tag);
+    const tdSize = document.createElement("td"); tdSize.className = "nowrap"; tdSize.textContent = fmtSize(f.size);
+    const tdDate = document.createElement("td"); tdDate.className = "nowrap"; tdDate.textContent = fmtDate(f.uploadedAt);
+    const tdAct = document.createElement("td");
+    tdAct.append(
+      btn("⬇ Ouvrir", "", () => openFile(f)),
+      btn("✏️ Renommer", "", () => renameFile(f)),
+      btn("🗑️ Supprimer", "del", () => removeFile(f))
+    );
+    tr.append(tdName, tdFolder, tdSize, tdDate, tdAct);
+    return tr;
+  }));
+}
+["search","filter-folder","sort"].forEach((id) => $(id).addEventListener("input", render));
+
+/* ---------- Actions ---------- */
+async function openFile(f) {
+  if (!isAdmin()) return;
+  try {
+    // Lien généré à la demande, jamais stocké dans la base.
+    const url = await getDownloadURL(sRef(storage, f.path));
+    window.open(url, "_blank", "noopener,noreferrer");
+  } catch (e) { setMsg(listMsg, "Impossible d'ouvrir ce fichier (introuvable ou accès refusé).", "err"); }
+}
+async function renameFile(f) {
+  if (!isAdmin()) return;
+  const n = prompt("Nouveau nom d'affichage :", f.name || "");
+  if (n === null) return;
+  const name = safeName(n);
+  try { await updateDoc(doc(db, COLLECTION, f.id), { name }); setMsg(listMsg, "Nom mis à jour.", "ok"); }
+  catch (e) { setMsg(listMsg, "Renommage refusé.", "err"); }
+}
+async function removeFile(f) {
+  if (!isAdmin()) return;
+  if (!confirm("Supprimer définitivement « " + (f.name || "ce fichier") + " » ? Cette action est irréversible.")) return;
+  try {
+    try { await deleteObject(sRef(storage, f.path)); }
+    catch (e) { if (!e || e.code !== "storage/object-not-found") throw e; }
+    await deleteDoc(doc(db, COLLECTION, f.id));
+    setMsg(listMsg, "Fichier supprimé.", "ok");
+  } catch (e) { setMsg(listMsg, "Suppression refusée ou impossible.", "err"); }
+}
+
+/* ---------- Envoi ---------- */
+const dz = $("dropzone"), input = $("file-input");
+dz.addEventListener("click", () => input.click());
+dz.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); input.click(); } });
+["dragenter","dragover"].forEach((ev) => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.add("drag"); }));
+["dragleave","drop"].forEach((ev) => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.remove("drag"); }));
+dz.addEventListener("drop", (e) => handleFiles(e.dataTransfer.files));
+input.addEventListener("change", () => { handleFiles(input.files); input.value = ""; });
+
+function handleFiles(fileList) {
+  if (!isAdmin()) { setMsg(upMsg, "Accès refusé.", "err"); return; }
+  const folder = slug($("up-folder").value);
+  setMsg(upMsg, "");
+  [...fileList].forEach((file) => uploadOne(file, folder));
+}
+
+function uploadOne(file, folder) {
+  const item = document.createElement("div"); item.className = "q-item";
+  const top = document.createElement("div"); top.className = "q-top";
+  const nm = document.createElement("span"); nm.className = "q-name"; nm.textContent = file.name;
+  const st = document.createElement("span"); st.className = "q-status";
+  top.append(nm, st);
+  const track = document.createElement("div"); track.className = "bar-track";
+  const fill = document.createElement("div"); fill.className = "bar-fill"; track.appendChild(fill);
+  item.append(top, track);
+  $("queue").prepend(item);
+
+  const fail = (text) => { st.textContent = text; st.className = "q-status err"; fill.style.width = "0"; };
+
+  if (extOf(file.name) && BLOCKED_EXT.includes(extOf(file.name))) return fail("Type de fichier refusé");
+  if (file.size > MAX_SIZE) return fail("Dépasse 500 Mo");
+  if (file.size === 0) return fail("Fichier vide");
+
+  const name = safeName(file.name);
+  const path = `${STORAGE_ROOT}/${folder}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}_${name.replace(/\s+/g, "_")}`;
+  const task = uploadBytesResumable(sRef(storage, path), file, { contentType: file.type || "application/octet-stream", contentDisposition: "attachment" });
+
+  task.on("state_changed",
+    (s) => { const p = Math.round((s.bytesTransferred / s.totalBytes) * 100); fill.style.width = p + "%"; st.textContent = p + " %"; },
+    () => fail("Échec de l'envoi"),
+    async () => {
+      try {
+        await addDoc(collection(db, COLLECTION), {
+          name, path, folder, size: file.size,
+          contentType: file.type || "application/octet-stream",
+          uploadedAt: serverTimestamp(),
+          uploadedBy: auth.currentUser.email
+        });
+        fill.style.width = "100%"; st.textContent = "✅ Terminé"; st.className = "q-status ok";
+      } catch (e) {
+        // Pas de fichier orphelin : si l'enregistrement échoue, on retire le fichier envoyé.
+        try { await deleteObject(task.snapshot.ref); } catch (_) { /* ignore */ }
+        fail("Enregistrement refusé");
+      }
+    });
+}
+</script>
+</body>
+</html>

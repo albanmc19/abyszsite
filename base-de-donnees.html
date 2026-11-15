@@ -123,7 +123,7 @@ setTimeout(function () {
   <p class="sub-title">Stockage privé des gros documents · accessible uniquement à l'administrateur</p>
 
   <div class="session-bar">
-    <span>🔐 Connecté en tant que <b id="session-email">—</b> · déconnexion automatique après 30 min d'inactivité</span>
+    <span>🔐 Connecté en tant que <b id="session-email">—</b> · déconnexion automatique après 30 min d'inactivité · page v4</span>
     <button type="button" class="btn-ghost" id="btn-logout">Se déconnecter</button>
   </div>
 
@@ -426,6 +426,17 @@ function uploadOne(file, folder) {
   const path = `${STORAGE_ROOT}/${folder}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}_${name.replace(/\s+/g, "_")}`;
   const task = uploadBytesResumable(sRef(storage, path), file, { contentType: file.type || "application/octet-stream", contentDisposition: "attachment" });
 
+  let started = false;
+  const watchdog = setTimeout(() => {
+    if (!started) {
+      try { task.cancel(); } catch (_) { /* ignore */ }
+      fail("Aucune réponse de Storage après 15 s : Storage n'est pas activé sur le projet, ou le nom du bucket est incorrect (" + firebaseConfig.storageBucket + ")");
+    }
+  }, 15000);
+
+  task.on("state_changed",
+    (s) => { if (s.bytesTransferred > 0) { started = true; clearTimeout(watchdog); } },
+    () => {}, () => {});
   task.on("state_changed",
     (s) => { const p = Math.round((s.bytesTransferred / s.totalBytes) * 100); fill.style.width = p + "%"; st.textContent = p + " %"; },
     (err) => {
@@ -439,6 +450,8 @@ function uploadOne(file, folder) {
         "storage/project-not-found": "projet introuvable",
         "storage/quota-exceeded": "quota dépassé"
       };
+      clearTimeout(watchdog);
+      if (code === "storage/canceled") return;
       fail("Échec : " + (hints[code] || code));
     },
     async () => {

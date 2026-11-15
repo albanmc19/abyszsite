@@ -6,7 +6,7 @@
 <meta name="description" content="Base de données ABYSZ Esports (accès administrateur)">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'; form-action 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com">
+<meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'; form-action 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://accounts.google.com">
 <script>
 /* Anti-clickjacking (frame-ancestors est ignoré en <meta> : à doubler par un en-tête HTTP) */
 if (window.top !== window.self) { document.documentElement.style.display = "none"; try { window.top.location = window.self.location; } catch (e) { /* ignore */ } }
@@ -14,6 +14,7 @@ if (window.top !== window.self) { document.documentElement.style.display = "none
 <title>ABYSZ | Base de données</title>
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 .logo-link { display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit; }
 .hidden { display: none !important; }
@@ -44,6 +45,13 @@ if (window.top !== window.self) { document.documentElement.style.display = "none
 .msg { margin-top: 10px; font-size: .85rem; font-family: 'Inter', sans-serif; min-height: 1.2em; }
 .msg.ok { color: #22c55e; } .msg.err { color: #ff6b6b; } .msg.info { color: #aaa; }
 .muted { color: #8f8f8f; font-size: .85rem; line-height: 1.5; font-family: 'Inter', sans-serif; }
+
+/* Google Drive */
+.drive-box { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; background: #0b0b0b; border: 1px solid #1a1a1a; border-radius: 12px; padding: 14px 18px; margin-bottom: 18px; font-family: 'Inter', sans-serif; font-size: .85rem; color: #aaa; }
+.drive-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #666; margin-right: 8px; }
+.drive-dot.on { background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,.6); }
+.drive-box b { color: #fff; }
+.src-tag { display: inline-block; font-size: .65rem; padding: 2px 7px; border-radius: 999px; border: 1px solid #333; color: #999; margin-left: 8px; font-weight: 700; vertical-align: middle; }
 
 /* Zone de dépôt */
 .dropzone { border: 2px dashed #3a2a55; border-radius: 14px; background: #0a0a0a; padding: 34px 20px; text-align: center; cursor: pointer; transition: border-color .2s, background .2s; }
@@ -94,14 +102,6 @@ if (window.top !== window.self) { document.documentElement.style.display = "none
   </ul>
 </nav>
 
-<div id="boot-msg" style="padding:160px 20px 0; text-align:center; color:#aaa; font-family:'Inter',sans-serif;">Chargement…</div>
-<script>
-setTimeout(function () {
-  var b = document.getElementById("boot-msg");
-  if (b && !window.__dbReady) { b.style.color = "#ff6b6b"; b.textContent = "La page n'a pas pu se charger (erreur de script ou connexion). Ouvre la console du navigateur (F12) pour voir le détail."; }
-}, 6000);
-</script>
-
 <!-- Zone affichée à tout le monde sauf à l'administrateur connecté -->
 <div id="access-denied" class="restricted-zone hidden">
   <h2>🔒 ACCÈS RESTREINT</h2>
@@ -120,10 +120,10 @@ setTimeout(function () {
 <!-- Contenu : n'est affiché (et aucune donnée n'est chargée) qu'après vérification de l'admin -->
 <main id="db-content" class="wrapper hidden" style="padding-top:140px;">
   <h1 class="main-title">🗄️ Base de données</h1>
-  <p class="sub-title">Stockage privé des gros documents · accessible uniquement à l'administrateur</p>
+  <p class="sub-title">Stockage privé des gros documents sur Google Drive · accessible uniquement à l'administrateur</p>
 
   <div class="session-bar">
-    <span>🔐 Connecté en tant que <b id="session-email">—</b> · déconnexion automatique après 30 min d'inactivité · page v4</span>
+    <span>🔐 Connecté en tant que <b id="session-email">—</b> · déconnexion automatique après 30 min d'inactivité</span>
     <button type="button" class="btn-ghost" id="btn-logout">Se déconnecter</button>
   </div>
 
@@ -135,6 +135,10 @@ setTimeout(function () {
 
   <div class="section-title"><span>📤 Ajouter des documents</span></div>
   <div class="box">
+    <div class="drive-box">
+      <span><span class="drive-dot" id="drive-dot"></span><b>Google Drive</b> — <span id="drive-status">non connecté</span></span>
+      <button type="button" class="btn-ghost" id="btn-drive">Connecter Google Drive</button>
+    </div>
     <div class="upload-opts">
       <div class="input-group" style="margin-bottom:0;">
         <label for="up-folder">Dossier</label>
@@ -143,7 +147,7 @@ setTimeout(function () {
       </div>
       <div class="input-group" style="margin-bottom:0;">
         <label>Limites</label>
-        <p class="muted" style="margin:0; padding-top:6px;">500 Mo maximum par fichier. Les fichiers exécutables et les pages web (.exe, .bat, .js, .html…) sont refusés.</p>
+        <p class="muted" style="margin:0; padding-top:6px;">5 Go maximum par fichier (dans la limite de l'espace de ton Drive). Les fichiers exécutables et les pages web (.exe, .bat, .js, .html…) sont refusés. Les fichiers sont rangés dans « ABYSZ - Base de données » sur ton Drive.</p>
       </div>
     </div>
     <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Choisir des fichiers à envoyer">
@@ -179,7 +183,8 @@ setTimeout(function () {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, query, orderBy, onSnapshot, addDoc, deleteDoc, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getStorage, ref as sRef, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+/* Firebase Storage n'est conservé que pour ouvrir / supprimer les anciens fichiers déjà envoyés avant le passage à Google Drive. */
+import { getStorage, ref as sRef, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBFzPc8WF4IGN74RZ1axtpUBu6Bv8Iu-UQ",
@@ -195,18 +200,20 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
-// Sans cela, un problème de configuration reste « bloqué à 0 % » jusqu'à 10 minutes au lieu d'afficher une erreur.
-storage.maxUploadRetryTime = 20000;
-storage.maxOperationRetryTime = 20000;
 
 const ADMIN_EMAIL = "abyszofficial@gmail.com";
 const COLLECTION = "database_files";
-const STORAGE_ROOT = "database";
-const MAX_SIZE = 500 * 1024 * 1024; // 500 Mo (doit rester <= à la limite des règles Storage)
+
+/* ===== GOOGLE DRIVE =====
+   1) Colle ici l'ID client OAuth (type « Application Web ») créé dans Google Cloud Console.
+      Il est public par nature (ce n'est pas un secret). Voir les étapes de configuration à la fin du message. */
+const DRIVE_CLIENT_ID = "837095000991-a7vfe7qco3v5mtan4cgpd6tcrnn0vtr0.apps.googleusercontent.com";
+const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file"; // accès limité aux fichiers créés par ce site
+const DRIVE_ROOT_NAME = "ABYSZ - Base de données";
+const MAX_SIZE = 5 * 1024 * 1024 * 1024; // 5 Go
 const BLOCKED_EXT = ["exe","msi","bat","cmd","com","scr","vbs","ps1","sh","js","mjs","html","htm","svg","jar","apk"];
 const IDLE_MS = 30 * 60 * 1000;
 
-/* L'affichage est contrôlé ici, mais la VRAIE protection ce sont les règles Firebase (voir firebase-rules.md). */
 const isAdmin = () => {
   const u = auth.currentUser;
   return !!(u && u.email && u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
@@ -216,8 +223,8 @@ const $ = (id) => document.getElementById(id);
 const denied = $("access-denied"), content = $("db-content");
 const rowsEl = $("rows"), listMsg = $("list-msg"), upMsg = $("up-msg");
 
-let files = [];            // documents Firestore
-let unsubscribe = null;    // écoute Firestore
+let files = [];
+let unsubscribe = null;
 let idleTimer = null;
 
 /* ---------- Utilitaires ---------- */
@@ -232,6 +239,86 @@ const safeName = (s) => s.normalize("NFC").replace(/[\\/:*?"<>|\u0000-\u001f]/g,
 const extOf = (n) => (n.split(".").pop() || "").toLowerCase();
 const setMsg = (el, text, kind) => { el.textContent = text || ""; el.className = "msg " + (kind || ""); };
 
+/* ============================================================
+   Google Drive : jeton d'accès (Google Identity Services)
+   ============================================================ */
+let driveToken = null, driveExp = 0, tokenClient = null;
+const driveConfigured = () => DRIVE_CLIENT_ID && !DRIVE_CLIENT_ID.startsWith("COLLE_ICI");
+const driveReady = () => !!(driveToken && Date.now() < driveExp - 60000);
+
+function updateDriveUI() {
+  const on = driveReady();
+  $("drive-dot").classList.toggle("on", on);
+  $("drive-status").textContent = !driveConfigured() ? "ID client non configuré (voir le code)" : on ? "connecté" : "non connecté";
+  $("btn-drive").textContent = on ? "Reconnecter" : "Connecter Google Drive";
+  $("btn-drive").disabled = !driveConfigured();
+}
+
+/* À appeler directement depuis un clic / un dépôt (le navigateur bloque la fenêtre Google sinon). */
+function getDriveToken() {
+  return new Promise((resolve, reject) => {
+    if (driveReady()) return resolve(driveToken);
+    if (!driveConfigured()) return reject(new Error("ID client Google non configuré dans la page."));
+    if (!window.google || !google.accounts || !google.accounts.oauth2) return reject(new Error("Service Google non chargé, recharge la page."));
+    if (!tokenClient) {
+      tokenClient = google.accounts.oauth2.initTokenClient({ client_id: DRIVE_CLIENT_ID, scope: DRIVE_SCOPE, callback: () => {} });
+    }
+    tokenClient.callback = (r) => {
+      if (r.error) return reject(new Error("Autorisation Google refusée."));
+      driveToken = r.access_token;
+      driveExp = Date.now() + (Number(r.expires_in) || 3600) * 1000;
+      updateDriveUI();
+      resolve(driveToken);
+    };
+    tokenClient.error_callback = () => reject(new Error("Fenêtre Google fermée ou bloquée."));
+    tokenClient.requestAccessToken({ login_hint: (auth.currentUser && auth.currentUser.email) || ADMIN_EMAIL });
+  });
+}
+function dropDriveToken() { driveToken = null; driveExp = 0; folderCache.clear(); updateDriveUI(); }
+
+async function driveFetch(url, opts = {}) {
+  if (!driveReady()) throw new Error("Google Drive non connecté : clique sur « Connecter Google Drive ».");
+  const res = await fetch(url, { ...opts, headers: { ...(opts.headers || {}), Authorization: "Bearer " + driveToken } });
+  if (res.status === 401) { dropDriveToken(); throw new Error("Session Google Drive expirée : reconnecte-toi."); }
+  return res;
+}
+
+/* Dossiers Drive : racine + un sous-dossier par « dossier » de la page (promesse en cache = pas de doublon) */
+const folderCache = new Map();
+async function findOrCreateFolder(name, parentId) {
+  const q = "mimeType='application/vnd.google-apps.folder' and trashed=false and name='" + name.replace(/\\/g, "\\\\").replace(/'/g, "\\'") + "'" +
+            " and '" + (parentId || "root") + "' in parents";
+  const r = await driveFetch("https://www.googleapis.com/drive/v3/files?pageSize=1&fields=files(id)&q=" + encodeURIComponent(q));
+  if (!r.ok) throw new Error("Drive : lecture des dossiers impossible (HTTP " + r.status + ")");
+  const found = ((await r.json()).files || [])[0];
+  if (found) return found.id;
+  const c = await driveFetch("https://www.googleapis.com/drive/v3/files?fields=id", {
+    method: "POST",
+    headers: { "Content-Type": "application/json; charset=UTF-8" },
+    body: JSON.stringify({ name, mimeType: "application/vnd.google-apps.folder", ...(parentId ? { parents: [parentId] } : {}) })
+  });
+  if (!c.ok) throw new Error("Drive : création du dossier impossible (HTTP " + c.status + ")");
+  return (await c.json()).id;
+}
+function ensureFolder(folder) {
+  const key = "f:" + folder;
+  if (!folderCache.has(key)) {
+    const p = (async () => {
+      if (!folderCache.has("root")) folderCache.set("root", findOrCreateFolder(DRIVE_ROOT_NAME, null));
+      const rootId = await folderCache.get("root");
+      return findOrCreateFolder(folder, rootId);
+    })();
+    p.catch(() => { folderCache.delete(key); folderCache.delete("root"); });
+    folderCache.set(key, p);
+  }
+  return folderCache.get(key);
+}
+
+$("btn-drive").addEventListener("click", async () => {
+  try { await getDriveToken(); setMsg(upMsg, "Google Drive connecté.", "ok"); }
+  catch (e) { setMsg(upMsg, e.message, "err"); }
+});
+
 /* ---------- Affichage selon l'état de connexion ---------- */
 function showDenied(info, canLogout) {
   content.classList.add("hidden");
@@ -244,9 +331,8 @@ function showDenied(info, canLogout) {
 }
 
 onAuthStateChanged(auth, (user) => {
-  window.__dbReady = true;
-  const boot = document.getElementById("boot-msg"); if (boot) boot.remove();
   stopListening();
+  dropDriveToken();
   if (!user) { showDenied("", false); return; }
   if (!user.email || user.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
     showDenied("Le compte connecté n'a pas les droits d'administrateur.", true); return;
@@ -256,6 +342,7 @@ onAuthStateChanged(auth, (user) => {
   $("nav-database").classList.remove("hidden");
   $("nav-dashboard").classList.remove("hidden");
   $("session-email").textContent = user.email;
+  updateDriveUI();
   startListening();
   resetIdle();
 });
@@ -273,7 +360,10 @@ $("denied-login-form").addEventListener("submit", async (e) => {
   } finally { btn.disabled = false; }
 });
 $("denied-logout").addEventListener("click", () => signOut(auth));
-$("btn-logout").addEventListener("click", () => signOut(auth));
+$("btn-logout").addEventListener("click", () => {
+  try { if (driveToken && window.google && google.accounts) google.accounts.oauth2.revoke(driveToken, () => {}); } catch (_) { /* ignore */ }
+  signOut(auth);
+});
 
 /* ---------- Déconnexion automatique après inactivité ---------- */
 function resetIdle() {
@@ -283,7 +373,7 @@ function resetIdle() {
 }
 ["mousemove","keydown","click","touchstart","scroll"].forEach((ev) => window.addEventListener(ev, resetIdle, { passive: true }));
 
-/* ---------- Lecture Firestore (uniquement si admin vérifié) ---------- */
+/* ---------- Lecture Firestore (index des fichiers, uniquement si admin vérifié) ---------- */
 function startListening() {
   if (!isAdmin()) return;
   const q = query(collection(db, COLLECTION), orderBy("uploadedAt", "desc"));
@@ -340,11 +430,12 @@ function render() {
     "name-asc":  (a, b) => (a.name || "").localeCompare(b.name || "", "fr")
   }[sort]);
 
-  if (!list.length) { rowsEl.replaceChildren(emptyRow(files.length ? "Aucun résultat." : "Aucun document pour l'instant. Ajoute-en ci-dessus.")); return; }
+  if (!list.length) { rowsEl.replaceChildren(emptyRow(files.length ? "Aucun résultat." : "Aucun document pour l'instant. Ajoutes-en ci-dessus.")); return; }
 
   rowsEl.replaceChildren(...list.map((f) => {
     const tr = document.createElement("tr");
     const tdName = document.createElement("td"); tdName.textContent = f.name || "(sans nom)";
+    if (!f.driveId) { const old = document.createElement("span"); old.className = "src-tag"; old.textContent = "ancien stockage"; tdName.appendChild(old); }
     const tdFolder = document.createElement("td");
     const tag = document.createElement("span"); tag.className = "folder-tag"; tag.textContent = f.folder || "general"; tdFolder.appendChild(tag);
     const tdSize = document.createElement("td"); tdSize.className = "nowrap"; tdSize.textContent = fmtSize(f.size);
@@ -365,31 +456,52 @@ function render() {
 async function openFile(f) {
   if (!isAdmin()) return;
   try {
-    // Lien généré à la demande, jamais stocké dans la base.
-    const url = await getDownloadURL(sRef(storage, f.path));
-    window.open(url, "_blank", "noopener,noreferrer");
+    if (f.driveId) {
+      // Ouvre le fichier dans Google Drive (seul ton compte Google y a accès).
+      window.open("https://drive.google.com/file/d/" + encodeURIComponent(f.driveId) + "/view", "_blank", "noopener,noreferrer");
+    } else if (f.path) {
+      const url = await getDownloadURL(sRef(storage, f.path));
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
   } catch (e) { setMsg(listMsg, "Impossible d'ouvrir ce fichier (introuvable ou accès refusé).", "err"); }
 }
 async function renameFile(f) {
   if (!isAdmin()) return;
-  const n = prompt("Nouveau nom d'affichage :", f.name || "");
+  const n = prompt("Nouveau nom :", f.name || "");
   if (n === null) return;
   const name = safeName(n);
-  try { await updateDoc(doc(db, COLLECTION, f.id), { name }); setMsg(listMsg, "Nom mis à jour.", "ok"); }
-  catch (e) { setMsg(listMsg, "Renommage refusé.", "err"); }
+  const tokenP = f.driveId ? getDriveToken() : Promise.resolve(null); // appelé dans le clic
+  try {
+    await tokenP;
+    if (f.driveId) {
+      const r = await driveFetch("https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(f.driveId), {
+        method: "PATCH", headers: { "Content-Type": "application/json; charset=UTF-8" }, body: JSON.stringify({ name })
+      });
+      if (!r.ok && r.status !== 404) throw new Error("Drive HTTP " + r.status);
+    }
+    await updateDoc(doc(db, COLLECTION, f.id), { name });
+    setMsg(listMsg, "Nom mis à jour.", "ok");
+  } catch (e) { setMsg(listMsg, "Renommage refusé : " + (e.message || "erreur"), "err"); }
 }
 async function removeFile(f) {
   if (!isAdmin()) return;
   if (!confirm("Supprimer définitivement « " + (f.name || "ce fichier") + " » ? Cette action est irréversible.")) return;
+  const tokenP = f.driveId ? getDriveToken() : Promise.resolve(null); // appelé dans le clic
   try {
-    try { await deleteObject(sRef(storage, f.path)); }
-    catch (e) { if (!e || e.code !== "storage/object-not-found") throw e; }
+    await tokenP;
+    if (f.driveId) {
+      const r = await driveFetch("https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(f.driveId), { method: "DELETE" });
+      if (!r.ok && r.status !== 404) throw new Error("Drive HTTP " + r.status);
+    } else if (f.path) {
+      try { await deleteObject(sRef(storage, f.path)); }
+      catch (e) { if (!e || e.code !== "storage/object-not-found") throw e; }
+    }
     await deleteDoc(doc(db, COLLECTION, f.id));
     setMsg(listMsg, "Fichier supprimé.", "ok");
-  } catch (e) { setMsg(listMsg, "Suppression refusée ou impossible.", "err"); }
+  } catch (e) { setMsg(listMsg, "Suppression refusée ou impossible : " + (e.message || "erreur"), "err"); }
 }
 
-/* ---------- Envoi ---------- */
+/* ---------- Envoi vers Google Drive ---------- */
 const dz = $("dropzone"), input = $("file-input");
 dz.addEventListener("click", () => input.click());
 dz.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); input.click(); } });
@@ -401,11 +513,31 @@ input.addEventListener("change", () => { handleFiles(input.files); input.value =
 function handleFiles(fileList) {
   if (!isAdmin()) { setMsg(upMsg, "Accès refusé.", "err"); return; }
   const folder = slug($("up-folder").value);
+  const list = [...fileList];
+  if (!list.length) return;
   setMsg(upMsg, "");
-  [...fileList].forEach((file) => uploadOne(file, folder));
+  // Le jeton est demandé tout de suite (dans le geste de l'utilisateur) puis partagé entre tous les envois.
+  const tokenP = getDriveToken();
+  tokenP.catch((e) => setMsg(upMsg, e.message, "err"));
+  list.forEach((file) => uploadOne(file, folder, tokenP));
 }
 
-function uploadOne(file, folder) {
+function putResumable(sessionUrl, file, onProgress) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("PUT", sessionUrl);
+    xhr.upload.onprogress = (e) => { if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100)); };
+    xhr.onload = () => {
+      if (xhr.status === 200 || xhr.status === 201) {
+        try { resolve(JSON.parse(xhr.responseText)); } catch (e) { reject(new Error("Réponse Drive illisible")); }
+      } else reject(new Error("Drive HTTP " + xhr.status));
+    };
+    xhr.onerror = () => reject(new Error("Connexion interrompue"));
+    xhr.send(file);
+  });
+}
+
+async function uploadOne(file, folder, tokenP) {
   const item = document.createElement("div"); item.className = "q-item";
   const top = document.createElement("div"); top.className = "q-top";
   const nm = document.createElement("span"); nm.className = "q-name"; nm.textContent = file.name;
@@ -419,57 +551,55 @@ function uploadOne(file, folder) {
   const fail = (text) => { st.textContent = text; st.className = "q-status err"; fill.style.width = "0"; };
 
   if (extOf(file.name) && BLOCKED_EXT.includes(extOf(file.name))) return fail("Type de fichier refusé");
-  if (file.size > MAX_SIZE) return fail("Dépasse 500 Mo");
+  if (file.size > MAX_SIZE) return fail("Dépasse 5 Go");
   if (file.size === 0) return fail("Fichier vide");
 
   const name = safeName(file.name);
-  const path = `${STORAGE_ROOT}/${folder}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}_${name.replace(/\s+/g, "_")}`;
-  const task = uploadBytesResumable(sRef(storage, path), file, { contentType: file.type || "application/octet-stream", contentDisposition: "attachment" });
+  const mime = file.type || "application/octet-stream";
+  let driveId = null;
+  try {
+    st.textContent = "Connexion à Drive…";
+    await tokenP;
+    const folderId = await ensureFolder(folder);
 
-  let started = false;
-  const watchdog = setTimeout(() => {
-    if (!started) {
-      try { task.cancel(); } catch (_) { /* ignore */ }
-      fail("Aucune réponse de Storage après 15 s : Storage n'est pas activé sur le projet, ou le nom du bucket est incorrect (" + firebaseConfig.storageBucket + ")");
-    }
-  }, 15000);
-
-  task.on("state_changed",
-    (s) => { if (s.bytesTransferred > 0) { started = true; clearTimeout(watchdog); } },
-    () => {}, () => {});
-  task.on("state_changed",
-    (s) => { const p = Math.round((s.bytesTransferred / s.totalBytes) * 100); fill.style.width = p + "%"; st.textContent = p + " %"; },
-    (err) => {
-      console.error("Envoi Storage :", err);
-      const code = (err && err.code) || "inconnu";
-      const hints = {
-        "storage/unauthorized": "refusé par les règles Storage (règles non publiées ou compte non admin)",
-        "storage/unauthenticated": "non connecté",
-        "storage/retry-limit-exceeded": "Storage injoignable : service non activé, mauvais bucket ou réseau",
-        "storage/bucket-not-found": "bucket introuvable : Storage n'est pas activé sur le projet",
-        "storage/project-not-found": "projet introuvable",
-        "storage/quota-exceeded": "quota dépassé"
-      };
-      clearTimeout(watchdog);
-      if (code === "storage/canceled") return;
-      fail("Échec : " + (hints[code] || code));
-    },
-    async () => {
-      try {
-        await addDoc(collection(db, COLLECTION), {
-          name, path, folder, size: file.size,
-          contentType: file.type || "application/octet-stream",
-          uploadedAt: serverTimestamp(),
-          uploadedBy: auth.currentUser.email
-        });
-        fill.style.width = "100%"; st.textContent = "✅ Terminé"; st.className = "q-status ok";
-      } catch (e) {
-        // Pas de fichier orphelin : si l'enregistrement échoue, on retire le fichier envoyé.
-        try { await deleteObject(task.snapshot.ref); } catch (_) { /* ignore */ }
-        fail("Enregistrement refusé");
-      }
+    // 1) Ouverture d'une session d'envoi reprenable
+    const init = await driveFetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&fields=id", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json; charset=UTF-8",
+        "X-Upload-Content-Type": mime,
+        "X-Upload-Content-Length": String(file.size)
+      },
+      body: JSON.stringify({ name, parents: [folderId], mimeType: mime })
     });
+    if (!init.ok) throw new Error("Drive HTTP " + init.status);
+    const sessionUrl = init.headers.get("Location");
+    if (!sessionUrl) throw new Error("Session d'envoi Drive introuvable");
+
+    // 2) Envoi du fichier avec progression
+    const meta = await putResumable(sessionUrl, file, (p) => { fill.style.width = p + "%"; st.textContent = p + " %"; });
+    driveId = meta.id;
+  } catch (e) {
+    return fail(e && e.message ? e.message.slice(0, 60) : "Échec de l'envoi");
+  }
+
+  // 3) Index dans Firestore
+  try {
+    await addDoc(collection(db, COLLECTION), {
+      name, driveId, folder, size: file.size,
+      contentType: mime,
+      uploadedAt: serverTimestamp(),
+      uploadedBy: auth.currentUser.email
+    });
+    fill.style.width = "100%"; st.textContent = "✅ Terminé"; st.className = "q-status ok";
+  } catch (e) {
+    // Pas de fichier orphelin : si l'enregistrement échoue, on retire le fichier envoyé sur Drive.
+    try { await driveFetch("https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(driveId), { method: "DELETE" }); } catch (_) { /* ignore */ }
+    fail("Enregistrement refusé");
+  }
 }
+
+updateDriveUI();
 </script>
 </body>
 </html>
